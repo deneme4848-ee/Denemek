@@ -1,1 +1,0 @@
-{"name":"korsan-dunyasi-2d","version":"0.1.0","private":true,"description":"Mobil tarayıcıda çalışan çok oyunculu 2D korsan prototipi","main":"server.js","scripts":{"start":"node server.js"},"dependencies":{"express":"^4.21.2","socket.io":"^4.8.1"}}
