@@ -352,7 +352,7 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
-// Kullanıcı & Oturum Yönetimi (İleride backend API'ye kolay bağlanacak yapı)
+// Kullanıcı & Oturum Yönetimi
 const USERS_STORAGE_KEY = 'pirate2d_users_v1';
 const SESSION_STORAGE_KEY = 'pirate2d_session_v1';
 let authMode = 'login';
@@ -367,7 +367,6 @@ function loadUsers() {
     users = [];
   }
 
-  // "Test" / "test" kullanıcısı yoksa otomatik oluştur
   const hasTest = users.some(u => u.username.toLowerCase() === 'test');
   if (!hasTest) {
     users.push({
@@ -628,7 +627,7 @@ function addExp(amount) {
     player.maxHp += 150;
     player.hp = player.maxHp;
     player.damage += 35;
-    addFloatingText(player.x, player.y - 38, `SEVİYE ${player.level}!`, '#38bdf8');
+    addFloatingText(player.x, player.y - 46, `SEVİYE ${player.level}!`, '#38bdf8');
   }
   updateHUD();
 }
@@ -780,7 +779,7 @@ canvas.addEventListener('pointerdown', e => {
   const worldY = world.y;
 
   let clickedEnemy = null;
-  let bestDist = 48;
+  let bestDist = 50;
   for (const enemy of enemies) {
     const d = Math.hypot(worldX - enemy.x, worldY - enemy.y);
     if (d <= bestDist) {
@@ -844,17 +843,17 @@ function lerpAngle(a, b, t) {
 }
 
 function updateWake(ship, isMoving) {
-  if (isMoving && Math.random() < 0.45) {
+  if (isMoving && Math.random() < 0.55) {
     ship.wake.push({
-      x: ship.x - Math.cos(ship.a) * 20,
-      y: ship.y - Math.sin(ship.a) * 20,
-      r: 4,
-      alpha: 0.45
+      x: ship.x - Math.cos(ship.a) * 24,
+      y: ship.y - Math.sin(ship.a) * 24,
+      r: 4.5,
+      alpha: 0.5
     });
   }
   for (let i = ship.wake.length - 1; i >= 0; i--) {
     const w = ship.wake[i];
-    w.r += 0.25;
+    w.r += 0.28;
     w.alpha -= 0.012;
     if (w.alpha <= 0) ship.wake.splice(i, 1);
   }
@@ -872,7 +871,7 @@ function update() {
         player.lastRegenTick = now;
         const healAmount = Math.min(100, player.maxHp - player.hp);
         player.hp += healAmount;
-        addFloatingText(player.x, player.y - 34, `+${healAmount}`, '#4ade80');
+        addFloatingText(player.x, player.y - 42, `+${healAmount}`, '#4ade80');
         updateHUD();
       }
       const nextTickSec = Math.max(1, Math.ceil((5000 - (now - player.lastRegenTick)) / 1000));
@@ -914,7 +913,7 @@ function update() {
 
   for (const isl of islands) {
     const dist = Math.hypot(player.x - isl.x, player.y - isl.y);
-    const minDist = isl.r + 18;
+    const minDist = isl.r + 22;
     if (dist < minDist) {
       const ang = Math.atan2(player.y - isl.y, player.x - isl.x);
       player.x = isl.x + Math.cos(ang) * minDist;
@@ -937,7 +936,7 @@ function update() {
 
   for (let i = treasures.length - 1; i >= 0; i--) {
     const tr = treasures[i];
-    if (Math.hypot(player.x - tr.x, player.y - tr.y) < 34) {
+    if (Math.hypot(player.x - tr.x, player.y - tr.y) < 36) {
       treasures.splice(i, 1);
       player.score += 25;
       addExp(20);
@@ -979,10 +978,10 @@ function update() {
 
     for (const isl of islands) {
       const dist = Math.hypot(e.x - isl.x, e.y - isl.y);
-      if (dist < isl.r + 18) {
+      if (dist < isl.r + 22) {
         const ang = Math.atan2(e.y - isl.y, e.x - isl.x);
-        e.x = isl.x + Math.cos(ang) * (isl.r + 18);
-        e.y = isl.y + Math.sin(ang) * (isl.r + 18);
+        e.x = isl.x + Math.cos(ang) * (isl.r + 22);
+        e.y = isl.y + Math.sin(ang) * (isl.r + 22);
         e.targetAngle = ang;
       }
     }
@@ -1019,9 +1018,9 @@ function update() {
       const dy = targetEnemy.y - s.y;
       const dist = Math.hypot(dx, dy);
 
-      if (dist <= s.speed + 14) {
+      if (dist <= s.speed + 16) {
         targetEnemy.hp -= s.damage;
-        addFloatingText(targetEnemy.x, targetEnemy.y - 28, `-${s.damage}`, '#ffd783');
+        addFloatingText(targetEnemy.x, targetEnemy.y - 38, `-${s.damage}`, '#ffd783');
         spawnImpactEffects(targetEnemy.x, targetEnemy.y, false);
 
         if (targetEnemy.hp <= 0) {
@@ -1048,11 +1047,11 @@ function update() {
       const dy = player.y - s.y;
       const dist = Math.hypot(dx, dy);
 
-      if (dist <= s.speed + 14) {
+      if (dist <= s.speed + 16) {
         player.hp = Math.max(0, player.hp - s.damage);
         player.lastHitTime = now;
         player.lastRegenTick = now;
-        addFloatingText(player.x, player.y - 28, `-${s.damage}`, '#f87171');
+        addFloatingText(player.x, player.y - 38, `-${s.damage}`, '#f87171');
         spawnImpactEffects(player.x, player.y, true);
         updateHUD();
 
@@ -1122,7 +1121,9 @@ function drawRangeRing(wx, wy) {
   ctx.restore();
 }
 
-function drawRealisticShip(p, isEnemy = false, isSelected = false) {
+// 3D Perspektifli / Hacimli Kalyon Çizimi
+function draw3DShip(p, isEnemy = false, isSelected = false) {
+  // Su izi köpükleri
   for (const w of p.wake || []) {
     ctx.save();
     ctx.globalAlpha = Math.max(0, w.alpha);
@@ -1133,20 +1134,19 @@ function drawRealisticShip(p, isEnemy = false, isSelected = false) {
     ctx.restore();
   }
 
+  // Seçili düşman hedef halkası
   if (isEnemy && isSelected) {
-    const pulse = 30 + Math.sin(Date.now() / 150) * 3;
+    const pulse = 38 + Math.sin(Date.now() / 150) * 3.5;
     ctx.save();
     ctx.strokeStyle = '#ef4444';
     ctx.lineWidth = 3;
-    ctx.setLineDash([8, 5]);
+    ctx.setLineDash([9, 5]);
     ctx.beginPath();
-    ctx.arc(p.x, p.y, pulse, 0, Math.PI * 2);
+    ctx.ellipse(p.x, p.y + 4, pulse, pulse * 0.72, 0, 0, Math.PI * 2);
     ctx.stroke();
 
     ctx.setLineDash([]);
     ctx.fillStyle = 'rgba(239, 68, 68, 0.14)';
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, pulse, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
   }
@@ -1154,108 +1154,209 @@ function drawRealisticShip(p, isEnemy = false, isSelected = false) {
   ctx.save();
   ctx.translate(p.x, p.y);
 
+  // Düşman can çubuğu (3D üstte)
   if (isEnemy && p.hp < p.maxHp) {
-    ctx.fillStyle = 'rgba(0,0,0,0.6)';
-    ctx.fillRect(-20, -36, 40, 5);
+    ctx.fillStyle = 'rgba(0,0,0,0.68)';
+    ctx.fillRect(-24, -48, 48, 6);
     ctx.fillStyle = '#ef4444';
-    ctx.fillRect(-20, -36, 40 * (p.hp / p.maxHp), 5);
+    ctx.fillRect(-24, -48, 48 * (p.hp / p.maxHp), 6);
   }
+
+  // 3D İzometrik Gölge (su yüzeyinde kaydırılmış)
+  ctx.save();
+  ctx.translate(7, 13);
+  ctx.rotate(p.a || 0);
+  ctx.scale(1, 0.85);
+  ctx.fillStyle = 'rgba(2, 22, 38, 0.42)';
+  ctx.beginPath();
+  ctx.moveTo(34, 0);
+  ctx.quadraticCurveTo(16, 19, -26, 15);
+  ctx.lineTo(-32, 0);
+  ctx.lineTo(-26, -15);
+  ctx.quadraticCurveTo(16, -19, 34, 0);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
 
   ctx.rotate(p.a || 0);
 
-  ctx.fillStyle = 'rgba(0, 20, 35, 0.35)';
+  // 1. KATMAN: 3D Gövde Alt Yan Duvarı (Depth / Extrusion)
+  ctx.fillStyle = isEnemy ? '#190706' : '#2b1406';
   ctx.beginPath();
-  ctx.moveTo(27, 4);
-  ctx.quadraticCurveTo(10, 18, -22, 13);
-  ctx.lineTo(-27, 4);
-  ctx.lineTo(-22, -6);
-  ctx.quadraticCurveTo(10, -10, 27, 4);
+  ctx.moveTo(33, 5);
+  ctx.quadraticCurveTo(15, 22, -25, 18);
+  ctx.lineTo(-31, 6);
+  ctx.lineTo(-25, 11);
+  ctx.quadraticCurveTo(15, 14, 33, 0);
   ctx.closePath();
   ctx.fill();
 
-  const hullGrad = ctx.createLinearGradient(0, -14, 0, 14);
+  // 2. KATMAN: Ana 3D Gövde (Işık/Gölge Gradyanı)
+  const hullGrad = ctx.createLinearGradient(0, -18, 0, 18);
   if (isEnemy) {
-    hullGrad.addColorStop(0, '#4a1c16');
-    hullGrad.addColorStop(0.5, '#2b100d');
-    hullGrad.addColorStop(1, '#180807');
+    hullGrad.addColorStop(0, '#7f1d1d');
+    hullGrad.addColorStop(0.45, '#450a0a');
+    hullGrad.addColorStop(1, '#1c0505');
   } else {
-    hullGrad.addColorStop(0, '#8c5327');
-    hullGrad.addColorStop(0.5, '#5c3314');
-    hullGrad.addColorStop(1, '#381d09');
+    hullGrad.addColorStop(0, '#b46932');
+    hullGrad.addColorStop(0.45, '#6e3b16');
+    hullGrad.addColorStop(1, '#3b1d08');
   }
 
   ctx.fillStyle = hullGrad;
   ctx.beginPath();
-  ctx.moveTo(28, 0);
-  ctx.quadraticCurveTo(12, 15, -21, 11);
-  ctx.lineTo(-26, 0);
-  ctx.lineTo(-21, -11);
-  ctx.quadraticCurveTo(12, -15, 28, 0);
+  ctx.moveTo(34, 0);
+  ctx.quadraticCurveTo(16, 18, -25, 14);
+  ctx.lineTo(-31, 0);
+  ctx.lineTo(-25, -14);
+  ctx.quadraticCurveTo(16, -18, 34, 0);
   ctx.closePath();
   ctx.fill();
 
-  ctx.strokeStyle = isEnemy ? '#fca5a5' : '#f3d59b';
-  ctx.lineWidth = 1.8;
+  // Altın / Metalik Borda Şeridi
+  ctx.strokeStyle = isEnemy ? '#f87171' : '#f6d388';
+  ctx.lineWidth = 2;
   ctx.stroke();
 
-  ctx.fillStyle = isEnemy ? '#6b2920' : '#a86b38';
+  // 3. KATMAN: Yükseltilmiş Ahşap Güverte (3D İç Platform)
+  const deckGrad = ctx.createLinearGradient(-20, -10, 24, 10);
+  if (isEnemy) {
+    deckGrad.addColorStop(0, '#5c1f1a');
+    deckGrad.addColorStop(1, '#8c352b');
+  } else {
+    deckGrad.addColorStop(0, '#8f5629');
+    deckGrad.addColorStop(1, '#c98549');
+  }
+  ctx.fillStyle = deckGrad;
   ctx.beginPath();
-  ctx.moveTo(21, 0);
-  ctx.quadraticCurveTo(8, 10, -17, 7);
-  ctx.lineTo(-20, 0);
-  ctx.lineTo(-17, -7);
-  ctx.quadraticCurveTo(8, -10, 21, 0);
+  ctx.moveTo(27, 0);
+  ctx.quadraticCurveTo(11, 12, -21, 9);
+  ctx.lineTo(-25, 0);
+  ctx.lineTo(-21, -9);
+  ctx.quadraticCurveTo(11, -12, 27, 0);
   ctx.closePath();
   ctx.fill();
 
-  ctx.fillStyle = '#0f172a';
-  for (const lx of [-8, 1, 10]) {
-    ctx.fillRect(lx, -10.5, 4, 2.2);
-    ctx.fillRect(lx, 8.3, 4, 2.2);
+  // Güverte tahta çizgileri
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.22)';
+  ctx.lineWidth = 1;
+  for (const dx of [-14, -6, 2, 10, 18]) {
+    ctx.beginPath();
+    ctx.moveTo(dx, -7);
+    ctx.lineTo(dx, 7);
+    ctx.stroke();
   }
 
-  ctx.strokeStyle = '#3b2314';
-  ctx.lineWidth = 2.6;
+  // Pruva ve Kıç Kasarası (3D Yükselti)
+  ctx.fillStyle = isEnemy ? '#3b0d0b' : '#572d10';
+  ctx.fillRect(-24, -8, 9, 16);
+  ctx.fillRect(17, -6, 8, 12);
+
+  // 4. KATMAN: 3D Top Namluları (Bordadan Dışa Uzanan)
+  for (const cx of [-11, -2, 7, 15]) {
+    // Üst borda topu
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(cx, -14.5, 5, 4);
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillRect(cx + 3.5, -14.5, 1.5, 4);
+
+    // Alt borda topu
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(cx, 10.5, 5, 4);
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillRect(cx + 3.5, 10.5, 1.5, 4);
+  }
+
+  // 5. KATMAN: 3D Direkler, Arma ve Şişkin Yelkenler
+  const masts = [-12, 1, 14];
+  const sailSizes = [
+    { w: 12, h: 15, curve: 6 },
+    { w: 15, h: 19, curve: 8 },
+    { w: 10, h: 13, curve: 5 }
+  ];
+
+  // Omurga / Direk hattı
+  ctx.strokeStyle = '#2d1608';
+  ctx.lineWidth = 3;
   ctx.beginPath();
-  ctx.moveTo(-10, 0);
-  ctx.lineTo(8, 0);
+  ctx.moveTo(-16, 0);
+  ctx.lineTo(24, 0);
   ctx.stroke();
 
-  ctx.fillStyle = isEnemy ? '#dc2626' : '#f8ecd2';
-  ctx.strokeStyle = isEnemy ? '#7f1d1d' : '#cbb382';
-  ctx.lineWidth = 1;
+  masts.forEach((mx, idx) => {
+    const s = sailSizes[idx];
 
+    // Yelken gölgesi (güverteye düşen)
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.24)';
+    ctx.beginPath();
+    ctx.ellipse(mx + 4, 3, s.curve * 0.7, s.h * 0.75, 0.2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Direk gövdesi
+    ctx.fillStyle = isEnemy ? '#3f1d18' : '#5c3314';
+    ctx.beginPath();
+    ctx.arc(mx, 0, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Şişkin 3D Yelken (Rüzgârla kavisli)
+    const sailGrad = ctx.createLinearGradient(mx - s.curve, -s.h, mx + s.curve, s.h);
+    if (isEnemy) {
+      sailGrad.addColorStop(0, '#ef4444');
+      sailGrad.addColorStop(0.5, '#b91c1c');
+      sailGrad.addColorStop(1, '#450a0a');
+    } else {
+      sailGrad.addColorStop(0, '#fffbeb');
+      sailGrad.addColorStop(0.55, '#f5ebd6');
+      sailGrad.addColorStop(1, '#cbb382');
+    }
+
+    ctx.fillStyle = sailGrad;
+    ctx.strokeStyle = isEnemy ? '#7f1d1d' : '#b89b67';
+    ctx.lineWidth = 1.1;
+
+    ctx.beginPath();
+    ctx.moveTo(mx - 2, -s.h);
+    ctx.quadraticCurveTo(mx + s.curve + 4, 0, mx - 2, s.h);
+    ctx.quadraticCurveTo(mx + s.curve * 0.25, 0, mx - 2, -s.h);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  });
+
+  // Baş Cıvadrası ve Ön Flok Yelkeni
+  ctx.strokeStyle = isEnemy ? '#7f1d1d' : '#6e3b16';
+  ctx.lineWidth = 2.4;
   ctx.beginPath();
-  ctx.moveTo(-4, -11);
-  ctx.quadraticCurveTo(6, 0, -4, 11);
-  ctx.quadraticCurveTo(-1, 0, -4, -11);
+  ctx.moveTo(28, 0);
+  ctx.lineTo(42, 0);
+  ctx.stroke();
+
+  ctx.fillStyle = isEnemy ? '#dc2626' : '#fef3c7';
+  ctx.beginPath();
+  ctx.moveTo(22, 0);
+  ctx.quadraticCurveTo(33, 6, 41, 0);
+  ctx.quadraticCurveTo(33, -6, 22, 0);
   ctx.closePath();
   ctx.fill();
-  ctx.stroke();
 
-  ctx.beginPath();
-  ctx.moveTo(8, -8);
-  ctx.quadraticCurveTo(19, 0, 8, 8);
-  ctx.quadraticCurveTo(11, 0, 8, -8);
-  ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
-
+  // Kıç Sancak Bayrağı (Dalgalanan)
+  const flagWave = Math.sin(Date.now() / 160 + (p.x || 0) * 0.05) * 3;
   ctx.fillStyle = isEnemy ? '#ef4444' : '#fbbf24';
   ctx.beginPath();
-  ctx.moveTo(-22, 0);
-  ctx.lineTo(-31, -4);
-  ctx.lineTo(-29, 0);
-  ctx.lineTo(-31, 4);
+  ctx.moveTo(-29, 0);
+  ctx.lineTo(-41, -5 + flagWave);
+  ctx.lineTo(-38, 0 + flagWave * 0.5);
+  ctx.lineTo(-41, 5 + flagWave);
   ctx.closePath();
   ctx.fill();
 
   ctx.restore();
 
+  // Kaptan / Gemi İsmi
   ctx.fillStyle = isEnemy ? (isSelected ? '#fecaca' : '#fca5a5') : '#ffffff';
   ctx.textAlign = 'center';
-  ctx.font = '600 12px system-ui';
-  ctx.fillText(p.name, p.x, p.y - 25);
+  ctx.font = '700 12px system-ui';
+  ctx.fillText(p.name, p.x, p.y - 34);
 }
 
 function drawMinimap() {
@@ -1385,10 +1486,10 @@ function draw() {
   for (const e of enemies) {
     if (e.x < cam.x - 120 || e.x > cam.x + viewW + 120 ||
         e.y < cam.y - 120 || e.y > cam.y + viewH + 120) continue;
-    drawRealisticShip(e, true, e.id === selectedEnemyId);
+    draw3DShip(e, true, e.id === selectedEnemyId);
   }
 
-  drawRealisticShip(player, false, false);
+  draw3DShip(player, false, false);
 
   for (const sw of shockwaves) {
     ctx.save();
@@ -1412,8 +1513,10 @@ function draw() {
   }
 
   for (const fl of flashes) {
+    const fx = fl.x;
+    const fy = fl.y;
     ctx.save();
-    ctx.translate(fl.x, fl.y);
+    ctx.translate(fx, fy);
     ctx.rotate(fl.angle);
     ctx.globalAlpha = Math.max(0, fl.life);
     const grad = ctx.createRadialGradient(0, 0, 1, 0, 0, fl.radius);
@@ -1446,7 +1549,6 @@ function draw() {
   requestAnimationFrame(draw);
 }
 
-// Başlangıçta Test kullanıcısını hazırla ve aktif oturum varsa doğrudan gir
 loadUsers();
 try {
   const savedSession = JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY) || 'null');
