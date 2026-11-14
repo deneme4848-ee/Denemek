@@ -271,8 +271,8 @@ const SHIP_MODELS = {
   standard: { id: 'standard', name: '8 Yönlü Efsanevi Gemi', desc: 'Şeffaf PNG Sprite Filosu', cost: 0 }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v12';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v12';
+const USERS_STORAGE_KEY = 'pirate3d_users_v13';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v13';
 let authMode = 'login';
 let currentUser = null;
 
@@ -331,62 +331,96 @@ if (authForm) {
 if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeItem(SESSION_STORAGE_KEY); location.reload(); });
 
 // ==========================================================
-// BOYUT NORMALİZASYONU VE CANLI OKYANUS DOKUSU
+// DOĞRU YÖN HARİTALAMA VE GERÇEKÇİ OKYANUS DOKUSU
 // ==========================================================
 let scene, camera, renderer;
-let playerSprite, playerWakeRing, enemies = [], rangeRingMesh, oceanTexture;
+let playerSprite, playerWakeRing, enemies = [], rangeRingMesh, oceanTexture, oceanBumpTexture;
 let raycaster, planeGeo, mouse;
 let shipTextures = {};
 let textureLoader;
 const WORLD_SIZE = 4000;
 const ATTACK_RANGE = 320;
 const AGGRO_RANGE = 300;
-const BASE_SHIP_HEIGHT = 95; // Tüm yönler için sabit görsel yükseklik
+const BASE_SHIP_HEIGHT = 95;
 
-// Deniz yüzeyine hareketli dalga ve köpük dokusu üreten Canvas
-function createOceanTexture() {
-  const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 512;
-  const ctx = canvas.getContext('2d');
+// Yüksek kaliteli çok katmanlı derin okyanus ve ışık yansıması dokusu
+function createHighQualityOceanTextures() {
+  const size = 1024;
+  const colorCanvas = document.createElement('canvas');
+  colorCanvas.width = size;
+  colorCanvas.height = size;
+  const ctx = colorCanvas.getContext('2d');
 
-  // Derin okyanus tabanı
-  const grad = ctx.createLinearGradient(0, 0, 512, 512);
-  grad.addColorStop(0, '#072a3e');
-  grad.addColorStop(0.5, '#0a3a54');
-  grad.addColorStop(1, '#062233');
+  // 1. Derin turkuaz-lacivert okyanus gradyanı
+  const grad = ctx.createRadialGradient(size/2, size/2, 50, size/2, size/2, size/1.2);
+  grad.addColorStop(0, '#0c4a6e');
+  grad.addColorStop(0.5, '#07334d');
+  grad.addColorStop(1, '#042033');
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 512, 512);
+  ctx.fillRect(0, 0, size, size);
 
-  // Dalga parıltıları ve su dokusu
-  ctx.strokeStyle = 'rgba(56, 189, 248, 0.14)';
-  ctx.lineWidth = 2;
-  for (let y = 0; y < 512; y += 24) {
+  // 2. Organik su halkaları ve kaustik (su altı ışık kırılması) desenleri
+  for (let i = 0; i < 420; i++) {
+    const cx = Math.random() * size;
+    const cy = Math.random() * size;
+    const rx = 25 + Math.random() * 65;
+    const ry = 10 + Math.random() * 28;
+    const rot = Math.random() * Math.PI;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rot);
     ctx.beginPath();
-    for (let x = 0; x <= 512; x += 16) {
-      const waveY = y + Math.sin((x / 512) * Math.PI * 4 + y) * 5;
-      if (x === 0) ctx.moveTo(x, waveY);
-      else ctx.lineTo(x, waveY);
-    }
+    ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = i % 2 === 0 ? 'rgba(56, 189, 248, 0.09)' : 'rgba(14, 165, 233, 0.07)';
+    ctx.lineWidth = 1.5;
     ctx.stroke();
+    ctx.restore();
   }
 
-  // Hafif su köpüğü benekleri
-  ctx.fillStyle = 'rgba(186, 230, 253, 0.08)';
-  for (let i = 0; i < 180; i++) {
-    ctx.beginPath();
-    ctx.arc(Math.random() * 512, Math.random() * 512, Math.random() * 3 + 1, 0, Math.PI * 2);
-    ctx.fill();
+  // 3. Dalga sırtlarında güneş/ay parıltıları
+  for (let i = 0; i < 300; i++) {
+    const x = Math.random() * size;
+    const y = Math.random() * size;
+    const w = 12 + Math.random() * 35;
+    ctx.fillStyle = 'rgba(186, 230, 253, 0.07)';
+    ctx.fillRect(x, y, w, 1.5);
   }
 
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.wrapS = THREE.RepeatWrapping;
-  tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(45, 45);
-  return tex;
+  // Kabartma (Bump Map) dokusu - Işığın dalgalar üzerinde gerçekçi kırılması için
+  const bumpCanvas = document.createElement('canvas');
+  bumpCanvas.width = size;
+  bumpCanvas.height = size;
+  const bCtx = bumpCanvas.getContext('2d');
+  bCtx.fillStyle = '#808080';
+  bCtx.fillRect(0, 0, size, size);
+
+  for (let i = 0; i < 600; i++) {
+    const x = Math.random() * size;
+    const y = Math.random() * size;
+    const r = 15 + Math.random() * 45;
+    const bGrad = bCtx.createRadialGradient(x, y, 1, x, y, r);
+    bGrad.addColorStop(0, 'rgba(255,255,255,0.22)');
+    bGrad.addColorStop(1, 'rgba(128,128,128,0)');
+    bCtx.fillStyle = bGrad;
+    bCtx.beginPath();
+    bCtx.arc(x, y, r, 0, Math.PI * 2);
+    bCtx.fill();
+  }
+
+  const mapTex = new THREE.CanvasTexture(colorCanvas);
+  mapTex.wrapS = THREE.RepeatWrapping;
+  mapTex.wrapT = THREE.RepeatWrapping;
+  mapTex.repeat.set(32, 32);
+
+  const bumpTex = new THREE.CanvasTexture(bumpCanvas);
+  bumpTex.wrapS = THREE.RepeatWrapping;
+  bumpTex.wrapT = THREE.RepeatWrapping;
+  bumpTex.repeat.set(32, 32);
+
+  return { mapTex, bumpTex };
 }
 
-// Görselin gerçek piksel sınırlarını kırpıp (trim) tüm yönleri eşit boyuta getiren fonksiyon
 function normalizeSpriteTexture(rawTexture) {
   const img = rawTexture.image;
   if (!img || !img.width) return { texture: rawTexture, aspect: 1 };
@@ -422,7 +456,6 @@ function normalizeSpriteTexture(rawTexture) {
     return { texture: rawTexture, aspect: img.width / img.height };
   }
 
-  // Boş şeffaf kenarları kırpıp gemiyi tam merkeze ve eşit boyuta oturt
   const trimW = maxX - minX + 1;
   const trimH = maxY - minY + 1;
   const trimCanvas = document.createElement('canvas');
@@ -438,14 +471,14 @@ function normalizeSpriteTexture(rawTexture) {
 
 function loadShipTextures(onAllLoaded) {
   const textureFiles = {
-    right: 'gemi11.png',
-    topRight: 'gemi12.png',
-    top: 'gemi13.png',
-    topLeft: 'gemi14.png',
-    left: 'gemi15.png',
-    bottomLeft: 'gemi16.png',
-    bottom: 'gemi17.png',
-    bottomRight: 'gemi18.png'
+    right: 'gemi11.png',       // tam sağ
+    topRight: 'gemi12.png',    // sağ üst
+    top: 'gemi13.png',         // tam yukarı
+    topLeft: 'gemi14.png',     // sol üst
+    left: 'gemi15.png',        // tam sol
+    bottomLeft: 'gemi16.png',  // sol alt
+    bottom: 'gemi17.png',      // tam aşağı
+    bottomRight: 'gemi18.png'  // sağ alt
   };
 
   let loadedCount = 0;
@@ -464,18 +497,20 @@ function loadShipTextures(onAllLoaded) {
   }
 }
 
+// DÜZELTİLEN YÖN HESABI:
+// Three.js'te: +X = Sağ (0°), +Z = Aşağı (90°), -X = Sol (180°), -Z = Yukarı (270°)
 function getDirectionSpriteData(angle) {
   let deg = (angle * (180 / Math.PI)) % 360;
   if (deg < 0) deg += 360;
 
-  if (deg >= 337.5 || deg < 22.5) return shipTextures.right || shipTextures.top;
-  if (deg >= 22.5 && deg < 67.5) return shipTextures.topRight || shipTextures.top;
-  if (deg >= 67.5 && deg < 112.5) return shipTextures.top || shipTextures.right;
-  if (deg >= 112.5 && deg < 157.5) return shipTextures.topLeft || shipTextures.top;
-  if (deg >= 157.5 && deg < 202.5) return shipTextures.left || shipTextures.top;
-  if (deg >= 202.5 && deg < 247.5) return shipTextures.bottomLeft || shipTextures.top;
-  if (deg >= 247.5 && deg < 292.5) return shipTextures.bottom || shipTextures.right;
-  return shipTextures.bottomRight || shipTextures.top;
+  if (deg >= 337.5 || deg < 22.5) return shipTextures.right || shipTextures.top;       // 0° -> Tam Sağ (+X)
+  if (deg >= 22.5 && deg < 67.5) return shipTextures.bottomRight || shipTextures.top;  // 45° -> Sağ Alt (+X, +Z)
+  if (deg >= 67.5 && deg < 112.5) return shipTextures.bottom || shipTextures.right;    // 90° -> Tam Aşağı (+Z)
+  if (deg >= 112.5 && deg < 157.5) return shipTextures.bottomLeft || shipTextures.top; // 135° -> Sol Alt (-X, +Z)
+  if (deg >= 157.5 && deg < 202.5) return shipTextures.left || shipTextures.top;       // 180° -> Tam Sol (-X)
+  if (deg >= 202.5 && deg < 247.5) return shipTextures.topLeft || shipTextures.top;    // 225° -> Sol Üst (-X, -Z)
+  if (deg >= 247.5 && deg < 292.5) return shipTextures.top || shipTextures.right;      // 270° -> Tam Yukarı (-Z)
+  return shipTextures.topRight || shipTextures.top;                                    // 315° -> Sağ Üst (+X, -Z)
 }
 
 function applyNormalizedSprite(sprite, angle, baseHeight = BASE_SHIP_HEIGHT) {
@@ -487,8 +522,8 @@ function applyNormalizedSprite(sprite, angle, baseHeight = BASE_SHIP_HEIGHT) {
 
 function initThreeGame() {
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x062436);
-  scene.fog = new THREE.FogExp2(0x062436, 0.00045);
+  scene.background = new THREE.Color(0x052236);
+  scene.fog = new THREE.FogExp2(0x052236, 0.0004);
 
   camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 18000);
   camera.position.set(0, 600, 450);
@@ -501,26 +536,30 @@ function initThreeGame() {
 
   textureLoader = new THREE.TextureLoader();
 
-  const ambientLight = new THREE.AmbientLight(0xfff1e0, 1.1);
+  const ambientLight = new THREE.AmbientLight(0xe0f2fe, 0.95);
   scene.add(ambientLight);
 
-  const sunLight = new THREE.DirectionalLight(0xffb74d, 1.6);
-  sunLight.position.set(600, 900, 600);
+  const sunLight = new THREE.DirectionalLight(0xffedd5, 1.8);
+  sunLight.position.set(500, 850, 400);
   scene.add(sunLight);
 
-  // Dalgalı ve dokulu okyanus zemini
-  oceanTexture = createOceanTexture();
-  planeGeo = new THREE.PlaneGeometry(WORLD_SIZE * 3, WORLD_SIZE * 3, 40, 40);
+  // Yüksek kaliteli dalgalı ve kabartmalı deniz yüzeyi
+  const oceanTexData = createHighQualityOceanTextures();
+  oceanTexture = oceanTexData.mapTex;
+  oceanBumpTexture = oceanTexData.bumpTex;
+
+  planeGeo = new THREE.PlaneGeometry(WORLD_SIZE * 3, WORLD_SIZE * 3, 64, 64);
   const oceanMat = new THREE.MeshStandardMaterial({
     map: oceanTexture,
-    roughness: 0.25,
-    metalness: 0.2
+    bumpMap: oceanBumpTexture,
+    bumpScale: 4.5,
+    roughness: 0.18,
+    metalness: 0.45
   });
   const ocean = new THREE.Mesh(planeGeo, oceanMat);
   ocean.rotation.x = -Math.PI / 2;
   scene.add(ocean);
 
-  // Saldırı menzil halkası
   const ringGeo = new THREE.RingGeometry(ATTACK_RANGE - 3, ATTACK_RANGE, 64);
   const ringMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b, side: THREE.DoubleSide, transparent: true, opacity: 0.45 });
   rangeRingMesh = new THREE.Mesh(ringGeo, ringMat);
@@ -528,9 +567,8 @@ function initThreeGame() {
   rangeRingMesh.position.y = 0.6;
   scene.add(rangeRingMesh);
 
-  // Geminin suya oturduğunu gösteren beyaz köpük/dalga halkası
-  const wakeGeo = new THREE.RingGeometry(24, 38, 32);
-  const wakeMat = new THREE.MeshBasicMaterial({ color: 0xbae6fd, side: THREE.DoubleSide, transparent: true, opacity: 0.35 });
+  const wakeGeo = new THREE.RingGeometry(22, 36, 36);
+  const wakeMat = new THREE.MeshBasicMaterial({ color: 0xe0f2fe, side: THREE.DoubleSide, transparent: true, opacity: 0.35 });
   playerWakeRing = new THREE.Mesh(wakeGeo, wakeMat);
   playerWakeRing.rotation.x = -Math.PI / 2;
   playerWakeRing.position.y = 0.8;
@@ -595,7 +633,7 @@ function startGameLogic() {
   const initialData = shipTextures.top || Object.values(shipTextures)[0];
   const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1 });
   playerSprite = new THREE.Sprite(mat);
-  playerSprite.center.set(0.5, 0.22); // Geminin alt gövdesini tam su çizgisine oturtur
+  playerSprite.center.set(0.5, 0.22);
   applyNormalizedSprite(playerSprite, player.a);
   scene.add(playerSprite);
 
@@ -628,7 +666,7 @@ function spawnEnemySprite(id) {
   const initialData = shipTextures.top || Object.values(shipTextures)[0];
   const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1, color: 0xd1fae5 });
   const sprite = new THREE.Sprite(mat);
-  sprite.center.set(0.5, 0.22); // Düşman gemisini de su yüzeyine oturtur
+  sprite.center.set(0.5, 0.22);
   applyNormalizedSprite(sprite, 0);
   sprite.position.set(ex, 2, ez);
   sprite.userData.enemyId = id;
@@ -655,10 +693,11 @@ attackBtn.addEventListener('click', () => {
 function animate3D() {
   requestAnimationFrame(animate3D);
 
-  // Okyanus dalgalarını hafifçe kaydırarak canlı su akışı ver
-  if (oceanTexture) {
-    oceanTexture.offset.x += 0.0006;
-    oceanTexture.offset.y += 0.0004;
+  if (oceanTexture && oceanBumpTexture) {
+    oceanTexture.offset.x += 0.00045;
+    oceanTexture.offset.y += 0.0003;
+    oceanBumpTexture.offset.x -= 0.00035;
+    oceanBumpTexture.offset.y += 0.0004;
   }
 
   if (!player || isGameOver) {
@@ -689,7 +728,6 @@ function animate3D() {
     applyNormalizedSprite(playerSprite, player.a);
   }
 
-  // Su köpüğü halkasını geminin altında ritmik olarak genişlet
   if (playerWakeRing) {
     playerWakeRing.position.set(player.x, 0.8, player.z);
     const pulse = 1 + Math.sin(Date.now() / 220) * 0.15 + (player.speed * 0.15);
