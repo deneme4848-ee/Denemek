@@ -488,7 +488,7 @@ const SHIP_MODELS = {
   tasarim_1: {
     id: 'tasarim_1',
     name: 'Tasarım 1',
-    desc: 'Ejderha figürlü, koyu zırhlı ve kırmızı yelkenli özel tasarım.',
+    desc: 'Özel detaylı zırhlı ve kırmızı yelkenli özel tasarım.',
     cost: 500,
     isCustomPng: true,
     hullColor: '#291206',
@@ -1583,7 +1583,7 @@ function drawRangeRing(wx, wy) {
 }
 
 // ==========================================
-// GEMİ ÇİZİM FONKSİYONU (TASARIM 1 PNG + DİĞER MODELLER)
+// GEMİ ÇİZİM FONKSİYONU (TASARIM 1 PNG + BEYAZ ARKA PLAN ELEME / 'multiply')
 // ==========================================
 function draw3DShip(p, isEnemy = false, isSelected = false) {
   for (const w of p.wake || []) {
@@ -1620,7 +1620,7 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
     flagColor: '#dc2626'
   } : (p.shipModel || SHIP_MODELS.standard);
 
-  // Eğer Tasarım 1 seçiliyse özel PNG görselini düz ve net şekilde çiz
+  // Tasarım 1 seçiliyse görseli çiz (multiply modu ile beyaz arka planı okyanusta yok ediyoruz)
   if (!isEnemy && m.isCustomPng) {
     ctx.save();
     ctx.translate(p.x, p.y);
@@ -1644,9 +1644,12 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
     if (tasarim1Img.complete && tasarim1Img.naturalWidth > 0) {
       const shipWidth = 104;
       const shipHeight = 82;
+      
+      // Beyaz kareyi ortadan kaldırmak için blend mode kullanıyoruz
+      ctx.globalCompositeOperation = 'multiply';
       ctx.drawImage(tasarim1Img, -shipWidth / 2, -shipHeight / 2 - 8, shipWidth, shipHeight);
+      ctx.globalCompositeOperation = 'source-over';
     } else {
-      // Görsel yüklenene kadar yedek gövde
       ctx.fillStyle = '#451a03';
       ctx.beginPath();
       ctx.ellipse(0, 0, 34, 15, 0, 0, Math.PI * 2);
