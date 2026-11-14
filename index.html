@@ -885,7 +885,7 @@ function spawnEnemySprite(id) {
   const sprite = new THREE.Sprite(mat);
   sprite.center.set(0.5, 0.95);
   applyNormalizedSprite(sprite, 0);
-  sprite.position.set(ex, 12, ez);
+  sprite.position.set(ex, 50, ez);
   sprite.userData.enemyId = id;
   scene.add(sprite);
 
@@ -995,7 +995,7 @@ function animate3D() {
   coordDisplayEl.textContent = `X: ${Math.round((player.x / (WORLD_SIZE / 2)) * 50)} · Y: ${Math.round((player.z / (WORLD_SIZE / 2)) * 50)}`;
 
   if (playerSprite) {
-    playerSprite.position.set(player.x, 20, player.z);
+    playerSprite.position.set(player.x, 50, player.z);
     applyNormalizedSprite(playerSprite, player.a);
   }
 
