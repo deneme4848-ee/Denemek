@@ -20,7 +20,24 @@
     .panel {
       background: rgba(0, 30, 48, 0.84); backdrop-filter: blur(4px);
       padding: 10px 14px; border-radius: 12px; font-size: 13px;
-      border: 1px solid rgba(255,255,255,0.16); min-width: 225px;
+      border: 1px solid rgba(255,255,255,0.16); min-width: 235px;
+      pointer-events: auto;
+    }
+    .hud-top-row {
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    }
+    .logout-chip {
+      border: 1px solid rgba(255, 215, 131, 0.45);
+      background: rgba(143, 45, 20, 0.72);
+      color: #ffd783;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .logout-chip:hover {
+      background: rgba(185, 58, 26, 0.9);
     }
     .stat-row {
       display: flex; justify-content: space-between; align-items: center;
@@ -46,7 +63,7 @@
       flex-shrink: 0;
     }
     #hint {
-      position: fixed; top: 122px; left: 12px; font-size: 12px;
+      position: fixed; top: 132px; left: 12px; font-size: 12px;
       background: rgba(0, 30, 48, 0.72); padding: 6px 10px; border-radius: 8px;
       pointer-events: none; max-width: 72vw;
     }
@@ -90,6 +107,134 @@
       padding: 12px 28px; font-size: 16px; font-weight: bold; border-radius: 12px;
       border: 2px solid #ffd783; background: #a33d22; color: white; cursor: pointer;
     }
+
+    /* Giriş ve Kayıt Ol Ekranı */
+    #auth-overlay {
+      position: fixed; inset: 0; z-index: 20;
+      background: radial-gradient(circle at top, rgba(8, 125, 160, 0.55), rgba(3, 21, 34, 0.92));
+      backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 18px;
+      user-select: text; -webkit-user-select: text;
+    }
+    .auth-card {
+      width: 100%; max-width: 400px;
+      background: rgba(5, 29, 45, 0.94);
+      border: 1px solid rgba(255, 215, 131, 0.35);
+      border-radius: 18px;
+      padding: 24px 22px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);
+    }
+    .auth-brand {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+    .auth-brand h1 {
+      margin: 0;
+      font-size: 24px;
+      color: #ffd783;
+      letter-spacing: 0.4px;
+    }
+    .auth-brand p {
+      margin: 6px 0 0;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+    .auth-tab {
+      border: none;
+      background: transparent;
+      color: #cbd5e1;
+      padding: 9px 10px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .auth-tab.active {
+      background: linear-gradient(180deg, #c24929, #8f2d14);
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+    }
+    .auth-field {
+      margin-bottom: 12px;
+    }
+    .auth-field label {
+      display: block;
+      font-size: 12px;
+      color: #cbd5e1;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    .auth-field input {
+      width: 100%;
+      height: 42px;
+      padding: 0 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(15, 43, 64, 0.88);
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+    .auth-field input:focus {
+      border-color: #ffd783;
+    }
+    .auth-msg {
+      min-height: 18px;
+      font-size: 12px;
+      margin: 4px 0 12px;
+      color: #fca5a5;
+    }
+    .auth-msg.ok {
+      color: #4ade80;
+    }
+    .auth-submit {
+      width: 100%;
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid #ffd783;
+      background: linear-gradient(180deg, #c24929, #8f2d14);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      cursor: pointer;
+    }
+    .auth-submit:hover {
+      filter: brightness(1.08);
+    }
+    .quick-test-box {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #bae6fd;
+    }
+    .quick-test-btn {
+      border: 1px solid rgba(186, 230, 253, 0.35);
+      background: rgba(14, 116, 144, 0.35);
+      color: #e0f2fe;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
   </style>
 </head>
 <body>
@@ -98,8 +243,12 @@
 
   <div id="hud">
     <div class="panel">
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
-        <strong>Kara İnci</strong>
+      <div class="hud-top-row">
+        <strong id="ship-title">Kara İnci</strong>
+        <button id="logout-btn" class="logout-chip" title="Oturumu Kapat">Çıkış</button>
+      </div>
+      <div class="stat-row" style="margin-top:4px;">
+        <span>Kaptan: <strong id="captain-name">Test</strong></span>
         <span>Sv. <strong id="level">1</strong> · Altın: <strong id="score">0</strong></span>
       </div>
       <div class="stat-row">
@@ -129,6 +278,39 @@
     <button id="restart-btn">YENİDEN YELKEN AÇ</button>
   </div>
 
+  <!-- Giriş ve Kayıt Ol Modalı -->
+  <div id="auth-overlay">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <h1>⚓ Korsan Dünyası 2D</h1>
+        <p>Çok oyunculu denizler için gemi kaptan hesabınla giriş yap</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button id="tab-login" class="auth-tab active" type="button">Giriş Yap</button>
+        <button id="tab-register" class="auth-tab" type="button">Kayıt Ol</button>
+      </div>
+
+      <form id="auth-form">
+        <div class="auth-field">
+          <label for="auth-username">Gemi Kullanıcı İsmi</label>
+          <input id="auth-username" type="text" autocomplete="username" placeholder="Örn: Test" required>
+        </div>
+        <div class="auth-field">
+          <label for="auth-password">Şifre</label>
+          <input id="auth-password" type="password" autocomplete="current-password" placeholder="Şifreniz" required>
+        </div>
+        <div id="auth-msg" class="auth-msg"></div>
+        <button id="auth-submit" class="auth-submit" type="submit">Denize Açıl</button>
+      </form>
+
+      <div class="quick-test-box">
+        <span>Test Hesabı: <strong>Test</strong> / <strong>test</strong></span>
+        <button id="fill-test-btn" class="quick-test-btn" type="button">Hızlı Doldur</button>
+      </div>
+    </div>
+  </div>
+
 <script>
 const canvas = document.querySelector('#game');
 const ctx = canvas.getContext('2d');
@@ -145,6 +327,18 @@ const regenInfoEl = document.querySelector('#regen-info');
 const attackBtn = document.querySelector('#attack-btn');
 const gameOverEl = document.querySelector('#gameover');
 const finalScoreEl = document.querySelector('#final-score');
+const captainNameEl = document.querySelector('#captain-name');
+const logoutBtn = document.querySelector('#logout-btn');
+
+const authOverlay = document.querySelector('#auth-overlay');
+const tabLogin = document.querySelector('#tab-login');
+const tabRegister = document.querySelector('#tab-register');
+const authForm = document.querySelector('#auth-form');
+const authUsernameInput = document.querySelector('#auth-username');
+const authPasswordInput = document.querySelector('#auth-password');
+const authMsgEl = document.querySelector('#auth-msg');
+const authSubmitBtn = document.querySelector('#auth-submit');
+const fillTestBtn = document.querySelector('#fill-test-btn');
 
 let W, H, dpr;
 function resize() {
@@ -158,10 +352,143 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
+// Kullanıcı & Oturum Yönetimi (İleride backend API'ye kolay bağlanacak yapı)
+const USERS_STORAGE_KEY = 'pirate2d_users_v1';
+const SESSION_STORAGE_KEY = 'pirate2d_session_v1';
+let authMode = 'login';
+let currentUser = null;
+
+function loadUsers() {
+  let users = [];
+  try {
+    users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+    if (!Array.isArray(users)) users = [];
+  } catch {
+    users = [];
+  }
+
+  // "Test" / "test" kullanıcısı yoksa otomatik oluştur
+  const hasTest = users.some(u => u.username.toLowerCase() === 'test');
+  if (!hasTest) {
+    users.push({
+      id: 'user_test_default',
+      username: 'Test',
+      password: 'test',
+      createdAt: Date.now()
+    });
+    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+  }
+  return users;
+}
+
+function saveUsers(users) {
+  localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+}
+
+function setAuthMode(mode) {
+  authMode = mode;
+  authMsgEl.textContent = '';
+  authMsgEl.className = 'auth-msg';
+  if (mode === 'login') {
+    tabLogin.classList.add('active');
+    tabRegister.classList.remove('active');
+    authSubmitBtn.textContent = 'Giriş Yap ve Yelken Aç';
+    authPasswordInput.setAttribute('autocomplete', 'current-password');
+  } else {
+    tabRegister.classList.add('active');
+    tabLogin.classList.remove('active');
+    authSubmitBtn.textContent = 'Kayıt Ol ve Gemi Al';
+    authPasswordInput.setAttribute('autocomplete', 'new-password');
+  }
+}
+
+tabLogin.addEventListener('click', () => setAuthMode('login'));
+tabRegister.addEventListener('click', () => setAuthMode('register'));
+
+fillTestBtn.addEventListener('click', () => {
+  setAuthMode('login');
+  authUsernameInput.value = 'Test';
+  authPasswordInput.value = 'test';
+  authMsgEl.textContent = 'Test hesabı bilgileri dolduruldu.';
+  authMsgEl.className = 'auth-msg ok';
+});
+
+function completeLogin(user) {
+  currentUser = { id: user.id, username: user.username };
+  localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
+  captainNameEl.textContent = currentUser.username;
+  authOverlay.style.display = 'none';
+  initGame();
+}
+
+authForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const username = authUsernameInput.value.trim();
+  const password = authPasswordInput.value;
+
+  if (!username || !password) {
+    authMsgEl.textContent = 'Lütfen kullanıcı ismi ve şifre girin.';
+    authMsgEl.className = 'auth-msg';
+    return;
+  }
+
+  const users = loadUsers();
+
+  if (authMode === 'register') {
+    if (username.length < 2 || username.length > 20) {
+      authMsgEl.textContent = 'Kullanıcı ismi 2-20 karakter arasında olmalı.';
+      authMsgEl.className = 'auth-msg';
+      return;
+    }
+    const exists = users.some(u => u.username.toLowerCase() === username.toLowerCase());
+    if (exists) {
+      authMsgEl.textContent = 'Bu gemi kullanıcı ismi zaten kayıtlı.';
+      authMsgEl.className = 'auth-msg';
+      return;
+    }
+    const newUser = {
+      id: 'user_' + Date.now(),
+      username,
+      password,
+      createdAt: Date.now()
+    };
+    users.push(newUser);
+    saveUsers(users);
+    authMsgEl.textContent = 'Kayıt başarılı! Gemine geçiliyor...';
+    authMsgEl.className = 'auth-msg ok';
+    setTimeout(() => completeLogin(newUser), 250);
+    return;
+  }
+
+  const found = users.find(
+    u => u.username.toLowerCase() === username.toLowerCase() && u.password === password
+  );
+  if (!found) {
+    authMsgEl.textContent = 'Gemi kullanıcı ismi veya şifre hatalı.';
+    authMsgEl.className = 'auth-msg';
+    return;
+  }
+
+  authMsgEl.textContent = 'Giriş başarılı!';
+  authMsgEl.className = 'auth-msg ok';
+  setTimeout(() => completeLogin(found), 180);
+});
+
+logoutBtn.addEventListener('click', () => {
+  localStorage.removeItem(SESSION_STORAGE_KEY);
+  currentUser = null;
+  isAttacking = false;
+  targetPos = null;
+  authOverlay.style.display = 'flex';
+  authUsernameInput.value = 'Test';
+  authPasswordInput.value = 'test';
+  setAuthMode('login');
+});
+
 const WORLD_SIZE = 2400;
-const CAMERA_ZOOM = 0.72; // Haritayı daha geniş gösteren kamera uzaklaştırma oranı
+const CAMERA_ZOOM = 0.72;
 const ATTACK_RANGE = 230;
-const ENEMY_ATTACK_RANGE = ATTACK_RANGE / 2; // NPC atış menzili oyuncunun yarısı kadar
+const ENEMY_ATTACK_RANGE = ATTACK_RANGE / 2;
 const PLAYER_MAX_SPEED = 1.85;
 const ENEMY_MAX_SPEED = PLAYER_MAX_SPEED * (2 / 3);
 const ENEMY_DAMAGE = 10;
@@ -188,14 +515,6 @@ function screenToWorld(clientX, clientY) {
   return {
     x: cam.x + clientX / CAMERA_ZOOM,
     y: cam.y + clientY / CAMERA_ZOOM
-  };
-}
-
-function worldToScreen(wx, wy) {
-  const cam = getCameraOrigin();
-  return {
-    x: (wx - cam.x) * CAMERA_ZOOM,
-    y: (wy - cam.y) * CAMERA_ZOOM
   };
 }
 
@@ -230,13 +549,14 @@ function initGame() {
   gameOverEl.style.display = 'none';
 
   const now = Date.now();
+  const captain = currentUser ? currentUser.username : 'Test';
   player = {
-    id: 'player',
+    id: currentUser ? currentUser.id : 'player',
     x: 0, y: 0, a: 0, speed: 0, maxSpeed: PLAYER_MAX_SPEED,
     hp: 1000, maxHp: 1000,
     exp: 0, maxExp: 100, level: 1,
     damage: 180,
-    score: 0, name: 'Kara İnci',
+    score: 0, name: captain,
     wake: [],
     lastHitTime: now,
     lastRegenTick: now
@@ -452,7 +772,7 @@ function fireLockedCannon(shooter, target, isPlayer) {
 }
 
 canvas.addEventListener('pointerdown', e => {
-  if (isGameOver) return;
+  if (!currentUser || isGameOver) return;
   e.preventDefault();
 
   const world = screenToWorld(e.clientX, e.clientY);
@@ -486,8 +806,6 @@ canvas.addEventListener('pointerdown', e => {
     return;
   }
 
-  // Haritaya (boş denize) tıklandığında mevcut düşman seçimi ve saldırı butonu deaktif olmaz;
-  // sadece yeni hedef noktasına yelken açılır
   lastClickEnemyId = null;
   targetPos = {
     x: Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, worldX)),
@@ -498,7 +816,7 @@ canvas.addEventListener('pointerdown', e => {
 attackBtn.addEventListener('pointerdown', e => {
   e.preventDefault();
   e.stopPropagation();
-  if (isGameOver || attackBtn.disabled) return;
+  if (!currentUser || isGameOver || attackBtn.disabled) return;
 
   const selectedEnemy = enemies.find(en => en.id === selectedEnemyId);
   if (!selectedEnemy) return;
@@ -543,7 +861,7 @@ function updateWake(ship, isMoving) {
 }
 
 function update() {
-  if (isGameOver) return;
+  if (!currentUser || !player || isGameOver) return;
 
   const now = Date.now();
 
@@ -574,7 +892,6 @@ function update() {
     syncAttackButton();
   }
 
-  // Oyuncu hareketi (Diğer fonksiyonları etkilemez)
   if (targetPos) {
     const distToTarget = Math.hypot(targetPos.x - player.x, targetPos.y - player.y);
     if (distToTarget > 10) {
@@ -607,7 +924,6 @@ function update() {
     }
   }
 
-  // Hareket halindeyken de menzil dışına çıkmadıkça ateş devam eder
   if (isAttacking && selectedEnemy) {
     const distToEnemy = Math.hypot(selectedEnemy.x - player.x, selectedEnemy.y - player.y);
     if (distToEnemy > ATTACK_RANGE) {
@@ -631,7 +947,6 @@ function update() {
     }
   }
 
-  // NPC gemileri: hızı oyuncudan 1/3 daha yavaş, atış menzili oyuncunun yarısı kadar
   for (let i = enemies.length - 1; i >= 0; i--) {
     const e = enemies[i];
     const distToPlayer = Math.hypot(player.x - e.x, player.y - e.y);
@@ -945,6 +1260,7 @@ function drawRealisticShip(p, isEnemy = false, isSelected = false) {
 
 function drawMinimap() {
   mctx.clearRect(0, 0, 92, 92);
+  if (!player) return;
   const scale = 42 / WORLD_SIZE;
   const cx = 46, cy = 46;
 
@@ -976,19 +1292,24 @@ function drawMinimap() {
 function draw() {
   update();
 
-  const cam = getCameraOrigin();
-  const viewW = W / CAMERA_ZOOM;
-  const viewH = H / CAMERA_ZOOM;
-
   ctx.save();
   ctx.clearRect(0, 0, W, H);
   ctx.fillStyle = '#087da0';
   ctx.fillRect(0, 0, W, H);
 
+  if (!player) {
+    ctx.restore();
+    requestAnimationFrame(draw);
+    return;
+  }
+
+  const cam = getCameraOrigin();
+  const viewW = W / CAMERA_ZOOM;
+  const viewH = H / CAMERA_ZOOM;
+
   ctx.scale(CAMERA_ZOOM, CAMERA_ZOOM);
   ctx.translate(-cam.x, -cam.y);
 
-  // Hareketli Dalgalar
   const t = Date.now() / 800;
   ctx.strokeStyle = '#54bdd0';
   ctx.globalAlpha = 0.25;
@@ -1003,12 +1324,10 @@ function draw() {
   }
   ctx.globalAlpha = 1;
 
-  // Harita Sınırı
   ctx.strokeStyle = 'rgba(255, 215, 131, 0.35)';
   ctx.lineWidth = 4;
   ctx.strokeRect(-WORLD_SIZE, -WORLD_SIZE, WORLD_SIZE * 2, WORLD_SIZE * 2);
 
-  // Geminin etrafında gözü yormayan hafif saydam beyaz menzil çerçevesi
   drawRangeRing(player.x, player.y);
 
   if (targetPos) {
@@ -1127,7 +1446,21 @@ function draw() {
   requestAnimationFrame(draw);
 }
 
-initGame();
+// Başlangıçta Test kullanıcısını hazırla ve aktif oturum varsa doğrudan gir
+loadUsers();
+try {
+  const savedSession = JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY) || 'null');
+  if (savedSession && savedSession.username) {
+    completeLogin(savedSession);
+  } else {
+    authUsernameInput.value = 'Test';
+    authPasswordInput.value = 'test';
+  }
+} catch {
+  authUsernameInput.value = 'Test';
+  authPasswordInput.value = 'test';
+}
+
 draw();
 </script>
 </body>
