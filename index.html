@@ -114,10 +114,12 @@
     }
     .ship-sub-name { font-size: 10px; color: #94a3b8; text-align: right; }
 
+    /* Geminin Altındaki Can Barı & İsim / Filo Etiketi (Kusursuz Hizalandı) */
     #player-label {
       position: fixed; z-index: 5; pointer-events: none;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, 0);
       display: flex; flex-direction: column; align-items: center; gap: 2px;
+      will-change: transform;
     }
     .ship-hp-track {
       width: 60px; height: 6px; background: rgba(0, 0, 0, 0.7);
@@ -534,8 +536,8 @@ const SHIP_MODELS = {
   dragon:   { id: 'dragon',   name: 'Kızıl Ejder',         desc: 'Ejderha nefesi gücünü artıran efsane', cost: 35000000 }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v24';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v24';
+const USERS_STORAGE_KEY = 'pirate3d_users_v25';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v25';
 let authMode = 'login';
 let currentUser = null;
 
@@ -613,7 +615,7 @@ const WORLD_SIZE = 1000;
 const ATTACK_RANGE = 280;
 const AGGRO_RANGE = 280;
 const BASE_SHIP_HEIGHT = 95;
-const SHIP_Y_POS = 46;
+const SHIP_Y_POS = 52;
 
 function createStaticOceanTextures() {
   const size = 1024;
@@ -1012,7 +1014,6 @@ attackBtn.addEventListener('click', () => {
 
 restartBtn.addEventListener('click', () => startGameLogic());
 
-// Gülle ateşleme ve kıvılcım efekti oluşturan fonksiyon
 function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
   const ammoSpec = AMMO_TYPES[ammoKey];
   const pGeo = new THREE.SphereGeometry(3.5, 16, 16);
@@ -1026,15 +1027,8 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
   scene.add(mesh);
 
   activeProjectiles.push({
-    mesh,
-    x: startX,
-    z: startZ,
-    targetX,
-    targetZ,
-    speed: 14,
-    ammoKey,
-    onHit,
-    sparkTimer: 0
+    mesh, x: startX, z: startZ, targetX, targetZ,
+    speed: 14, ammoKey, onHit, sparkTimer: 0
   });
 }
 
@@ -1084,19 +1078,19 @@ function animate3D() {
 
   rangeRingMesh.position.set(player.x, 0.6, player.z);
 
+  // --- KUSURSUZ 3D TO 2D PROJEKSİYON HİZALAMASI ---
   if (playerSprite) {
     const tempVector = new THREE.Vector3(player.x, SHIP_Y_POS, player.z);
     tempVector.project(camera);
     const xPx = (tempVector.x *  .5 + .5) * window.innerWidth;
-    const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 32;
-    playerLabelEl.style.transform = `translate(-50%, -50%) translate(${xPx}px, ${yPx}px)`;
+    const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 35; // Geminin altındaki mesafe
+    playerLabelEl.style.transform = `translate(-50%, 0) translate(${xPx}px, ${yPx}px)`;
   }
 
   camera.position.x += (player.x - camera.position.x) * 0.08;
   camera.position.z += (player.z + 540 - camera.position.z) * 0.08;
   camera.lookAt(player.x, 0, player.z);
 
-  // Mermileri ve kıvılcım efektlerini güncelle
   for (let i = activeProjectiles.length - 1; i >= 0; i--) {
     const p = activeProjectiles[i];
     const dx = p.targetX - p.x;
@@ -1116,7 +1110,6 @@ function animate3D() {
       p.mesh.rotation.x += 0.1;
       p.mesh.rotation.y += 0.1;
 
-      // Alevli veya ejderha güllesiyse arkasından kıvılcım / parçacık bırak
       if (p.ammoKey === 'fire' || p.ammoKey === 'dragon') {
         p.sparkTimer++;
         if (p.sparkTimer % 2 === 0) {
@@ -1131,7 +1124,6 @@ function animate3D() {
     }
   }
 
-  // Kıvılcım parçacıklarını sönümle
   for (let i = particleSystems.length - 1; i >= 0; i--) {
     const pt = particleSystems[i];
     pt.life--;
@@ -1159,7 +1151,6 @@ function animate3D() {
 
       if (distToPlayer <= ATTACK_RANGE && (now - en.lastAttackTime >= 1000)) {
         en.lastAttackTime = now;
-        // NPC hasarı tam istediğin gibi 100 olarak ayarlandı
         player.hp = Math.max(0, player.hp - 100);
         player.lastDamagedTime = now;
         updateHUD();
@@ -1201,7 +1192,6 @@ function animate3D() {
         lastPlayerAttackTime = now;
         player.ammo[ammoKey]--;
 
-        // Gülle ateşleme efektini başlat
         fireProjectile(player.x, player.z, target.x, target.z, ammoKey, () => {
           target.hp -= ammoSpec.damage;
           if (ammoSpec.slow < 1.0) target.slowTimer = 240;
