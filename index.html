@@ -995,7 +995,7 @@ function animate3D() {
   coordDisplayEl.textContent = `X: ${Math.round((player.x / (WORLD_SIZE / 2)) * 50)} · Y: ${Math.round((player.z / (WORLD_SIZE / 2)) * 50)}`;
 
   if (playerSprite) {
-    playerSprite.position.set(player.x, 12, player.z);
+    playerSprite.position.set(player.x, 20, player.z);
     applyNormalizedSprite(playerSprite, player.a);
   }
 
