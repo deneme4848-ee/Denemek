@@ -15,27 +15,39 @@
     #hud {
       position: fixed; top: 12px; left: 12px; right: 12px;
       display: flex; justify-content: space-between; align-items: flex-start;
-      pointer-events: none; text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      pointer-events: none; text-shadow: 0 2px 4px rgba(0,0,0,0.85);
     }
     .panel {
-      background: rgba(0, 30, 48, 0.8); backdrop-filter: blur(4px);
-      padding: 8px 14px; border-radius: 12px; font-size: 13px;
-      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(0, 30, 48, 0.84); backdrop-filter: blur(4px);
+      padding: 10px 14px; border-radius: 12px; font-size: 13px;
+      border: 1px solid rgba(255,255,255,0.16); min-width: 225px;
     }
-    #hp-bar-bg {
-      width: 130px; height: 8px; background: rgba(255,255,255,0.2);
-      border-radius: 4px; margin-top: 6px; overflow: hidden;
+    .stat-row {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; margin-top: 6px; gap: 8px;
+    }
+    .bar-bg {
+      width: 100%; height: 9px; background: rgba(255,255,255,0.18);
+      border-radius: 5px; margin-top: 4px; overflow: hidden;
     }
     #hp-bar {
       width: 100%; height: 100%; background: #4ade80; transition: width 0.2s, background 0.2s;
     }
+    #exp-bar {
+      width: 0%; height: 100%; background: linear-gradient(90deg, #38bdf8, #818cf8);
+      transition: width 0.25s ease;
+    }
+    #regen-info {
+      font-size: 11px; color: #bae6fd; margin-top: 5px; min-height: 14px;
+    }
     #minimap {
       width: 92px; height: 92px; border-radius: 50%;
       background: rgba(0, 24, 38, 0.88); border: 2px solid rgba(233, 211, 161, 0.55);
+      flex-shrink: 0;
     }
     #hint {
-      position: fixed; top: 76px; left: 12px; font-size: 12px;
-      background: rgba(0, 30, 48, 0.7); padding: 6px 10px; border-radius: 8px;
+      position: fixed; top: 122px; left: 12px; font-size: 12px;
+      background: rgba(0, 30, 48, 0.72); padding: 6px 10px; border-radius: 8px;
       pointer-events: none; max-width: 72vw;
     }
 
@@ -86,8 +98,21 @@
 
   <div id="hud">
     <div class="panel">
-      <div><strong>Kaptan</strong> · Altın: <span id="score">0</span></div>
-      <div id="hp-bar-bg"><div id="hp-bar"></div></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+        <strong>Kara İnci</strong>
+        <span>Sv. <strong id="level">1</strong> · Altın: <strong id="score">0</strong></span>
+      </div>
+      <div class="stat-row">
+        <span>Can</span>
+        <span id="hp-text">1000 / 1000</span>
+      </div>
+      <div class="bar-bg"><div id="hp-bar"></div></div>
+      <div class="stat-row">
+        <span>EXP</span>
+        <span id="exp-text">0 / 100</span>
+      </div>
+      <div class="bar-bg"><div id="exp-bar"></div></div>
+      <div id="regen-info"></div>
     </div>
     <canvas id="minimap" width="92" height="92"></canvas>
   </div>
@@ -111,7 +136,12 @@ const miniCanvas = document.querySelector('#minimap');
 const mctx = miniCanvas.getContext('2d');
 
 const scoreEl = document.querySelector('#score');
+const levelEl = document.querySelector('#level');
+const hpTextEl = document.querySelector('#hp-text');
+const expTextEl = document.querySelector('#exp-text');
 const hpBarEl = document.querySelector('#hp-bar');
+const expBarEl = document.querySelector('#exp-bar');
+const regenInfoEl = document.querySelector('#regen-info');
 const attackBtn = document.querySelector('#attack-btn');
 const gameOverEl = document.querySelector('#gameover');
 const finalScoreEl = document.querySelector('#final-score');
@@ -130,7 +160,7 @@ resize();
 
 const WORLD_SIZE = 2400;
 
-let player, enemies, islands, treasures, shots, particles, isGameOver;
+let player, enemies, islands, treasures, shots, particles, floatingTexts, isGameOver;
 let targetPos = null;
 let selectedEnemyId = null;
 let isAttacking = false;
@@ -169,15 +199,22 @@ function initGame() {
   lastClickTime = 0;
   gameOverEl.style.display = 'none';
 
+  const now = Date.now();
   player = {
     id: 'player',
     x: 0, y: 0, a: 0, speed: 0, maxSpeed: 3.7,
-    hp: 100, maxHp: 100, score: 0, name: 'Kara İnci',
-    wake: []
+    hp: 1000, maxHp: 1000,
+    exp: 0, maxExp: 100, level: 1,
+    damage: 180,
+    score: 0, name: 'Kara İnci',
+    wake: [],
+    lastHitTime: now,
+    lastRegenTick: now
   };
 
   shots = [];
   particles = [];
+  floatingTexts = [];
   islands = [];
   treasures = [];
   enemies = [];
@@ -221,7 +258,7 @@ function spawnEnemy() {
     id: nextEnemyId++,
     x: ex, y: ey,
     a: Math.random() * Math.PI * 2,
-    hp: 70, maxHp: 70,
+    hp: 700, maxHp: 700,
     lastShot: 0,
     turnTimer: 0,
     targetAngle: Math.random() * Math.PI * 2,
@@ -230,11 +267,44 @@ function spawnEnemy() {
   });
 }
 
+function addExp(amount) {
+  player.exp += amount;
+  while (player.exp >= player.maxExp) {
+    player.exp -= player.maxExp;
+    player.level += 1;
+    player.maxExp = Math.round(player.maxExp * 1.35);
+    player.maxHp += 150;
+    player.hp = player.maxHp;
+    player.damage += 35;
+    addFloatingText(player.x, player.y - 38, `SEVİYE ${player.level}!`, '#38bdf8');
+  }
+  updateHUD();
+}
+
 function updateHUD() {
   scoreEl.textContent = player.score;
-  const pct = Math.max(0, (player.hp / player.maxHp) * 100);
-  hpBarEl.style.width = pct + '%';
-  hpBarEl.style.background = pct > 50 ? '#4ade80' : pct > 25 ? '#facc15' : '#ef4444';
+  levelEl.textContent = player.level;
+  hpTextEl.textContent = `${Math.ceil(player.hp)} / ${player.maxHp}`;
+  expTextEl.textContent = `${player.exp} / ${player.maxExp}`;
+
+  const hpPct = Math.max(0, Math.min(100, (player.hp / player.maxHp) * 100));
+  hpBarEl.style.width = hpPct + '%';
+  hpBarEl.style.background = hpPct > 50 ? '#4ade80' : hpPct > 25 ? '#facc15' : '#ef4444';
+
+  const expPct = Math.max(0, Math.min(100, (player.exp / player.maxExp) * 100));
+  expBarEl.style.width = expPct + '%';
+}
+
+function addFloatingText(x, y, text, color) {
+  floatingTexts.push({
+    x,
+    y,
+    text,
+    color,
+    alpha: 1,
+    createdAt: Date.now(),
+    duration: 850
+  });
 }
 
 function createExplosion(x, y, color = '#ff9e2c', count = 14) {
@@ -253,7 +323,6 @@ function createExplosion(x, y, color = '#ff9e2c', count = 14) {
   }
 }
 
-// Doğrudan hedef gemiye kilitlenen gülle oluşturur (ıskalama yok)
 function fireLockedCannon(shooter, targetId, isPlayer) {
   const muzzleX = shooter.x + Math.cos(shooter.a) * 18;
   const muzzleY = shooter.y + Math.sin(shooter.a) * 18;
@@ -264,7 +333,7 @@ function fireLockedCannon(shooter, targetId, isPlayer) {
     speed: isPlayer ? 9.5 : 7.8,
     isPlayer,
     targetId,
-    damage: isPlayer ? 18 : 11
+    damage: isPlayer ? player.damage : 110
   });
 
   createExplosion(muzzleX, muzzleY, '#e2e8f0', 5);
@@ -359,6 +428,29 @@ function updateWake(ship, isMoving) {
 function update() {
   if (isGameOver) return;
 
+  const now = Date.now();
+
+  // Can 1000'in altındaysa: 5 sn saldırı almazsa her 5 sn'de +100 tamir
+  if (player.hp < player.maxHp) {
+    const sinceHit = now - player.lastHitTime;
+    if (sinceHit >= 5000) {
+      if (now - player.lastRegenTick >= 5000) {
+        player.lastRegenTick = now;
+        const healAmount = Math.min(100, player.maxHp - player.hp);
+        player.hp += healAmount;
+        addFloatingText(player.x, player.y - 34, `+${healAmount}`, '#4ade80');
+        updateHUD();
+      }
+      const nextTickSec = Math.max(1, Math.ceil((5000 - (now - player.lastRegenTick)) / 1000));
+      regenInfoEl.textContent = `Tamir aktif: +100 can (${nextTickSec}s)`;
+    } else {
+      const waitSec = Math.ceil((5000 - sinceHit) / 1000);
+      regenInfoEl.textContent = `Tamir için saldırısız bekle: ${waitSec}s`;
+    }
+  } else {
+    regenInfoEl.textContent = '';
+  }
+
   const selectedEnemy = enemies.find(en => en.id === selectedEnemyId);
   if (!selectedEnemy && (selectedEnemyId !== null || isAttacking)) {
     selectedEnemyId = null;
@@ -399,7 +491,6 @@ function update() {
   }
 
   // Seçili düşmana doğrudan kilitli ateş
-  const now = Date.now();
   if (isAttacking && selectedEnemy) {
     const desiredAngle = Math.atan2(selectedEnemy.y - player.y, selectedEnemy.x - player.x);
     if (!targetPos) {
@@ -417,7 +508,7 @@ function update() {
     if (Math.hypot(player.x - tr.x, player.y - tr.y) < 34) {
       treasures.splice(i, 1);
       player.score += 25;
-      player.hp = Math.min(player.maxHp, player.hp + 15);
+      addExp(20);
       createExplosion(tr.x, tr.y, '#ffd783', 10);
       updateHUD();
       spawnTreasure();
@@ -466,7 +557,7 @@ function update() {
     }
   }
 
-  // Kilitli Top Gülleleri (Manevra ile ıskalamaz, doğrudan hedefe ulaşıp hasar verir)
+  // Kilitli Top Gülleleri
   for (let i = shots.length - 1; i >= 0; i--) {
     const s = shots[i];
 
@@ -482,7 +573,9 @@ function update() {
 
       if (dist <= s.speed + 12) {
         targetEnemy.hp -= s.damage;
+        addFloatingText(targetEnemy.x, targetEnemy.y - 28, `-${s.damage}`, '#ffd783');
         createExplosion(targetEnemy.x, targetEnemy.y, '#ff7b00', 10);
+
         if (targetEnemy.hp <= 0) {
           createExplosion(targetEnemy.x, targetEnemy.y, '#ef4444', 24);
           if (selectedEnemyId === targetEnemy.id) {
@@ -492,6 +585,7 @@ function update() {
           }
           enemies = enemies.filter(en => en.id !== targetEnemy.id);
           player.score += 100;
+          addExp(45);
           updateHUD();
           setTimeout(spawnEnemy, 2600);
         }
@@ -507,9 +601,13 @@ function update() {
       const dist = Math.hypot(dx, dy);
 
       if (dist <= s.speed + 12) {
-        player.hp -= s.damage;
+        player.hp = Math.max(0, player.hp - s.damage);
+        player.lastHitTime = now;
+        player.lastRegenTick = now;
+        addFloatingText(player.x, player.y - 28, `-${s.damage}`, '#f87171');
         createExplosion(player.x, player.y, '#ef4444', 12);
         updateHUD();
+
         if (player.hp <= 0) {
           isGameOver = true;
           isAttacking = false;
@@ -533,6 +631,18 @@ function update() {
     pt.y += pt.vy;
     pt.life -= pt.decay;
     if (pt.life <= 0) particles.splice(i, 1);
+  }
+
+  // Kısa süreli hasar rakamı animasyonları
+  for (let i = floatingTexts.length - 1; i >= 0; i--) {
+    const ft = floatingTexts[i];
+    const elapsed = now - ft.createdAt;
+    if (elapsed >= ft.duration) {
+      floatingTexts.splice(i, 1);
+      continue;
+    }
+    ft.y -= 0.75;
+    ft.alpha = 1 - elapsed / ft.duration;
   }
 }
 
@@ -788,6 +898,20 @@ function draw() {
     ctx.fill();
   }
   ctx.globalAlpha = 1;
+
+  // Kısa süreli hasar / tamir rakamları
+  for (const ft of floatingTexts) {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, ft.alpha);
+    ctx.font = '800 14px system-ui';
+    ctx.textAlign = 'center';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.75)';
+    ctx.strokeText(ft.text, ft.x - camX, ft.y - camY);
+    ctx.fillStyle = ft.color;
+    ctx.fillText(ft.text, ft.x - camX, ft.y - camY);
+    ctx.restore();
+  }
 
   drawMinimap();
   requestAnimationFrame(draw);
