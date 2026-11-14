@@ -469,6 +469,10 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
+// --- TASARIM 1 ÖZEL PNG GÖRSELİ ---
+const tasarim1Img = new Image();
+tasarim1Img.src = 'tasarim1.png';
+
 const SHIP_MODELS = {
   standard: {
     id: 'standard',
@@ -480,6 +484,18 @@ const SHIP_MODELS = {
     trimColor: '#f6d388',
     sailColor: '#fffbeb',
     flagColor: '#fbbf24'
+  },
+  tasarim_1: {
+    id: 'tasarim_1',
+    name: 'Tasarım 1',
+    desc: 'Ejderha figürlü, koyu zırhlı ve kırmızı yelkenli özel tasarım.',
+    cost: 500,
+    isCustomPng: true,
+    hullColor: '#291206',
+    deckColor: '#451a03',
+    trimColor: '#f59e0b',
+    sailColor: '#991b1b',
+    flagColor: '#dc2626'
   },
   corsair: {
     id: 'corsair',
@@ -1567,7 +1583,7 @@ function drawRangeRing(wx, wy) {
 }
 
 // ==========================================
-// SEAFIGHT TARZI GELİŞTİRİLMİŞ DETAYLI GEMİ ÇİZİM FONKSİYONU
+// GEMİ ÇİZİM FONKSİYONU (TASARIM 1 PNG + DİĞER MODELLER)
 // ==========================================
 function draw3DShip(p, isEnemy = false, isSelected = false) {
   for (const w of p.wake || []) {
@@ -1596,6 +1612,62 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
     ctx.restore();
   }
 
+  const m = isEnemy ? {
+    hullColor: '#450a0a',
+    deckColor: '#5c1f1a',
+    trimColor: '#f87171',
+    sailColor: '#ef4444',
+    flagColor: '#dc2626'
+  } : (p.shipModel || SHIP_MODELS.standard);
+
+  // Eğer Tasarım 1 seçiliyse özel PNG görselini düz ve net şekilde çiz
+  if (!isEnemy && m.isCustomPng) {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+
+    // Gemi altı hafif gölge
+    ctx.save();
+    ctx.translate(0, 20);
+    ctx.fillStyle = 'rgba(0, 12, 24, 0.42)';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 38, 11, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // Yön kontrolü (Sola gidiyorsa yatay aynala)
+    const facingLeft = Math.cos(p.a || 0) < 0;
+    ctx.save();
+    if (facingLeft) {
+      ctx.scale(-1, 1);
+    }
+
+    if (tasarim1Img.complete && tasarim1Img.naturalWidth > 0) {
+      const shipWidth = 104;
+      const shipHeight = 82;
+      ctx.drawImage(tasarim1Img, -shipWidth / 2, -shipHeight / 2 - 8, shipWidth, shipHeight);
+    } else {
+      // Görsel yüklenene kadar yedek gövde
+      ctx.fillStyle = '#451a03';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 34, 15, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // İsim Etiketi
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
+    ctx.font = '700 12px system-ui';
+    ctx.shadowColor = 'rgba(0,0,0,0.85)';
+    ctx.shadowBlur = 4;
+    ctx.fillText(p.name, 0, -48);
+    ctx.shadowBlur = 0;
+
+    ctx.restore();
+    return;
+  }
+
+  // Diğer standart modeller ve düşman gemileri için orijinal çizim
   ctx.save();
   ctx.translate(p.x, p.y);
 
@@ -1606,7 +1678,6 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
     ctx.fillRect(-24, -48, 48 * (p.hp / p.maxHp), 6);
   }
 
-  // Detaylı Alt Gölge
   ctx.save();
   ctx.translate(8, 14);
   ctx.rotate(p.a || 0);
@@ -1624,15 +1695,6 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
 
   ctx.rotate(p.a || 0);
 
-  const m = isEnemy ? {
-    hullColor: '#450a0a',
-    deckColor: '#5c1f1a',
-    trimColor: '#f87171',
-    sailColor: '#ef4444',
-    flagColor: '#dc2626'
-  } : (p.shipModel || SHIP_MODELS.standard);
-
-  // Omurga Alt Katman
   ctx.fillStyle = '#110403';
   ctx.beginPath();
   ctx.moveTo(35, 6);
@@ -1643,7 +1705,6 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
   ctx.closePath();
   ctx.fill();
 
-  // Gövde Degrade ve Zırh Tasarımı
   const hullGrad = ctx.createLinearGradient(0, -20, 0, 20);
   hullGrad.addColorStop(0, m.trimColor);
   hullGrad.addColorStop(0.3, m.hullColor);
@@ -1660,12 +1721,10 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
   ctx.closePath();
   ctx.fill();
 
-  // Varak / Kenar Süslemesi (Seafight Tarzı Altın Çizgiler)
   ctx.strokeStyle = m.trimColor;
   ctx.lineWidth = 2.2;
   ctx.stroke();
 
-  // İç Güverte Detayı
   const deckGrad = ctx.createLinearGradient(-22, -12, 26, 12);
   deckGrad.addColorStop(0, m.deckColor);
   deckGrad.addColorStop(1, m.trimColor);
@@ -1679,7 +1738,6 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
   ctx.closePath();
   ctx.fill();
 
-  // Tahta Döşeme Çizgileri
   ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)';
   ctx.lineWidth = 1.2;
   for (const dx of [-16, -8, 0, 8, 16]) {
@@ -1689,33 +1747,28 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
     ctx.stroke();
   }
 
-  // Güverte Eşyaları (Fıçı / Kasa Detayları)
   ctx.fillStyle = '#291206';
   ctx.fillRect(-6, -4, 5, 8);
   ctx.strokeStyle = '#fde047';
   ctx.lineWidth = 0.8;
   ctx.strokeRect(-6, -4, 5, 8);
 
-  // Kaptan Kütüklüğü / Kabin Bölümü
   ctx.fillStyle = m.hullColor;
   ctx.fillRect(-26, -9, 10, 18);
   ctx.strokeStyle = m.trimColor;
   ctx.strokeRect(-26, -9, 10, 18);
 
-  // Kıç Tarafta Parlayan Fener (Seafight Detayı)
   ctx.fillStyle = '#0f172a';
   ctx.fillRect(-28, -3, 4, 6);
   ctx.fillStyle = '#f59e0b';
   ctx.beginPath();
   ctx.arc(-26, 0, 2.5, 0, Math.PI * 2);
   ctx.fill();
-  // Fener Parlaması
   ctx.shadowColor = '#f59e0b';
   ctx.shadowBlur = 8;
   ctx.fill();
-  ctx.shadowBlur = 0; // Sıfırla
+  ctx.shadowBlur = 0;
 
-  // Top Namluları (Yanlardan Dışarı Bakan Toplar)
   for (const cx of [-13, -4, 5, 14]) {
     ctx.fillStyle = '#0f172a';
     ctx.fillRect(cx, -16, 5, 4.5);
@@ -1728,7 +1781,6 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
     ctx.fillRect(cx + 3.5, 11.5, 1.5, 4.5);
   }
 
-  // Direkler ve Katmanlı Kabartmalı Yelkenler
   const masts = [-13, 1, 15];
   const sailSizes = [
     { w: 13, h: 16, curve: 7 },
@@ -1746,19 +1798,16 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
   masts.forEach((mx, idx) => {
     const s = sailSizes[idx];
 
-    // Yelken Gölgesi
     ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
     ctx.beginPath();
     ctx.ellipse(mx + 5, 4, s.curve * 0.75, s.h * 0.8, 0.2, 0, Math.PI * 2);
     ctx.fill();
 
-    // Direk Başı
     ctx.fillStyle = '#3d1c0a';
     ctx.beginPath();
     ctx.arc(mx, 0, 3, 0, Math.PI * 2);
     ctx.fill();
 
-    // Detaylı Yelken Gradyanı
     const sailGrad = ctx.createLinearGradient(mx - s.curve, -s.h, mx + s.curve, s.h);
     sailGrad.addColorStop(0, '#ffffff');
     sailGrad.addColorStop(0.4, m.sailColor);
@@ -1776,7 +1825,6 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
     ctx.fill();
     ctx.stroke();
 
-    // Yelken Kumaş Çizgileri (Detay)
     ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -1785,7 +1833,6 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
     ctx.stroke();
   });
 
-  // Baş Baston (Prow Sprit) ve Flok Yelkeni
   ctx.strokeStyle = '#3d1c0a';
   ctx.lineWidth = 2.8;
   ctx.beginPath();
@@ -1804,7 +1851,6 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
   ctx.lineWidth = 1;
   ctx.stroke();
 
-  // Dalgalanan Flama / Bayrak
   const flagWave = Math.sin(Date.now() / 150 + (p.x || 0) * 0.05) * 3.5;
   ctx.fillStyle = m.flagColor;
   ctx.beginPath();
@@ -1820,7 +1866,6 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
 
   ctx.restore();
 
-  // İsim Etiketi
   ctx.fillStyle = isEnemy ? (isSelected ? '#fecaca' : '#fca5a5') : '#ffffff';
   ctx.textAlign = 'center';
   ctx.font = '700 12px system-ui';
@@ -1992,7 +2037,6 @@ function draw() {
     grad.addColorStop(0.45, '#fde047');
     grad.addColorStop(1, 'rgba(249, 115, 22, 0)');
     ctx.fillStyle = grad;
-    grad.addColorStop(0, '#ffffff');
     ctx.beginPath();
     ctx.arc(0, 0, fl.radius, 0, Math.PI * 2);
     ctx.fill();
