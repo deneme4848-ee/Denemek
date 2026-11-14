@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Detaylı 3D Gemi Görünümü</title>
+  <title>Korsan Dünyası - Efsanevi Gemi Koleksiyonu</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -285,7 +285,7 @@
   <div id="hud">
     <div class="panel">
       <div class="hud-top-row">
-        <strong id="ship-title">Kara İnci (Standart)</strong>
+        <strong id="ship-title">Standart Sloop</strong>
         <button id="logout-btn" class="logout-chip" title="Oturumu Kapat">Çıkış</button>
       </div>
       <div class="stat-row" style="margin-top:4px;">
@@ -469,99 +469,86 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
+// ==========================================================
+// YEPYENİ ÖZEL TASARIMLI EFSANEVİ GEMİ MODELLERİ
+// ==========================================================
 const SHIP_MODELS = {
   standard: {
     id: 'standard',
     name: 'Standart Sloop',
     desc: 'Başlangıç gemisi, sade ahşap gövde.',
     cost: 0,
+    theme: 'standard',
     hullColor: '#b46932',
     deckColor: '#8f5629',
     trimColor: '#f6d388',
     sailColor: '#fffbeb',
     flagColor: '#fbbf24'
   },
-  tasarim_1: {
-    id: 'tasarim_1',
-    name: 'Tasarım 1',
-    desc: 'Özel detaylı zırhlı ve kırmızı yelkenli özel tasarım.',
-    cost: 500,
-    hullColor: '#291206',
-    deckColor: '#451a03',
-    trimColor: '#f59e0b',
-    sailColor: '#991b1b',
-    flagColor: '#dc2626'
+  minotaur: {
+    id: 'minotaur',
+    name: "Minotaur'un Gazabı",
+    desc: 'Pruvasında devasa boğa başı heykeli ve bronz zırhlar barındıran güçlü savaş gemisi.',
+    cost: 300,
+    theme: 'minotaur',
+    hullColor: '#451a03',
+    deckColor: '#291206',
+    trimColor: '#d97706',
+    sailColor: '#78350f',
+    flagColor: '#b45309'
   },
-  corsair: {
-    id: 'corsair',
-    name: 'Kızıl Korsan Kateri',
-    desc: 'Kırmızı yelkenli ve koyu gövdeli vahşi korsan tasarımı.',
-    cost: 150,
-    hullColor: '#450a0a',
-    deckColor: '#5c1f1a',
-    trimColor: '#f87171',
+  hellfire: {
+    id: 'hellfire',
+    name: 'Cehennem Ateşi',
+    desc: 'Gövdesinden ve yelkenlerinden alev saçan mistik ve tehlikeli tasarım.',
+    cost: 750,
+    theme: 'hellfire',
+    hullColor: '#1c0404',
+    deckColor: '#310404',
+    trimColor: '#f97316',
     sailColor: '#ef4444',
     flagColor: '#dc2626'
   },
-  phantom: {
-    id: 'phantom',
-    name: 'Hayalet Savaş Gemisi',
-    desc: 'Karanlık sularda hayalet gibi süzülen gizemli model.',
-    cost: 350,
-    hullColor: '#1e293b',
-    deckColor: '#0f172a',
+  leviathan: {
+    id: 'leviathan',
+    name: 'Karanlık Leviathan',
+    desc: 'Deniz canavarı pulları ve mistik okyanus mavisi zırhıyla donatılmış.',
+    cost: 1500,
+    theme: 'leviathan',
+    hullColor: '#0c2340',
+    deckColor: '#071326',
     trimColor: '#38bdf8',
-    sailColor: '#cbd5e1',
-    flagColor: '#38bdf8'
+    sailColor: '#0284c7',
+    flagColor: '#0ea5e9'
   },
-  golden: {
-    id: 'golden',
-    name: 'Altın Varaklı Kalyon',
-    desc: 'Servetini ve ihtişamını sergilemek isteyen kaptanlar için.',
-    cost: 750,
-    hullColor: '#78350f',
-    deckColor: '#b45309',
-    trimColor: '#fde047',
-    sailColor: '#fef3c7',
-    flagColor: '#fbbf24'
-  },
-  royal: {
-    id: 'royal',
-    name: 'Kraliyet Donanma Fırkateyni',
-    desc: 'Asil mavi tonları ve şık bayrağıyla denizlerin hakimi.',
-    cost: 1200,
-    hullColor: '#1e3a8a',
-    deckColor: '#1e40af',
+  frost_queen: {
+    id: 'frost_queen',
+    name: 'Buzul Kraliçesi',
+    desc: 'Kuzeyin buzlu sularından ilham alan kristal yelkenli şık fırkateyn.',
+    cost: 2500,
+    theme: 'frost',
+    hullColor: '#0f172a',
+    deckColor: '#1e293b',
     trimColor: '#93c5fd',
     sailColor: '#e0f2fe',
     flagColor: '#60a5fa'
   },
-  emerald: {
-    id: 'emerald',
-    name: 'Zümrüt Okyanus Avcısı',
-    desc: 'Tropik denizlerin doğasından ilham alan yeşil tonlu özel model.',
-    cost: 2000,
-    hullColor: '#064e3b',
-    deckColor: '#065f46',
-    trimColor: '#34d399',
-    sailColor: '#d1fae5',
-    flagColor: '#10b981'
-  },
-  crimson_emperor: {
-    id: 'crimson_emperor',
-    name: 'Kızıl İmparatorluk Kalyonu',
-    desc: 'Tersanenin en ihtişamlı, devasa ve korkutucu amiral gemisi.',
-    cost: 3500,
-    hullColor: '#310404',
-    deckColor: '#581c87',
-    trimColor: '#fb7185',
+  thunder_lord: {
+    id: 'thunder_lord',
+    name: 'Gök Gürültüsü',
+    desc: 'Yıldırımlarla yüklü, tersanenin en ihtişamlı ve korkutucu amiral gemisi.',
+    cost: 4000,
+    theme: 'thunder',
+    hullColor: '#2e1065',
+    deckColor: '#3b0764',
+    trimColor: '#c084fc',
     sailColor: '#f3e8ff',
-    flagColor: '#f43f5e'
+    flagColor: '#a855f7'
   }
 };
 
-const USERS_STORAGE_KEY = 'pirate2d_users_v8_pro3d';
-const SESSION_STORAGE_KEY = 'pirate2d_session_v8_pro3d';
+const USERS_STORAGE_KEY = 'pirate2d_users_v9_epic';
+const SESSION_STORAGE_KEY = 'pirate2d_session_v9_epic';
 let authMode = 'login';
 let currentUser = null;
 
@@ -722,7 +709,7 @@ function openPanel(section) {
     tabMarket.classList.remove('active');
     sectionShipyard.classList.add('active');
     sectionMarket.classList.remove('active');
-    document.querySelector('#panel-main-title').textContent = '⚓ Tersane (Gemi Modelleri)';
+    document.querySelector('#panel-main-title').textContent = '⚓ Tersane (Efsanevi Tasarımlar)';
     renderShipyardList();
   }
   marketFeedbackEl.textContent = '';
@@ -1578,11 +1565,13 @@ function drawRangeRing(wx, wy) {
 }
 
 // ==========================================================
-// DETAYLI 3D 3/4 AÇILI, HAREKETLİ VE DÖNEN GEMİ ÇİZİMİ
+// EFSANEVİ VE ÖZEL TASARIMLI 3D GEMİ ÇİZİM FONKSİYONU
 // ==========================================================
-function drawDetailed3DShip(p, isEnemy = false, isSelected = false) {
+function drawUnique3DShip(p, isEnemy = false, isSelected = false) {
   const m = isEnemy ? {
     id: 'enemy',
+    theme: 'enemy',
+    name: 'Kızıl Sancak',
     hullColor: '#35100c',
     deckColor: '#54231b',
     trimColor: '#d97757',
@@ -1590,28 +1579,14 @@ function drawDetailed3DShip(p, isEnemy = false, isSelected = false) {
     flagColor: '#dc2626'
   } : (p.shipModel || SHIP_MODELS.standard);
 
-  const id = m.id || 'enemy';
-
-  const styles = {
-    standard: { accent: '#d6a66a', glow: '#fbbf24', symbol: '◆' },
-    tasarim_1: { accent: '#f59e0b', glow: '#ef4444', symbol: '✦' },
-    corsair: { accent: '#ef4444', glow: '#dc2626', symbol: '✦' },
-    phantom: { accent: '#38bdf8', glow: '#22d3ee', symbol: '◇' },
-    golden: { accent: '#fde047', glow: '#f59e0b', symbol: '♛' },
-    royal: { accent: '#60a5fa', glow: '#3b82f6', symbol: '♜' },
-    emerald: { accent: '#34d399', glow: '#10b981', symbol: '◆' },
-    crimson_emperor: { accent: '#fb7185', glow: '#e11d48', symbol: '✦' },
-    enemy: { accent: '#ef4444', glow: '#dc2626', symbol: '☠' }
-  };
-
-  const style = styles[id] || styles.standard;
+  const theme = m.theme || 'standard';
   const t = Date.now();
 
   // Su üstü köpük izleri
   for (const w of p.wake || []) {
     ctx.save();
     ctx.globalAlpha = Math.max(0, w.alpha);
-    ctx.fillStyle = '#d9f7ff';
+    ctx.fillStyle = theme === 'hellfire' ? '#fed7aa' : '#d9f7ff';
     ctx.beginPath();
     ctx.ellipse(w.x, w.y, w.r * 2, w.r, 0, 0, Math.PI * 2);
     ctx.fill();
@@ -1643,29 +1618,28 @@ function drawDetailed3DShip(p, isEnemy = false, isSelected = false) {
 
   ctx.save();
   ctx.translate(p.x, p.y);
-  // Gittiği yöne akıcı dönme açısı
   ctx.rotate((p.a || 0) + Math.PI / 2);
 
-  // Derinlikli Gölge (Hafif arkaya uzanan 3D gölge)
+  // Derinlikli Gölge
   ctx.fillStyle = 'rgba(0, 10, 20, 0.5)';
   ctx.beginPath();
   ctx.ellipse(0, 12, 20, 42, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // --- 3D GÖVDE (Kalyon Formu, Borda Kaplamaları ve Gölgelendirme) ---
+  // --- GÖVDE ÇİZİMİ ---
   const hullGrad = ctx.createLinearGradient(-20, -48, 20, 48);
   hullGrad.addColorStop(0, m.trimColor);
   hullGrad.addColorStop(0.3, m.deckColor);
   hullGrad.addColorStop(0.7, m.hullColor);
-  hullGrad.addColorStop(1, '#150602');
+  hullGrad.addColorStop(1, '#080c10');
 
   ctx.fillStyle = hullGrad;
   ctx.beginPath();
-  ctx.moveTo(0, -52); // Pruva burun
-  ctx.quadraticCurveTo(20, -22, 16, 32);
-  ctx.quadraticCurveTo(13, 46, 0, 46); // Kıç omuzluk
+  ctx.moveTo(0, -54); // Pruva
+  ctx.quadraticCurveTo(21, -22, 16, 32);
+  ctx.quadraticCurveTo(13, 46, 0, 46); // Kıç
   ctx.quadraticCurveTo(-13, 46, -16, 32);
-  ctx.quadraticCurveTo(-20, -22, 0, -52);
+  ctx.quadraticCurveTo(-21, -22, 0, -54);
   ctx.closePath();
   ctx.fill();
 
@@ -1673,43 +1647,78 @@ function drawDetailed3DShip(p, isEnemy = false, isSelected = false) {
   ctx.lineWidth = 2.5;
   ctx.stroke();
 
-  // Borda Çizgileri (Ahşap katman detayı)
-  ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)';
-  ctx.lineWidth = 1;
-  for (let gy = -35; gy < 35; gy += 10) {
-    ctx.beginPath();
-    ctx.moveTo(-13, gy);
-    ctx.lineTo(13, gy);
-    ctx.stroke();
-  }
-
-  // Yüksek Güverte Katı
+  // Güverte
   ctx.fillStyle = m.deckColor;
   ctx.beginPath();
-  ctx.moveTo(0, -42);
+  ctx.moveTo(0, -44);
   ctx.quadraticCurveTo(13, -15, 11, 24);
   ctx.quadraticCurveTo(8, 36, 0, 36);
   ctx.quadraticCurveTo(-8, 36, -11, 24);
-  ctx.quadraticCurveTo(-13, -15, 0, -42);
+  ctx.quadraticCurveTo(-13, -15, 0, -44);
   ctx.closePath();
   ctx.fill();
 
-  // Yan Top Portları (Borda Topları)
+  // --- ÖZEL TEMA DETAYLARI (Pruva Heykelleri & Simgeler) ---
+  if (theme === 'minotaur') {
+    // Boğa Başlı Figür (Pruva)
+    ctx.fillStyle = '#d97706';
+    ctx.beginPath();
+    ctx.arc(0, -50, 6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 1.5;
+    // Boynuzlar
+    ctx.beginPath();
+    ctx.moveTo(-2, -52); ctx.lineTo(-8, -58);
+    ctx.moveTo(2, -52); ctx.lineTo(8, -58);
+    ctx.stroke();
+  } else if (theme === 'hellfire') {
+    // Alev Efekti Pruva ve Yelkenler
+    ctx.shadowColor = '#f97316';
+    ctx.shadowBlur = 15;
+    ctx.fillStyle = '#f97316';
+    ctx.beginPath();
+    ctx.arc(0, -50, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  } else if (theme === 'leviathan') {
+    // Deniz Canavarı Pul Detayları
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(0, -46, 4, 0, Math.PI);
+    ctx.stroke();
+  } else if (theme === 'frost') {
+    // Buz Kristali Detayı
+    ctx.fillStyle = '#93c5fd';
+    ctx.beginPath();
+    ctx.moveTo(0, -54); ctx.lineTo(-4, -48); ctx.lineTo(4, -48);
+    ctx.closePath();
+    ctx.fill();
+  } else if (theme === 'thunder') {
+    // Yıldırım / Enerji Halkası
+    ctx.strokeStyle = '#c084fc';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(0, -10, 16, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  // Top Portları
   ctx.fillStyle = '#05080c';
   for (const ty of [-22, -10, 2, 14]) {
     ctx.fillRect(-11, ty, 3, 4);
     ctx.fillRect(8, ty, 3, 4);
   }
 
-  // --- ÜÇLÜ DETAYLI DİREKLER VE ŞİŞKİN RÜZGARLI YELKENLER ---
+  // --- DİREKLER VE ŞİŞKİN RÜZGARLI YELKENLER ---
   const masts = [
-    { y: -26, h: 28, w: 18, name: 'ön' },
-    { y: -2,  h: 38, w: 25, name: 'ana' },
-    { y: 20,  h: 24, w: 16, name: 'kıç' }
+    { y: -26, h: 28, w: 18 },
+    { y: -2,  h: 38, w: 25 },
+    { y: 20,  h: 24, w: 16 }
   ];
 
   masts.forEach((mast, index) => {
-    // Direk Çubuğu
     ctx.strokeStyle = '#1a0d06';
     ctx.lineWidth = index === 1 ? 4 : 3;
     ctx.beginPath();
@@ -1717,7 +1726,6 @@ function drawDetailed3DShip(p, isEnemy = false, isSelected = false) {
     ctx.lineTo(0, mast.y - mast.h);
     ctx.stroke();
 
-    // Rüzgarla Şişmiş 3D Yelken
     const sailGrad = ctx.createLinearGradient(-20, mast.y - mast.h, 20, mast.y);
     sailGrad.addColorStop(0, '#ffffff');
     sailGrad.addColorStop(0.45, m.sailColor);
@@ -1732,21 +1740,21 @@ function drawDetailed3DShip(p, isEnemy = false, isSelected = false) {
     ctx.closePath();
     ctx.fill();
 
-    ctx.strokeStyle = style.accent;
+    ctx.strokeStyle = m.trimColor;
     ctx.lineWidth = 1.3;
     ctx.stroke();
 
-    // Ana yelkene özel semböl
     if (index === 1) {
-      ctx.fillStyle = style.accent;
+      ctx.fillStyle = m.trimColor;
       ctx.font = 'bold 12px serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(style.symbol, 0, mast.y - mast.h * 0.5);
+      const symbol = theme === 'minotaur' ? '♉' : theme === 'hellfire' ? '🔥' : theme === 'leviathan' ? '🌊' : theme === 'frost' ? '❄' : theme === 'thunder' ? '⚡' : '◆';
+      ctx.fillText(symbol, 0, mast.y - mast.h * 0.5);
     }
   });
 
-  // Dalgalanan Komutan Bayrağı
+  // Dalgalanan Bayrak
   const wave = Math.sin(t / 160 + (p.x || 0) * 0.03) * 3.5;
   ctx.fillStyle = m.flagColor;
   ctx.beginPath();
@@ -1756,28 +1764,9 @@ function drawDetailed3DShip(p, isEnemy = false, isSelected = false) {
   ctx.closePath();
   ctx.fill();
 
-  // Özel Gemi Işıltıları ve Varak Detayları
-  if (id === 'phantom' || id === 'emerald') {
-    ctx.shadowColor = style.glow;
-    ctx.shadowBlur = 14;
-    ctx.fillStyle = style.glow;
-    ctx.beginPath();
-    ctx.arc(0, 0, 4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.shadowBlur = 0;
-  }
-
-  if (id === 'golden' || id === 'crimson_emperor') {
-    ctx.strokeStyle = style.accent;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(0, -32, 6, 0, Math.PI);
-    ctx.stroke();
-  }
-
   ctx.restore();
 
-  // Gemi İsim Etiketi (Düzgün okunur, dönmez)
+  // Gemi İsim Etiketi
   ctx.save();
   ctx.textAlign = 'center';
   ctx.font = '700 13px system-ui';
@@ -1915,10 +1904,10 @@ function draw() {
   for (const e of enemies) {
     if (e.x < cam.x - 120 || e.x > cam.x + viewW + 120 ||
         e.y < cam.y - 120 || e.y > cam.y + viewH + 120) continue;
-    drawDetailed3DShip(e, true, e.id === selectedEnemyId);
+    drawUnique3DShip(e, true, e.id === selectedEnemyId);
   }
 
-  drawDetailed3DShip(player, false, false);
+  drawUnique3DShip(player, false, false);
 
   for (const sw of shockwaves) {
     ctx.save();
