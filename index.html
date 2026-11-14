@@ -159,7 +159,9 @@ window.addEventListener('resize', resize);
 resize();
 
 const WORLD_SIZE = 2400;
-const ATTACK_RANGE = 320;
+const ATTACK_RANGE = 230; // Azaltılmış menzil
+const PLAYER_MAX_SPEED = 1.85; // Önceki 3.7 hızının yarı yarıya azaltılmış hali
+const ENEMY_MAX_SPEED = PLAYER_MAX_SPEED * (2 / 3); // Oyuncudan 1/3 daha yavaş
 const ENEMY_DAMAGE = 10;
 const ENEMY_FIRE_INTERVAL = 3000;
 
@@ -205,7 +207,7 @@ function initGame() {
   const now = Date.now();
   player = {
     id: 'player',
-    x: 0, y: 0, a: 0, speed: 0, maxSpeed: 3.7,
+    x: 0, y: 0, a: 0, speed: 0, maxSpeed: PLAYER_MAX_SPEED,
     hp: 1000, maxHp: 1000,
     exp: 0, maxExp: 100, level: 1,
     damage: 180,
@@ -424,6 +426,7 @@ function fireLockedCannon(shooter, target, isPlayer) {
   });
 }
 
+// Hareket halindeyken de düşman seçmeye ve hedef değiştirmeye izin verir
 canvas.addEventListener('pointerdown', e => {
   if (isGameOver) return;
   e.preventDefault();
@@ -434,7 +437,7 @@ canvas.addEventListener('pointerdown', e => {
   const worldY = e.clientY + camY;
 
   let clickedEnemy = null;
-  let bestDist = 42;
+  let bestDist = 44;
   for (const enemy of enemies) {
     const d = Math.hypot(worldX - enemy.x, worldY - enemy.y);
     if (d <= bestDist) {
@@ -460,8 +463,8 @@ canvas.addEventListener('pointerdown', e => {
     return;
   }
 
+  // Boş denize tıklandığında mevcut saldırı durumunu bozmadan yeni hedefe yelken aç
   selectedEnemyId = null;
-  isAttacking = false;
   lastClickEnemyId = null;
   syncAttackButton();
 
@@ -550,12 +553,13 @@ function update() {
     syncAttackButton();
   }
 
+  // Oyuncu hareketi (Diğer fonksiyonları etkilemez)
   if (targetPos) {
     const distToTarget = Math.hypot(targetPos.x - player.x, targetPos.y - player.y);
-    if (distToTarget > 14) {
+    if (distToTarget > 10) {
       const targetA = Math.atan2(targetPos.y - player.y, targetPos.x - player.x);
-      player.a = lerpAngle(player.a, targetA, 0.13);
-      player.speed = Math.min(player.maxSpeed, player.speed + 0.16);
+      player.a = lerpAngle(player.a, targetA, 0.14);
+      player.speed = Math.min(player.maxSpeed, player.speed + 0.12);
     } else {
       targetPos = null;
       player.speed *= 0.9;
@@ -568,7 +572,7 @@ function update() {
   player.y += Math.sin(player.a) * player.speed;
   player.x = Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, player.x));
   player.y = Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, player.y));
-  updateWake(player, player.speed > 0.4);
+  updateWake(player, player.speed > 0.25);
 
   for (const isl of islands) {
     const dist = Math.hypot(player.x - isl.x, player.y - isl.y);
@@ -582,21 +586,15 @@ function update() {
     }
   }
 
-  // Menzilden çıkıldığında saldırı otomatik iptal olur; tekrar girince kendiliğinden başlamaz
+  // Saldırı devam ederken hareket edilse bile menzilden çıkmadıkça ateş kesilmez
   if (isAttacking && selectedEnemy) {
     const distToEnemy = Math.hypot(selectedEnemy.x - player.x, selectedEnemy.y - player.y);
     if (distToEnemy > ATTACK_RANGE) {
       isAttacking = false;
       syncAttackButton();
-    } else {
-      const desiredAngle = Math.atan2(selectedEnemy.y - player.y, selectedEnemy.x - player.x);
-      if (!targetPos) {
-        player.a = lerpAngle(player.a, desiredAngle, 0.12);
-      }
-      if (now - lastPlayerShot > 520) {
-        lastPlayerShot = now;
-        fireLockedCannon(player, selectedEnemy, true);
-      }
+    } else if (now - lastPlayerShot > 520) {
+      lastPlayerShot = now;
+      fireLockedCannon(player, selectedEnemy, true);
     }
   }
 
@@ -612,16 +610,17 @@ function update() {
     }
   }
 
+  // NPC gemileri oyuncudan 1/3 daha yavaş hareket eder
   for (let i = enemies.length - 1; i >= 0; i--) {
     const e = enemies[i];
     const distToPlayer = Math.hypot(player.x - e.x, player.y - e.y);
-    let eSpeed = 1.4;
+    let eSpeed = ENEMY_MAX_SPEED * 0.75;
 
     if (distToPlayer < 480) {
       const angToPlayer = Math.atan2(player.y - e.y, player.x - e.x);
       e.a = lerpAngle(e.a, angToPlayer, 0.05);
       if (distToPlayer > 175) {
-        eSpeed = 2.0;
+        eSpeed = ENEMY_MAX_SPEED;
         e.x += Math.cos(e.a) * eSpeed;
         e.y += Math.sin(e.a) * eSpeed;
       }
@@ -778,11 +777,11 @@ function drawRangeRing(sx, sy) {
   ctx.save();
   ctx.beginPath();
   ctx.arc(sx, sy, ATTACK_RANGE, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
   ctx.fill();
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.42)';
-  ctx.setLineDash([12, 8]);
+  ctx.lineWidth = 1.8;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+  ctx.setLineDash([10, 8]);
   ctx.stroke();
   ctx.restore();
 }
@@ -983,7 +982,7 @@ function draw() {
   ctx.lineWidth = 4;
   ctx.strokeRect(-WORLD_SIZE - camX, -WORLD_SIZE - camY, WORLD_SIZE * 2, WORLD_SIZE * 2);
 
-  // Geminin etrafında gözü yormayan hafif saydam beyaz menzil çizgisi
+  // Geminin etrafında hafif saydam beyaz menzil çerçevesi
   drawRangeRing(W / 2, H / 2);
 
   if (targetPos) {
