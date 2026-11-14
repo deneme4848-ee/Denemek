@@ -54,7 +54,7 @@
       letter-spacing: 0.3px;
     }
 
-    /* SOL ÜST: KÜÇÜLTÜLMÜŞ HARİTA + KOORDİNAT + YAN İKONLAR */
+    /* SOL ÜST: KÜÇÜLTÜLMÜŞ PARŞÖMEN HARİTA + KOORDİNAT + YAN İKONLAR */
     #top-left-hud {
       position: fixed; top: 66px; left: 10px;
       display: flex; align-items: flex-start; gap: 8px;
@@ -501,8 +501,8 @@ const SHIP_MODELS = {
   standard: { id: 'standard', name: '8 Yönlü Efsanevi Gemi', desc: 'Şeffaf PNG Sprite Filosu', cost: 0 }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v15';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v15';
+const USERS_STORAGE_KEY = 'pirate3d_users_v16';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v16';
 let authMode = 'login';
 let currentUser = null;
 
@@ -569,8 +569,8 @@ let raycaster, planeGeo, mouse;
 let shipTextures = {};
 let textureLoader;
 const WORLD_SIZE = 4000;
-const ATTACK_RANGE = 320;
-const AGGRO_RANGE = 300;
+const ATTACK_RANGE = 280; // Menzil biraz düşürüldü
+const AGGRO_RANGE = 280;
 const BASE_SHIP_HEIGHT = 95;
 
 function createStaticOceanTextures() {
@@ -739,7 +739,6 @@ function initThreeGame() {
   scene.background = new THREE.Color(0x052236);
   scene.fog = new THREE.FogExp2(0x052236, 0.0003);
 
-  // Kamera daha yukarı ve geriye taşındı (Görüş mesafesi arttı)
   camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 18000);
   camera.position.set(0, 950, 720);
   camera.lookAt(0, 0, 0);
@@ -782,7 +781,7 @@ function initThreeGame() {
   rangeRingMesh.position.y = 0.6;
   scene.add(rangeRingMesh);
 
-  // Mavimsi neon dönen çember (Gemi altında)
+  // Mavimsi neon dönen çember
   const neonGeo = new THREE.RingGeometry(32, 38, 48);
   const neonMat = new THREE.MeshBasicMaterial({ color: 0x0ea5e9, side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
   playerNeonRing = new THREE.Mesh(neonGeo, neonMat);
@@ -838,7 +837,7 @@ function initThreeGame() {
 }
 
 // ==========================================================
-// OYUN MANTIĞI & 1 SANİYEDE 1 ATIŞ / 5 SN OTOMATİK TAMİR
+// OYUN MANTIĞI & NPC SALDIRI/MENZİL YÖNETİMİ
 // ==========================================================
 let player, gameIslands = [];
 let targetPos = null, selectedEnemyId = null, isAttacking = false, isGameOver = false;
@@ -862,7 +861,8 @@ function startGameLogic() {
   const initialData = shipTextures.top || Object.values(shipTextures)[0];
   const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1 });
   playerSprite = new THREE.Sprite(mat);
-  playerSprite.center.set(0.5, 0.22);
+  // center.set(0.5, 0.4) yapılarak gemi sudan yukarı (daha az batık) konuma getirildi
+  playerSprite.center.set(0.5, 0.4);
   applyNormalizedSprite(playerSprite, player.a);
   scene.add(playerSprite);
 
@@ -897,7 +897,7 @@ function spawnEnemySprite(id) {
   const initialData = shipTextures.top || Object.values(shipTextures)[0];
   const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1, color: 0xd1fae5 });
   const sprite = new THREE.Sprite(mat);
-  sprite.center.set(0.5, 0.22);
+  sprite.center.set(0.5, 0.4);
   applyNormalizedSprite(sprite, 0);
   sprite.position.set(ex, 2, ez);
   sprite.userData.enemyId = id;
@@ -982,7 +982,6 @@ function animate3D() {
     return;
   }
 
-  // 5 saniyedir atış almadıysa otomatik tamir (can yenileme)
   const now = Date.now();
   if (player.hp < player.maxHp && (now - player.lastDamagedTime > 5000)) {
     player.hp = Math.min(player.maxHp, player.hp + 12);
@@ -1014,7 +1013,6 @@ function animate3D() {
     applyNormalizedSprite(playerSprite, player.a);
   }
 
-  // Mavimsi neon çemberin yavaşça dönmesi
   if (playerNeonRing) {
     playerNeonRing.position.set(player.x, 0.8, player.z);
     playerNeonRing.rotation.z += 0.02;
@@ -1031,12 +1029,17 @@ function animate3D() {
     const activeSpeed = en.slowTimer > 0 ? en.baseSpeed * 0.5 : en.baseSpeed;
     const distToPlayer = Math.hypot(player.x - en.x, player.z - en.z);
 
+    // DÜZELTİLEN NPC DAVRANIŞI: Menzile girince durup saldırır, çıkınca rastgele gezinir
     if (distToPlayer <= AGGRO_RANGE) {
       en.a = Math.atan2(player.z - en.z, player.x - en.x);
-      en.x += Math.cos(en.a) * (activeSpeed * 1.25);
-      en.z += Math.sin(en.a) * (activeSpeed * 1.25);
+      
+      // Eğer menzilin dışındaysa oyuncuya doğru yaklaş, menzile girdiyse dur!
+      if (distToPlayer > ATTACK_RANGE - 20) {
+        en.x += Math.cos(en.a) * (activeSpeed * 1.25);
+        en.z += Math.sin(en.a) * (activeSpeed * 1.25);
+      }
 
-      // NPC saniyede 1 atış yapma kuralı
+      // Menzil içindeyse saniyede 1 kez ateş et
       if (distToPlayer <= ATTACK_RANGE && (now - en.lastAttackTime >= 1000)) {
         en.lastAttackTime = now;
         player.hp = Math.max(0, player.hp - 30);
@@ -1069,7 +1072,7 @@ function animate3D() {
     }
   }
 
-  // Kullanıcı saniyede 1 atış yapma kuralı
+  // Oyuncunun saniyede 1 atış mantığı
   if (isAttacking && selectedEnemyId) {
     const target = enemies.find(e => e.id === selectedEnemyId);
     const ammoKey = player.selectedAmmo;
