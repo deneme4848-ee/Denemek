@@ -1578,7 +1578,7 @@ function drawRangeRing(wx, wy) {
 }
 
 // ==========================================
-// GEMİ ÇİZİM FONKSİYONU
+// GEMİ ÇİZİM FONKSİYONU (AÇILI / PERSPEKTİF GÖRÜNÜM)
 // ==========================================
 function draw3DShip(p, isEnemy = false, isSelected = false) {
   const m = isEnemy ? {
@@ -1592,7 +1592,6 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
 
   const id = m.id || 'enemy';
 
-  // Gemilerin özel tasarım renkleri
   const styles = {
     standard: { accent: '#d6a66a', glow: '#fbbf24', symbol: '◆' },
     tasarim_1: { accent: '#f59e0b', glow: '#ef4444', symbol: '✦' },
@@ -1646,6 +1645,9 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
   ctx.save();
   ctx.translate(p.x, p.y);
   ctx.rotate(p.a || 0);
+
+  // ⭐ BURASI EKLENDİ: Tam üstten görünümü engellemek için dikey ekseni hafifçe sıkıştırıyoruz (Eğimli 3D Açı Efekti)
+  ctx.scale(1, 0.68);
 
   // Gemi gölgesi
   ctx.fillStyle = 'rgba(0,0,0,.38)';
@@ -1922,7 +1924,7 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
 
   ctx.restore();
 
-  // Gemi adı
+  // Gemi adı (Perspektiften bağımsız düzgün durması için save bloğu dışında)
   ctx.save();
   ctx.textAlign = 'center';
   ctx.font = 'bold 12px system-ui';
