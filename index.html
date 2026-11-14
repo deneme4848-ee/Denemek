@@ -39,7 +39,6 @@
       pointer-events: none; max-width: 72vw;
     }
 
-    /* Alt Orta Saldırı / Atış Kes Butonu */
     #combat-bar {
       position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
       z-index: 6; display: flex; gap: 10px; align-items: center;
@@ -254,27 +253,23 @@ function createExplosion(x, y, color = '#ff9e2c', count = 14) {
   }
 }
 
-function fireCannon(shooter, target, isPlayer) {
-  const ang = target ? Math.atan2(target.y - shooter.y, target.x - shooter.x) : shooter.a;
-  // Bordadan top atışı
-  const side = Math.random() < 0.5 ? 1 : -1;
-  const broadsideAngle = ang + (Math.PI / 2) * side * 0.35;
-  const muzzleX = shooter.x + Math.cos(shooter.a) * 12 + Math.cos(shooter.a + Math.PI / 2) * side * 9;
-  const muzzleY = shooter.y + Math.sin(shooter.a) * 12 + Math.sin(shooter.a + Math.PI / 2) * side * 9;
+// Doğrudan hedef gemiye kilitlenen gülle oluşturur (ıskalama yok)
+function fireLockedCannon(shooter, targetId, isPlayer) {
+  const muzzleX = shooter.x + Math.cos(shooter.a) * 18;
+  const muzzleY = shooter.y + Math.sin(shooter.a) * 18;
 
   shots.push({
     x: muzzleX,
     y: muzzleY,
-    vx: Math.cos(broadsideAngle) * 8.8,
-    vy: Math.sin(broadsideAngle) * 8.8,
+    speed: isPlayer ? 9.5 : 7.8,
     isPlayer,
-    life: 70
+    targetId,
+    damage: isPlayer ? 18 : 11
   });
 
   createExplosion(muzzleX, muzzleY, '#e2e8f0', 5);
 }
 
-// Canvas Tıklama / Dokunma: Düşman seçimi (1 tık) veya Çift Tıkla Saldırı (2 tık), değilse hedefe yelken
 canvas.addEventListener('pointerdown', e => {
   if (isGameOver) return;
 
@@ -283,9 +278,8 @@ canvas.addEventListener('pointerdown', e => {
   const worldX = e.clientX + camX;
   const worldY = e.clientY + camY;
 
-  // Tıklanan noktada düşman gemisi var mı?
   let clickedEnemy = null;
-  let bestDist = 34;
+  let bestDist = 36;
   for (const enemy of enemies) {
     const d = Math.hypot(worldX - enemy.x, worldY - enemy.y);
     if (d <= bestDist) {
@@ -297,13 +291,11 @@ canvas.addEventListener('pointerdown', e => {
   if (clickedEnemy) {
     const now = Date.now();
     if (lastClickEnemyId === clickedEnemy.id && now - lastClickTime < 650) {
-      // 2. kez üst üste aynı düşmana tıklandı -> Saldırı başlat
       selectedEnemyId = clickedEnemy.id;
       isAttacking = true;
       lastClickEnemyId = null;
       lastClickTime = 0;
     } else {
-      // 1. tıklama -> Sadece seç
       selectedEnemyId = clickedEnemy.id;
       lastClickEnemyId = clickedEnemy.id;
       lastClickTime = now;
@@ -312,7 +304,6 @@ canvas.addEventListener('pointerdown', e => {
     return;
   }
 
-  // Boş denize tıklandı -> Seçimi kaldır, saldırıyı durdur, yeni hedefe git
   selectedEnemyId = null;
   isAttacking = false;
   lastClickEnemyId = null;
@@ -324,7 +315,6 @@ canvas.addEventListener('pointerdown', e => {
   };
 });
 
-// Alt Saldırı / Atış Kes Butonu
 attackBtn.addEventListener('pointerdown', e => {
   e.preventDefault();
   e.stopPropagation();
@@ -376,15 +366,12 @@ function update() {
     syncAttackButton();
   }
 
-  // Oyuncu hareketi
-  let moving = false;
   if (targetPos) {
     const distToTarget = Math.hypot(targetPos.x - player.x, targetPos.y - player.y);
     if (distToTarget > 14) {
       const targetA = Math.atan2(targetPos.y - player.y, targetPos.x - player.x);
       player.a = lerpAngle(player.a, targetA, 0.13);
       player.speed = Math.min(player.maxSpeed, player.speed + 0.16);
-      moving = true;
     } else {
       targetPos = null;
       player.speed *= 0.9;
@@ -399,7 +386,6 @@ function update() {
   player.y = Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, player.y));
   updateWake(player, player.speed > 0.4);
 
-  // Adalarla çarpışma (Oyuncu)
   for (const isl of islands) {
     const dist = Math.hypot(player.x - isl.x, player.y - isl.y);
     const minDist = isl.r + 18;
@@ -412,17 +398,16 @@ function update() {
     }
   }
 
-  // Seçili düşmana saldırı modu aktifse otomatik ateş et
+  // Seçili düşmana doğrudan kilitli ateş
   const now = Date.now();
   if (isAttacking && selectedEnemy) {
-    const dist = Math.hypot(selectedEnemy.x - player.x, selectedEnemy.y - player.y);
     const desiredAngle = Math.atan2(selectedEnemy.y - player.y, selectedEnemy.x - player.x);
     if (!targetPos) {
-      player.a = lerpAngle(player.a, desiredAngle, 0.08);
+      player.a = lerpAngle(player.a, desiredAngle, 0.12);
     }
-    if (dist < 440 && now - lastPlayerShot > 520) {
+    if (now - lastPlayerShot > 520) {
       lastPlayerShot = now;
-      fireCannon(player, selectedEnemy, true);
+      fireLockedCannon(player, selectedEnemy.id, true);
     }
   }
 
@@ -445,7 +430,7 @@ function update() {
     const distToPlayer = Math.hypot(player.x - e.x, player.y - e.y);
     let eSpeed = 1.4;
 
-    if (distToPlayer < 460) {
+    if (distToPlayer < 480) {
       const angToPlayer = Math.atan2(player.y - e.y, player.x - e.x);
       e.a = lerpAngle(e.a, angToPlayer, 0.05);
       if (distToPlayer > 175) {
@@ -453,9 +438,9 @@ function update() {
         e.x += Math.cos(e.a) * eSpeed;
         e.y += Math.sin(e.a) * eSpeed;
       }
-      if (distToPlayer < 350 && now - e.lastShot > 1800) {
+      if (distToPlayer < 420 && now - e.lastShot > 1800) {
         e.lastShot = now;
-        fireCannon(e, player, false);
+        fireLockedCannon(e, player.id, false);
       }
     } else {
       e.turnTimer--;
@@ -481,49 +466,49 @@ function update() {
     }
   }
 
-  // Top Gülleleri
+  // Kilitli Top Gülleleri (Manevra ile ıskalamaz, doğrudan hedefe ulaşıp hasar verir)
   for (let i = shots.length - 1; i >= 0; i--) {
     const s = shots[i];
-    s.x += s.vx;
-    s.y += s.vy;
-    s.life--;
 
-    let hit = false;
-    for (const isl of islands) {
-      if (Math.hypot(s.x - isl.x, s.y - isl.y) < isl.r) {
-        hit = true;
-        createExplosion(s.x, s.y, '#cbd5e1', 6);
-        break;
+    if (s.isPlayer) {
+      const targetEnemy = enemies.find(en => en.id === s.targetId);
+      if (!targetEnemy) {
+        shots.splice(i, 1);
+        continue;
       }
-    }
+      const dx = targetEnemy.x - s.x;
+      const dy = targetEnemy.y - s.y;
+      const dist = Math.hypot(dx, dy);
 
-    if (!hit && s.isPlayer) {
-      for (let j = enemies.length - 1; j >= 0; j--) {
-        const e = enemies[j];
-        if (Math.hypot(s.x - e.x, s.y - e.y) < 24) {
-          hit = true;
-          e.hp -= 18;
-          createExplosion(s.x, s.y, '#ff7b00', 8);
-          if (e.hp <= 0) {
-            createExplosion(e.x, e.y, '#ef4444', 24);
-            if (selectedEnemyId === e.id) {
-              selectedEnemyId = null;
-              isAttacking = false;
-              syncAttackButton();
-            }
-            enemies.splice(j, 1);
-            player.score += 100;
-            updateHUD();
-            setTimeout(spawnEnemy, 2600);
+      if (dist <= s.speed + 12) {
+        targetEnemy.hp -= s.damage;
+        createExplosion(targetEnemy.x, targetEnemy.y, '#ff7b00', 10);
+        if (targetEnemy.hp <= 0) {
+          createExplosion(targetEnemy.x, targetEnemy.y, '#ef4444', 24);
+          if (selectedEnemyId === targetEnemy.id) {
+            selectedEnemyId = null;
+            isAttacking = false;
+            syncAttackButton();
           }
-          break;
+          enemies = enemies.filter(en => en.id !== targetEnemy.id);
+          player.score += 100;
+          updateHUD();
+          setTimeout(spawnEnemy, 2600);
         }
+        shots.splice(i, 1);
+        continue;
       }
-    } else if (!hit && !s.isPlayer) {
-      if (Math.hypot(s.x - player.x, s.y - player.y) < 22) {
-        hit = true;
-        player.hp -= 11;
-        createExplosion(s.x, s.y, '#ef4444', 10);
+
+      s.x += (dx / dist) * s.speed;
+      s.y += (dy / dist) * s.speed;
+    } else {
+      const dx = player.x - s.x;
+      const dy = player.y - s.y;
+      const dist = Math.hypot(dx, dy);
+
+      if (dist <= s.speed + 12) {
+        player.hp -= s.damage;
+        createExplosion(player.x, player.y, '#ef4444', 12);
         updateHUD();
         if (player.hp <= 0) {
           isGameOver = true;
@@ -532,10 +517,13 @@ function update() {
           finalScoreEl.textContent = 'Toplanan Altın: ' + player.score;
           gameOverEl.style.display = 'flex';
         }
+        shots.splice(i, 1);
+        continue;
       }
-    }
 
-    if (hit || s.life <= 0) shots.splice(i, 1);
+      s.x += (dx / dist) * s.speed;
+      s.y += (dy / dist) * s.speed;
+    }
   }
 
   // Parçacıklar
@@ -548,9 +536,7 @@ function update() {
   }
 }
 
-// Daha Gerçekçi Gemi Çizimi (Köpük izi, ahşap gövde, güverte, lombozlar, direkler, yelken, bayrak)
 function drawRealisticShip(p, sx, sy, camX, camY, isEnemy = false, isSelected = false) {
-  // Gemi arkası köpük izi
   for (const w of p.wake || []) {
     ctx.save();
     ctx.globalAlpha = Math.max(0, w.alpha);
@@ -561,7 +547,6 @@ function drawRealisticShip(p, sx, sy, camX, camY, isEnemy = false, isSelected = 
     ctx.restore();
   }
 
-  // Seçili düşman için belirgin kırmızı çember
   if (isEnemy && isSelected) {
     const pulse = 30 + Math.sin(Date.now() / 150) * 3;
     ctx.save();
@@ -583,7 +568,6 @@ function drawRealisticShip(p, sx, sy, camX, camY, isEnemy = false, isSelected = 
   ctx.save();
   ctx.translate(sx, sy);
 
-  // Düşman can barı
   if (isEnemy && p.hp < p.maxHp) {
     ctx.fillStyle = 'rgba(0,0,0,0.6)';
     ctx.fillRect(-20, -36, 40, 5);
@@ -593,7 +577,6 @@ function drawRealisticShip(p, sx, sy, camX, camY, isEnemy = false, isSelected = 
 
   ctx.rotate(p.a || 0);
 
-  // Gövde gölgesi
   ctx.fillStyle = 'rgba(0, 20, 35, 0.35)';
   ctx.beginPath();
   ctx.moveTo(27, 4);
@@ -604,7 +587,6 @@ function drawRealisticShip(p, sx, sy, camX, camY, isEnemy = false, isSelected = 
   ctx.closePath();
   ctx.fill();
 
-  // Ana Gövde (Ahşap)
   const hullGrad = ctx.createLinearGradient(0, -14, 0, 14);
   if (isEnemy) {
     hullGrad.addColorStop(0, '#4a1c16');
@@ -618,7 +600,7 @@ function drawRealisticShip(p, sx, sy, camX, camY, isEnemy = false, isSelected = 
 
   ctx.fillStyle = hullGrad;
   ctx.beginPath();
-  ctx.moveTo(28, 0); // Pruva mahmuzu
+  ctx.moveTo(28, 0);
   ctx.quadraticCurveTo(12, 15, -21, 11);
   ctx.lineTo(-26, 0);
   ctx.lineTo(-21, -11);
@@ -626,12 +608,10 @@ function drawRealisticShip(p, sx, sy, camX, camY, isEnemy = false, isSelected = 
   ctx.closePath();
   ctx.fill();
 
-  // Küpeşte (kenar kaplama)
   ctx.strokeStyle = isEnemy ? '#fca5a5' : '#f3d59b';
   ctx.lineWidth = 1.8;
   ctx.stroke();
 
-  // İç güverte tahtası
   ctx.fillStyle = isEnemy ? '#6b2920' : '#a86b38';
   ctx.beginPath();
   ctx.moveTo(21, 0);
@@ -642,14 +622,12 @@ function drawRealisticShip(p, sx, sy, camX, camY, isEnemy = false, isSelected = 
   ctx.closePath();
   ctx.fill();
 
-  // Bordadaki top lombozları
   ctx.fillStyle = '#0f172a';
   for (const lx of [-8, 1, 10]) {
     ctx.fillRect(lx, -10.5, 4, 2.2);
     ctx.fillRect(lx, 8.3, 4, 2.2);
   }
 
-  // Ana Direk ve Kıç Direk
   ctx.strokeStyle = '#3b2314';
   ctx.lineWidth = 2.6;
   ctx.beginPath();
@@ -657,12 +635,10 @@ function drawRealisticShip(p, sx, sy, camX, camY, isEnemy = false, isSelected = 
   ctx.lineTo(8, 0);
   ctx.stroke();
 
-  // Şişkin Yelkenler (Ana Yelken + Flok Yelken)
   ctx.fillStyle = isEnemy ? '#dc2626' : '#f8ecd2';
   ctx.strokeStyle = isEnemy ? '#7f1d1d' : '#cbb382';
   ctx.lineWidth = 1;
 
-  // Ana yelken
   ctx.beginPath();
   ctx.moveTo(-4, -11);
   ctx.quadraticCurveTo(6, 0, -4, 11);
@@ -671,7 +647,6 @@ function drawRealisticShip(p, sx, sy, camX, camY, isEnemy = false, isSelected = 
   ctx.fill();
   ctx.stroke();
 
-  // Ön yelken
   ctx.beginPath();
   ctx.moveTo(8, -8);
   ctx.quadraticCurveTo(19, 0, 8, 8);
@@ -680,7 +655,6 @@ function drawRealisticShip(p, sx, sy, camX, camY, isEnemy = false, isSelected = 
   ctx.fill();
   ctx.stroke();
 
-  // Kıç Bayrağı
   ctx.fillStyle = isEnemy ? '#ef4444' : '#fbbf24';
   ctx.beginPath();
   ctx.moveTo(-22, 0);
@@ -692,7 +666,6 @@ function drawRealisticShip(p, sx, sy, camX, camY, isEnemy = false, isSelected = 
 
   ctx.restore();
 
-  // İsim etiketi
   ctx.fillStyle = isEnemy ? (isSelected ? '#fecaca' : '#fca5a5') : '#ffffff';
   ctx.textAlign = 'center';
   ctx.font = '600 12px system-ui';
@@ -739,7 +712,6 @@ function draw() {
   const camX = player.x - W / 2;
   const camY = player.y - H / 2;
 
-  // Hareketli Dalgalar
   const t = Date.now() / 800;
   ctx.strokeStyle = '#54bdd0';
   ctx.globalAlpha = 0.25;
@@ -756,12 +728,10 @@ function draw() {
   }
   ctx.globalAlpha = 1;
 
-  // Harita Sınırı
   ctx.strokeStyle = 'rgba(255, 215, 131, 0.35)';
   ctx.lineWidth = 4;
   ctx.strokeRect(-WORLD_SIZE - camX, -WORLD_SIZE - camY, WORLD_SIZE * 2, WORLD_SIZE * 2);
 
-  // Hedef Noktası Halkası
   if (targetPos) {
     const tx = targetPos.x - camX;
     const ty = targetPos.y - camY;
@@ -775,7 +745,6 @@ function draw() {
     ctx.restore();
   }
 
-  // Adalar
   for (const isl of islands) {
     const sx = isl.x - camX, sy = isl.y - camY;
     if (sx < -150 || sx > W + 150 || sy < -150 || sy > H + 150) continue;
@@ -785,7 +754,6 @@ function draw() {
     ctx.beginPath(); ctx.arc(sx, sy, isl.r * 0.72, 0, Math.PI * 2); ctx.fill();
   }
 
-  // Hazine Sandıkları
   for (const tr of treasures) {
     const sx = tr.x - camX, sy = tr.y - camY;
     if (sx < -50 || sx > W + 50 || sy < -50 || sy > H + 50) continue;
@@ -797,7 +765,6 @@ function draw() {
     ctx.strokeRect(sx - 9, sy - 7 + bob, 18, 14);
   }
 
-  // Top Gülleleri
   for (const s of shots) {
     ctx.fillStyle = s.isPlayer ? '#1e293b' : '#991b1b';
     ctx.beginPath();
@@ -805,17 +772,14 @@ function draw() {
     ctx.fill();
   }
 
-  // Düşman Gemileri
   for (const e of enemies) {
     const sx = e.x - camX, sy = e.y - camY;
     if (sx < -100 || sx > W + 100 || sy < -100 || sy > H + 100) continue;
     drawRealisticShip(e, sx, sy, camX, camY, true, e.id === selectedEnemyId);
   }
 
-  // Oyuncu Gemisi
   drawRealisticShip(player, W / 2, H / 2, camX, camY, false, false);
 
-  // Parçacıklar
   for (const pt of particles) {
     ctx.globalAlpha = pt.life;
     ctx.fillStyle = pt.color;
