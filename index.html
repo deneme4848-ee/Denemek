@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - 3D GLTF Efsanevi Filo</title>
+  <title>Korsan Dünyası - Efsanevi 3D Filo</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -33,7 +33,6 @@
     .stat-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-top: 6px; gap: 8px; color: #cbd5e1; }
     .stat-row strong { color: #fff4d4; }
     .ammo-badge { color: #fde047; font-weight: 800; }
-    .ammo-badge.low { color: #f87171; }
     .bar-bg { width: 100%; height: 8px; background: rgba(255,255,255,0.15); border-radius: 5px; margin-top: 5px; overflow: hidden; }
     #hp-bar { width: 100%; height: 100%; background: linear-gradient(90deg,#16a34a,#4ade80); transition: width 0.2s; }
     #exp-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #0284c7, #c084fc); }
@@ -77,7 +76,6 @@
     .buy-btn:disabled { opacity: 0.42; background: rgba(30, 41, 59, 0.8); cursor: not-allowed; }
     .buy-btn.owned { background: #15803d; border-color: #4ade80; color: #f0fdf4; }
     .buy-btn.equipped { background: #1e40af; border-color: #60a5fa; color: #eff6ff; }
-    #market-feedback { font-size: 11px; min-height: 15px; margin-top: 8px; text-align: center; color: #4ade80; }
 
     #hint { position: fixed; top: 152px; left: 12px; font-size: 12px; background: rgba(8,22,33,0.85); border: 1px solid rgba(245,197,94,0.3); padding: 6px 10px; border-radius: 8px; pointer-events: none; z-index: 5; color: #ffe8b1; }
 
@@ -114,15 +112,13 @@
     .auth-field label { display: block; font-size: 12px; color: #cbd5e1; margin-bottom: 5px; font-weight: 600; }
     .auth-field input { width: 100%; height: 46px; padding: 0 14px; border-radius: 12px; border: 1px solid #334155; background: #081622; color: #fff; font-size: 16px; outline: none; }
     .auth-msg { min-height: 18px; font-size: 12px; margin: 4px 0 12px; color: #fca5a5; }
-    .auth-msg.ok { color: #4ade80; }
     .auth-submit { width: 100%; height: 50px; border-radius: 14px; border: 1px solid #ffd783; background: linear-gradient(135deg, #c2410c, #7c2d12); color: #fffbeb; font-size: 15px; font-weight: 900; cursor: pointer; }
     .quick-test-box { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #bae6fd; }
     .quick-test-btn { border: 1px solid rgba(186, 230, 253, 0.35); background: rgba(14, 116, 144, 0.35); color: #e0f2fe; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; }
   </style>
 
-  <!-- Three.js ve GLTFLoader Kütüphaneleri -->
+  <!-- Three.js Kütüphanesi -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/loaders/GLTFLoader.js"></script>
 </head>
 <body>
 
@@ -152,7 +148,6 @@
         <span id="exp-text">0 / 100</span>
       </div>
       <div class="bar-bg"><div id="exp-bar"></div></div>
-      <div id="regen-info"></div>
     </div>
 
     <div class="right-hud">
@@ -166,7 +161,7 @@
 
   <div id="market-panel">
     <div class="market-header">
-      <strong id="panel-main-title">⚓ Korsan Ticaret & Tersane</strong>
+      <strong>⚓ Korsan Ticaret & Tersane</strong>
       <button id="market-close-btn" class="market-close" type="button">✕</button>
     </div>
     <div class="market-tabs">
@@ -185,10 +180,6 @@
       <div class="market-item">
         <div class="market-item-info"><span class="market-item-title">💣 30 Adet Gülle</span><span class="market-item-sub">Orta sandık</span></div>
         <button class="buy-btn ammo-buy-btn" type="button" data-ammo="30" data-cost="40">40 Altın</button>
-      </div>
-      <div class="market-item">
-        <div class="market-item-info"><span class="market-item-title">💣 75 Adet Gülle</span><span class="market-item-sub">Kalyon deposu</span></div>
-        <button class="buy-btn ammo-buy-btn" type="button" data-ammo="75" data-cost="90">90 Altın</button>
       </div>
     </div>
     <div id="section-shipyard" class="market-section">
@@ -213,7 +204,7 @@
     <div class="auth-card">
       <div class="auth-brand">
         <h1>⚓ Korsan Dünyası</h1>
-        <p>Meshy.ai GLTF Destekli Efsanevi 3D Denizler</p>
+        <p>Sea of Thieves Esintili Efsanevi 3D Denizler</p>
       </div>
       <div class="auth-tabs">
         <button id="tab-login" class="auth-tab active" type="button">Giriş Yap</button>
@@ -246,7 +237,6 @@ const hpTextEl = document.querySelector('#hp-text');
 const expTextEl = document.querySelector('#exp-text');
 const hpBarEl = document.querySelector('#hp-bar');
 const expBarEl = document.querySelector('#exp-bar');
-const regenInfoEl = document.querySelector('#regen-info');
 const attackBtn = document.querySelector('#attack-btn');
 const gameOverEl = document.querySelector('#gameover');
 const finalScoreEl = document.querySelector('#final-score');
@@ -258,16 +248,12 @@ const marketToggleBtn = document.querySelector('#market-toggle-btn');
 const shipyardToggleBtn = document.querySelector('#shipyard-toggle-btn');
 const marketPanel = document.querySelector('#market-panel');
 const marketCloseBtn = document.querySelector('#market-close-btn');
-const marketGoldEl = document.querySelector('#market-gold');
-const marketAmmoEl = document.querySelector('#market-ammo');
-const marketFeedbackEl = document.querySelector('#market-feedback');
-const ammoBuyBtns = document.querySelectorAll('.ammo-buy-btn');
+const shipyardListEl = document.querySelector('#shipyard-list');
 
 const tabMarket = document.querySelector('#tab-market');
 const tabShipyard = document.querySelector('#tab-shipyard');
 const sectionMarket = document.querySelector('#section-market');
 const sectionShipyard = document.querySelector('#section-shipyard');
-const shipyardListEl = document.querySelector('#shipyard-list');
 
 const authOverlay = document.querySelector('#auth-overlay');
 const tabLogin = document.querySelector('#tab-login');
@@ -283,11 +269,11 @@ const miniCanvas = document.querySelector('#minimap');
 const mctx = miniCanvas.getContext('2d');
 
 const SHIP_MODELS = {
-  standard: { id: 'standard', name: 'Efsanevi Gemi', desc: 'Meshy.ai GLB modeli.', cost: 0, file: 'gemi.glb' }
+  standard: { id: 'standard', name: 'Efsanevi Ejderha Gemi', desc: 'Meshy.ai tarzı efsanevi savaş gemisi.', cost: 0 }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v7';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v7';
+const USERS_STORAGE_KEY = 'pirate3d_users_v8';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v8';
 let authMode = 'login';
 let currentUser = null;
 
@@ -346,51 +332,77 @@ if (authForm) {
 if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeItem(SESSION_STORAGE_KEY); location.reload(); });
 
 // ==========================================================
-// GÜVENLİ GLTF YÜKLEYİCİ VE YEDEK MODEL SİSTEMİ
+// SEA OF THIEVES 3D EJDERHA PRUVALI EFSANEVİ GEMİ MODELLEME
 // ==========================================================
 let scene, camera, renderer;
 let playerMesh, enemies = [], islands = [], rangeRingMesh;
 let raycaster, planeGeo, mouse;
-let gltfLoader;
 const WORLD_SIZE = 4000;
 const ATTACK_RANGE = 320;
 const AGGRO_RANGE = 300;
 
-function createFallbackShip(modelConfig, isEnemy = false) {
+function createSeaOfThievesDragonShip(isEnemy = false) {
   const group = new THREE.Group();
-  const hullGeo = new THREE.CylinderGeometry(5.5, 8, 50, 12);
-  const hullMat = new THREE.MeshStandardMaterial({ color: isEnemy ? 0x042f2e : 0x3b1c11, roughness: 0.4 });
+
+  // 1. Koyu Ahşap Gövde (Tekne Silüeti)
+  const hullGeo = new THREE.CylinderGeometry(5.8, 8.5, 52, 14);
+  const hullMat = new THREE.MeshStandardMaterial({ color: 0x1c120c, roughness: 0.35, metalness: 0.2 });
   const hull = new THREE.Mesh(hullGeo, hullMat);
   hull.rotation.z = Math.PI / 2;
-  hull.position.y = 4.2;
+  hull.position.y = 4.5;
+  hull.castShadow = true; hull.receiveShadow = true;
   group.add(hull);
-  return group;
-}
 
-function loadShipModel(modelConfig, isEnemy = false, onLoaded) {
-  const group = new THREE.Group();
-  const file = modelConfig.file || 'gemi.glb';
+  // 2. Güverte Zemin Kaplaması ve Bordalar
+  const deckGeo = new THREE.BoxGeometry(14.5, 1.6, 42);
+  const deckMat = new THREE.MeshStandardMaterial({ color: 0x4a2e18, roughness: 0.65 });
+  const deck = new THREE.Mesh(deckGeo, deckMat);
+  deck.position.y = 9.0;
+  group.add(deck);
 
-  if (!gltfLoader) gltfLoader = new THREE.GLTFLoader();
+  // 3. Yanan Ağızlı Ejderha / Canavar Pruva Süsü (Ön Burun)
+  const dragonMouthGeo = new THREE.ConeGeometry(4, 16, 6);
+  const dragonMat = new THREE.MeshStandardMaterial({ color: 0xb91c1c, roughness: 0.2, emissive: 0x7f1d1d, emissiveIntensity: 0.6 });
+  const dragonBow = new THREE.Mesh(dragonMouthGeo, dragonMat);
+  dragonBow.rotation.x = Math.PI / 2;
+  dragonBow.position.set(0, 5.2, -32);
+  group.add(dragonBow);
 
-  gltfLoader.load(file, (gltf) => {
-    const model = gltf.scene;
-    model.scale.set(1.5, 1.5, 1.5);
-    model.position.set(0, 0, 0);
-    model.traverse(child => {
-      if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-      }
+  // 4. Üç Katlı Direkler ve Yırtık Kızıl Şişkin Yelkenler
+  const mastMat = new THREE.MeshStandardMaterial({ color: 0x140a04, roughness: 0.85 });
+  [-13, 2, 17].forEach((mz, idx) => {
+    const height = idx === 1 ? 42 : 32;
+    const mastGeo = new THREE.CylinderGeometry(1.1, 1.4, height);
+    const mast = new THREE.Mesh(mastGeo, mastMat);
+    mast.position.set(0, height / 2 + 9.5, mz);
+    group.add(mast);
+
+    const sailWidth = idx === 1 ? 24 : 16;
+    const sailHeight = idx === 1 ? 20 : 15;
+    const sailGeo = new THREE.BoxGeometry(sailWidth, sailHeight, 1.6);
+    const sailMat = new THREE.MeshStandardMaterial({ 
+      color: isEnemy ? 0x042f2e : 0x7f1d1d, 
+      roughness: 0.8,
+      side: THREE.DoubleSide 
     });
-    group.add(model);
-    if (onLoaded) onLoaded(group);
-  }, undefined, (error) => {
-    console.warn('GLB yüklenemedi, yedek gemi modeli kullanılıyor:', error);
-    const fallback = createFallbackShip(modelConfig, isEnemy);
-    group.add(fallback);
-    if (onLoaded) onLoaded(group);
+    const sail = new THREE.Mesh(sailGeo, sailMat);
+    sail.position.set(0, height / 2 + 7.5, mz + 0.9);
+    group.add(sail);
   });
+
+  // 5. Kıç Kamarası (Üst Yapı ve Pencereler)
+  const cabinGeo = new THREE.BoxGeometry(13.5, 8.5, 13);
+  const cabinMat = new THREE.MeshStandardMaterial({ color: 0x1c120c, roughness: 0.5 });
+  const cabin = new THREE.Mesh(cabinGeo, cabinMat);
+  cabin.position.set(0, 14.2, 20);
+  group.add(cabin);
+
+  // 6. Fenerler ve Bayrak
+  const flagGeo = new THREE.BoxGeometry(6.5, 3.8, 0.3);
+  const flagMat = new THREE.MeshStandardMaterial({ color: isEnemy ? 0x0f766e : 0x991b1b });
+  const flag = new THREE.Mesh(flagGeo, flagMat);
+  flag.position.set(0, 34, 16);
+  group.add(flag);
 
   return group;
 }
@@ -410,12 +422,10 @@ function initThreeGame() {
   renderer.shadowMap.enabled = true;
   document.getElementById('game').appendChild(renderer.domElement);
 
-  gltfLoader = new THREE.GLTFLoader();
-
-  const ambientLight = new THREE.AmbientLight(0xfff1e0, 0.85);
+  const ambientLight = new THREE.AmbientLight(0xfff1e0, 0.9);
   scene.add(ambientLight);
 
-  const sunLight = new THREE.DirectionalLight(0xffb74d, 1.5);
+  const sunLight = new THREE.DirectionalLight(0xffb74d, 1.6);
   sunLight.position.set(600, 900, 600);
   sunLight.castShadow = true;
   scene.add(sunLight);
@@ -481,22 +491,16 @@ function startGameLogic() {
   isGameOver = false; targetPos = null; selectedEnemyId = null; isAttacking = false;
   gameOverEl.style.display = 'none';
 
-  const equippedId = currentUser && currentUser.equippedShip ? currentUser.equippedShip : 'standard';
-  const activeModel = SHIP_MODELS[equippedId] || SHIP_MODELS.standard;
-
   player = {
     x: 0, z: 0, a: -Math.PI / 2, speed: 0, maxSpeed: 1.85,
     hp: 1000, maxHp: 1000, score: 100000000, ammo: 25,
-    level: 1, exp: 0, maxExp: 100, damage: 180,
-    model: activeModel
+    level: 1, exp: 0, maxExp: 100, damage: 180
   };
-  shipTitleEl.textContent = activeModel.name;
+  shipTitleEl.textContent = "Efsanevi Ejderha Gemi";
 
   if (playerMesh) scene.remove(playerMesh);
-  playerMesh = loadShipModel(activeModel, false, (group) => {
-    scene.add(group);
-    playerMesh = group;
-  });
+  playerMesh = createSeaOfThievesDragonShip(false);
+  scene.add(playerMesh);
 
   gameIslands.forEach(isl => scene.remove(isl.mesh));
   gameIslands = [];
@@ -524,14 +528,13 @@ function spawn3DEnemy(id) {
     ez = (Math.random() - 0.5) * 3000;
   } while (Math.hypot(ex, ez) < 500);
 
-  const meshGroup = loadShipModel(SHIP_MODELS.standard, true, (group) => {
-    group.position.set(ex, 0, ez);
-    group.traverse(child => { child.userData.enemyId = id; });
-    scene.add(group);
-  });
+  const mesh = createSeaOfThievesDragonShip(true);
+  mesh.position.set(ex, 0, ez);
+  mesh.traverse(child => { child.userData.enemyId = id; });
+  scene.add(mesh);
 
   enemies.push({
-    id, mesh: meshGroup, x: ex, z: ez, hp: 520, maxHp: 520, speed: 1.15,
+    id, mesh, x: ex, z: ez, hp: 520, maxHp: 520, speed: 1.15,
     wanderAngle: Math.random() * Math.PI * 2, wanderTimer: 0
   });
 }
@@ -671,7 +674,7 @@ function drawMinimap() {
 
   mctx.fillStyle = '#4ade80';
   mctx.beginPath();
-  mctx.arc(cx + player.x * scale, cy + player.y * scale, 3, 0, Math.PI * 2);
+  mctx.arc(cx + player.x * scale, cy + player.z * scale, 3, 0, Math.PI * 2);
   mctx.fill();
 }
 
@@ -697,21 +700,14 @@ shipyardToggleBtn.addEventListener('click', () => {
 function renderShipyardList() {
   shipyardListEl.innerHTML = '';
   Object.values(SHIP_MODELS).forEach(model => {
-    const isOwned = currentUser.ownedShips.includes(model.id);
-    const isEquipped = currentUser.equippedShip === model.id;
+    const isOwned = true;
+    const isEquipped = true;
     const div = document.createElement('div');
     div.className = 'market-item';
     div.innerHTML = `
       <div class="market-item-info"><span class="market-item-title">${model.name}</span><span class="market-item-sub">${model.desc}</span></div>
-      <button class="buy-btn ${isEquipped ? 'equipped' : isOwned ? 'owned' : ''}" type="button">${isEquipped ? 'Kullanımda' : isOwned ? 'Kullan' : model.cost + ' Altın'}</button>
+      <button class="buy-btn equipped" type="button">Kullanımda</button>
     `;
-    div.querySelector('button').addEventListener('click', () => {
-      if (isEquipped) return;
-      currentUser.equippedShip = model.id;
-      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
-      startGameLogic();
-      renderShipyardList();
-    });
     shipyardListEl.appendChild(div);
   });
 }
