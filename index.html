@@ -478,15 +478,11 @@ const fillTestBtn = document.querySelector('#fill-test-btn');
 const miniCanvas = document.querySelector('#minimap');
 const mctx = miniCanvas.getContext('2d');
 
-// Sayı Kısaltma (Format) Fonksiyonu
+// Hassas Eşikli Sayı Kısaltma Fonksiyonu (1m'den düşünce 999k yazar)
 function formatShortNumber(num) {
   if (num >= 1000000000) return (num / 1000000000).toFixed(num % 1000000000 !== 0 ? 1 : 0) + 't';
-  if (num >= 100000000)  return (num / 1000000).toFixed(0) + 'm';
-  if (num >= 10000000)   return (num / 1000000).toFixed(0) + 'm';
-  if (num >= 1000000)    return (num / 1000000).toFixed(0) + 'm';
-  if (num >= 100000)     return (num / 1000).toFixed(0) + 'k';
-  if (num >= 10000)      return (num / 1000).toFixed(0) + 'k';
-  if (num >= 1000)       return (num / 1000).toFixed(0) + 'k';
+  if (num >= 1000000)    return (num / 1000000).toFixed(num % 1000000 !== 0 ? 1 : 0) + 'm';
+  if (num >= 1000)       return (num / 1000).toFixed(num % 1000 !== 0 ? 1 : 0) + 'k';
   return num.toString();
 }
 
@@ -501,8 +497,8 @@ const SHIP_MODELS = {
   standard: { id: 'standard', name: '8 Yönlü Efsanevi Gemi', desc: 'Şeffaf PNG Sprite Filosu', cost: 0 }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v20';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v20';
+const USERS_STORAGE_KEY = 'pirate3d_users_v21';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v21';
 let authMode = 'login';
 let currentUser = null;
 
@@ -572,6 +568,10 @@ const WORLD_SIZE = 1000;
 const ATTACK_RANGE = 280;
 const AGGRO_RANGE = 280;
 const BASE_SHIP_HEIGHT = 95;
+
+// GEMİ VE ÇEMBER YÜKSEKLİK SABİTLERİ (Dilediğin gibi kolayca değiştirebilirsin)
+const SHIP_Y_POS = 52;
+const RING_OFFSET = 47; // Çemberin gemiye olan dikey mesafe farkı
 
 function createStaticOceanTextures() {
   const size = 1024;
@@ -784,7 +784,7 @@ function initThreeGame() {
   const neonMat = new THREE.MeshBasicMaterial({ color: 0x0ea5e9, side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
   playerNeonRing = new THREE.Mesh(neonGeo, neonMat);
   playerNeonRing.rotation.x = -Math.PI / 2;
-  playerNeonRing.position.y = 47.2;
+  playerNeonRing.position.y = SHIP_Y_POS + RING_OFFSET;
   scene.add(playerNeonRing);
 
   raycaster = new THREE.Raycaster();
@@ -896,7 +896,7 @@ function spawnEnemySprite(id) {
   const sprite = new THREE.Sprite(mat);
   sprite.center.set(0.5, 0.95);
   applyNormalizedSprite(sprite, 0);
-  sprite.position.set(ex, 47, ez);
+  sprite.position.set(ex, SHIP_Y_POS, ez);
   sprite.userData.enemyId = id;
   scene.add(sprite);
 
@@ -1006,12 +1006,12 @@ function animate3D() {
   coordDisplayEl.textContent = `X: ${Math.round((player.x / (WORLD_SIZE / 2)) * 50)} · Y: ${Math.round((player.z / (WORLD_SIZE / 2)) * 50)}`;
 
   if (playerSprite) {
-    playerSprite.position.set(player.x, 47, player.z);
+    playerSprite.position.set(player.x, SHIP_Y_POS, player.z);
     applyNormalizedSprite(playerSprite, player.a);
   }
 
   if (playerNeonRing) {
-    playerNeonRing.position.set(player.x, 47.2, player.z);
+    playerNeonRing.position.set(player.x, SHIP_Y_POS + RING_OFFSET, player.z);
     playerNeonRing.rotation.z += 0.02;
   }
 
@@ -1061,7 +1061,7 @@ function animate3D() {
     en.z = Math.max(-WORLD_SIZE/2, Math.min(WORLD_SIZE/2, en.z));
 
     if (en.sprite) {
-      en.sprite.position.set(en.x, 47, en.z);
+      en.sprite.position.set(en.x, SHIP_Y_POS, en.z);
       applyNormalizedSprite(en.sprite, en.a);
     }
   }
@@ -1155,7 +1155,6 @@ function updateHUD() {
   scoreEl.textContent = player.score.toLocaleString();
   levelEl.textContent = player.level;
   
-  // Can ve exp normal yazılmaya devam ediyor
   hpTextEl.textContent = `Can ${Math.ceil(player.hp).toLocaleString()} / ${player.maxHp.toLocaleString()}`;
   expTextEl.textContent = `Deneyim ${player.exp.toLocaleString()} / ${player.maxExp.toLocaleString()}`;
   
@@ -1163,7 +1162,6 @@ function updateHUD() {
   expBarEl.style.width = ((player.exp / player.maxExp) * 100) + '%';
   marketGoldEl.textContent = player.score.toLocaleString();
 
-  // Gülle miktarları istenen kısaltmalarla (k, m, t) yazılıyor
   Object.keys(qtyEls).forEach(type => {
     const count = player.ammo[type] || 0;
     qtyEls[type].textContent = formatShortNumber(count);
