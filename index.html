@@ -544,6 +544,27 @@ const SHIP_MODELS = {
     trimColor: '#c084fc',
     sailColor: '#f3e8ff',
     flagColor: '#a855f7'
+  },
+  corsair: {
+    id: 'corsair', name: 'Kara Şahin',
+    desc: 'İnce profilli, çift pruvalı ve koyu çelik detaylı hızlı akıncı gemisi.',
+    cost: 5500, theme: 'corsair',
+    hullColor: '#17212b', deckColor: '#293947', trimColor: '#94a3b8',
+    sailColor: '#dbe4e8', flagColor: '#334155'
+  },
+  royal: {
+    id: 'royal', name: 'Altın Hükümdar',
+    desc: 'Altın kaplama bordaları, geniş yelkenleri ve kraliyet armasıyla görkemli kalyon.',
+    cost: 7000, theme: 'royal',
+    hullColor: '#633b12', deckColor: '#8a5a20', trimColor: '#fbbf24',
+    sailColor: '#fff1c2', flagColor: '#b45309'
+  },
+  phantom: {
+    id: 'phantom', name: 'Hayalet Ufuk',
+    desc: 'Soluk turkuaz ışıklarla parlayan, sislerin içinden çıkan gizemli gemi.',
+    cost: 9000, theme: 'phantom',
+    hullColor: '#102c38', deckColor: '#163e4a', trimColor: '#67e8f9',
+    sailColor: '#c8f7f5', flagColor: '#0e7490'
   }
 };
 
@@ -1567,52 +1588,45 @@ function drawRangeRing(wx, wy) {
 // ==========================================================
 // EFSANEVİ VE ÖZEL TASARIMLI 3D GEMİ ÇİZİM FONKSİYONU
 // ==========================================================
+// ==========================================================
+// GELİŞTİRİLMİŞ ÖZGÜN GEMİ ÇİZİM SİSTEMİ (Canvas 2D)
+// Her sınıfın gövde silüeti, güvertesi, donanımı ve yelkeni farklıdır.
+// ==========================================================
 function drawUnique3DShip(p, isEnemy = false, isSelected = false) {
   const m = isEnemy ? {
-    id: 'enemy',
-    theme: 'enemy',
-    name: 'Kızıl Sancak',
-    hullColor: '#35100c',
-    deckColor: '#54231b',
-    trimColor: '#d97757',
-    sailColor: '#781d25',
-    flagColor: '#dc2626'
+    id: 'enemy', theme: 'enemy', name: 'Kızıl Sancak',
+    hullColor: '#35100c', deckColor: '#54231b', trimColor: '#d97757',
+    sailColor: '#781d25', flagColor: '#dc2626'
   } : (p.shipModel || SHIP_MODELS.standard);
-
   const theme = m.theme || 'standard';
   const t = Date.now();
+  const accent = m.trimColor || '#d6b779';
+  const dark = '#090f16';
 
-  // Su üstü köpük izleri
+  // Geminin arkasında kalan köpük izi
   for (const w of p.wake || []) {
     ctx.save();
-    ctx.globalAlpha = Math.max(0, w.alpha);
-    ctx.fillStyle = theme === 'hellfire' ? '#fed7aa' : '#d9f7ff';
+    ctx.globalAlpha = Math.max(0, w.alpha) * 0.7;
+    ctx.fillStyle = theme === 'hellfire' ? '#ffb45e' : '#d9f7ff';
     ctx.beginPath();
-    ctx.ellipse(w.x, w.y, w.r * 2, w.r, 0, 0, Math.PI * 2);
+    ctx.ellipse(w.x, w.y, w.r * 2.25, w.r * 0.82, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
   }
 
-  // Düşman seçilme çemberi
   if (isEnemy && isSelected) {
-    const pulse = 52 + Math.sin(t / 150) * 4;
+    const pulse = 54 + Math.sin(t / 150) * 4;
     ctx.save();
-    ctx.strokeStyle = '#ef4444';
-    ctx.lineWidth = 3;
-    ctx.setLineDash([8, 4]);
-    ctx.beginPath();
-    ctx.ellipse(p.x, p.y + 8, pulse, pulse * 0.55, 0, 0, Math.PI * 2);
-    ctx.stroke();
+    ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 3;
+    ctx.setLineDash([8, 5]);
+    ctx.beginPath(); ctx.ellipse(p.x, p.y + 9, pulse, pulse * 0.56, 0, 0, Math.PI * 2); ctx.stroke();
     ctx.restore();
   }
-
-  // Düşman can göstergesi
   if (isEnemy && p.hp < p.maxHp) {
     ctx.save();
-    ctx.fillStyle = 'rgba(0,0,0,.75)';
-    ctx.fillRect(p.x - 32, p.y - 80, 64, 6);
-    ctx.fillStyle = '#ef4444';
-    ctx.fillRect(p.x - 32, p.y - 80, 64 * Math.max(0, p.hp / p.maxHp), 6);
+    ctx.fillStyle = 'rgba(0,0,0,.78)'; ctx.fillRect(p.x - 34, p.y - 86, 68, 7);
+    ctx.fillStyle = '#ef4444'; ctx.fillRect(p.x - 34, p.y - 86, 68 * Math.max(0, p.hp / p.maxHp), 7);
+    ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = 1; ctx.strokeRect(p.x - 34, p.y - 86, 68, 7);
     ctx.restore();
   }
 
@@ -1620,162 +1634,239 @@ function drawUnique3DShip(p, isEnemy = false, isSelected = false) {
   ctx.translate(p.x, p.y);
   ctx.rotate((p.a || 0) + Math.PI / 2);
 
-  // Derinlikli Gölge
-  ctx.fillStyle = 'rgba(0, 10, 20, 0.5)';
-  ctx.beginPath();
-  ctx.ellipse(0, 12, 20, 42, 0, 0, Math.PI * 2);
-  ctx.fill();
+  // Hafif izometrik gölge ve su yansıması
+  ctx.fillStyle = 'rgba(0, 8, 18, .38)';
+  ctx.beginPath(); ctx.ellipse(2, 14, 25, 49, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = 'rgba(180,235,245,.10)';
+  ctx.beginPath(); ctx.ellipse(0, 28, 17, 18, 0, 0, Math.PI * 2); ctx.fill();
 
-  // --- GÖVDE ÇİZİMİ ---
-  const hullGrad = ctx.createLinearGradient(-20, -48, 20, 48);
+  // Sınıfa göre gövde karakteri
+  const shapes = {
+    standard: { half: 15, bow: -55, stern: 43, curve: 18 },
+    minotaur: { half: 20, bow: -58, stern: 46, curve: 25 },
+    hellfire: { half: 17, bow: -61, stern: 47, curve: 19 },
+    leviathan: { half: 19, bow: -64, stern: 48, curve: 24 },
+    frost: { half: 14, bow: -66, stern: 43, curve: 16 },
+    thunder: { half: 21, bow: -62, stern: 49, curve: 25 },
+    corsair: { half: 16, bow: -70, stern: 42, curve: 13 },
+    royal: { half: 24, bow: -59, stern: 53, curve: 29 },
+    phantom: { half: 18, bow: -68, stern: 47, curve: 20 },
+    enemy: { half: 18, bow: -58, stern: 46, curve: 22 }
+  };
+  const sh = shapes[theme] || shapes.standard;
+  const hullGrad = ctx.createLinearGradient(-sh.half, -30, sh.half, 35);
   hullGrad.addColorStop(0, m.trimColor);
-  hullGrad.addColorStop(0.3, m.deckColor);
-  hullGrad.addColorStop(0.7, m.hullColor);
-  hullGrad.addColorStop(1, '#080c10');
+  hullGrad.addColorStop(0.18, m.deckColor);
+  hullGrad.addColorStop(0.58, m.hullColor);
+  hullGrad.addColorStop(1, dark);
 
+  // Dış zırh/gövde silüeti
   ctx.fillStyle = hullGrad;
   ctx.beginPath();
-  ctx.moveTo(0, -54); // Pruva
-  ctx.quadraticCurveTo(21, -22, 16, 32);
-  ctx.quadraticCurveTo(13, 46, 0, 46); // Kıç
-  ctx.quadraticCurveTo(-13, 46, -16, 32);
-  ctx.quadraticCurveTo(-21, -22, 0, -54);
-  ctx.closePath();
-  ctx.fill();
-
-  ctx.strokeStyle = m.trimColor;
-  ctx.lineWidth = 2.5;
-  ctx.stroke();
-
-  // Güverte
-  ctx.fillStyle = m.deckColor;
-  ctx.beginPath();
-  ctx.moveTo(0, -44);
-  ctx.quadraticCurveTo(13, -15, 11, 24);
-  ctx.quadraticCurveTo(8, 36, 0, 36);
-  ctx.quadraticCurveTo(-8, 36, -11, 24);
-  ctx.quadraticCurveTo(-13, -15, 0, -44);
-  ctx.closePath();
-  ctx.fill();
-
-  // --- ÖZEL TEMA DETAYLARI (Pruva Heykelleri & Simgeler) ---
   if (theme === 'minotaur') {
-    // Boğa Başlı Figür (Pruva)
-    ctx.fillStyle = '#d97706';
-    ctx.beginPath();
-    ctx.arc(0, -50, 6, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#f59e0b';
-    ctx.lineWidth = 1.5;
-    // Boynuzlar
-    ctx.beginPath();
-    ctx.moveTo(-2, -52); ctx.lineTo(-8, -58);
-    ctx.moveTo(2, -52); ctx.lineTo(8, -58);
-    ctx.stroke();
+    ctx.moveTo(0, sh.bow - 2); ctx.lineTo(-7, -48); ctx.quadraticCurveTo(-sh.half - 7, -19, -sh.half, 25);
+    ctx.lineTo(-sh.half + 2, 39); ctx.lineTo(-9, sh.stern); ctx.lineTo(0, sh.stern + 2);
+    ctx.lineTo(9, sh.stern); ctx.lineTo(sh.half - 2, 39); ctx.lineTo(sh.half, 25);
+    ctx.quadraticCurveTo(sh.half + 7, -19, 7, -48); ctx.closePath();
   } else if (theme === 'hellfire') {
-    // Alev Efekti Pruva ve Yelkenler
-    ctx.shadowColor = '#f97316';
-    ctx.shadowBlur = 15;
-    ctx.fillStyle = '#f97316';
-    ctx.beginPath();
-    ctx.arc(0, -50, 5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.shadowBlur = 0;
+    ctx.moveTo(0, sh.bow); ctx.lineTo(-10, -43); ctx.lineTo(-sh.half, -8); ctx.lineTo(-sh.half + 3, 31);
+    ctx.lineTo(-8, sh.stern); ctx.lineTo(0, sh.stern + 3); ctx.lineTo(8, sh.stern);
+    ctx.lineTo(sh.half - 3, 31); ctx.lineTo(sh.half, -8); ctx.lineTo(10, -43); ctx.closePath();
   } else if (theme === 'leviathan') {
-    // Deniz Canavarı Pul Detayları
-    ctx.strokeStyle = '#38bdf8';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(0, -46, 4, 0, Math.PI);
-    ctx.stroke();
+    ctx.moveTo(0, sh.bow); ctx.quadraticCurveTo(25, -24, sh.half, 14);
+    ctx.quadraticCurveTo(sh.half + 5, 40, 0, sh.stern); ctx.quadraticCurveTo(-sh.half - 5, 40, -sh.half, 14);
+    ctx.quadraticCurveTo(-25, -24, 0, sh.bow);
   } else if (theme === 'frost') {
-    // Buz Kristali Detayı
-    ctx.fillStyle = '#93c5fd';
-    ctx.beginPath();
-    ctx.moveTo(0, -54); ctx.lineTo(-4, -48); ctx.lineTo(4, -48);
-    ctx.closePath();
-    ctx.fill();
+    ctx.moveTo(0, sh.bow); ctx.lineTo(-8, -43); ctx.lineTo(-sh.half, 13); ctx.lineTo(-9, 37);
+    ctx.lineTo(0, sh.stern); ctx.lineTo(9, 37); ctx.lineTo(sh.half, 13); ctx.lineTo(8, -43); ctx.closePath();
+  } else {
+    ctx.moveTo(0, sh.bow); ctx.quadraticCurveTo(sh.curve, -25, sh.half, 27);
+    ctx.quadraticCurveTo(sh.half - 1, 42, 0, sh.stern); ctx.quadraticCurveTo(-sh.half + 1, 42, -sh.half, 27);
+    ctx.quadraticCurveTo(-sh.curve, -25, 0, sh.bow);
+  }
+  ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = accent; ctx.lineWidth = 2.8; ctx.stroke();
+
+  // Omurga çizgisi ve borda katmanları
+  ctx.strokeStyle = 'rgba(255,230,180,.32)'; ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.moveTo(0, sh.bow + 8); ctx.quadraticCurveTo(2, 0, 0, sh.stern - 5); ctx.stroke();
+  ctx.strokeStyle = 'rgba(0,0,0,.55)'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(-sh.half + 3, -22); ctx.quadraticCurveTo(-sh.half - 1, 8, -sh.half + 4, 31); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(sh.half - 3, -22); ctx.quadraticCurveTo(sh.half + 1, 8, sh.half - 4, 31); ctx.stroke();
+
+  // Güverte: ahşap tonları ve plank çizgileri
+  ctx.fillStyle = m.deckColor;
+  ctx.beginPath(); ctx.moveTo(0, sh.bow + 10); ctx.quadraticCurveTo(sh.half - 2, -13, sh.half - 4, 25);
+  ctx.quadraticCurveTo(7, 36, 0, 37); ctx.quadraticCurveTo(-7, 36, -sh.half + 4, 25);
+  ctx.quadraticCurveTo(-sh.half + 2, -13, 0, sh.bow + 10); ctx.closePath(); ctx.fill();
+  ctx.save(); ctx.beginPath(); ctx.ellipse(0, -1, sh.half - 5, 35, 0, 0, Math.PI * 2); ctx.clip();
+  for (let y = -35; y <= 31; y += 7) {
+    ctx.strokeStyle = y % 14 === 0 ? 'rgba(255,220,160,.25)' : 'rgba(0,0,0,.18)';
+    ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(-sh.half, y); ctx.lineTo(sh.half, y + 1); ctx.stroke();
+  }
+  ctx.restore();
+
+  // Kıç kamarası ve pruvalık yükseltiler
+  ctx.fillStyle = theme === 'frost' ? '#647f9d' : '#3b2419';
+  ctx.fillRect(-7, 24, 14, 9);
+  ctx.strokeStyle = accent; ctx.lineWidth = 1.4; ctx.strokeRect(-7, 24, 14, 9);
+  ctx.fillStyle = 'rgba(255,255,255,.16)'; ctx.fillRect(-5, 26, 10, 2);
+
+  // Top ağızları, metal çemberler ve kısa namlular
+  const gunRows = theme === 'thunder' || theme === 'minotaur' ? [-28, -14, 0, 14, 27] : [-24, -8, 9, 25];
+  for (const gy of gunRows) {
+    for (const side of [-1, 1]) {
+      const gx = side * (sh.half - 2);
+      ctx.fillStyle = '#080b10'; ctx.beginPath(); ctx.arc(gx, gy, 3.1, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = accent; ctx.lineWidth = 1; ctx.stroke();
+      ctx.strokeStyle = '#111827'; ctx.lineWidth = 2.4;
+      ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx + side * 5, gy); ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,.25)'; ctx.fillRect(gx - 1, gy - 1, 1, 1);
+    }
+  }
+
+  // Borda korkulukları ve metal perçinler
+  ctx.strokeStyle = accent; ctx.globalAlpha = 0.72; ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.moveTo(-sh.half + 3, -30); ctx.quadraticCurveTo(-sh.half - 1, 0, -sh.half + 4, 28); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(sh.half - 3, -30); ctx.quadraticCurveTo(sh.half + 1, 0, sh.half - 4, 28); ctx.stroke();
+  ctx.globalAlpha = 1;
+  for (const gy of [-31, -17, -3, 11, 25]) {
+    ctx.fillStyle = '#f2d7a0';
+    ctx.beginPath(); ctx.arc(-sh.half + 4, gy, 1.1, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(sh.half - 4, gy, 1.1, 0, Math.PI * 2); ctx.fill();
+  }
+
+  // Temaya özel figür başı / zırh
+  if (theme === 'minotaur') {
+    ctx.fillStyle = '#d99a32'; ctx.strokeStyle = '#ffe0a0'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.ellipse(0, -51, 5.5, 6.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-3, -54); ctx.quadraticCurveTo(-12, -64, -10, -57);
+    ctx.moveTo(3, -54); ctx.quadraticCurveTo(12, -64, 10, -57); ctx.stroke();
+  } else if (theme === 'hellfire') {
+    ctx.save(); ctx.shadowColor = '#fb5a16'; ctx.shadowBlur = 13;
+    ctx.fillStyle = '#ff7b22'; ctx.beginPath(); ctx.moveTo(0, -65); ctx.lineTo(-5, -52); ctx.lineTo(0, -55); ctx.lineTo(5, -49); ctx.closePath(); ctx.fill(); ctx.restore();
+    ctx.strokeStyle = '#ff6b24'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-14, 12); ctx.quadraticCurveTo(-20, 20, -12, 27); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(14, 12); ctx.quadraticCurveTo(20, 20, 12, 27); ctx.stroke();
+  } else if (theme === 'leviathan') {
+    ctx.strokeStyle = '#67e8f9'; ctx.lineWidth = 1.5;
+    for (let y = -38; y < 27; y += 10) {
+      ctx.beginPath(); ctx.arc(-8, y, 4, -0.7, 0.9); ctx.stroke();
+      ctx.beginPath(); ctx.arc(8, y, 4, Math.PI - 0.9, Math.PI + 0.7); ctx.stroke();
+    }
+    ctx.fillStyle = '#0e7490'; ctx.beginPath(); ctx.moveTo(0, -58); ctx.lineTo(-5, -47); ctx.lineTo(0, -43); ctx.lineTo(5, -47); ctx.closePath(); ctx.fill();
+  } else if (theme === 'frost') {
+    ctx.fillStyle = '#dff7ff'; ctx.strokeStyle = '#7dd3fc'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, -68); ctx.lineTo(-5, -53); ctx.lineTo(0, -48); ctx.lineTo(5, -53); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle = 'rgba(191,230,255,.8)'; ctx.beginPath(); ctx.moveTo(-12, 4); ctx.lineTo(-17, 12); ctx.lineTo(-11, 18); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(12, 4); ctx.lineTo(17, 12); ctx.lineTo(11, 18); ctx.stroke();
   } else if (theme === 'thunder') {
-    // Yıldırım / Enerji Halkası
-    ctx.strokeStyle = '#c084fc';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(0, -10, 16, 0, Math.PI * 2);
-    ctx.stroke();
+    ctx.strokeStyle = '#d8b4fe'; ctx.lineWidth = 2; ctx.shadowColor = '#a855f7'; ctx.shadowBlur = 8;
+    ctx.beginPath(); ctx.arc(0, -5, 13, 0, Math.PI * 2); ctx.stroke(); ctx.shadowBlur = 0;
+    ctx.fillStyle = '#e9d5ff'; ctx.beginPath(); ctx.moveTo(2, -19); ctx.lineTo(-5, -4); ctx.lineTo(1, -5); ctx.lineTo(-2, 9); ctx.lineTo(8, -7); ctx.lineTo(2, -6); ctx.closePath(); ctx.fill();
+  } else if (theme === 'corsair') {
+    ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, -69); ctx.lineTo(-7, -55); ctx.lineTo(0, -58); ctx.lineTo(7, -55); ctx.closePath(); ctx.stroke();
+    ctx.fillStyle = '#0f172a'; ctx.fillRect(-5, -8, 10, 18);
+    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(-13, 18); ctx.lineTo(-19, 27); ctx.lineTo(-12, 32); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(13, 18); ctx.lineTo(19, 27); ctx.lineTo(12, 32); ctx.stroke();
+  } else if (theme === 'royal') {
+    ctx.save(); ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = 9;
+    ctx.fillStyle = '#facc15'; ctx.strokeStyle = '#fff1a8'; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(-8, -48); ctx.lineTo(-10, -60); ctx.lineTo(-3, -54); ctx.lineTo(0, -65); ctx.lineTo(4, -54); ctx.lineTo(10, -60); ctx.lineTo(8, -48); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
+    ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(-15, 20); ctx.lineTo(15, 20); ctx.stroke();
+  } else if (theme === 'phantom') {
+    ctx.save(); ctx.shadowColor = '#67e8f9'; ctx.shadowBlur = 14;
+    ctx.strokeStyle = '#a5f3fc'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(0, -8, 12, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, -23); ctx.lineTo(0, 7); ctx.moveTo(-10, -8); ctx.lineTo(10, -8); ctx.stroke();
+    ctx.fillStyle = 'rgba(103,232,249,.18)'; ctx.beginPath(); ctx.ellipse(0, 3, 20, 36, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
   }
 
-  // Top Portları
-  ctx.fillStyle = '#05080c';
-  for (const ty of [-22, -10, 2, 14]) {
-    ctx.fillRect(-11, ty, 3, 4);
-    ctx.fillRect(8, ty, 3, 4);
-  }
-
-  // --- DİREKLER VE ŞİŞKİN RÜZGARLI YELKENLER ---
-  const masts = [
-    { y: -26, h: 28, w: 18 },
-    { y: -2,  h: 38, w: 25 },
-    { y: 20,  h: 24, w: 16 }
-  ];
-
+  // Direkler: her sınıfta farklı aralık ve yükseklik
+  const mastSets = {
+    standard: [{y:-25,h:27,w:17},{y:2,h:34,w:22},{y:23,h:21,w:14}],
+    minotaur: [{y:-30,h:30,w:18},{y:-1,h:40,w:26},{y:25,h:25,w:18}],
+    hellfire: [{y:-30,h:32,w:20},{y:-2,h:43,w:27},{y:25,h:28,w:19}],
+    leviathan: [{y:-32,h:34,w:19},{y:-2,h:43,w:28},{y:27,h:27,w:20}],
+    frost: [{y:-34,h:35,w:16},{y:-3,h:44,w:23},{y:25,h:25,w:16}],
+    thunder: [{y:-33,h:36,w:21},{y:-2,h:47,w:30},{y:28,h:29,w:22}],
+    corsair: [{y:-38,h:39,w:17},{y:-4,h:46,w:25},{y:27,h:26,w:16}],
+    royal: [{y:-31,h:35,w:24},{y:0,h:49,w:33},{y:30,h:32,w:25}],
+    phantom: [{y:-36,h:38,w:20},{y:-2,h:48,w:28},{y:28,h:29,w:20}],
+    enemy: [{y:-29,h:31,w:19},{y:-1,h:41,w:26},{y:25,h:25,w:18}]
+  };
+  const masts = mastSets[theme] || mastSets.standard;
   masts.forEach((mast, index) => {
-    ctx.strokeStyle = '#1a0d06';
-    ctx.lineWidth = index === 1 ? 4 : 3;
-    ctx.beginPath();
-    ctx.moveTo(0, mast.y + 6);
-    ctx.lineTo(0, mast.y - mast.h);
-    ctx.stroke();
+    // Direk gölgesi ve ahşap gövde
+    ctx.strokeStyle = 'rgba(0,0,0,.65)'; ctx.lineWidth = index === 1 ? 5 : 4;
+    ctx.beginPath(); ctx.moveTo(2, mast.y + 8); ctx.lineTo(2, mast.y - mast.h - 2); ctx.stroke();
+    ctx.strokeStyle = '#b88a55'; ctx.lineWidth = index === 1 ? 3 : 2.3;
+    ctx.beginPath(); ctx.moveTo(0, mast.y + 7); ctx.lineTo(0, mast.y - mast.h); ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,235,190,.55)'; ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.moveTo(-1, mast.y + 4); ctx.lineTo(-1, mast.y - mast.h + 3); ctx.stroke();
 
-    const sailGrad = ctx.createLinearGradient(-20, mast.y - mast.h, 20, mast.y);
-    sailGrad.addColorStop(0, '#ffffff');
-    sailGrad.addColorStop(0.45, m.sailColor);
-    sailGrad.addColorStop(1, '#2c120f');
-
+    // Yelken yüzeyi, gölgeli kıvrım ve dikişler
+    const sailGrad = ctx.createLinearGradient(-mast.w, mast.y - mast.h, mast.w, mast.y + 2);
+    sailGrad.addColorStop(0, 'rgba(255,255,255,.88)');
+    sailGrad.addColorStop(0.22, m.sailColor);
+    sailGrad.addColorStop(0.72, m.sailColor);
+    sailGrad.addColorStop(1, 'rgba(8,12,20,.88)');
     ctx.fillStyle = sailGrad;
-    ctx.beginPath();
-    ctx.moveTo(0, mast.y - mast.h);
-    ctx.quadraticCurveTo(mast.w + 6, mast.y - mast.h * 0.5, 9, mast.y);
+    ctx.beginPath(); ctx.moveTo(0, mast.y - mast.h);
+    ctx.quadraticCurveTo(mast.w + 7, mast.y - mast.h * .48, 9, mast.y);
     ctx.quadraticCurveTo(0, mast.y + 4, -9, mast.y);
-    ctx.quadraticCurveTo(-(mast.w + 6), mast.y - mast.h * 0.5, 0, mast.y - mast.h);
-    ctx.closePath();
-    ctx.fill();
+    ctx.quadraticCurveTo(-(mast.w + 7), mast.y - mast.h * .48, 0, mast.y - mast.h);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = accent; ctx.lineWidth = 1.25; ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,.25)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, mast.y - mast.h + 5); ctx.quadraticCurveTo(4, mast.y - mast.h * .45, 2, mast.y - 4); ctx.stroke();
+    ctx.strokeStyle = 'rgba(0,0,0,.25)'; ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.moveTo(-mast.w * .45, mast.y - mast.h * .55); ctx.lineTo(mast.w * .42, mast.y - mast.h * .55); ctx.stroke();
 
-    ctx.strokeStyle = m.trimColor;
-    ctx.lineWidth = 1.3;
-    ctx.stroke();
-
+    // Ana yelkende özgün arma
     if (index === 1) {
-      ctx.fillStyle = m.trimColor;
-      ctx.font = 'bold 12px serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      const symbol = theme === 'minotaur' ? '♉' : theme === 'hellfire' ? '🔥' : theme === 'leviathan' ? '🌊' : theme === 'frost' ? '❄' : theme === 'thunder' ? '⚡' : '◆';
-      ctx.fillText(symbol, 0, mast.y - mast.h * 0.5);
+      const symbols = { minotaur: '♉', hellfire: '✦', leviathan: '◈', frost: '❄', thunder: 'ϟ', corsair: '♠', royal: '♛', phantom: '☼', standard: '◆', enemy: '✦' };
+      ctx.save(); ctx.fillStyle = accent; ctx.font = 'bold 12px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(0,0,0,.65)'; ctx.shadowBlur = 3;
+      ctx.fillText(symbols[theme] || '◆', 0, mast.y - mast.h * .48); ctx.restore();
     }
   });
 
-  // Dalgalanan Bayrak
+  // Çapraz halatlar ve seren bağlantıları
+  ctx.strokeStyle = 'rgba(226,211,180,.62)'; ctx.lineWidth = 0.8;
+  ctx.beginPath(); ctx.moveTo(-15, -39); ctx.lineTo(0, -3); ctx.lineTo(15, 19); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(15, -39); ctx.lineTo(0, -3); ctx.lineTo(-15, 19); ctx.stroke();
+
+  // Dalgalanan sancak
   const wave = Math.sin(t / 160 + (p.x || 0) * 0.03) * 3.5;
-  ctx.fillStyle = m.flagColor;
-  ctx.beginPath();
-  ctx.moveTo(0, -38);
-  ctx.lineTo(14 + wave, -45);
-  ctx.lineTo(10, -38);
-  ctx.closePath();
-  ctx.fill();
+  ctx.fillStyle = m.flagColor; ctx.beginPath(); ctx.moveTo(0, -42);
+  ctx.quadraticCurveTo(8 + wave, -47, 16 + wave, -43); ctx.lineTo(12, -35);
+  ctx.quadraticCurveTo(6, -38, 0, -34); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,.45)'; ctx.lineWidth = 0.8; ctx.stroke();
 
+  // Hayalet geminin su üstünde bıraktığı özgün turkuaz ışık izi
+  if (theme === 'phantom') {
+    ctx.save(); ctx.globalAlpha = 0.32 + Math.sin(t / 210) * 0.08;
+    ctx.shadowColor = '#67e8f9'; ctx.shadowBlur = 18;
+    ctx.strokeStyle = '#67e8f9'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.ellipse(0, 4, sh.half + 5, 38, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.restore();
+  }
+
+  // Kenar ışığı: gövdeye hacim hissi verir
+  ctx.strokeStyle = 'rgba(255,255,255,.22)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(-sh.half + 2, -20); ctx.quadraticCurveTo(-sh.half + 6, -39, -2, sh.bow + 8); ctx.stroke();
   ctx.restore();
 
-  // Gemi İsim Etiketi
-  ctx.save();
-  ctx.textAlign = 'center';
-  ctx.font = '700 13px system-ui';
+  // Gemi adı
+  ctx.save(); ctx.textAlign = 'center'; ctx.font = '700 13px system-ui';
   ctx.fillStyle = isEnemy ? '#fecaca' : '#ffffff';
-  ctx.shadowColor = 'rgba(0,0,0,0.9)';
-  ctx.shadowBlur = 6;
-  ctx.fillText(p.name || 'Gemi', p.x, p.y + 54);
-  ctx.restore();
+  ctx.shadowColor = 'rgba(0,0,0,.95)'; ctx.shadowBlur = 6;
+  ctx.fillText(p.name || 'Gemi', p.x, p.y + 58); ctx.restore();
 }
+
 
 function drawMinimap() {
   mctx.clearRect(0, 0, 92, 92);
