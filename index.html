@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Efsanevi Gemi Koleksiyonu</title>
+  <title>Korsan Dünyası - Three.js 3D Efsanevi Filo</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
       margin: 0; width: 100%; height: 100%; overflow: hidden;
-      background: #087da0; color: #fff; font-family: system-ui, -apple-system, sans-serif;
+      background: #031522; color: #fff; font-family: system-ui, -apple-system, sans-serif;
     }
-    canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: crosshair; pointer-events: auto; }
+    #game { display: block; width: 100%; height: 100%; position: fixed; inset: 0; z-index: 0; }
 
     #hud {
       position: fixed; top: 12px; left: 12px; right: 12px;
@@ -19,281 +19,127 @@
       z-index: 5;
     }
     .panel {
-      background: rgba(0, 30, 48, 0.84); backdrop-filter: blur(4px);
+      background: rgba(0, 30, 48, 0.88); backdrop-filter: blur(6px);
       padding: 10px 14px; border-radius: 12px; font-size: 13px;
-      border: 1px solid rgba(255,255,255,0.16); min-width: 245px;
+      border: 1px solid rgba(255,215,131,0.3); min-width: 245px;
       pointer-events: auto;
     }
-    .hud-top-row {
-      display: flex; justify-content: space-between; align-items: center; gap: 10px;
-    }
+    .hud-top-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
     .logout-chip {
-      border: 1px solid rgba(255, 215, 131, 0.45);
-      background: rgba(143, 45, 20, 0.72);
-      color: #ffd783;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 999px;
-      cursor: pointer;
+      border: 1px solid rgba(255, 215, 131, 0.45); background: rgba(143, 45, 20, 0.72);
+      color: #ffd783; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; cursor: pointer;
     }
-    .logout-chip:hover {
-      background: rgba(185, 58, 26, 0.9);
-    }
-    .stat-row {
-      display: flex; justify-content: space-between; align-items: center;
-      font-size: 12px; margin-top: 6px; gap: 8px;
-    }
-    .ammo-badge {
-      color: #fde047;
-      font-weight: 800;
-    }
-    .ammo-badge.low {
-      color: #f87171;
-    }
-    .bar-bg {
-      width: 100%; height: 9px; background: rgba(255,255,255,0.18);
-      border-radius: 5px; margin-top: 4px; overflow: hidden;
-    }
-    #hp-bar {
-      width: 100%; height: 100%; background: #4ade80; transition: width 0.2s, background 0.2s;
-    }
-    #exp-bar {
-      width: 0%; height: 100%; background: linear-gradient(90deg, #38bdf8, #818cf8);
-      transition: width 0.25s ease;
-    }
-    #regen-info {
-      font-size: 11px; color: #bae6fd; margin-top: 5px; min-height: 14px;
-    }
+    .logout-chip:hover { background: rgba(185, 58, 26, 0.9); }
+    .stat-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-top: 6px; gap: 8px; }
+    .ammo-badge { color: #fde047; font-weight: 800; }
+    .ammo-badge.low { color: #f87171; }
+    .bar-bg { width: 100%; height: 9px; background: rgba(255,255,255,0.18); border-radius: 5px; margin-top: 4px; overflow: hidden; }
+    #hp-bar { width: 100%; height: 100%; background: #4ade80; transition: width 0.2s, background 0.2s; }
+    #exp-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #38bdf8, #818cf8); transition: width 0.25s ease; }
+    #regen-info { font-size: 11px; color: #bae6fd; margin-top: 5px; min-height: 14px; }
 
-    .right-hud {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 8px;
-      pointer-events: auto;
-    }
+    .right-hud { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; pointer-events: auto; }
     #minimap {
       width: 92px; height: 92px; border-radius: 50%;
-      background: rgba(0, 24, 38, 0.88); border: 2px solid rgba(233, 211, 161, 0.55);
-      flex-shrink: 0;
+      background: rgba(0, 24, 38, 0.88); border: 2px solid rgba(233, 211, 161, 0.55); flex-shrink: 0;
     }
-    .hud-btn-group {
-      display: flex;
-      gap: 6px;
-    }
+    .hud-btn-group { display: flex; gap: 6px; }
     .hud-action-btn {
-      padding: 7px 11px;
-      border-radius: 10px;
-      border: 1px solid #ffd783;
-      background: linear-gradient(180deg, #b45309, #78350f);
-      color: #fffbeb;
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.3px;
-      cursor: pointer;
+      padding: 7px 11px; border-radius: 10px; border: 1px solid #ffd783;
+      background: linear-gradient(180deg, #b45309, #78350f); color: #fffbeb;
+      font-size: 12px; font-weight: 800; letter-spacing: 0.3px; cursor: pointer;
       box-shadow: 0 4px 12px rgba(0,0,0,0.45);
-      transition: transform 0.12s ease, filter 0.12s ease;
     }
     .hud-action-btn:hover { filter: brightness(1.1); }
     .hud-action-btn:active { transform: scale(0.96); }
 
     #market-panel {
-      display: none;
-      position: fixed;
-      top: 152px;
-      right: 12px;
-      width: 310px;
-      max-height: 72vh;
-      overflow-y: auto;
-      background: rgba(3, 27, 42, 0.95);
-      backdrop-filter: blur(6px);
-      border: 1px solid rgba(255, 215, 131, 0.45);
-      border-radius: 14px;
-      padding: 12px;
-      z-index: 8;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.55);
-      pointer-events: auto;
+      display: none; position: fixed; top: 152px; right: 12px; width: 310px; max-height: 72vh;
+      overflow-y: auto; background: rgba(3, 27, 42, 0.95); backdrop-filter: blur(6px);
+      border: 1px solid rgba(255, 215, 131, 0.45); border-radius: 14px; padding: 12px; z-index: 8;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.55); pointer-events: auto;
     }
     #market-panel.open { display: block; }
-    .market-header {
-      display: flex; justify-content: space-between; align-items: center;
-      border-bottom: 1px solid rgba(255,255,255,0.12);
-      padding-bottom: 8px; margin-bottom: 8px;
-    }
+    .market-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 8px; margin-bottom: 8px; }
     .market-header strong { color: #ffd783; font-size: 14px; }
-    .market-close {
-      background: rgba(255,255,255,0.1); border: none; color: #cbd5e1;
-      width: 24px; height: 24px; border-radius: 6px; font-weight: 700; cursor: pointer;
-    }
-    .market-close:hover { background: rgba(239, 68, 68, 0.4); color: #fff; }
-    
-    .market-tabs {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px;
-    }
-    .market-tab-btn {
-      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15);
-      color: #cbd5e1; padding: 6px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;
-    }
-    .market-tab-btn.active {
-      background: linear-gradient(180deg, #d97706, #92400e);
-      color: #fff; border-color: #ffd783;
-    }
-
+    .market-close { background: rgba(255,255,255,0.1); border: none; color: #cbd5e1; width: 24px; height: 24px; border-radius: 6px; font-weight: 700; cursor: pointer; }
+    .market-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+    .market-tab-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 6px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .market-tab-btn.active { background: linear-gradient(180deg, #d97706, #92400e); color: #fff; border-color: #ffd783; }
     .market-section { display: none; }
     .market-section.active { display: block; }
-
-    .market-balance {
-      display: flex; justify-content: space-between; font-size: 12px;
-      background: rgba(255,255,255,0.06); padding: 6px 9px; border-radius: 8px;
-      margin-bottom: 10px; color: #e2e8f0;
-    }
-    .market-item {
-      display: flex; justify-content: space-between; align-items: center; gap: 8px;
-      background: rgba(15, 43, 64, 0.78); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px; padding: 8px 10px; margin-bottom: 8px;
-    }
-    .market-item:last-of-type { margin-bottom: 0; }
+    .market-balance { display: flex; justify-content: space-between; font-size: 12px; background: rgba(255,255,255,0.06); padding: 6px 9px; border-radius: 8px; margin-bottom: 10px; color: #e2e8f0; }
+    .market-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(15, 43, 64, 0.78); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 8px 10px; margin-bottom: 8px; }
     .market-item-info { display: flex; flex-direction: column; gap: 2px; }
     .market-item-title { font-size: 13px; font-weight: 700; color: #fff; }
     .market-item-sub { font-size: 11px; color: #94a3b8; }
-    
-    .buy-btn {
-      padding: 6px 10px; border-radius: 8px; border: 1px solid #ffd783;
-      background: linear-gradient(180deg, #d97706, #92400e); color: #fff;
-      font-size: 12px; font-weight: 800; cursor: pointer; white-space: nowrap;
-    }
-    .buy-btn:hover:not(:disabled) { filter: brightness(1.12); }
-    .buy-btn:disabled {
-      opacity: 0.42; border-color: rgba(255,255,255,0.2);
-      background: rgba(30, 41, 59, 0.8); cursor: not-allowed;
-    }
-    .buy-btn.owned { background: #15803d; border-color: #4ade80; color: #f0fdf4; cursor: default; }
-    .buy-btn.equipped { background: #1e40af; border-color: #60a5fa; color: #eff6ff; cursor: default; }
-
+    .buy-btn { padding: 6px 10px; border-radius: 8px; border: 1px solid #ffd783; background: linear-gradient(180deg, #d97706, #92400e); color: #fff; font-size: 12px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+    .buy-btn:disabled { opacity: 0.42; background: rgba(30, 41, 59, 0.8); cursor: not-allowed; }
+    .buy-btn.owned { background: #15803d; border-color: #4ade80; color: #f0fdf4; }
+    .buy-btn.equipped { background: #1e40af; border-color: #60a5fa; color: #eff6ff; }
     #market-feedback { font-size: 11px; min-height: 15px; margin-top: 8px; text-align: center; color: #4ade80; }
 
-    #hint {
-      position: fixed; top: 152px; left: 12px; font-size: 12px;
-      background: rgba(0, 30, 48, 0.72); padding: 6px 10px; border-radius: 8px;
-      pointer-events: none; max-width: 62vw;
-    }
+    #hint { position: fixed; top: 152px; left: 12px; font-size: 12px; background: rgba(0, 30, 48, 0.72); padding: 6px 10px; border-radius: 8px; pointer-events: none; max-width: 62vw; z-index: 5; }
 
-    #combat-bar {
-      position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
-      z-index: 6; display: flex; gap: 10px; align-items: center;
-    }
+    #combat-bar { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 6; display: flex; gap: 10px; align-items: center; }
     #attack-btn {
-      min-width: 170px; height: 52px; padding: 0 24px;
-      border-radius: 999px; border: 2px solid rgba(255,255,255,0.25);
-      background: rgba(15, 35, 50, 0.75); color: rgba(255,255,255,0.4);
-      font-size: 15px; font-weight: 800; letter-spacing: 0.6px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+      min-width: 170px; height: 52px; padding: 0 24px; border-radius: 999px;
+      border: 2px solid rgba(255,255,255,0.25); background: rgba(15, 35, 50, 0.75); color: rgba(255,255,255,0.4);
+      font-size: 15px; font-weight: 800; letter-spacing: 0.6px; box-shadow: 0 6px 18px rgba(0,0,0,0.45);
       cursor: not-allowed; transition: all 0.16s ease;
-      touch-action: manipulation;
     }
-    #attack-btn.active {
-      border-color: #ffd783; background: linear-gradient(180deg, #c24929, #8f2d14);
-      color: #fff; cursor: pointer;
-    }
-    #attack-btn.active:active { transform: scale(0.96); }
-    #attack-btn.firing {
-      border-color: #fda4af; background: linear-gradient(180deg, #dc2626, #7f1d1d);
-      color: #fff; cursor: pointer; box-shadow: 0 0 18px rgba(239, 68, 68, 0.6);
-    }
+    #attack-btn.active { border-color: #ffd783; background: linear-gradient(180deg, #c24929, #8f2d14); color: #fff; cursor: pointer; }
+    #attack-btn.firing { border-color: #fda4af; background: linear-gradient(180deg, #dc2626, #7f1d1d); color: #fff; cursor: pointer; box-shadow: 0 0 18px rgba(239, 68, 68, 0.6); }
 
     #gameover {
       display: none; position: fixed; inset: 0; background: rgba(0, 18, 28, 0.86);
-      flex-direction: column; align-items: center; justify-content: center; z-index: 12;
-      text-align: center; padding: 20px;
+      flex-direction: column; align-items: center; justify-content: center; z-index: 12; text-align: center; padding: 20px;
     }
     #gameover h1 { color: #ffd783; margin: 0 0 10px; font-size: 32px; }
     #gameover p { font-size: 16px; margin: 0 0 24px; color: #cbd5e1; }
-    #restart-btn {
-      padding: 12px 28px; font-size: 16px; font-weight: bold; border-radius: 12px;
-      border: 2px solid #ffd783; background: #a33d22; color: white; cursor: pointer;
-    }
+    #restart-btn { padding: 12px 28px; font-size: 16px; font-weight: bold; border-radius: 12px; border: 2px solid #ffd783; background: #a33d22; color: white; cursor: pointer; }
 
     #auth-overlay {
       position: fixed; inset: 0; z-index: 999999;
       background: radial-gradient(circle at top, rgba(8, 125, 160, 0.85), rgba(3, 21, 34, 0.98));
-      backdrop-filter: blur(6px);
-      display: flex; align-items: center; justify-content: center;
-      padding: 18px;
-      pointer-events: auto !important;
-      user-select: text; -webkit-user-select: text;
+      backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; padding: 18px;
     }
-    .auth-card {
-      width: 100%; max-width: 400px;
-      background: rgba(5, 29, 45, 0.98);
-      border: 1px solid rgba(255, 215, 131, 0.5);
-      border-radius: 18px;
-      padding: 24px 22px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
-      pointer-events: auto !important;
-    }
+    .auth-card { width: 100%; max-width: 400px; background: rgba(5, 29, 45, 0.98); border: 1px solid rgba(255, 215, 131, 0.5); border-radius: 18px; padding: 24px 22px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8); }
     .auth-brand { text-align: center; margin-bottom: 18px; }
-    .auth-brand h1 { margin: 0; font-size: 24px; color: #ffd783; letter-spacing: 0.4px; }
+    .auth-brand h1 { margin: 0; font-size: 24px; color: #ffd783; }
     .auth-brand p { margin: 6px 0 0; font-size: 12px; color: #94a3b8; }
-    .auth-tabs {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-      background: rgba(255, 255, 255, 0.06); padding: 4px; border-radius: 12px; margin-bottom: 16px;
-      pointer-events: auto;
-    }
-    .auth-tab {
-      border: none; background: transparent; color: #cbd5e1; padding: 9px 10px;
-      border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s ease;
-      pointer-events: auto;
-    }
-    .auth-tab.active {
-      background: linear-gradient(180deg, #c24929, #8f2d14); color: #fff;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
-    }
-    .auth-field { margin-bottom: 12px; pointer-events: auto; }
+    .auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: rgba(255, 255, 255, 0.06); padding: 4px; border-radius: 12px; margin-bottom: 16px; }
+    .auth-tab { border: none; background: transparent; color: #cbd5e1; padding: 9px 10px; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .auth-tab.active { background: linear-gradient(180deg, #c24929, #8f2d14); color: #fff; }
+    .auth-field { margin-bottom: 12px; }
     .auth-field label { display: block; font-size: 12px; color: #cbd5e1; margin-bottom: 5px; font-weight: 600; }
-    .auth-field input {
-      width: 100%; height: 42px; padding: 0 12px; border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.18); background: rgba(15, 43, 64, 0.88);
-      color: #fff; font-size: 14px; outline: none; pointer-events: auto;
-    }
-    .auth-field input:focus { border-color: #ffd783; }
+    .auth-field input { width: 100%; height: 42px; padding: 0 12px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.18); background: rgba(15, 43, 64, 0.88); color: #fff; font-size: 14px; outline: none; }
     .auth-msg { min-height: 18px; font-size: 12px; margin: 4px 0 12px; color: #fca5a5; }
     .auth-msg.ok { color: #4ade80; }
-    .auth-submit {
-      width: 100%; height: 44px; border-radius: 12px; border: 1px solid #ffd783;
-      background: linear-gradient(180deg, #c24929, #8f2d14); color: #fff;
-      font-size: 14px; font-weight: 800; letter-spacing: 0.4px; cursor: pointer;
-      pointer-events: auto !important;
-    }
-    .auth-submit:hover { filter: brightness(1.08); }
-    .quick-test-box {
-      margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.1);
-      display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; color: #bae6fd;
-      pointer-events: auto;
-    }
-    .quick-test-btn {
-      border: 1px solid rgba(186, 230, 253, 0.35); background: rgba(14, 116, 144, 0.35);
-      color: #e0f2fe; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap;
-      pointer-events: auto !important;
-    }
+    .auth-submit { width: 100%; height: 44px; border-radius: 12px; border: 1px solid #ffd783; background: linear-gradient(180deg, #c24929, #8f2d14); color: #fff; font-size: 14px; font-weight: 800; cursor: pointer; }
+    .quick-test-box { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #bae6fd; }
+    .quick-test-btn { border: 1px solid rgba(186, 230, 253, 0.35); background: rgba(14, 116, 144, 0.35); color: #e0f2fe; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; }
   </style>
+
+  <!-- Three.js Kütüphanesi -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
-  <canvas id="game"></canvas>
+  <div id="game"></div>
 
   <div id="hud">
     <div class="panel">
       <div class="hud-top-row">
         <strong id="ship-title">Standart Sloop</strong>
-        <button id="logout-btn" class="logout-chip" title="Oturumu Kapat">Çıkış</button>
+        <button id="logout-btn" class="logout-chip">Çıkış</button>
       </div>
       <div class="stat-row" style="margin-top:4px;">
         <span>Kaptan: <strong id="captain-name">Test</strong></span>
         <span>Sv. <strong id="level">1</strong> · Altın: <strong id="score">100,000,000</strong></span>
       </div>
       <div class="stat-row">
-        <span>💣 Gülle (Cephane)</span>
+        <span>💣 Gülle</span>
         <span id="ammo-count" class="ammo-badge">25</span>
       </div>
       <div class="stat-row">
@@ -312,8 +158,8 @@
     <div class="right-hud">
       <canvas id="minimap" width="92" height="92"></canvas>
       <div class="hud-btn-group">
-        <button id="market-toggle-btn" class="hud-action-btn" type="button" title="Market (M)">⚖️ Market</button>
-        <button id="shipyard-toggle-btn" class="hud-action-btn" type="button" title="Tersane (T)">⚓ Tersane</button>
+        <button id="market-toggle-btn" class="hud-action-btn" type="button">⚖️ Market</button>
+        <button id="shipyard-toggle-btn" class="hud-action-btn" type="button">⚓ Tersane</button>
       </div>
     </div>
   </div>
@@ -323,51 +169,35 @@
       <strong id="panel-main-title">⚓ Korsan Ticaret & Tersane</strong>
       <button id="market-close-btn" class="market-close" type="button">✕</button>
     </div>
-
     <div class="market-tabs">
       <button id="tab-market" class="market-tab-btn active" type="button">Cephane Marketi</button>
-      <button id="tab-shipyard" class="market-tab-btn" type="button">Tersane (Modeller)</button>
+      <button id="tab-shipyard" class="market-tab-btn" type="button">Tersane (3D Modeller)</button>
     </div>
-
     <div class="market-balance">
       <span>Altın: <strong id="market-gold" style="color:#ffd783;">100,000,000</strong></span>
       <span>Gülle: <strong id="market-ammo" style="color:#fde047;">25</strong></span>
     </div>
-
     <div id="section-market" class="market-section active">
       <div class="market-item">
-        <div class="market-item-info">
-          <span class="market-item-title">💣 10 Adet Gülle</span>
-          <span class="market-item-sub">Küçük cephane kesesi</span>
-        </div>
+        <div class="market-item-info"><span class="market-item-title">💣 10 Adet Gülle</span><span class="market-item-sub">Küçük kese</span></div>
         <button class="buy-btn ammo-buy-btn" type="button" data-ammo="10" data-cost="15">15 Altın</button>
       </div>
-
       <div class="market-item">
-        <div class="market-item-info">
-          <span class="market-item-title">💣 30 Adet Gülle</span>
-          <span class="market-item-sub">Orta sandık (%11 indirim)</span>
-        </div>
+        <div class="market-item-info"><span class="market-item-title">💣 30 Adet Gülle</span><span class="market-item-sub">Orta sandık</span></div>
         <button class="buy-btn ammo-buy-btn" type="button" data-ammo="30" data-cost="40">40 Altın</button>
       </div>
-
       <div class="market-item">
-        <div class="market-item-info">
-          <span class="market-item-title">💣 75 Adet Gülle</span>
-          <span class="market-item-sub">Kalyon cephaneliği (%20 indirim)</span>
-        </div>
+        <div class="market-item-info"><span class="market-item-title">💣 75 Adet Gülle</span><span class="market-item-sub">Kalyon deposu</span></div>
         <button class="buy-btn ammo-buy-btn" type="button" data-ammo="75" data-cost="90">90 Altın</button>
       </div>
     </div>
-
     <div id="section-shipyard" class="market-section">
       <div id="shipyard-list"></div>
     </div>
-
     <div id="market-feedback"></div>
   </div>
 
-  <div id="hint">Denize tıkla: Yelken aç · Düşmana 2 tık: Saldır · M: Market · T: Tersane</div>
+  <div id="hint">Denize tıkla: Yelken aç · Düşmana 2 tık: Hedefle · M: Market · T: Tersane</div>
 
   <div id="combat-bar">
     <button id="attack-btn" disabled>SALDIR</button>
@@ -382,41 +212,36 @@
   <div id="auth-overlay">
     <div class="auth-card">
       <div class="auth-brand">
-        <h1>⚓ Korsan Dünyası</h1>
-        <p>Denizlerin hakimi olmak için kaptan hesabınla giriş yap</p>
+        <h1>⚓ Korsan Dünyası 3D</h1>
+        <p>Three.js Destekli Efsanevi 3D Deniz Dünyası</p>
       </div>
-
       <div class="auth-tabs">
         <button id="tab-login" class="auth-tab active" type="button">Giriş Yap</button>
         <button id="tab-register" class="auth-tab" type="button">Kayıt Ol</button>
       </div>
-
       <form id="auth-form">
         <div class="auth-field">
-          <label for="auth-username">Gemi Kullanıcı İsmi</label>
+          <label for="auth-username">Kullanıcı İsmi</label>
           <input id="auth-username" type="text" autocomplete="username" placeholder="Örn: Test" required>
         </div>
         <div class="auth-field">
           <label for="auth-password">Şifre</label>
-          <input id="auth-password" type="password" autocomplete="current-password" placeholder="Şifreniz" required>
+          <input id="auth-password" type="password" autocomplete="current-password" placeholder="Şifre" required>
         </div>
         <div id="auth-msg" class="auth-msg"></div>
         <button id="auth-submit" class="auth-submit" type="submit">Denize Açıl</button>
       </form>
-
       <div class="quick-test-box">
-        <span>Test Hesabı: <strong>Test</strong> / <strong>test</strong></span>
+        <span>Test: <strong>Test</strong> / <strong>test</strong></span>
         <button id="fill-test-btn" class="quick-test-btn" type="button">Hızlı Doldur</button>
       </div>
     </div>
   </div>
 
 <script>
-const canvas = document.querySelector('#game');
-const ctx = canvas.getContext('2d');
-const miniCanvas = document.querySelector('#minimap');
-const mctx = miniCanvas.getContext('2d');
-
+// ==========================================================
+// THREE.JS 3D OYUN MOTORU ENTEGRASYONU
+// ==========================================================
 const scoreEl = document.querySelector('#score');
 const ammoCountEl = document.querySelector('#ammo-count');
 const levelEl = document.querySelector('#level');
@@ -457,895 +282,248 @@ const authMsgEl = document.querySelector('#auth-msg');
 const authSubmitBtn = document.querySelector('#auth-submit');
 const fillTestBtn = document.querySelector('#fill-test-btn');
 
-let W, H, dpr;
-function resize() {
-  dpr = Math.min(devicePixelRatio || 1, 2);
-  W = innerWidth;
-  H = innerHeight;
-  canvas.width = W * dpr;
-  canvas.height = H * dpr;
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-}
-window.addEventListener('resize', resize);
-resize();
+const miniCanvas = document.querySelector('#minimap');
+const mctx = miniCanvas.getContext('2d');
 
-// ==========================================================
-// YEPYENİ ÖZEL TASARIMLI EFSANEVİ GEMİ MODELLERİ
-// ==========================================================
 const SHIP_MODELS = {
-  standard: {
-    id: 'standard',
-    name: 'Standart Sloop',
-    desc: 'Başlangıç gemisi, sade ahşap gövde.',
-    cost: 0,
-    theme: 'standard',
-    hullColor: '#b46932',
-    deckColor: '#8f5629',
-    trimColor: '#f6d388',
-    sailColor: '#fffbeb',
-    flagColor: '#fbbf24'
-  },
-  minotaur: {
-    id: 'minotaur',
-    name: "Minotaur'un Gazabı",
-    desc: 'Pruvasında devasa boğa başı heykeli ve bronz zırhlar barındıran güçlü savaş gemisi.',
-    cost: 300,
-    theme: 'minotaur',
-    hullColor: '#451a03',
-    deckColor: '#291206',
-    trimColor: '#d97706',
-    sailColor: '#78350f',
-    flagColor: '#b45309'
-  },
-  hellfire: {
-    id: 'hellfire',
-    name: 'Cehennem Ateşi',
-    desc: 'Gövdesinden ve yelkenlerinden alev saçan mistik ve tehlikeli tasarım.',
-    cost: 750,
-    theme: 'hellfire',
-    hullColor: '#1c0404',
-    deckColor: '#310404',
-    trimColor: '#f97316',
-    sailColor: '#ef4444',
-    flagColor: '#dc2626'
-  },
-  leviathan: {
-    id: 'leviathan',
-    name: 'Karanlık Leviathan',
-    desc: 'Deniz canavarı pulları ve mistik okyanus mavisi zırhıyla donatılmış.',
-    cost: 1500,
-    theme: 'leviathan',
-    hullColor: '#0c2340',
-    deckColor: '#071326',
-    trimColor: '#38bdf8',
-    sailColor: '#0284c7',
-    flagColor: '#0ea5e9'
-  },
-  frost_queen: {
-    id: 'frost_queen',
-    name: 'Buzul Kraliçesi',
-    desc: 'Kuzeyin buzlu sularından ilham alan kristal yelkenli şık fırkateyn.',
-    cost: 2500,
-    theme: 'frost',
-    hullColor: '#0f172a',
-    deckColor: '#1e293b',
-    trimColor: '#93c5fd',
-    sailColor: '#e0f2fe',
-    flagColor: '#60a5fa'
-  },
-  thunder_lord: {
-    id: 'thunder_lord',
-    name: 'Gök Gürültüsü',
-    desc: 'Yıldırımlarla yüklü, tersanenin en ihtişamlı ve korkutucu amiral gemisi.',
-    cost: 4000,
-    theme: 'thunder',
-    hullColor: '#2e1065',
-    deckColor: '#3b0764',
-    trimColor: '#c084fc',
-    sailColor: '#f3e8ff',
-    flagColor: '#a855f7'
-  },
-  corsair: {
-    id: 'corsair', name: 'Kara Şahin',
-    desc: 'İnce profilli, çift pruvalı ve koyu çelik detaylı hızlı akıncı gemisi.',
-    cost: 5500, theme: 'corsair',
-    hullColor: '#17212b', deckColor: '#293947', trimColor: '#94a3b8',
-    sailColor: '#dbe4e8', flagColor: '#334155'
-  },
-  royal: {
-    id: 'royal', name: 'Altın Hükümdar',
-    desc: 'Altın kaplama bordaları, geniş yelkenleri ve kraliyet armasıyla görkemli kalyon.',
-    cost: 7000, theme: 'royal',
-    hullColor: '#633b12', deckColor: '#8a5a20', trimColor: '#fbbf24',
-    sailColor: '#fff1c2', flagColor: '#b45309'
-  },
-  phantom: {
-    id: 'phantom', name: 'Hayalet Ufuk',
-    desc: 'Soluk turkuaz ışıklarla parlayan, sislerin içinden çıkan gizemli gemi.',
-    cost: 9000, theme: 'phantom',
-    hullColor: '#102c38', deckColor: '#163e4a', trimColor: '#67e8f9',
-    sailColor: '#c8f7f5', flagColor: '#0e7490'
-  }
+  standard: { id: 'standard', name: 'Standart Sloop', desc: 'Klasik ahşap gövde.', cost: 0, hullColor: 0xb46932, sailColor: 0xfffbeb },
+  minotaur: { id: 'minotaur', name: "Minotaur'un Gazabı", desc: 'Bronz zırhlı ağır savaş gemisi.', cost: 300, hullColor: 0x451a03, sailColor: 0x78350f },
+  hellfire: { id: 'hellfire', name: 'Cehennem Ateşi', desc: 'Alev renkli mistik hatlar.', cost: 750, hullColor: 0x1c0404, sailColor: 0xef4444 },
+  leviathan: { id: 'leviathan', name: 'Karanlık Leviathan', desc: 'Okyanus mavisi zırhlı.', cost: 1500, hullColor: 0x0c2340, sailColor: 0x0284c7 },
+  frost_queen: { id: 'frost_queen', name: 'Buzul Kraliçesi', desc: 'Buz kristali esintili fırkateyn.', cost: 2500, hullColor: 0x0f172a, sailColor: 0xe0f2fe },
+  thunder_lord: { id: 'thunder_lord', name: 'Gök Gürültüsü', desc: 'Mor efsanevi amiral gemisi.', cost: 4000, hullColor: 0x2e1065, sailColor: 0xf3e8ff },
+  corsair: { id: 'corsair', name: 'Kara Şahin', desc: 'Çevik akıncı gemisi.', cost: 5500, hullColor: 0x17212b, sailColor: 0xdbe4e8 },
+  royal: { id: 'royal', name: 'Altın Hükümdar', desc: 'Altın kaplama görkemli kalyon.', cost: 7000, hullColor: 0x633b12, sailColor: 0xfff1c2 },
+  phantom: { id: 'phantom', name: 'Hayalet Ufuk', desc: 'Turkuaz parıltılı hayalet gemi.', cost: 9000, hullColor: 0x102c38, sailColor: 0xc8f7f5 }
 };
 
-const USERS_STORAGE_KEY = 'pirate2d_users_v9_epic';
-const SESSION_STORAGE_KEY = 'pirate2d_session_v9_epic';
+const USERS_STORAGE_KEY = 'pirate3d_users_v1';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v1';
 let authMode = 'login';
 let currentUser = null;
 
 function loadUsers() {
   let users = [];
-  try {
-    users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
-    if (!Array.isArray(users)) users = [];
-  } catch {
-    users = [];
-  }
-
-  const hasTest = users.some(u => u.username.toLowerCase() === 'test');
-  if (!hasTest) {
-    users.push({
-      id: 'user_test_default',
-      username: 'Test',
-      password: 'test',
-      ownedShips: ['standard'],
-      equippedShip: 'standard',
-      createdAt: Date.now()
-    });
+  try { users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]'); } catch { users = []; }
+  if (!users.some(u => u.username.toLowerCase() === 'test')) {
+    users.push({ id: 'user_test', username: 'Test', password: 'test', ownedShips: ['standard'], equippedShip: 'standard' });
     localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
   }
   return users;
 }
-
-function saveUsers(users) {
-  localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
-}
+function saveUsers(users) { localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users)); }
 
 function setAuthMode(mode) {
   authMode = mode;
   if (!authMsgEl) return;
   authMsgEl.textContent = '';
-  authMsgEl.className = 'auth-msg';
   if (mode === 'login') {
-    tabLogin.classList.add('active');
-    tabRegister.classList.remove('active');
+    tabLogin.classList.add('active'); tabRegister.classList.remove('active');
     authSubmitBtn.textContent = 'Giriş Yap ve Yelken Aç';
-    authPasswordInput.setAttribute('autocomplete', 'current-password');
   } else {
-    tabRegister.classList.add('active');
-    tabLogin.classList.remove('active');
-    authSubmitBtn.textContent = 'Kayıt Ol ve Gemi Al';
-    authPasswordInput.setAttribute('autocomplete', 'new-password');
+    tabRegister.classList.add('active'); tabLogin.classList.remove('active');
+    authSubmitBtn.textContent = 'Kayıt Ol';
   }
 }
-
 if (tabLogin) tabLogin.addEventListener('click', () => setAuthMode('login'));
 if (tabRegister) tabRegister.addEventListener('click', () => setAuthMode('register'));
-
-if (fillTestBtn) {
-  fillTestBtn.addEventListener('click', () => {
-    setAuthMode('login');
-    authUsernameInput.value = 'Test';
-    authPasswordInput.value = 'test';
-    authMsgEl.textContent = 'Test hesabı bilgileri dolduruldu.';
-    authMsgEl.className = 'auth-msg ok';
-  });
-}
+if (fillTestBtn) fillTestBtn.addEventListener('click', () => { authUsernameInput.value = 'Test'; authPasswordInput.value = 'test'; });
 
 function completeLogin(user) {
-  currentUser = {
-    id: user.id,
-    username: user.username,
-    ownedShips: user.ownedShips || ['standard'],
-    equippedShip: user.equippedShip || 'standard'
-  };
+  currentUser = { id: user.id, username: user.username, ownedShips: user.ownedShips || ['standard'], equippedShip: user.equippedShip || 'standard' };
   localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
   captainNameEl.textContent = currentUser.username;
   authOverlay.style.display = 'none';
-  initGame();
+  initThreeGame();
 }
 
 if (authForm) {
   authForm.addEventListener('submit', e => {
     e.preventDefault();
-    const username = authUsernameInput.value.trim();
-    const password = authPasswordInput.value;
-
-    if (!username || !password) {
-      authMsgEl.textContent = 'Lütfen kullanıcı ismi ve şifre girin.';
-      authMsgEl.className = 'auth-msg';
-      return;
-    }
-
+    const uname = authUsernameInput.value.trim(); const pass = authPasswordInput.value;
     const users = loadUsers();
-
     if (authMode === 'register') {
-      if (username.length < 2 || username.length > 20) {
-        authMsgEl.textContent = 'Kullanıcı ismi 2-20 karakter arasında olmalı.';
-        authMsgEl.className = 'auth-msg';
-        return;
-      }
-      const exists = users.some(u => u.username.toLowerCase() === username.toLowerCase());
-      if (exists) {
-        authMsgEl.textContent = 'Bu gemi kullanıcı ismi zaten kayıtlı.';
-        authMsgEl.className = 'auth-msg';
-        return;
-      }
-      const newUser = {
-        id: 'user_' + Date.now(),
-        username,
-        password,
-        ownedShips: ['standard'],
-        equippedShip: 'standard',
-        createdAt: Date.now()
-      };
-      users.push(newUser);
-      saveUsers(users);
-      authMsgEl.textContent = 'Kayıt başarılı! Gemine geçiliyor...';
-      authMsgEl.className = 'auth-msg ok';
-      setTimeout(() => completeLogin(newUser), 250);
-      return;
-    }
-
-    const found = users.find(
-      u => u.username.toLowerCase() === username.toLowerCase() && u.password === password
-    );
-    if (!found) {
-      authMsgEl.textContent = 'Gemi kullanıcı ismi veya şifre hatalı.';
-      authMsgEl.className = 'auth-msg';
-      return;
-    }
-
-    authMsgEl.textContent = 'Giriş başarılı!';
-    authMsgEl.className = 'auth-msg ok';
-    setTimeout(() => completeLogin(found), 180);
-  });
-}
-
-if (logoutBtn) {
-  logoutBtn.addEventListener('click', () => {
-    localStorage.removeItem(SESSION_STORAGE_KEY);
-    currentUser = null;
-    isAttacking = false;
-    targetPos = null;
-    marketPanel.classList.remove('open');
-    authOverlay.style.display = 'flex';
-    authUsernameInput.value = 'Test';
-    authPasswordInput.value = 'test';
-    setAuthMode('login');
-  });
-}
-
-function openPanel(section) {
-  if (!currentUser || isGameOver) return;
-  marketPanel.classList.add('open');
-  if (section === 'market') {
-    tabMarket.classList.add('active');
-    tabShipyard.classList.remove('active');
-    sectionMarket.classList.add('active');
-    sectionShipyard.classList.remove('active');
-    document.querySelector('#panel-main-title').textContent = '⚓ Korsan Cephane Marketi';
-  } else {
-    tabShipyard.classList.add('active');
-    tabMarket.classList.remove('active');
-    sectionShipyard.classList.add('active');
-    sectionMarket.classList.remove('active');
-    document.querySelector('#panel-main-title').textContent = '⚓ Tersane (Efsanevi Tasarımlar)';
-    renderShipyardList();
-  }
-  marketFeedbackEl.textContent = '';
-  updateMarketUI();
-}
-
-function closePanel() {
-  marketPanel.classList.remove('open');
-}
-
-marketToggleBtn.addEventListener('click', e => { e.stopPropagation(); openPanel('market'); });
-shipyardToggleBtn.addEventListener('click', e => { e.stopPropagation(); openPanel('shipyard'); });
-marketCloseBtn.addEventListener('click', e => { e.stopPropagation(); closePanel(); });
-
-tabMarket.addEventListener('click', () => openPanel('market'));
-tabShipyard.addEventListener('click', () => openPanel('shipyard'));
-
-window.addEventListener('keydown', e => {
-  if (!currentUser || isGameOver) return;
-  if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
-  if (e.key === 'm' || e.key === 'M') {
-    if (marketPanel.classList.contains('open') && sectionMarket.classList.contains('active')) closePanel();
-    else openPanel('market');
-  }
-  if (e.key === 't' || e.key === 'T') {
-    if (marketPanel.classList.contains('open') && sectionShipyard.classList.contains('active')) closePanel();
-    else openPanel('shipyard');
-  }
-});
-
-function renderShipyardList() {
-  if (!currentUser) return;
-  shipyardListEl.innerHTML = '';
-
-  Object.values(SHIP_MODELS).forEach(model => {
-    const isOwned = currentUser.ownedShips.includes(model.id);
-    const isEquipped = currentUser.equippedShip === model.id;
-
-    const itemDiv = document.createElement('div');
-    itemDiv.className = 'market-item';
-
-    let btnHtml = '';
-    if (isEquipped) {
-      btnHtml = `<button class="buy-btn equipped" type="button" disabled>Kullanımda</button>`;
-    } else if (isOwned) {
-      btnHtml = `<button class="buy-btn equip-ship-btn" type="button" data-id="${model.id}">Kullan</button>`;
+      if (users.some(u => u.username.toLowerCase() === uname.toLowerCase())) { authMsgEl.textContent = 'Kullanıcı adı alınmış.'; return; }
+      const nu = { id: 'u_' + Date.now(), username: uname, password: pass, ownedShips: ['standard'], equippedShip: 'standard' };
+      users.push(nu); saveUsers(users);
+      setTimeout(() => completeLogin(nu), 200);
     } else {
-      const canAfford = player && player.score >= model.cost;
-      btnHtml = `<button class="buy-btn buy-ship-btn" type="button" data-id="${model.id}" data-cost="${model.cost}" ${!canAfford ? 'disabled' : ''}>${model.cost} Altın</button>`;
+      const found = users.find(u => u.username.toLowerCase() === uname.toLowerCase() && u.password === pass);
+      if (!found) { authMsgEl.textContent = 'Hatalı kullanıcı adı veya şifre.'; return; }
+      completeLogin(found);
     }
-
-    itemDiv.innerHTML = `
-      <div class="market-item-info">
-        <span class="market-item-title">${model.name}</span>
-        <span class="market-item-sub">${model.desc}</span>
-      </div>
-      ${btnHtml}
-    `;
-    shipyardListEl.appendChild(itemDiv);
-  });
-
-  shipyardListEl.querySelectorAll('.buy-ship-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      const modelId = btn.dataset.id;
-      const cost = Number(btn.dataset.cost);
-      const model = SHIP_MODELS[modelId];
-
-      if (player.score < cost) {
-        marketFeedbackEl.style.color = '#f87171';
-        marketFeedbackEl.textContent = 'Yetersiz altın!';
-        return;
-      }
-
-      player.score -= cost;
-      currentUser.ownedShips.push(modelId);
-      currentUser.equippedShip = modelId;
-      saveUserSessionAndStorage();
-
-      player.shipModel = model;
-      shipTitleEl.textContent = model.name;
-
-      addFloatingText(player.x, player.y - 45, `${model.name} açıldı!`, '#4ade80');
-      marketFeedbackEl.style.color = '#4ade80';
-      marketFeedbackEl.textContent = `Tebrikler! ${model.name} satın alındı ve kuşanıldı.`;
-
-      updateHUD();
-      renderShipyardList();
-    });
-  });
-
-  shipyardListEl.querySelectorAll('.equip-ship-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      const modelId = btn.dataset.id;
-      const model = SHIP_MODELS[modelId];
-
-      currentUser.equippedShip = modelId;
-      saveUserSessionAndStorage();
-
-      player.shipModel = model;
-      shipTitleEl.textContent = model.name;
-
-      marketFeedbackEl.style.color = '#4ade80';
-      marketFeedbackEl.textContent = `${model.name} kuşanıldı!`;
-
-      updateHUD();
-      renderShipyardList();
-    });
   });
 }
+if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeItem(SESSION_STORAGE_KEY); location.reload(); });
 
-function saveUserSessionAndStorage() {
-  localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
-  const users = loadUsers();
-  const idx = users.findIndex(u => u.id === currentUser.id);
-  if (idx !== -1) {
-    users[idx].ownedShips = currentUser.ownedShips;
-    users[idx].equippedShip = currentUser.equippedShip;
-    saveUsers(users);
-  }
-}
-
-let marketFeedbackTimer = null;
-ammoBuyBtns.forEach(btn => {
-  btn.addEventListener('click', e => {
-    e.stopPropagation();
-    if (!player || isGameOver) return;
-
-    const ammoAmount = Number(btn.dataset.ammo);
-    const goldCost = Number(btn.dataset.cost);
-
-    if (player.score < goldCost) {
-      marketFeedbackEl.style.color = '#f87171';
-      marketFeedbackEl.textContent = 'Yetersiz altın!';
-      return;
-    }
-
-    player.score -= goldCost;
-    player.ammo += ammoAmount;
-
-    addFloatingText(player.x, player.y - 45, `+${ammoAmount} Gülle`, '#fde047');
-    marketFeedbackEl.style.color = '#4ade80';
-    marketFeedbackEl.textContent = `+${ammoAmount} gülle cephaneye eklendi!`;
-
-    clearTimeout(marketFeedbackTimer);
-    marketFeedbackTimer = setTimeout(() => {
-      marketFeedbackEl.textContent = '';
-    }, 2000);
-
-    updateHUD();
-    syncAttackButton();
-  });
-});
-
-function updateMarketUI() {
-  if (!player) return;
-  marketGoldEl.textContent = player.score.toLocaleString();
-  marketAmmoEl.textContent = player.ammo;
-  ammoBuyBtns.forEach(btn => {
-    const cost = Number(btn.dataset.cost);
-    btn.disabled = player.score < cost;
-  });
-  if (sectionShipyard.classList.contains('active')) {
-    renderShipyardList();
-  }
-}
-
+// ==========================================================
+// THREE.JS SAHNE, IŞIK VE DÜNYA KURULUMU
+// ==========================================================
+let scene, camera, renderer;
+let playerMesh, enemies = [], islands = [], treasures = [], shotsMesh = [];
+let raycaster, planeGeo, mouse;
 const WORLD_SIZE = 2400;
-const CAMERA_ZOOM = 0.72;
-const ATTACK_RANGE = 230;
-const ENEMY_AGGRO_RANGE = 320;
-const ENEMY_ATTACK_RANGE = ATTACK_RANGE / 2;
-const PLAYER_MAX_SPEED = 1.85;
-const ENEMY_MAX_SPEED = PLAYER_MAX_SPEED * (2 / 3);
-const ENEMY_DAMAGE = 10;
-const ENEMY_FIRE_INTERVAL = 3000;
-const STARTING_AMMO = 25;
-const TEST_STARTING_GOLD = 100000000;
 
-let player, enemies, islands, treasures, shots, particles, shockwaves, flashes, floatingTexts, isGameOver;
-let targetPos = null;
-let selectedEnemyId = null;
-let isAttacking = false;
-let lastPlayerShot = 0;
-let lastClickEnemyId = null;
-let lastClickTime = 0;
-let nextEnemyId = 1;
+function create3DShip(modelConfig) {
+  const group = new THREE.Group();
 
-function getCameraOrigin() {
-  return {
-    x: player.x - (W / CAMERA_ZOOM) / 2,
-    y: player.y - (H / CAMERA_ZOOM) / 2
-  };
+  // Gövde (Hull)
+  const hullGeo = new THREE.BoxGeometry(18, 10, 42);
+  const hullMat = new THREE.MeshStandardMaterial({ color: modelConfig.hullColor, roughness: 0.4 });
+  const hull = new THREE.Mesh(hullGeo, hullMat);
+  hull.position.y = 4;
+  hull.castShadow = true; hull.receiveShadow = true;
+  group.add(hull);
+
+  // Güverte
+  const deckGeo = new THREE.BoxGeometry(15, 1, 36);
+  const deckMat = new THREE.MeshStandardMaterial({ color: 0x5a3d28, roughness: 0.6 });
+  const deck = new THREE.Mesh(deckGeo, deckMat);
+  deck.position.y = 9.5;
+  group.add(deck);
+
+  // Direkler ve Yelkenler
+  const mastGeo = new THREE.CylinderGeometry(1.2, 1.2, 32);
+  const mastMat = new THREE.MeshStandardMaterial({ color: 0x271911 });
+  const mast = new THREE.Mesh(mastGeo, mastMat);
+  mast.position.set(0, 22, 2);
+  group.add(mast);
+
+  const sailGeo = new THREE.BoxGeometry(14, 20, 1.5);
+  const sailMat = new THREE.MeshStandardMaterial({ color: modelConfig.sailColor, roughness: 0.8 });
+  const sail = new THREE.Mesh(sailGeo, sailMat);
+  sail.position.set(0, 24, 2);
+  group.add(sail);
+
+  return group;
 }
 
-function screenToWorld(clientX, clientY) {
-  const cam = getCameraOrigin();
-  return {
-    x: cam.x + clientX / CAMERA_ZOOM,
-    y: cam.y + clientY / CAMERA_ZOOM
-  };
+function initThreeGame() {
+  // Sahne ve Kamera
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x061b2b);
+  scene.fog = new THREE.FogExp2(0x061b2b, 0.0012);
+
+  camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
+  camera.position.set(0, 250, 220);
+  camera.lookAt(0, 0, 0);
+
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  document.getElementById('game').appendChild(renderer.domElement);
+
+  // Işıklandırma (Sea of Thieves Gün Batımı Atmosferi)
+  const ambientLight = new THREE.AmbientLight(0xfff0d4, 0.6);
+  scene.add(ambientLight);
+
+  const sunLight = new THREE.DirectionalLight(0xffb74d, 1.2);
+  sunLight.position.set(300, 500, 300);
+  sunLight.castShadow = true;
+  scene.add(sunLight);
+
+  // Okyanus Zemini
+  planeGeo = new THREE.PlaneGeometry(WORLD_SIZE * 3, WORLD_SIZE * 3, 64, 64);
+  const oceanMat = new THREE.MeshStandardMaterial({ color: 0x087da0, roughness: 0.3, metalness: 0.2 });
+  const ocean = new THREE.Mesh(planeGeo, oceanMat);
+  ocean.rotation.x = -Math.PI / 2;
+  ocean.receiveShadow = true;
+  scene.add(ocean);
+
+  raycaster = new THREE.Raycaster();
+  mouse = new THREE.Vector2();
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  window.addEventListener('pointerdown', e => {
+    if (e.target.closest('#hud') || e.target.closest('#market-panel') || e.target.closest('#combat-bar') || e.target.closest('#auth-overlay')) return;
+    mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObject(ocean);
+    if (intersects.length > 0) {
+      targetPos = { x: intersects[0].point.x, z: intersects[0].point.z };
+    }
+  });
+
+  startGameLogic();
+  animate3D();
 }
 
-function syncAttackButton() {
-  const selectedEnemy = enemies.find(e => e.id === selectedEnemyId);
-  if (!selectedEnemy || isGameOver) {
-    selectedEnemyId = selectedEnemy ? selectedEnemy.id : null;
-    isAttacking = false;
-    attackBtn.disabled = true;
-    attackBtn.textContent = 'SALDIR';
-    attackBtn.className = '';
-    return;
-  }
+// ==========================================================
+// OYUN MANTIĞI VE DÖNGÜSÜ
+// ==========================================================
+let player, gameEnemies = [], gameTreasures = [], gameIslands = [];
+let targetPos = null, selectedEnemyId = null, isAttacking = false, isGameOver = false;
 
-  if (player && player.ammo <= 0) {
-    isAttacking = false;
-    attackBtn.disabled = true;
-    attackBtn.textContent = 'GÜLLE YOK';
-    attackBtn.className = '';
-    return;
-  }
-
-  attackBtn.disabled = false;
-  if (isAttacking) {
-    attackBtn.textContent = 'ATIŞ KES';
-    attackBtn.className = 'firing';
-  } else {
-    attackBtn.textContent = 'SALDIR';
-    attackBtn.className = 'active';
-  }
-}
-
-function initGame() {
-  isGameOver = false;
-  targetPos = null;
-  selectedEnemyId = null;
-  isAttacking = false;
-  lastClickEnemyId = null;
-  lastClickTime = 0;
+function startGameLogic() {
+  isGameOver = false; targetPos = null; selectedEnemyId = null; isAttacking = false;
   gameOverEl.style.display = 'none';
-  marketPanel.classList.remove('open');
 
-  const now = Date.now();
-  const captain = currentUser ? currentUser.username : 'Test';
   const equippedId = currentUser && currentUser.equippedShip ? currentUser.equippedShip : 'standard';
   const activeModel = SHIP_MODELS[equippedId] || SHIP_MODELS.standard;
 
   player = {
-    id: currentUser ? currentUser.id : 'player',
-    x: 0, y: 0, a: -Math.PI / 2, speed: 0, maxSpeed: PLAYER_MAX_SPEED,
-    hp: 1000, maxHp: 1000,
-    exp: 0, maxExp: 100, level: 1,
-    damage: 180,
-    score: TEST_STARTING_GOLD,
-    ammo: STARTING_AMMO,
-    name: captain,
-    shipModel: activeModel,
-    wake: [],
-    lastHitTime: now,
-    lastRegenTick: now
+    x: 0, z: 0, a: -Math.PI / 2, speed: 0, maxSpeed: 1.8,
+    hp: 1000, maxHp: 1000, score: 100000000, ammo: 25,
+    level: 1, exp: 0, maxExp: 100, damage: 180,
+    model: activeModel
   };
-
   shipTitleEl.textContent = activeModel.name;
 
-  shots = [];
-  particles = [];
-  shockwaves = [];
-  flashes = [];
-  floatingTexts = [];
-  islands = [];
-  treasures = [];
-  enemies = [];
+  if (playerMesh) scene.remove(playerMesh);
+  playerMesh = create3DShip(activeModel);
+  scene.add(playerMesh);
 
-  for (let i = 0; i < 18; i++) {
-    let ix, iy;
-    do {
-      ix = (Math.random() - 0.5) * WORLD_SIZE * 1.8;
-      iy = (Math.random() - 0.5) * WORLD_SIZE * 1.8;
-    } while (Math.hypot(ix, iy) < 230);
-    islands.push({
-      x: ix, y: iy,
-      r: 45 + Math.random() * 55,
-      seed: Math.random() * 10
-    });
+  // Adalar
+  gameIslands.forEach(isl => scene.remove(isl.mesh));
+  gameIslands = [];
+  const islGeo = new THREE.CylinderGeometry(40, 55, 30, 8);
+  const islMat = new THREE.MeshStandardMaterial({ color: 0x2a9d8f, roughness: 0.9 });
+  for (let i = 0; i < 12; i++) {
+    const mesh = new THREE.Mesh(islGeo, islMat);
+    mesh.position.set((Math.random() - 0.5) * 2000, 10, (Math.random() - 0.5) * 2000);
+    scene.add(mesh);
+    gameIslands.push({ mesh, r: 50 });
   }
 
-  for (let i = 0; i < 15; i++) spawnTreasure();
-  for (let i = 0; i < 8; i++) spawnEnemy();
+  // Düşmanlar
+  gameEnemies.forEach(en => scene.remove(en.mesh));
+  gameEnemies = [];
+  for (let i = 0; i < 6; i++) spawn3DEnemy(i + 1);
 
-  updateHUD();
-  syncAttackButton();
-}
-
-function spawnTreasure() {
-  treasures.push({
-    x: (Math.random() - 0.5) * WORLD_SIZE * 1.7,
-    y: (Math.random() - 0.5) * WORLD_SIZE * 1.7,
-    bob: Math.random() * Math.PI * 2
-  });
-}
-
-function spawnEnemy() {
-  let ex, ey;
-  do {
-    ex = (Math.random() - 0.5) * (WORLD_SIZE * 1.6);
-    ey = (Math.random() - 0.5) * (WORLD_SIZE * 1.6);
-  } while (Math.hypot(ex - player.x, ey - player.y) < 350);
-
-  enemies.push({
-    id: nextEnemyId++,
-    x: ex, y: ey,
-    a: Math.random() * Math.PI * 2,
-    hp: 700, maxHp: 700,
-    lastShot: 0,
-    turnTimer: 0,
-    targetAngle: Math.random() * Math.PI * 2,
-    name: 'Kızıl Sancak',
-    wake: []
-  });
-}
-
-function addExp(amount) {
-  player.exp += amount;
-  while (player.exp >= player.maxExp) {
-    player.exp -= player.maxExp;
-    player.level += 1;
-    player.maxExp = Math.round(player.maxExp * 1.35);
-    player.maxHp += 150;
-    player.hp = player.maxHp;
-    player.damage += 35;
-    addFloatingText(player.x, player.y - 46, `SEVİYE ${player.level}!`, '#38bdf8');
-  }
   updateHUD();
 }
 
-function updateHUD() {
-  scoreEl.textContent = player.score.toLocaleString();
-  ammoCountEl.textContent = player.ammo;
-  ammoCountEl.classList.toggle('low', player.ammo <= 5);
-  levelEl.textContent = player.level;
-  hpTextEl.textContent = `${Math.ceil(player.hp)} / ${player.maxHp}`;
-  expTextEl.textContent = `${player.exp} / ${player.maxExp}`;
-
-  const hpPct = Math.max(0, Math.min(100, (player.hp / player.maxHp) * 100));
-  hpBarEl.style.width = hpPct + '%';
-  hpBarEl.style.background = hpPct > 50 ? '#4ade80' : hpPct > 25 ? '#facc15' : '#ef4444';
-
-  const expPct = Math.max(0, Math.min(100, (player.exp / player.maxExp) * 100));
-  expBarEl.style.width = expPct + '%';
-
-  updateMarketUI();
+function spawn3DEnemy(id) {
+  const mesh = create3DShip(SHIP_MODELS.standard);
+  mesh.position.set((Math.random() - 0.5) * 1800, 0, (Math.random() - 0.5) * 1800);
+  scene.add(mesh);
+  gameEnemies.push({ id, mesh, x: mesh.position.x, z: mesh.position.z, hp: 500, maxHp: 500, speed: 1.2 });
 }
 
-function addFloatingText(x, y, text, color) {
-  floatingTexts.push({
-    x,
-    y,
-    text,
-    color,
-    alpha: 1,
-    createdAt: Date.now(),
-    duration: 850
-  });
-}
+function animate3D() {
+  requestAnimationFrame(animate3D);
 
-function spawnMuzzleEffects(x, y, angle) {
-  flashes.push({
-    x,
-    y,
-    angle,
-    life: 1,
-    decay: 0.16,
-    radius: 16
-  });
-
-  for (let i = 0; i < 9; i++) {
-    const spread = (Math.random() - 0.5) * 0.9;
-    const dir = angle + spread;
-    const spd = 0.6 + Math.random() * 2.1;
-    particles.push({
-      type: 'smoke',
-      x,
-      y,
-      vx: Math.cos(dir) * spd,
-      vy: Math.sin(dir) * spd,
-      life: 0.78 + Math.random() * 0.2,
-      decay: 0.015 + Math.random() * 0.012,
-      size: 5 + Math.random() * 5,
-      grow: 0.28,
-      color: Math.random() < 0.5 ? '#e2e8f0' : '#cbd5e1'
-    });
-  }
-
-  for (let i = 0; i < 6; i++) {
-    const spread = (Math.random() - 0.5) * 0.65;
-    const dir = angle + spread;
-    const spd = 2.5 + Math.random() * 3.5;
-    particles.push({
-      type: 'spark',
-      x,
-      y,
-      vx: Math.cos(dir) * spd,
-      vy: Math.sin(dir) * spd,
-      life: 1,
-      decay: 0.06 + Math.random() * 0.03,
-      size: 2 + Math.random() * 2,
-      color: '#fde047'
-    });
-  }
-}
-
-function spawnImpactEffects(x, y, isPlayerHit = false) {
-  shockwaves.push({
-    x,
-    y,
-    r: 6,
-    maxR: 38,
-    alpha: 0.85,
-    color: isPlayerHit ? '#fca5a5' : '#fdba74'
-  });
-
-  for (let i = 0; i < 18; i++) {
-    const ang = Math.random() * Math.PI * 2;
-    const spd = 1.2 + Math.random() * 4.2;
-    const palette = ['#fffbeb', '#fde047', '#fb923c', '#ef4444'];
-    particles.push({
-      type: 'fire',
-      x,
-      y,
-      vx: Math.cos(ang) * spd,
-      vy: Math.sin(ang) * spd,
-      life: 1,
-      decay: 0.028 + Math.random() * 0.022,
-      size: 3 + Math.random() * 4.5,
-      grow: -0.02,
-      color: palette[Math.floor(Math.random() * palette.length)]
-    });
-  }
-
-  for (let i = 0; i < 8; i++) {
-    const ang = Math.random() * Math.PI * 2;
-    const spd = 0.5 + Math.random() * 1.6;
-    particles.push({
-      type: 'smoke',
-      x,
-      y,
-      vx: Math.cos(ang) * spd,
-      vy: Math.sin(ang) * spd,
-      life: 0.7,
-      decay: 0.016 + Math.random() * 0.01,
-      size: 6 + Math.random() * 5,
-      grow: 0.22,
-      color: '#334155'
-    });
-  }
-}
-
-function fireLockedCannon(shooter, target, isPlayer) {
-  const angleToTarget = Math.atan2(target.y - shooter.y, target.x - shooter.x);
-  const muzzleX = shooter.x + Math.cos(angleToTarget) * 20;
-  const muzzleY = shooter.y + Math.sin(angleToTarget) * 20;
-
-  spawnMuzzleEffects(muzzleX, muzzleY, angleToTarget);
-
-  shots.push({
-    x: muzzleX,
-    y: muzzleY,
-    prevX: muzzleX,
-    prevY: muzzleY,
-    speed: isPlayer ? 10.5 : 8.2,
-    isPlayer,
-    targetId: target.id,
-    damage: isPlayer ? player.damage : ENEMY_DAMAGE,
-    trailTimer: 0
-  });
-}
-
-canvas.addEventListener('pointerdown', e => {
-  if (!currentUser || isGameOver) return;
-  e.preventDefault();
-
-  const world = screenToWorld(e.clientX, e.clientY);
-  const worldX = world.x;
-  const worldY = world.y;
-
-  let clickedEnemy = null;
-  let bestDist = 50;
-  for (const enemy of enemies) {
-    const d = Math.hypot(worldX - enemy.x, worldY - enemy.y);
-    if (d <= bestDist) {
-      bestDist = d;
-      clickedEnemy = enemy;
-    }
-  }
-
-  if (clickedEnemy) {
-    const now = Date.now();
-    if (lastClickEnemyId === clickedEnemy.id && now - lastClickTime < 650) {
-      selectedEnemyId = clickedEnemy.id;
-      if (player.ammo <= 0) {
-        addFloatingText(player.x, player.y - 44, 'Gülle bitti! Marketten al', '#f87171');
-        isAttacking = false;
-      } else {
-        const dist = Math.hypot(clickedEnemy.x - player.x, clickedEnemy.y - player.y);
-        isAttacking = dist <= ATTACK_RANGE;
-      }
-      lastClickEnemyId = null;
-      lastClickTime = 0;
-    } else {
-      selectedEnemyId = clickedEnemy.id;
-      lastClickEnemyId = clickedEnemy.id;
-      lastClickTime = now;
-    }
-    syncAttackButton();
+  if (!player || isGameOver) {
+    renderer.render(scene, camera);
     return;
   }
 
-  lastClickEnemyId = null;
-  targetPos = {
-    x: Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, worldX)),
-    y: Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, worldY))
-  };
-});
-
-attackBtn.addEventListener('pointerdown', e => {
-  e.preventDefault();
-  e.stopPropagation();
-  if (!currentUser || isGameOver || attackBtn.disabled) return;
-
-  const selectedEnemy = enemies.find(en => en.id === selectedEnemyId);
-  if (!selectedEnemy) return;
-
-  if (!isAttacking) {
-    if (player.ammo <= 0) {
-      addFloatingText(player.x, player.y - 44, 'Gülle bitti!', '#f87171');
-      syncAttackButton();
-      return;
-    }
-    const dist = Math.hypot(selectedEnemy.x - player.x, selectedEnemy.y - player.y);
-    if (dist > ATTACK_RANGE) return;
-    isAttacking = true;
-  } else {
-    isAttacking = false;
-  }
-  syncAttackButton();
-});
-
-document.querySelector('#restart-btn').addEventListener('click', e => {
-  e.stopPropagation();
-  initGame();
-});
-
-function lerpAngle(a, b, t) {
-  let diff = b - a;
-  while (diff < -Math.PI) diff += Math.PI * 2;
-  while (diff > Math.PI) diff -= Math.PI * 2;
-  return a + diff * t;
-}
-
-function updateWake(ship, isMoving) {
-  if (isMoving && Math.random() < 0.55) {
-    ship.wake.push({
-      x: ship.x - Math.cos(ship.a) * 26,
-      y: ship.y - Math.sin(ship.a) * 26,
-      r: 4,
-      alpha: 0.6
-    });
-  }
-  for (let i = ship.wake.length - 1; i >= 0; i--) {
-    const w = ship.wake[i];
-    w.r += 0.25;
-    w.alpha -= 0.012;
-    if (w.alpha <= 0) ship.wake.splice(i, 1);
-  }
-}
-
-function update() {
-  if (!currentUser || !player || isGameOver) return;
-
-  const now = Date.now();
-
-  if (player.hp < player.maxHp) {
-    const sinceHit = now - player.lastHitTime;
-    if (sinceHit >= 5000) {
-      if (now - player.lastRegenTick >= 5000) {
-        player.lastRegenTick = now;
-        const healAmount = Math.min(100, player.maxHp - player.hp);
-        player.hp += healAmount;
-        addFloatingText(player.x, player.y - 42, `+${healAmount}`, '#4ade80');
-        updateHUD();
-      }
-      const nextTickSec = Math.max(1, Math.ceil((5000 - (now - player.lastRegenTick)) / 1000));
-      regenInfoEl.textContent = `Tamir aktif: +100 can (${nextTickSec}s)`;
-    } else {
-      const waitSec = Math.ceil((5000 - sinceHit) / 1000);
-      regenInfoEl.textContent = `Tamir için saldırısız bekle: ${waitSec}s`;
-    }
-  } else {
-    regenInfoEl.textContent = '';
-  }
-
-  const selectedEnemy = enemies.find(en => en.id === selectedEnemyId);
-  if (!selectedEnemy && (selectedEnemyId !== null || isAttacking)) {
-    selectedEnemyId = null;
-    isAttacking = false;
-    syncAttackButton();
-  }
-
+  // Oyuncu Hareketi
   if (targetPos) {
-    const distToTarget = Math.hypot(targetPos.x - player.x, targetPos.y - player.y);
-    if (distToTarget > 10) {
-      const targetA = Math.atan2(targetPos.y - player.y, targetPos.x - player.x);
-      player.a = lerpAngle(player.a, targetA, 0.14);
-      player.speed = Math.min(player.maxSpeed, player.speed + 0.12);
+    const dx = targetPos.x - player.x;
+    const dz = targetPos.z - player.z;
+    const dist = Math.hypot(dx, dz);
+    if (dist > 8) {
+      const targetA = Math.atan2(dz, dx);
+      player.a = targetA;
+      player.speed = Math.min(player.maxSpeed, player.speed + 0.1);
     } else {
       targetPos = null;
       player.speed *= 0.9;
@@ -1355,518 +533,35 @@ function update() {
   }
 
   player.x += Math.cos(player.a) * player.speed;
-  player.y += Math.sin(player.a) * player.speed;
-  player.x = Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, player.x));
-  player.y = Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, player.y));
-  updateWake(player, player.speed > 0.25);
+  player.z += Math.sin(player.a) * player.speed;
 
-  for (const isl of islands) {
-    const dist = Math.hypot(player.x - isl.x, player.y - isl.y);
-    const minDist = isl.r + 22;
-    if (dist < minDist) {
-      const ang = Math.atan2(player.y - isl.y, player.x - isl.x);
-      player.x = isl.x + Math.cos(ang) * minDist;
-      player.y = isl.y + Math.sin(ang) * minDist;
-      player.speed *= 0.5;
-      targetPos = null;
+  playerMesh.position.set(player.x, 0, player.z);
+  playerMesh.rotation.y = -player.a + Math.PI / 2;
+  // Hafif dalga sallantısı
+  playerMesh.position.y = Math.sin(Date.now() / 200) * 0.8;
+
+  // Kamera Takibi (Smooth Follow)
+  camera.position.x += (player.x - camera.position.x) * 0.08;
+  camera.position.z += (player.z + 180 - camera.position.z) * 0.08;
+  camera.lookAt(player.x, 0, player.z);
+
+  // Düşman Yapay Zekası
+  for (const en of gameEnemies) {
+    const edx = player.x - en.x;
+    const edz = player.z - en.z;
+    const edist = Math.hypot(edx, edz);
+    if (edist < 400) {
+      const ea = Math.atan2(edz, edx);
+      en.x += Math.cos(ea) * en.speed;
+      en.z += Math.sin(ea) * en.speed;
+      en.mesh.position.set(en.x, 0, en.z);
+      en.mesh.rotation.y = -ea + Math.PI / 2;
     }
   }
 
-  if (isAttacking && selectedEnemy) {
-    const distToEnemy = Math.hypot(selectedEnemy.x - player.x, selectedEnemy.y - player.y);
-    if (distToEnemy > ATTACK_RANGE) {
-      isAttacking = false;
-      syncAttackButton();
-    } else if (player.ammo <= 0) {
-      isAttacking = false;
-      addFloatingText(player.x, player.y - 44, 'Cephanen bitti!', '#f87171');
-      syncAttackButton();
-    } else if (now - lastPlayerShot > 520) {
-      lastPlayerShot = now;
-      player.ammo -= 1;
-      updateHUD();
-      fireLockedCannon(player, selectedEnemy, true);
-
-      if (player.ammo <= 0) {
-        isAttacking = false;
-        addFloatingText(player.x, player.y - 44, 'Son gülle atıldı!', '#f87171');
-        syncAttackButton();
-      }
-    }
-  }
-
-  for (let i = treasures.length - 1; i >= 0; i--) {
-    const tr = treasures[i];
-    if (Math.hypot(player.x - tr.x, player.y - tr.y) < 36) {
-      treasures.splice(i, 1);
-      player.score += 25;
-      addExp(20);
-      spawnImpactEffects(tr.x, tr.y, false);
-      updateHUD();
-      spawnTreasure();
-    }
-  }
-
-  for (let i = enemies.length - 1; i >= 0; i--) {
-    const e = enemies[i];
-    const distToPlayer = Math.hypot(player.x - e.x, player.y - e.y);
-    let eSpeed = ENEMY_MAX_SPEED * 0.75;
-
-    if (distToPlayer < ENEMY_AGGRO_RANGE) {
-      const angToPlayer = Math.atan2(player.y - e.y, player.x - e.x);
-      e.a = lerpAngle(e.a, angToPlayer, 0.08);
-
-      if (distToPlayer > 120) {
-        eSpeed = ENEMY_MAX_SPEED;
-        e.x += Math.cos(e.a) * eSpeed;
-        e.y += Math.sin(e.a) * eSpeed;
-      }
-
-      if (distToPlayer <= ENEMY_ATTACK_RANGE && now - e.lastShot > ENEMY_FIRE_INTERVAL) {
-        e.lastShot = now;
-        fireLockedCannon(e, player, false);
-      }
-    } else {
-      e.turnTimer--;
-      if (e.turnTimer <= 0) {
-        e.targetAngle = Math.random() * Math.PI * 2;
-        e.turnTimer = 180 + Math.random() * 250;
-      }
-      e.a = lerpAngle(e.a, e.targetAngle, 0.03);
-      e.x += Math.cos(e.a) * eSpeed;
-      e.y += Math.sin(e.a) * eSpeed;
-    }
-
-    updateWake(e, true);
-
-    for (const isl of islands) {
-      const dist = Math.hypot(e.x - isl.x, e.y - isl.y);
-      if (dist < isl.r + 22) {
-        const ang = Math.atan2(e.y - isl.y, e.x - isl.x);
-        e.x = isl.x + Math.cos(ang) * (isl.r + 22);
-        e.y = isl.y + Math.sin(ang) * (isl.r + 22);
-        e.targetAngle = ang;
-      }
-    }
-  }
-
-  for (let i = shots.length - 1; i >= 0; i--) {
-    const s = shots[i];
-    s.prevX = s.x;
-    s.prevY = s.y;
-
-    s.trailTimer++;
-    if (s.trailTimer % 2 === 0) {
-      particles.push({
-        type: 'smoke',
-        x: s.x,
-        y: s.y,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        life: 0.45,
-        decay: 0.025,
-        size: 3,
-        grow: 0.12,
-        color: '#cbd5e1'
-      });
-    }
-
-    if (s.isPlayer) {
-      const targetEnemy = enemies.find(en => en.id === s.targetId);
-      if (!targetEnemy) {
-        shots.splice(i, 1);
-        continue;
-      }
-      const dx = targetEnemy.x - s.x;
-      const dy = targetEnemy.y - s.y;
-      const dist = Math.hypot(dx, dy);
-
-      if (dist <= s.speed + 16) {
-        targetEnemy.hp -= s.damage;
-        addFloatingText(targetEnemy.x, targetEnemy.y - 38, `-${s.damage}`, '#ffd783');
-        spawnImpactEffects(targetEnemy.x, targetEnemy.y, false);
-
-        if (targetEnemy.hp <= 0) {
-          spawnImpactEffects(targetEnemy.x, targetEnemy.y, false);
-          if (selectedEnemyId === targetEnemy.id) {
-            selectedEnemyId = null;
-            isAttacking = false;
-            syncAttackButton();
-          }
-          enemies = enemies.filter(en => en.id !== targetEnemy.id);
-          player.score += 100;
-          addExp(45);
-          updateHUD();
-          setTimeout(spawnEnemy, 2600);
-        }
-        shots.splice(i, 1);
-        continue;
-      }
-
-      s.x += (dx / dist) * s.speed;
-      s.y += (dy / dist) * s.speed;
-    } else {
-      const dx = player.x - s.x;
-      const dy = player.y - s.y;
-      const dist = Math.hypot(dx, dy);
-
-      if (dist <= s.speed + 16) {
-        player.hp = Math.max(0, player.hp - s.damage);
-        player.lastHitTime = now;
-        player.lastRegenTick = now;
-        addFloatingText(player.x, player.y - 38, `-${s.damage}`, '#f87171');
-        spawnImpactEffects(player.x, player.y, true);
-        updateHUD();
-
-        if (player.hp <= 0) {
-          isGameOver = true;
-          isAttacking = false;
-          marketPanel.classList.remove('open');
-          syncAttackButton();
-          finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString();
-          gameOverEl.style.display = 'flex';
-        }
-        shots.splice(i, 1);
-        continue;
-      }
-
-      s.x += (dx / dist) * s.speed;
-      s.y += (dy / dist) * s.speed;
-    }
-  }
-
-  for (let i = flashes.length - 1; i >= 0; i--) {
-    const fl = flashes[i];
-    fl.life -= fl.decay;
-    fl.radius += 1.4;
-    if (fl.life <= 0) flashes.splice(i, 1);
-  }
-
-  for (let i = shockwaves.length - 1; i >= 0; i--) {
-    const sw = shockwaves[i];
-    sw.r += (sw.maxR - sw.r) * 0.18 + 1.2;
-    sw.alpha -= 0.045;
-    if (sw.alpha <= 0) shockwaves.splice(i, 1);
-  }
-
-  for (let i = particles.length - 1; i >= 0; i--) {
-    const pt = particles[i];
-    pt.x += pt.vx;
-    pt.y += pt.vy;
-    pt.vx *= 0.95;
-    pt.vy *= 0.95;
-    pt.size = Math.max(0.5, pt.size + (pt.grow || 0));
-    pt.life -= pt.decay;
-    if (pt.life <= 0) particles.splice(i, 1);
-  }
-
-  for (let i = floatingTexts.length - 1; i >= 0; i--) {
-    const ft = floatingTexts[i];
-    const elapsed = now - ft.createdAt;
-    if (elapsed >= ft.duration) {
-      floatingTexts.splice(i, 1);
-      continue;
-    }
-    ft.y -= 0.75;
-    ft.alpha = 1 - elapsed / ft.duration;
-  }
+  renderer.render(scene, camera);
+  drawMinimap();
 }
-
-function drawRangeRing(wx, wy) {
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(wx, wy, ATTACK_RANGE, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-  ctx.fill();
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
-  ctx.setLineDash([10, 8]);
-  ctx.stroke();
-  ctx.restore();
-}
-
-// ==========================================================
-// EFSANEVİ VE ÖZEL TASARIMLI 3D GEMİ ÇİZİM FONKSİYONU
-// ==========================================================
-// ==========================================================
-// GELİŞTİRİLMİŞ ÖZGÜN GEMİ ÇİZİM SİSTEMİ (Canvas 2D)
-// Her sınıfın gövde silüeti, güvertesi, donanımı ve yelkeni farklıdır.
-// ==========================================================
-function drawUnique3DShip(p, isEnemy = false, isSelected = false) {
-  const m = isEnemy ? {
-    id: 'enemy', theme: 'enemy', name: 'Kızıl Sancak',
-    hullColor: '#35100c', deckColor: '#54231b', trimColor: '#d97757',
-    sailColor: '#781d25', flagColor: '#dc2626'
-  } : (p.shipModel || SHIP_MODELS.standard);
-  const theme = m.theme || 'standard';
-  const t = Date.now();
-  const accent = m.trimColor || '#d6b779';
-  const dark = '#090f16';
-
-  // Geminin arkasında kalan köpük izi
-  for (const w of p.wake || []) {
-    ctx.save();
-    ctx.globalAlpha = Math.max(0, w.alpha) * 0.7;
-    ctx.fillStyle = theme === 'hellfire' ? '#ffb45e' : '#d9f7ff';
-    ctx.beginPath();
-    ctx.ellipse(w.x, w.y, w.r * 2.25, w.r * 0.82, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-
-  if (isEnemy && isSelected) {
-    const pulse = 54 + Math.sin(t / 150) * 4;
-    ctx.save();
-    ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 3;
-    ctx.setLineDash([8, 5]);
-    ctx.beginPath(); ctx.ellipse(p.x, p.y + 9, pulse, pulse * 0.56, 0, 0, Math.PI * 2); ctx.stroke();
-    ctx.restore();
-  }
-  if (isEnemy && p.hp < p.maxHp) {
-    ctx.save();
-    ctx.fillStyle = 'rgba(0,0,0,.78)'; ctx.fillRect(p.x - 34, p.y - 86, 68, 7);
-    ctx.fillStyle = '#ef4444'; ctx.fillRect(p.x - 34, p.y - 86, 68 * Math.max(0, p.hp / p.maxHp), 7);
-    ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = 1; ctx.strokeRect(p.x - 34, p.y - 86, 68, 7);
-    ctx.restore();
-  }
-
-  ctx.save();
-  ctx.translate(p.x, p.y);
-  ctx.rotate((p.a || 0) + Math.PI / 2);
-
-  // Hafif izometrik gölge ve su yansıması
-  ctx.fillStyle = 'rgba(0, 8, 18, .38)';
-  ctx.beginPath(); ctx.ellipse(2, 14, 25, 49, 0, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = 'rgba(180,235,245,.10)';
-  ctx.beginPath(); ctx.ellipse(0, 28, 17, 18, 0, 0, Math.PI * 2); ctx.fill();
-
-  // Sınıfa göre gövde karakteri
-  const shapes = {
-    standard: { half: 15, bow: -55, stern: 43, curve: 18 },
-    minotaur: { half: 20, bow: -58, stern: 46, curve: 25 },
-    hellfire: { half: 17, bow: -61, stern: 47, curve: 19 },
-    leviathan: { half: 19, bow: -64, stern: 48, curve: 24 },
-    frost: { half: 14, bow: -66, stern: 43, curve: 16 },
-    thunder: { half: 21, bow: -62, stern: 49, curve: 25 },
-    corsair: { half: 16, bow: -70, stern: 42, curve: 13 },
-    royal: { half: 24, bow: -59, stern: 53, curve: 29 },
-    phantom: { half: 18, bow: -68, stern: 47, curve: 20 },
-    enemy: { half: 18, bow: -58, stern: 46, curve: 22 }
-  };
-  const sh = shapes[theme] || shapes.standard;
-  const hullGrad = ctx.createLinearGradient(-sh.half, -30, sh.half, 35);
-  hullGrad.addColorStop(0, m.trimColor);
-  hullGrad.addColorStop(0.18, m.deckColor);
-  hullGrad.addColorStop(0.58, m.hullColor);
-  hullGrad.addColorStop(1, dark);
-
-  // Dış zırh/gövde silüeti
-  ctx.fillStyle = hullGrad;
-  ctx.beginPath();
-  if (theme === 'minotaur') {
-    ctx.moveTo(0, sh.bow - 2); ctx.lineTo(-7, -48); ctx.quadraticCurveTo(-sh.half - 7, -19, -sh.half, 25);
-    ctx.lineTo(-sh.half + 2, 39); ctx.lineTo(-9, sh.stern); ctx.lineTo(0, sh.stern + 2);
-    ctx.lineTo(9, sh.stern); ctx.lineTo(sh.half - 2, 39); ctx.lineTo(sh.half, 25);
-    ctx.quadraticCurveTo(sh.half + 7, -19, 7, -48); ctx.closePath();
-  } else if (theme === 'hellfire') {
-    ctx.moveTo(0, sh.bow); ctx.lineTo(-10, -43); ctx.lineTo(-sh.half, -8); ctx.lineTo(-sh.half + 3, 31);
-    ctx.lineTo(-8, sh.stern); ctx.lineTo(0, sh.stern + 3); ctx.lineTo(8, sh.stern);
-    ctx.lineTo(sh.half - 3, 31); ctx.lineTo(sh.half, -8); ctx.lineTo(10, -43); ctx.closePath();
-  } else if (theme === 'leviathan') {
-    ctx.moveTo(0, sh.bow); ctx.quadraticCurveTo(25, -24, sh.half, 14);
-    ctx.quadraticCurveTo(sh.half + 5, 40, 0, sh.stern); ctx.quadraticCurveTo(-sh.half - 5, 40, -sh.half, 14);
-    ctx.quadraticCurveTo(-25, -24, 0, sh.bow);
-  } else if (theme === 'frost') {
-    ctx.moveTo(0, sh.bow); ctx.lineTo(-8, -43); ctx.lineTo(-sh.half, 13); ctx.lineTo(-9, 37);
-    ctx.lineTo(0, sh.stern); ctx.lineTo(9, 37); ctx.lineTo(sh.half, 13); ctx.lineTo(8, -43); ctx.closePath();
-  } else {
-    ctx.moveTo(0, sh.bow); ctx.quadraticCurveTo(sh.curve, -25, sh.half, 27);
-    ctx.quadraticCurveTo(sh.half - 1, 42, 0, sh.stern); ctx.quadraticCurveTo(-sh.half + 1, 42, -sh.half, 27);
-    ctx.quadraticCurveTo(-sh.curve, -25, 0, sh.bow);
-  }
-  ctx.closePath(); ctx.fill();
-  ctx.strokeStyle = accent; ctx.lineWidth = 2.8; ctx.stroke();
-
-  // Omurga çizgisi ve borda katmanları
-  ctx.strokeStyle = 'rgba(255,230,180,.32)'; ctx.lineWidth = 1.2;
-  ctx.beginPath(); ctx.moveTo(0, sh.bow + 8); ctx.quadraticCurveTo(2, 0, 0, sh.stern - 5); ctx.stroke();
-  ctx.strokeStyle = 'rgba(0,0,0,.55)'; ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.moveTo(-sh.half + 3, -22); ctx.quadraticCurveTo(-sh.half - 1, 8, -sh.half + 4, 31); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(sh.half - 3, -22); ctx.quadraticCurveTo(sh.half + 1, 8, sh.half - 4, 31); ctx.stroke();
-
-  // Güverte: ahşap tonları ve plank çizgileri
-  ctx.fillStyle = m.deckColor;
-  ctx.beginPath(); ctx.moveTo(0, sh.bow + 10); ctx.quadraticCurveTo(sh.half - 2, -13, sh.half - 4, 25);
-  ctx.quadraticCurveTo(7, 36, 0, 37); ctx.quadraticCurveTo(-7, 36, -sh.half + 4, 25);
-  ctx.quadraticCurveTo(-sh.half + 2, -13, 0, sh.bow + 10); ctx.closePath(); ctx.fill();
-  ctx.save(); ctx.beginPath(); ctx.ellipse(0, -1, sh.half - 5, 35, 0, 0, Math.PI * 2); ctx.clip();
-  for (let y = -35; y <= 31; y += 7) {
-    ctx.strokeStyle = y % 14 === 0 ? 'rgba(255,220,160,.25)' : 'rgba(0,0,0,.18)';
-    ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(-sh.half, y); ctx.lineTo(sh.half, y + 1); ctx.stroke();
-  }
-  ctx.restore();
-
-  // Kıç kamarası ve pruvalık yükseltiler
-  ctx.fillStyle = theme === 'frost' ? '#647f9d' : '#3b2419';
-  ctx.fillRect(-7, 24, 14, 9);
-  ctx.strokeStyle = accent; ctx.lineWidth = 1.4; ctx.strokeRect(-7, 24, 14, 9);
-  ctx.fillStyle = 'rgba(255,255,255,.16)'; ctx.fillRect(-5, 26, 10, 2);
-
-  // Top ağızları, metal çemberler ve kısa namlular
-  const gunRows = theme === 'thunder' || theme === 'minotaur' ? [-28, -14, 0, 14, 27] : [-24, -8, 9, 25];
-  for (const gy of gunRows) {
-    for (const side of [-1, 1]) {
-      const gx = side * (sh.half - 2);
-      ctx.fillStyle = '#080b10'; ctx.beginPath(); ctx.arc(gx, gy, 3.1, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = accent; ctx.lineWidth = 1; ctx.stroke();
-      ctx.strokeStyle = '#111827'; ctx.lineWidth = 2.4;
-      ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx + side * 5, gy); ctx.stroke();
-      ctx.fillStyle = 'rgba(255,255,255,.25)'; ctx.fillRect(gx - 1, gy - 1, 1, 1);
-    }
-  }
-
-  // Borda korkulukları ve metal perçinler
-  ctx.strokeStyle = accent; ctx.globalAlpha = 0.72; ctx.lineWidth = 1.2;
-  ctx.beginPath(); ctx.moveTo(-sh.half + 3, -30); ctx.quadraticCurveTo(-sh.half - 1, 0, -sh.half + 4, 28); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(sh.half - 3, -30); ctx.quadraticCurveTo(sh.half + 1, 0, sh.half - 4, 28); ctx.stroke();
-  ctx.globalAlpha = 1;
-  for (const gy of [-31, -17, -3, 11, 25]) {
-    ctx.fillStyle = '#f2d7a0';
-    ctx.beginPath(); ctx.arc(-sh.half + 4, gy, 1.1, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(sh.half - 4, gy, 1.1, 0, Math.PI * 2); ctx.fill();
-  }
-
-  // Temaya özel figür başı / zırh
-  if (theme === 'minotaur') {
-    ctx.fillStyle = '#d99a32'; ctx.strokeStyle = '#ffe0a0'; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.ellipse(0, -51, 5.5, 6.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(-3, -54); ctx.quadraticCurveTo(-12, -64, -10, -57);
-    ctx.moveTo(3, -54); ctx.quadraticCurveTo(12, -64, 10, -57); ctx.stroke();
-  } else if (theme === 'hellfire') {
-    ctx.save(); ctx.shadowColor = '#fb5a16'; ctx.shadowBlur = 13;
-    ctx.fillStyle = '#ff7b22'; ctx.beginPath(); ctx.moveTo(0, -65); ctx.lineTo(-5, -52); ctx.lineTo(0, -55); ctx.lineTo(5, -49); ctx.closePath(); ctx.fill(); ctx.restore();
-    ctx.strokeStyle = '#ff6b24'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-14, 12); ctx.quadraticCurveTo(-20, 20, -12, 27); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(14, 12); ctx.quadraticCurveTo(20, 20, 12, 27); ctx.stroke();
-  } else if (theme === 'leviathan') {
-    ctx.strokeStyle = '#67e8f9'; ctx.lineWidth = 1.5;
-    for (let y = -38; y < 27; y += 10) {
-      ctx.beginPath(); ctx.arc(-8, y, 4, -0.7, 0.9); ctx.stroke();
-      ctx.beginPath(); ctx.arc(8, y, 4, Math.PI - 0.9, Math.PI + 0.7); ctx.stroke();
-    }
-    ctx.fillStyle = '#0e7490'; ctx.beginPath(); ctx.moveTo(0, -58); ctx.lineTo(-5, -47); ctx.lineTo(0, -43); ctx.lineTo(5, -47); ctx.closePath(); ctx.fill();
-  } else if (theme === 'frost') {
-    ctx.fillStyle = '#dff7ff'; ctx.strokeStyle = '#7dd3fc'; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(0, -68); ctx.lineTo(-5, -53); ctx.lineTo(0, -48); ctx.lineTo(5, -53); ctx.closePath(); ctx.fill(); ctx.stroke();
-    ctx.strokeStyle = 'rgba(191,230,255,.8)'; ctx.beginPath(); ctx.moveTo(-12, 4); ctx.lineTo(-17, 12); ctx.lineTo(-11, 18); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(12, 4); ctx.lineTo(17, 12); ctx.lineTo(11, 18); ctx.stroke();
-  } else if (theme === 'thunder') {
-    ctx.strokeStyle = '#d8b4fe'; ctx.lineWidth = 2; ctx.shadowColor = '#a855f7'; ctx.shadowBlur = 8;
-    ctx.beginPath(); ctx.arc(0, -5, 13, 0, Math.PI * 2); ctx.stroke(); ctx.shadowBlur = 0;
-    ctx.fillStyle = '#e9d5ff'; ctx.beginPath(); ctx.moveTo(2, -19); ctx.lineTo(-5, -4); ctx.lineTo(1, -5); ctx.lineTo(-2, 9); ctx.lineTo(8, -7); ctx.lineTo(2, -6); ctx.closePath(); ctx.fill();
-  } else if (theme === 'corsair') {
-    ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(0, -69); ctx.lineTo(-7, -55); ctx.lineTo(0, -58); ctx.lineTo(7, -55); ctx.closePath(); ctx.stroke();
-    ctx.fillStyle = '#0f172a'; ctx.fillRect(-5, -8, 10, 18);
-    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(-13, 18); ctx.lineTo(-19, 27); ctx.lineTo(-12, 32); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(13, 18); ctx.lineTo(19, 27); ctx.lineTo(12, 32); ctx.stroke();
-  } else if (theme === 'royal') {
-    ctx.save(); ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = 9;
-    ctx.fillStyle = '#facc15'; ctx.strokeStyle = '#fff1a8'; ctx.lineWidth = 1.2;
-    ctx.beginPath(); ctx.moveTo(-8, -48); ctx.lineTo(-10, -60); ctx.lineTo(-3, -54); ctx.lineTo(0, -65); ctx.lineTo(4, -54); ctx.lineTo(10, -60); ctx.lineTo(8, -48); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
-    ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(-15, 20); ctx.lineTo(15, 20); ctx.stroke();
-  } else if (theme === 'phantom') {
-    ctx.save(); ctx.shadowColor = '#67e8f9'; ctx.shadowBlur = 14;
-    ctx.strokeStyle = '#a5f3fc'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.arc(0, -8, 12, 0, Math.PI * 2); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(0, -23); ctx.lineTo(0, 7); ctx.moveTo(-10, -8); ctx.lineTo(10, -8); ctx.stroke();
-    ctx.fillStyle = 'rgba(103,232,249,.18)'; ctx.beginPath(); ctx.ellipse(0, 3, 20, 36, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
-  }
-
-  // Direkler: her sınıfta farklı aralık ve yükseklik
-  const mastSets = {
-    standard: [{y:-25,h:27,w:17},{y:2,h:34,w:22},{y:23,h:21,w:14}],
-    minotaur: [{y:-30,h:30,w:18},{y:-1,h:40,w:26},{y:25,h:25,w:18}],
-    hellfire: [{y:-30,h:32,w:20},{y:-2,h:43,w:27},{y:25,h:28,w:19}],
-    leviathan: [{y:-32,h:34,w:19},{y:-2,h:43,w:28},{y:27,h:27,w:20}],
-    frost: [{y:-34,h:35,w:16},{y:-3,h:44,w:23},{y:25,h:25,w:16}],
-    thunder: [{y:-33,h:36,w:21},{y:-2,h:47,w:30},{y:28,h:29,w:22}],
-    corsair: [{y:-38,h:39,w:17},{y:-4,h:46,w:25},{y:27,h:26,w:16}],
-    royal: [{y:-31,h:35,w:24},{y:0,h:49,w:33},{y:30,h:32,w:25}],
-    phantom: [{y:-36,h:38,w:20},{y:-2,h:48,w:28},{y:28,h:29,w:20}],
-    enemy: [{y:-29,h:31,w:19},{y:-1,h:41,w:26},{y:25,h:25,w:18}]
-  };
-  const masts = mastSets[theme] || mastSets.standard;
-  masts.forEach((mast, index) => {
-    // Direk gölgesi ve ahşap gövde
-    ctx.strokeStyle = 'rgba(0,0,0,.65)'; ctx.lineWidth = index === 1 ? 5 : 4;
-    ctx.beginPath(); ctx.moveTo(2, mast.y + 8); ctx.lineTo(2, mast.y - mast.h - 2); ctx.stroke();
-    ctx.strokeStyle = '#b88a55'; ctx.lineWidth = index === 1 ? 3 : 2.3;
-    ctx.beginPath(); ctx.moveTo(0, mast.y + 7); ctx.lineTo(0, mast.y - mast.h); ctx.stroke();
-    ctx.strokeStyle = 'rgba(255,235,190,.55)'; ctx.lineWidth = 0.8;
-    ctx.beginPath(); ctx.moveTo(-1, mast.y + 4); ctx.lineTo(-1, mast.y - mast.h + 3); ctx.stroke();
-
-    // Yelken yüzeyi, gölgeli kıvrım ve dikişler
-    const sailGrad = ctx.createLinearGradient(-mast.w, mast.y - mast.h, mast.w, mast.y + 2);
-    sailGrad.addColorStop(0, 'rgba(255,255,255,.88)');
-    sailGrad.addColorStop(0.22, m.sailColor);
-    sailGrad.addColorStop(0.72, m.sailColor);
-    sailGrad.addColorStop(1, 'rgba(8,12,20,.88)');
-    ctx.fillStyle = sailGrad;
-    ctx.beginPath(); ctx.moveTo(0, mast.y - mast.h);
-    ctx.quadraticCurveTo(mast.w + 7, mast.y - mast.h * .48, 9, mast.y);
-    ctx.quadraticCurveTo(0, mast.y + 4, -9, mast.y);
-    ctx.quadraticCurveTo(-(mast.w + 7), mast.y - mast.h * .48, 0, mast.y - mast.h);
-    ctx.closePath(); ctx.fill();
-    ctx.strokeStyle = accent; ctx.lineWidth = 1.25; ctx.stroke();
-    ctx.strokeStyle = 'rgba(255,255,255,.25)'; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(0, mast.y - mast.h + 5); ctx.quadraticCurveTo(4, mast.y - mast.h * .45, 2, mast.y - 4); ctx.stroke();
-    ctx.strokeStyle = 'rgba(0,0,0,.25)'; ctx.lineWidth = 0.8;
-    ctx.beginPath(); ctx.moveTo(-mast.w * .45, mast.y - mast.h * .55); ctx.lineTo(mast.w * .42, mast.y - mast.h * .55); ctx.stroke();
-
-    // Ana yelkende özgün arma
-    if (index === 1) {
-      const symbols = { minotaur: '♉', hellfire: '✦', leviathan: '◈', frost: '❄', thunder: 'ϟ', corsair: '♠', royal: '♛', phantom: '☼', standard: '◆', enemy: '✦' };
-      ctx.save(); ctx.fillStyle = accent; ctx.font = 'bold 12px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.shadowColor = 'rgba(0,0,0,.65)'; ctx.shadowBlur = 3;
-      ctx.fillText(symbols[theme] || '◆', 0, mast.y - mast.h * .48); ctx.restore();
-    }
-  });
-
-  // Çapraz halatlar ve seren bağlantıları
-  ctx.strokeStyle = 'rgba(226,211,180,.62)'; ctx.lineWidth = 0.8;
-  ctx.beginPath(); ctx.moveTo(-15, -39); ctx.lineTo(0, -3); ctx.lineTo(15, 19); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(15, -39); ctx.lineTo(0, -3); ctx.lineTo(-15, 19); ctx.stroke();
-
-  // Dalgalanan sancak
-  const wave = Math.sin(t / 160 + (p.x || 0) * 0.03) * 3.5;
-  ctx.fillStyle = m.flagColor; ctx.beginPath(); ctx.moveTo(0, -42);
-  ctx.quadraticCurveTo(8 + wave, -47, 16 + wave, -43); ctx.lineTo(12, -35);
-  ctx.quadraticCurveTo(6, -38, 0, -34); ctx.closePath(); ctx.fill();
-  ctx.strokeStyle = 'rgba(255,255,255,.45)'; ctx.lineWidth = 0.8; ctx.stroke();
-
-  // Hayalet geminin su üstünde bıraktığı özgün turkuaz ışık izi
-  if (theme === 'phantom') {
-    ctx.save(); ctx.globalAlpha = 0.32 + Math.sin(t / 210) * 0.08;
-    ctx.shadowColor = '#67e8f9'; ctx.shadowBlur = 18;
-    ctx.strokeStyle = '#67e8f9'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.ellipse(0, 4, sh.half + 5, 38, 0, 0, Math.PI * 2); ctx.stroke();
-    ctx.restore();
-  }
-
-  // Kenar ışığı: gövdeye hacim hissi verir
-  ctx.strokeStyle = 'rgba(255,255,255,.22)'; ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(-sh.half + 2, -20); ctx.quadraticCurveTo(-sh.half + 6, -39, -2, sh.bow + 8); ctx.stroke();
-  ctx.restore();
-
-  // Gemi adı
-  ctx.save(); ctx.textAlign = 'center'; ctx.font = '700 13px system-ui';
-  ctx.fillStyle = isEnemy ? '#fecaca' : '#ffffff';
-  ctx.shadowColor = 'rgba(0,0,0,.95)'; ctx.shadowBlur = 6;
-  ctx.fillText(p.name || 'Gemi', p.x, p.y + 58); ctx.restore();
-}
-
 
 function drawMinimap() {
   mctx.clearRect(0, 0, 92, 92);
@@ -1874,205 +569,69 @@ function drawMinimap() {
   const scale = 42 / WORLD_SIZE;
   const cx = 46, cy = 46;
 
-  mctx.fillStyle = '#d97706';
-  for (const isl of islands) {
-    mctx.beginPath();
-    mctx.arc(cx + isl.x * scale, cy + isl.y * scale, Math.max(2, isl.r * scale), 0, Math.PI * 2);
-    mctx.fill();
-  }
+  mctx.fillStyle = '#2a9d8f';
+  gameIslands.forEach(isl => {
+    mctx.beginPath(); mctx.arc(cx + isl.mesh.position.x * scale, cy + isl.mesh.position.z * scale, 3, 0, Math.PI * 2); mctx.fill();
+  });
 
-  mctx.fillStyle = '#facc15';
-  for (const tr of treasures) {
-    mctx.fillRect(cx + tr.x * scale - 1.5, cy + tr.y * scale - 1.5, 3, 3);
-  }
-
-  for (const e of enemies) {
-    mctx.fillStyle = e.id === selectedEnemyId ? '#ffffff' : '#ef4444';
-    mctx.beginPath();
-    mctx.arc(cx + e.x * scale, cy + e.y * scale, e.id === selectedEnemyId ? 3.5 : 2.5, 0, Math.PI * 2);
-    mctx.fill();
-  }
+  mctx.fillStyle = '#ef4444';
+  gameEnemies.forEach(en => {
+    mctx.beginPath(); mctx.arc(cx + en.x * scale, cy + en.z * scale, 2.5, 0, Math.PI * 2); mctx.fill();
+  });
 
   mctx.fillStyle = '#4ade80';
-  mctx.beginPath();
-  mctx.arc(cx + player.x * scale, cy + player.y * scale, 3.2, 0, Math.PI * 2);
-  mctx.fill();
+  mctx.beginPath(); mctx.arc(cx + player.x * scale, cy + player.z * scale, 3, 0, Math.PI * 2); mctx.fill();
 }
 
-function draw() {
-  update();
+function updateHUD() {
+  scoreEl.textContent = player.score.toLocaleString();
+  ammoCountEl.textContent = player.ammo;
+  levelEl.textContent = player.level;
+  hpTextEl.textContent = `${Math.ceil(player.hp)} / ${player.maxHp}`;
+  expTextEl.textContent = `${player.exp} / ${player.maxExp}`;
+  hpBarEl.style.width = ((player.hp / player.maxHp) * 100) + '%';
+  expBarEl.style.width = ((player.exp / player.maxExp) * 100) + '%';
+}
 
-  ctx.save();
-  ctx.clearRect(0, 0, W, H);
-  ctx.fillStyle = '#087da0';
-  ctx.fillRect(0, 0, W, H);
+// Market & Tersane Entegrasyonu
+marketToggleBtn.addEventListener('click', () => marketPanel.classList.toggle('open'));
+marketCloseBtn.addEventListener('click', () => marketPanel.classList.remove('open'));
+shipyardToggleBtn.addEventListener('click', () => {
+  marketPanel.classList.add('open');
+  tabShipyard.classList.add('active'); tabMarket.classList.remove('active');
+  sectionShipyard.classList.add('active'); sectionMarket.classList.remove('active');
+  renderShipyardList();
+});
 
-  if (!player) {
-    ctx.restore();
-    requestAnimationFrame(draw);
-    return;
-  }
-
-  const cam = getCameraOrigin();
-  const viewW = W / CAMERA_ZOOM;
-  const viewH = H / CAMERA_ZOOM;
-
-  ctx.scale(CAMERA_ZOOM, CAMERA_ZOOM);
-  ctx.translate(-cam.x, -cam.y);
-
-  const t = Date.now() / 800;
-  ctx.strokeStyle = '#54bdd0';
-  ctx.globalAlpha = 0.25;
-  const startY = Math.floor(cam.y / 35) * 35;
-  for (let y = startY - 35; y < cam.y + viewH + 70; y += 35) {
-    ctx.beginPath();
-    for (let x = Math.floor(cam.x / 16) * 16; x < cam.x + viewW + 32; x += 16) {
-      const yy = y + Math.sin(x / 45 + t + y * 0.02) * 3;
-      x === Math.floor(cam.x / 16) * 16 ? ctx.moveTo(x, yy) : ctx.lineTo(x, yy);
-    }
-    ctx.stroke();
-  }
-  ctx.globalAlpha = 1;
-
-  ctx.strokeStyle = 'rgba(255, 215, 131, 0.35)';
-  ctx.lineWidth = 4;
-  ctx.strokeRect(-WORLD_SIZE, -WORLD_SIZE, WORLD_SIZE * 2, WORLD_SIZE * 2);
-
-  drawRangeRing(player.x, player.y);
-
-  if (targetPos) {
-    const pulse = 10 + Math.sin(Date.now() / 140) * 3;
-    ctx.save();
-    ctx.strokeStyle = 'rgba(255, 215, 131, 0.85)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(targetPos.x, targetPos.y, pulse, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  for (const isl of islands) {
-    if (isl.x + isl.r < cam.x - 150 || isl.x - isl.r > cam.x + viewW + 150 ||
-        isl.y + isl.r < cam.y - 150 || isl.y + isl.r > cam.y + viewH + 150) continue;
-    ctx.fillStyle = '#e9c46a';
-    ctx.beginPath(); ctx.arc(isl.x, isl.y, isl.r, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#2a9d8f';
-    ctx.beginPath(); ctx.arc(isl.x, isl.y, isl.r * 0.72, 0, Math.PI * 2); ctx.fill();
-  }
-
-  for (const tr of treasures) {
-    if (tr.x < cam.x - 80 || tr.x > cam.x + viewW + 80 ||
-        tr.y < cam.y - 80 || tr.y > cam.y + viewH + 80) continue;
-    const bob = Math.sin(Date.now() / 300 + tr.bob) * 2;
-    ctx.fillStyle = '#92400e';
-    ctx.fillRect(tr.x - 9, tr.y - 7 + bob, 18, 14);
-    ctx.strokeStyle = '#fbbf24';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(tr.x - 9, tr.y - 7 + bob, 18, 14);
-  }
-
-  for (const s of shots) {
-    ctx.save();
-    ctx.strokeStyle = s.isPlayer ? 'rgba(253, 224, 71, 0.45)' : 'rgba(248, 113, 113, 0.45)';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(s.prevX, s.prevY);
-    ctx.lineTo(s.x, s.y);
-    ctx.stroke();
-
-    ctx.fillStyle = s.isPlayer ? '#0f172a' : '#7f1d1d';
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, 5, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = s.isPlayer ? '#fde047' : '#fca5a5';
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, 2.2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-
-  for (const e of enemies) {
-    if (e.x < cam.x - 120 || e.x > cam.x + viewW + 120 ||
-        e.y < cam.y - 120 || e.y > cam.y + viewH + 120) continue;
-    drawUnique3DShip(e, true, e.id === selectedEnemyId);
-  }
-
-  drawUnique3DShip(player, false, false);
-
-  for (const sw of shockwaves) {
-    ctx.save();
-    ctx.globalAlpha = Math.max(0, sw.alpha);
-    ctx.strokeStyle = sw.color;
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    ctx.arc(sw.x, sw.y, sw.r, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  for (const pt of particles) {
-    ctx.save();
-    ctx.globalAlpha = Math.max(0, pt.life);
-    ctx.fillStyle = pt.color;
-    ctx.beginPath();
-    ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-
-  for (const fl of flashes) {
-    const fx = fl.x;
-    const fy = fl.y;
-    ctx.save();
-    ctx.translate(fx, fy);
-    ctx.rotate(fl.angle);
-    ctx.globalAlpha = Math.max(0, fl.life);
-    const grad = ctx.createRadialGradient(0, 0, 1, 0, 0, fl.radius);
-    grad.addColorStop(0, '#ffffff');
-    grad.addColorStop(0.45, '#fde047');
-    grad.addColorStop(1, 'rgba(249, 115, 22, 0)');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(0, 0, fl.radius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-
-  for (const ft of floatingTexts) {
-    ctx.save();
-    ctx.globalAlpha = Math.max(0, ft.alpha);
-    ctx.font = '800 14px system-ui';
-    ctx.textAlign = 'center';
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.75)';
-    ctx.strokeText(ft.text, ft.x, ft.y);
-    ctx.fillStyle = ft.color;
-    ctx.fillText(ft.text, ft.x, ft.y);
-    ctx.restore();
-  }
-
-  ctx.restore();
-
-  drawMinimap();
-  requestAnimationFrame(draw);
+function renderShipyardList() {
+  shipyardListEl.innerHTML = '';
+  Object.values(SHIP_MODELS).forEach(model => {
+    const isOwned = currentUser.ownedShips.includes(model.id);
+    const isEquipped = currentUser.equippedShip === model.id;
+    const div = document.createElement('div');
+    div.className = 'market-item';
+    div.innerHTML = `
+      <div class="market-item-info"><span class="market-item-title">${model.name}</span><span class="market-item-sub">${model.desc}</span></div>
+      <button class="buy-btn ${isEquipped ? 'equipped' : isOwned ? 'owned' : ''}" type="button">${isEquipped ? 'Kullanımda' : isOwned ? 'Kullan' : model.cost + ' Altın'}</button>
+    `;
+    div.querySelector('button').addEventListener('click', () => {
+      if (isEquipped) return;
+      if (!isOwned && player.score >= model.cost) {
+        player.score -= model.cost;
+        currentUser.ownedShips.push(model.id);
+      }
+      currentUser.equippedShip = model.id;
+      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
+      startGameLogic();
+      renderShipyardList();
+    });
+    shipyardListEl.appendChild(div);
+  });
 }
 
 loadUsers();
-try {
-  const savedSession = JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY) || 'null');
-  if (savedSession && savedSession.username) {
-    completeLogin(savedSession);
-  } else {
-    authUsernameInput.value = 'Test';
-    authPasswordInput.value = 'test';
-  }
-} catch {
-  authUsernameInput.value = 'Test';
-  authPasswordInput.value = 'test';
-}
-
-draw();
+const session = JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY) || 'null');
+if (session) { completeLogin(session); }
 </script>
 </body>
 </html>
