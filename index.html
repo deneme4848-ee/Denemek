@@ -159,7 +159,9 @@ window.addEventListener('resize', resize);
 resize();
 
 const WORLD_SIZE = 2400;
-const ATTACK_RANGE = 420;
+const ATTACK_RANGE = 320;
+const ENEMY_DAMAGE = 10;
+const ENEMY_FIRE_INTERVAL = 3000;
 
 let player, enemies, islands, treasures, shots, particles, shockwaves, flashes, floatingTexts, isGameOver;
 let targetPos = null;
@@ -169,8 +171,6 @@ let lastPlayerShot = 0;
 let lastClickEnemyId = null;
 let lastClickTime = 0;
 let nextEnemyId = 1;
-let shakeTime = 0;
-let shakeIntensity = 0;
 
 function syncAttackButton() {
   const selectedEnemy = enemies.find(e => e.id === selectedEnemyId);
@@ -200,7 +200,6 @@ function initGame() {
   isAttacking = false;
   lastClickEnemyId = null;
   lastClickTime = 0;
-  shakeTime = 0;
   gameOverEl.style.display = 'none';
 
   const now = Date.now();
@@ -313,12 +312,6 @@ function addFloatingText(x, y, text, color) {
   });
 }
 
-function addScreenShake(intensity = 5, duration = 180) {
-  shakeIntensity = Math.max(shakeIntensity, intensity);
-  shakeTime = Math.max(shakeTime, duration);
-}
-
-// Gerçekçi namlu alevi ve barut dumanı efekti
 function spawnMuzzleEffects(x, y, angle) {
   flashes.push({
     x,
@@ -329,7 +322,6 @@ function spawnMuzzleEffects(x, y, angle) {
     radius: 16
   });
 
-  // Barut dumanı bulutları
   for (let i = 0; i < 9; i++) {
     const spread = (Math.random() - 0.5) * 0.9;
     const dir = angle + spread;
@@ -348,7 +340,6 @@ function spawnMuzzleEffects(x, y, angle) {
     });
   }
 
-  // Kısa süreli kıvılcım
   for (let i = 0; i < 6; i++) {
     const spread = (Math.random() - 0.5) * 0.65;
     const dir = angle + spread;
@@ -367,7 +358,6 @@ function spawnMuzzleEffects(x, y, angle) {
   }
 }
 
-// Gerçekçi isabet patlaması, şok dalgası ve ateş parçacıkları
 function spawnImpactEffects(x, y, isPlayerHit = false) {
   shockwaves.push({
     x,
@@ -378,9 +368,6 @@ function spawnImpactEffects(x, y, isPlayerHit = false) {
     color: isPlayerHit ? '#fca5a5' : '#fdba74'
   });
 
-  addScreenShake(isPlayerHit ? 6 : 4, 170);
-
-  // Ateş ve patlama parçacıkları
   for (let i = 0; i < 18; i++) {
     const ang = Math.random() * Math.PI * 2;
     const spd = 1.2 + Math.random() * 4.2;
@@ -399,7 +386,6 @@ function spawnImpactEffects(x, y, isPlayerHit = false) {
     });
   }
 
-  // Koyu duman bulutu
   for (let i = 0; i < 8; i++) {
     const ang = Math.random() * Math.PI * 2;
     const spd = 0.5 + Math.random() * 1.6;
@@ -433,7 +419,7 @@ function fireLockedCannon(shooter, target, isPlayer) {
     speed: isPlayer ? 10.5 : 8.2,
     isPlayer,
     targetId: target.id,
-    damage: isPlayer ? player.damage : 110,
+    damage: isPlayer ? player.damage : ENEMY_DAMAGE,
     trailTimer: 0
   });
 }
@@ -532,17 +518,11 @@ function updateWake(ship, isMoving) {
   }
 }
 
-function update(dt) {
+function update() {
   if (isGameOver) return;
 
   const now = Date.now();
 
-  if (shakeTime > 0) {
-    shakeTime = Math.max(0, shakeTime - dt);
-    if (shakeTime === 0) shakeIntensity = 0;
-  }
-
-  // Can 1000'in altındaysa: 5 sn saldırı almazsa her 5 sn'de +100 tamir
   if (player.hp < player.maxHp) {
     const sinceHit = now - player.lastHitTime;
     if (sinceHit >= 5000) {
@@ -602,7 +582,6 @@ function update(dt) {
     }
   }
 
-  // Hareket ederken de menzil dışına çıkmadığı sürece seçili düşmana ateş et
   // Menzilden çıkıldığında saldırı otomatik iptal olur; tekrar girince kendiliğinden başlamaz
   if (isAttacking && selectedEnemy) {
     const distToEnemy = Math.hypot(selectedEnemy.x - player.x, selectedEnemy.y - player.y);
@@ -646,7 +625,7 @@ function update(dt) {
         e.x += Math.cos(e.a) * eSpeed;
         e.y += Math.sin(e.a) * eSpeed;
       }
-      if (distToPlayer < 420 && now - e.lastShot > 1800) {
+      if (distToPlayer < 420 && now - e.lastShot > ENEMY_FIRE_INTERVAL) {
         e.lastShot = now;
         fireLockedCannon(e, player, false);
       }
@@ -674,7 +653,6 @@ function update(dt) {
     }
   }
 
-  // Kilitli Top Gülleleri ve Duman İzleri
   for (let i = shots.length - 1; i >= 0; i--) {
     const s = shots[i];
     s.prevX = s.x;
@@ -800,11 +778,11 @@ function drawRangeRing(sx, sy) {
   ctx.save();
   ctx.beginPath();
   ctx.arc(sx, sy, ATTACK_RANGE, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.035)';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
   ctx.fill();
-  ctx.lineWidth = 1.5;
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
-  ctx.setLineDash([10, 8]);
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.42)';
+  ctx.setLineDash([12, 8]);
   ctx.stroke();
   ctx.restore();
 }
@@ -975,23 +953,12 @@ function drawMinimap() {
   mctx.fill();
 }
 
-let lastFrameTime = performance.now();
-function draw(nowTs = performance.now()) {
-  const dt = Math.min(50, nowTs - lastFrameTime);
-  lastFrameTime = nowTs;
+function draw() {
+  update();
 
-  update(dt);
-
-  ctx.save();
-  if (shakeTime > 0) {
-    const sx = (Math.random() - 0.5) * shakeIntensity * 2;
-    const sy = (Math.random() - 0.5) * shakeIntensity * 2;
-    ctx.translate(sx, sy);
-  }
-
-  ctx.clearRect(-20, -20, W + 40, H + 40);
+  ctx.clearRect(0, 0, W, H);
   ctx.fillStyle = '#087da0';
-  ctx.fillRect(-20, -20, W + 40, H + 40);
+  ctx.fillRect(0, 0, W, H);
 
   const camX = player.x - W / 2;
   const camY = player.y - H / 2;
@@ -1016,6 +983,7 @@ function draw(nowTs = performance.now()) {
   ctx.lineWidth = 4;
   ctx.strokeRect(-WORLD_SIZE - camX, -WORLD_SIZE - camY, WORLD_SIZE * 2, WORLD_SIZE * 2);
 
+  // Geminin etrafında gözü yormayan hafif saydam beyaz menzil çizgisi
   drawRangeRing(W / 2, H / 2);
 
   if (targetPos) {
@@ -1051,7 +1019,6 @@ function draw(nowTs = performance.now()) {
     ctx.strokeRect(sx - 9, sy - 7 + bob, 18, 14);
   }
 
-  // İzli Top Gülleleri
   for (const s of shots) {
     const sx = s.x - camX;
     const sy = s.y - camY;
@@ -1086,7 +1053,6 @@ function draw(nowTs = performance.now()) {
 
   drawRealisticShip(player, W / 2, H / 2, camX, camY, false, false);
 
-  // Şok dalgaları
   for (const sw of shockwaves) {
     ctx.save();
     ctx.globalAlpha = Math.max(0, sw.alpha);
@@ -1098,7 +1064,6 @@ function draw(nowTs = performance.now()) {
     ctx.restore();
   }
 
-  // Duman, alev ve kıvılcım parçacıkları
   for (const pt of particles) {
     ctx.save();
     ctx.globalAlpha = Math.max(0, pt.life);
@@ -1109,7 +1074,6 @@ function draw(nowTs = performance.now()) {
     ctx.restore();
   }
 
-  // Namlu alevi parlamaları
   for (const fl of flashes) {
     const fx = fl.x - camX;
     const fy = fl.y - camY;
@@ -1128,7 +1092,6 @@ function draw(nowTs = performance.now()) {
     ctx.restore();
   }
 
-  // Kısa süreli hasar / tamir rakamları
   for (const ft of floatingTexts) {
     ctx.save();
     ctx.globalAlpha = Math.max(0, ft.alpha);
@@ -1142,14 +1105,12 @@ function draw(nowTs = performance.now()) {
     ctx.restore();
   }
 
-  ctx.restore();
-
   drawMinimap();
   requestAnimationFrame(draw);
 }
 
 initGame();
-requestAnimationFrame(draw);
+draw();
 </script>
 </body>
 </html>
