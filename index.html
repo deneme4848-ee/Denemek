@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası 2D - Tersane ve Gemi Modelleri</title>
+  <title>Korsan Dünyası 2D - Test Sürümü</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -98,7 +98,6 @@
     .hud-action-btn:hover { filter: brightness(1.1); }
     .hud-action-btn:active { transform: scale(0.96); }
 
-    /* Market ve Tersane Ortak Paneli */
     #market-panel {
       display: none;
       position: fixed;
@@ -169,12 +168,8 @@
       opacity: 0.42; border-color: rgba(255,255,255,0.2);
       background: rgba(30, 41, 59, 0.8); cursor: not-allowed;
     }
-    .buy-btn.owned {
-      background: #15803d; border-color: #4ade80; color: #f0fdf4; cursor: default;
-    }
-    .buy-btn.equipped {
-      background: #1e40af; border-color: #60a5fa; color: #eff6ff; cursor: default;
-    }
+    .buy-btn.owned { background: #15803d; border-color: #4ade80; color: #f0fdf4; cursor: default; }
+    .buy-btn.equipped { background: #1e40af; border-color: #60a5fa; color: #eff6ff; cursor: default; }
 
     #market-feedback { font-size: 11px; min-height: 15px; margin-top: 8px; text-align: center; color: #4ade80; }
 
@@ -219,7 +214,6 @@
       border: 2px solid #ffd783; background: #a33d22; color: white; cursor: pointer;
     }
 
-    /* Giriş ve Kayıt Ol Ekranı */
     #auth-overlay {
       position: fixed; inset: 0; z-index: 999999;
       background: radial-gradient(circle at top, rgba(8, 125, 160, 0.85), rgba(3, 21, 34, 0.98));
@@ -296,7 +290,7 @@
       </div>
       <div class="stat-row" style="margin-top:4px;">
         <span>Kaptan: <strong id="captain-name">Test</strong></span>
-        <span>Sv. <strong id="level">1</strong> · Altın: <strong id="score">0</strong></span>
+        <span>Sv. <strong id="level">1</strong> · Altın: <strong id="score">100,000,000</strong></span>
       </div>
       <div class="stat-row">
         <span>💣 Gülle (Cephane)</span>
@@ -324,7 +318,6 @@
     </div>
   </div>
 
-  <!-- Ortak Market & Tersane Paneli -->
   <div id="market-panel">
     <div class="market-header">
       <strong id="panel-main-title">⚓ Korsan Ticaret & Tersane</strong>
@@ -337,11 +330,10 @@
     </div>
 
     <div class="market-balance">
-      <span>Altın: <strong id="market-gold" style="color:#ffd783;">0</strong></span>
+      <span>Altın: <strong id="market-gold" style="color:#ffd783;">100,000,000</strong></span>
       <span>Gülle: <strong id="market-ammo" style="color:#fde047;">25</strong></span>
     </div>
 
-    <!-- SEKME 1: CEPHANE MARKETİ -->
     <div id="section-market" class="market-section active">
       <div class="market-item">
         <div class="market-item-info">
@@ -368,7 +360,6 @@
       </div>
     </div>
 
-    <!-- SEKME 2: TERSANE (6-7 ADET GEMİ MODELİ) -->
     <div id="section-shipyard" class="market-section">
       <div id="shipyard-list"></div>
     </div>
@@ -388,7 +379,6 @@
     <button id="restart-btn">YENİDEN YELKEN AÇ</button>
   </div>
 
-  <!-- Giriş ve Kayıt Ol Modalı -->
   <div id="auth-overlay">
     <div class="auth-card">
       <div class="auth-brand">
@@ -442,7 +432,6 @@ const captainNameEl = document.querySelector('#captain-name');
 const shipTitleEl = document.querySelector('#ship-title');
 const logoutBtn = document.querySelector('#logout-btn');
 
-// Market & Tersane DOM Elemanları
 const marketToggleBtn = document.querySelector('#market-toggle-btn');
 const shipyardToggleBtn = document.querySelector('#shipyard-toggle-btn');
 const marketPanel = document.querySelector('#market-panel');
@@ -480,7 +469,6 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
-// 6-7 ADET FARKLI GEMİ MODELİ (TASARIM AMAÇLI TERSANE SİSTEMİ)
 const SHIP_MODELS = {
   standard: {
     id: 'standard',
@@ -516,6 +504,7 @@ const SHIP_MODELS = {
     flagColor: '#38bdf8'
   },
   golden: {
+    id: 'golden',
     name: 'Altın Varaklı Kalyon',
     desc: 'Servetini ve ihtişamını sergilemek isteyen kaptanlar için.',
     cost: 750,
@@ -560,8 +549,8 @@ const SHIP_MODELS = {
   }
 };
 
-const USERS_STORAGE_KEY = 'pirate2d_users_v2';
-const SESSION_STORAGE_KEY = 'pirate2d_session_v2';
+const USERS_STORAGE_KEY = 'pirate2d_users_v3_test';
+const SESSION_STORAGE_KEY = 'pirate2d_session_v3_test';
 let authMode = 'login';
 let currentUser = null;
 
@@ -708,7 +697,6 @@ if (logoutBtn) {
   });
 }
 
-// Market & Tersane Arayüz Sekme Yönetimi
 function openPanel(section) {
   if (!currentUser || isGameOver) return;
   marketPanel.classList.add('open');
@@ -754,7 +742,6 @@ window.addEventListener('keydown', e => {
   }
 });
 
-// Tersane Listesini Oluşturma
 function renderShipyardList() {
   if (!currentUser) return;
   shipyardListEl.innerHTML = '';
@@ -786,7 +773,6 @@ function renderShipyardList() {
     shipyardListEl.appendChild(itemDiv);
   });
 
-  // Satın Alma ve Donatma Buton Olayları
   shipyardListEl.querySelectorAll('.buy-ship-btn').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
@@ -849,7 +835,6 @@ function saveUserSessionAndStorage() {
   }
 }
 
-// Cephane Satın Alma Mantığı
 let marketFeedbackTimer = null;
 ammoBuyBtns.forEach(btn => {
   btn.addEventListener('click', e => {
@@ -884,7 +869,7 @@ ammoBuyBtns.forEach(btn => {
 
 function updateMarketUI() {
   if (!player) return;
-  marketGoldEl.textContent = player.score;
+  marketGoldEl.textContent = player.score.toLocaleString();
   marketAmmoEl.textContent = player.ammo;
   ammoBuyBtns.forEach(btn => {
     const cost = Number(btn.dataset.cost);
@@ -898,12 +883,14 @@ function updateMarketUI() {
 const WORLD_SIZE = 2400;
 const CAMERA_ZOOM = 0.72;
 const ATTACK_RANGE = 230;
+const ENEMY_AGGRO_RANGE = 320; // Düşmanın seni fark edip saldırıya geçeceği menzil
 const ENEMY_ATTACK_RANGE = ATTACK_RANGE / 2;
 const PLAYER_MAX_SPEED = 1.85;
 const ENEMY_MAX_SPEED = PLAYER_MAX_SPEED * (2 / 3);
 const ENEMY_DAMAGE = 10;
 const ENEMY_FIRE_INTERVAL = 3000;
 const STARTING_AMMO = 25;
+const TEST_STARTING_GOLD = 100000000; // 100 Milyon Test Altını
 
 let player, enemies, islands, treasures, shots, particles, shockwaves, flashes, floatingTexts, isGameOver;
 let targetPos = null;
@@ -979,7 +966,7 @@ function initGame() {
     hp: 1000, maxHp: 1000,
     exp: 0, maxExp: 100, level: 1,
     damage: 180,
-    score: 0,
+    score: TEST_STARTING_GOLD, // TEST İÇİN 100 MİLYON ALTIN
     ammo: STARTING_AMMO,
     name: captain,
     shipModel: activeModel,
@@ -1013,7 +1000,7 @@ function initGame() {
   }
 
   for (let i = 0; i < 15; i++) spawnTreasure();
-  for (let i = 0; i < 7; i++) spawnEnemy();
+  for (let i = 0; i < 8; i++) spawnEnemy();
 
   updateHUD();
   syncAttackButton();
@@ -1030,9 +1017,9 @@ function spawnTreasure() {
 function spawnEnemy() {
   let ex, ey;
   do {
-    ex = (Math.random() - 0.5) * 1200;
-    ey = (Math.random() - 0.5) * 1200;
-  } while (Math.hypot(ex - player.x, ey - player.y) < 160);
+    ex = (Math.random() - 0.5) * (WORLD_SIZE * 1.6);
+    ey = (Math.random() - 0.5) * (WORLD_SIZE * 1.6);
+  } while (Math.hypot(ex - player.x, ey - player.y) < 350);
 
   enemies.push({
     id: nextEnemyId++,
@@ -1062,7 +1049,7 @@ function addExp(amount) {
 }
 
 function updateHUD() {
-  scoreEl.textContent = player.score;
+  scoreEl.textContent = player.score.toLocaleString();
   ammoCountEl.textContent = player.ammo;
   ammoCountEl.classList.toggle('low', player.ammo <= 5);
   levelEl.textContent = player.level;
@@ -1401,28 +1388,34 @@ function update() {
     }
   }
 
+  // NPC DÜŞMAN YAPAY ZEKA GÜNCELLEMESİ (Rastgele Dolaşma + Agresif Menzil Takibi)
   for (let i = enemies.length - 1; i >= 0; i--) {
     const e = enemies[i];
     const distToPlayer = Math.hypot(player.x - e.x, player.y - e.y);
     let eSpeed = ENEMY_MAX_SPEED * 0.75;
 
-    if (distToPlayer < 480) {
+    // Sadece menzile (AGGRO_RANGE) giren düşmanlar oyuncuya yönelip saldırır
+    if (distToPlayer < ENEMY_AGGRO_RANGE) {
       const angToPlayer = Math.atan2(player.y - e.y, player.x - e.x);
-      e.a = lerpAngle(e.a, angToPlayer, 0.05);
-      if (distToPlayer > 175) {
+      e.a = lerpAngle(e.a, angToPlayer, 0.08);
+
+      // Çok fazla yaklaşma durmasını engellemek için hafif bir mesafe koruması (20 birim)
+      if (distToPlayer > 120) {
         eSpeed = ENEMY_MAX_SPEED;
         e.x += Math.cos(e.a) * eSpeed;
         e.y += Math.sin(e.a) * eSpeed;
       }
+
       if (distToPlayer <= ENEMY_ATTACK_RANGE && now - e.lastShot > ENEMY_FIRE_INTERVAL) {
         e.lastShot = now;
         fireLockedCannon(e, player, false);
       }
     } else {
+      // Menzil dışındakiler haritada rastgele dolaşmaya devam eder
       e.turnTimer--;
       if (e.turnTimer <= 0) {
         e.targetAngle = Math.random() * Math.PI * 2;
-        e.turnTimer = 120 + Math.random() * 150;
+        e.turnTimer = 180 + Math.random() * 250;
       }
       e.a = lerpAngle(e.a, e.targetAngle, 0.03);
       e.x += Math.cos(e.a) * eSpeed;
@@ -1515,7 +1508,7 @@ function update() {
           isAttacking = false;
           marketPanel.classList.remove('open');
           syncAttackButton();
-          finalScoreEl.textContent = 'Toplanan Altın: ' + player.score;
+          finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString();
           gameOverEl.style.display = 'flex';
         }
         shots.splice(i, 1);
@@ -1577,7 +1570,6 @@ function drawRangeRing(wx, wy) {
   ctx.restore();
 }
 
-// Seçilen Gemi Modelinin Renk Paletine Göre Özelleştirilmiş 3D Çizimi
 function draw3DShip(p, isEnemy = false, isSelected = false) {
   for (const w of p.wake || []) {
     ctx.save();
@@ -1632,7 +1624,6 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
 
   ctx.rotate(p.a || 0);
 
-  // Model renkleri (Oyuncu kendi gemi modeline sahip, düşmanlar standart kızıl sancak renklerinde)
   const m = isEnemy ? {
     hullColor: '#450a0a',
     deckColor: '#5c1f1a',
@@ -1970,7 +1961,7 @@ function draw() {
     ctx.restore();
   }
 
-    ctx.restore();
+  ctx.restore();
 
   drawMinimap();
   requestAnimationFrame(draw);
