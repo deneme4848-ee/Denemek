@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası 2D</title>
+  <title>Korsan Dünyası 2D - Tersane ve Gemi Modelleri</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -78,8 +78,12 @@
       background: rgba(0, 24, 38, 0.88); border: 2px solid rgba(233, 211, 161, 0.55);
       flex-shrink: 0;
     }
-    #market-toggle-btn {
-      padding: 7px 13px;
+    .hud-btn-group {
+      display: flex;
+      gap: 6px;
+    }
+    .hud-action-btn {
+      padding: 7px 11px;
       border-radius: 10px;
       border: 1px solid #ffd783;
       background: linear-gradient(180deg, #b45309, #78350f);
@@ -91,16 +95,19 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.45);
       transition: transform 0.12s ease, filter 0.12s ease;
     }
-    #market-toggle-btn:hover { filter: brightness(1.1); }
-    #market-toggle-btn:active { transform: scale(0.96); }
+    .hud-action-btn:hover { filter: brightness(1.1); }
+    .hud-action-btn:active { transform: scale(0.96); }
 
+    /* Market ve Tersane Ortak Paneli */
     #market-panel {
       display: none;
       position: fixed;
       top: 152px;
       right: 12px;
-      width: 270px;
-      background: rgba(3, 27, 42, 0.92);
+      width: 310px;
+      max-height: 72vh;
+      overflow-y: auto;
+      background: rgba(3, 27, 42, 0.95);
       backdrop-filter: blur(6px);
       border: 1px solid rgba(255, 215, 131, 0.45);
       border-radius: 14px;
@@ -113,7 +120,7 @@
     .market-header {
       display: flex; justify-content: space-between; align-items: center;
       border-bottom: 1px solid rgba(255,255,255,0.12);
-      padding-bottom: 8px; margin-bottom: 10px;
+      padding-bottom: 8px; margin-bottom: 8px;
     }
     .market-header strong { color: #ffd783; font-size: 14px; }
     .market-close {
@@ -121,6 +128,22 @@
       width: 24px; height: 24px; border-radius: 6px; font-weight: 700; cursor: pointer;
     }
     .market-close:hover { background: rgba(239, 68, 68, 0.4); color: #fff; }
+    
+    .market-tabs {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px;
+    }
+    .market-tab-btn {
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15);
+      color: #cbd5e1; padding: 6px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;
+    }
+    .market-tab-btn.active {
+      background: linear-gradient(180deg, #d97706, #92400e);
+      color: #fff; border-color: #ffd783;
+    }
+
+    .market-section { display: none; }
+    .market-section.active { display: block; }
+
     .market-balance {
       display: flex; justify-content: space-between; font-size: 12px;
       background: rgba(255,255,255,0.06); padding: 6px 9px; border-radius: 8px;
@@ -135,6 +158,7 @@
     .market-item-info { display: flex; flex-direction: column; gap: 2px; }
     .market-item-title { font-size: 13px; font-weight: 700; color: #fff; }
     .market-item-sub { font-size: 11px; color: #94a3b8; }
+    
     .buy-btn {
       padding: 6px 10px; border-radius: 8px; border: 1px solid #ffd783;
       background: linear-gradient(180deg, #d97706, #92400e); color: #fff;
@@ -145,6 +169,13 @@
       opacity: 0.42; border-color: rgba(255,255,255,0.2);
       background: rgba(30, 41, 59, 0.8); cursor: not-allowed;
     }
+    .buy-btn.owned {
+      background: #15803d; border-color: #4ade80; color: #f0fdf4; cursor: default;
+    }
+    .buy-btn.equipped {
+      background: #1e40af; border-color: #60a5fa; color: #eff6ff; cursor: default;
+    }
+
     #market-feedback { font-size: 11px; min-height: 15px; margin-top: 8px; text-align: center; color: #4ade80; }
 
     #hint {
@@ -188,7 +219,7 @@
       border: 2px solid #ffd783; background: #a33d22; color: white; cursor: pointer;
     }
 
-    /* Giriş ve Kayıt Ol Ekranı (Tıklama kilitlerini çözen z-index ve pointer-events ayarları) */
+    /* Giriş ve Kayıt Ol Ekranı */
     #auth-overlay {
       position: fixed; inset: 0; z-index: 999999;
       background: radial-gradient(circle at top, rgba(8, 125, 160, 0.85), rgba(3, 21, 34, 0.98));
@@ -260,7 +291,7 @@
   <div id="hud">
     <div class="panel">
       <div class="hud-top-row">
-        <strong id="ship-title">Kara İnci</strong>
+        <strong id="ship-title">Kara İnci (Standart)</strong>
         <button id="logout-btn" class="logout-chip" title="Oturumu Kapat">Çıkış</button>
       </div>
       <div class="stat-row" style="margin-top:4px;">
@@ -286,48 +317,66 @@
 
     <div class="right-hud">
       <canvas id="minimap" width="92" height="92"></canvas>
-      <button id="market-toggle-btn" type="button" title="Market (M)">⚖️ Market (M)</button>
+      <div class="hud-btn-group">
+        <button id="market-toggle-btn" class="hud-action-btn" type="button" title="Market (M)">⚖️ Market</button>
+        <button id="shipyard-toggle-btn" class="hud-action-btn" type="button" title="Tersane (T)">⚓ Tersane</button>
+      </div>
     </div>
   </div>
 
+  <!-- Ortak Market & Tersane Paneli -->
   <div id="market-panel">
     <div class="market-header">
-      <strong>⚓ Korsan Cephane Marketi</strong>
+      <strong id="panel-main-title">⚓ Korsan Ticaret & Tersane</strong>
       <button id="market-close-btn" class="market-close" type="button">✕</button>
     </div>
+
+    <div class="market-tabs">
+      <button id="tab-market" class="market-tab-btn active" type="button">Cephane Marketi</button>
+      <button id="tab-shipyard" class="market-tab-btn" type="button">Tersane (Modeller)</button>
+    </div>
+
     <div class="market-balance">
       <span>Altın: <strong id="market-gold" style="color:#ffd783;">0</strong></span>
       <span>Gülle: <strong id="market-ammo" style="color:#fde047;">25</strong></span>
     </div>
 
-    <div class="market-item">
-      <div class="market-item-info">
-        <span class="market-item-title">💣 10 Adet Gülle</span>
-        <span class="market-item-sub">Küçük cephane kesesi</span>
+    <!-- SEKME 1: CEPHANE MARKETİ -->
+    <div id="section-market" class="market-section active">
+      <div class="market-item">
+        <div class="market-item-info">
+          <span class="market-item-title">💣 10 Adet Gülle</span>
+          <span class="market-item-sub">Küçük cephane kesesi</span>
+        </div>
+        <button class="buy-btn ammo-buy-btn" type="button" data-ammo="10" data-cost="15">15 Altın</button>
       </div>
-      <button class="buy-btn" type="button" data-ammo="10" data-cost="15">15 Altın</button>
+
+      <div class="market-item">
+        <div class="market-item-info">
+          <span class="market-item-title">💣 30 Adet Gülle</span>
+          <span class="market-item-sub">Orta sandık (%11 indirim)</span>
+        </div>
+        <button class="buy-btn ammo-buy-btn" type="button" data-ammo="30" data-cost="40">40 Altın</button>
+      </div>
+
+      <div class="market-item">
+        <div class="market-item-info">
+          <span class="market-item-title">💣 75 Adet Gülle</span>
+          <span class="market-item-sub">Kalyon cephaneliği (%20 indirim)</span>
+        </div>
+        <button class="buy-btn ammo-buy-btn" type="button" data-ammo="75" data-cost="90">90 Altın</button>
+      </div>
     </div>
 
-    <div class="market-item">
-      <div class="market-item-info">
-        <span class="market-item-title">💣 30 Adet Gülle</span>
-        <span class="market-item-sub">Orta sandık (%11 indirim)</span>
-      </div>
-      <button class="buy-btn" type="button" data-ammo="30" data-cost="40">40 Altın</button>
-    </div>
-
-    <div class="market-item">
-      <div class="market-item-info">
-        <span class="market-item-title">💣 75 Adet Gülle</span>
-        <span class="market-item-sub">Kalyon cephaneliği (%20 indirim)</span>
-      </div>
-      <button class="buy-btn" type="button" data-ammo="75" data-cost="90">90 Altın</button>
+    <!-- SEKME 2: TERSANE (6-7 ADET GEMİ MODELİ) -->
+    <div id="section-shipyard" class="market-section">
+      <div id="shipyard-list"></div>
     </div>
 
     <div id="market-feedback"></div>
   </div>
 
-  <div id="hint">Denize tıkla: Yelken aç · Düşmana 2 tık: Saldır · M: Market</div>
+  <div id="hint">Denize tıkla: Yelken aç · Düşmana 2 tık: Saldır · M: Market · T: Tersane</div>
 
   <div id="combat-bar">
     <button id="attack-btn" disabled>SALDIR</button>
@@ -390,15 +439,24 @@ const attackBtn = document.querySelector('#attack-btn');
 const gameOverEl = document.querySelector('#gameover');
 const finalScoreEl = document.querySelector('#final-score');
 const captainNameEl = document.querySelector('#captain-name');
+const shipTitleEl = document.querySelector('#ship-title');
 const logoutBtn = document.querySelector('#logout-btn');
 
+// Market & Tersane DOM Elemanları
 const marketToggleBtn = document.querySelector('#market-toggle-btn');
+const shipyardToggleBtn = document.querySelector('#shipyard-toggle-btn');
 const marketPanel = document.querySelector('#market-panel');
 const marketCloseBtn = document.querySelector('#market-close-btn');
 const marketGoldEl = document.querySelector('#market-gold');
 const marketAmmoEl = document.querySelector('#market-ammo');
 const marketFeedbackEl = document.querySelector('#market-feedback');
-const marketBuyBtns = document.querySelectorAll('.buy-btn');
+const ammoBuyBtns = document.querySelectorAll('.ammo-buy-btn');
+
+const tabMarket = document.querySelector('#tab-market');
+const tabShipyard = document.querySelector('#tab-shipyard');
+const sectionMarket = document.querySelector('#section-market');
+const sectionShipyard = document.querySelector('#section-shipyard');
+const shipyardListEl = document.querySelector('#shipyard-list');
 
 const authOverlay = document.querySelector('#auth-overlay');
 const tabLogin = document.querySelector('#tab-login');
@@ -422,8 +480,88 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
-const USERS_STORAGE_KEY = 'pirate2d_users_v1';
-const SESSION_STORAGE_KEY = 'pirate2d_session_v1';
+// 6-7 ADET FARKLI GEMİ MODELİ (TASARIM AMAÇLI TERSANE SİSTEMİ)
+const SHIP_MODELS = {
+  standard: {
+    id: 'standard',
+    name: 'Standart Sloop',
+    desc: 'Başlangıç gemisi, sade ahşap gövde.',
+    cost: 0,
+    hullColor: '#b46932',
+    deckColor: '#8f5629',
+    trimColor: '#f6d388',
+    sailColor: '#fffbeb',
+    flagColor: '#fbbf24'
+  },
+  corsair: {
+    id: 'corsair',
+    name: 'Kızıl Korsan Kateri',
+    desc: 'Kırmızı yelkenli ve koyu gövdeli vahşi korsan tasarımı.',
+    cost: 150,
+    hullColor: '#450a0a',
+    deckColor: '#5c1f1a',
+    trimColor: '#f87171',
+    sailColor: '#ef4444',
+    flagColor: '#dc2626'
+  },
+  phantom: {
+    id: 'phantom',
+    name: 'Hayalet Savaş Gemisi',
+    desc: 'Karanlık sularda hayalet gibi süzülen gizemli model.',
+    cost: 350,
+    hullColor: '#1e293b',
+    deckColor: '#0f172a',
+    trimColor: '#38bdf8',
+    sailColor: '#cbd5e1',
+    flagColor: '#38bdf8'
+  },
+  golden: {
+    name: 'Altın Varaklı Kalyon',
+    desc: 'Servetini ve ihtişamını sergilemek isteyen kaptanlar için.',
+    cost: 750,
+    hullColor: '#78350f',
+    deckColor: '#b45309',
+    trimColor: '#fde047',
+    sailColor: '#fef3c7',
+    flagColor: '#fbbf24'
+  },
+  royal: {
+    id: 'royal',
+    name: 'Kraliyet Donanma Fırkateyni',
+    desc: 'Asil mavi tonları ve şık bayrağıyla denizlerin hakimi.',
+    cost: 1200,
+    hullColor: '#1e3a8a',
+    deckColor: '#1e40af',
+    trimColor: '#93c5fd',
+    sailColor: '#e0f2fe',
+    flagColor: '#60a5fa'
+  },
+  emerald: {
+    id: 'emerald',
+    name: 'Zümrüt Okyanus Avcısı',
+    desc: 'Tropik denizlerin doğasından ilham alan yeşil tonlu özel model.',
+    cost: 2000,
+    hullColor: '#064e3b',
+    deckColor: '#065f46',
+    trimColor: '#34d399',
+    sailColor: '#d1fae5',
+    flagColor: '#10b981'
+  },
+  crimson_emperor: {
+    id: 'crimson_emperor',
+    name: 'Kızıl İmparatorluk Kalyonu',
+    desc: 'Tersanenin en ihtişamlı, devasa ve korkutucu amiral gemisi.',
+    cost: 3500,
+    hullColor: '#310404',
+    deckColor: '#581c87',
+    trimColor: '#fb7185',
+    sailColor: '#f3e8ff',
+    flagColor: '#f43f5e'
+  }
+};
+
+const USERS_STORAGE_KEY = 'pirate2d_users_v2';
+const SESSION_STORAGE_KEY = 'pirate2d_session_v2';
 let authMode = 'login';
 let currentUser = null;
 
@@ -442,6 +580,8 @@ function loadUsers() {
       id: 'user_test_default',
       username: 'Test',
       password: 'test',
+      ownedShips: ['standard'],
+      equippedShip: 'standard',
       createdAt: Date.now()
     });
     localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
@@ -485,7 +625,12 @@ if (fillTestBtn) {
 }
 
 function completeLogin(user) {
-  currentUser = { id: user.id, username: user.username };
+  currentUser = {
+    id: user.id,
+    username: user.username,
+    ownedShips: user.ownedShips || ['standard'],
+    equippedShip: user.equippedShip || 'standard'
+  };
   localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
   captainNameEl.textContent = currentUser.username;
   authOverlay.style.display = 'none';
@@ -522,6 +667,8 @@ if (authForm) {
         id: 'user_' + Date.now(),
         username,
         password,
+        ownedShips: ['standard'],
+        equippedShip: 'standard',
         createdAt: Date.now()
       };
       users.push(newUser);
@@ -561,32 +708,150 @@ if (logoutBtn) {
   });
 }
 
-function toggleMarket(forceState) {
+// Market & Tersane Arayüz Sekme Yönetimi
+function openPanel(section) {
   if (!currentUser || isGameOver) return;
-  const shouldOpen = typeof forceState === 'boolean'
-    ? forceState
-    : !marketPanel.classList.contains('open');
-
-  marketPanel.classList.toggle('open', shouldOpen);
-  if (shouldOpen) {
-    marketFeedbackEl.textContent = '';
-    updateMarketUI();
+  marketPanel.classList.add('open');
+  if (section === 'market') {
+    tabMarket.classList.add('active');
+    tabShipyard.classList.remove('active');
+    sectionMarket.classList.add('active');
+    sectionShipyard.classList.remove('active');
+    document.querySelector('#panel-main-title').textContent = '⚓ Korsan Cephane Marketi';
+  } else {
+    tabShipyard.classList.add('active');
+    tabMarket.classList.remove('active');
+    sectionShipyard.classList.add('active');
+    sectionMarket.classList.remove('active');
+    document.querySelector('#panel-main-title').textContent = '⚓ Tersane (Gemi Modelleri)';
+    renderShipyardList();
   }
+  marketFeedbackEl.textContent = '';
+  updateMarketUI();
 }
 
-if (marketToggleBtn) marketToggleBtn.addEventListener('click', e => { e.stopPropagation(); toggleMarket(); });
-if (marketCloseBtn) marketCloseBtn.addEventListener('click', e => { e.stopPropagation(); toggleMarket(false); });
+function closePanel() {
+  marketPanel.classList.remove('open');
+}
+
+marketToggleBtn.addEventListener('click', e => { e.stopPropagation(); openPanel('market'); });
+shipyardToggleBtn.addEventListener('click', e => { e.stopPropagation(); openPanel('shipyard'); });
+marketCloseBtn.addEventListener('click', e => { e.stopPropagation(); closePanel(); });
+
+tabMarket.addEventListener('click', () => openPanel('market'));
+tabShipyard.addEventListener('click', () => openPanel('shipyard'));
 
 window.addEventListener('keydown', e => {
   if (!currentUser || isGameOver) return;
   if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
   if (e.key === 'm' || e.key === 'M') {
-    toggleMarket();
+    if (marketPanel.classList.contains('open') && sectionMarket.classList.contains('active')) closePanel();
+    else openPanel('market');
+  }
+  if (e.key === 't' || e.key === 'T') {
+    if (marketPanel.classList.contains('open') && sectionShipyard.classList.contains('active')) closePanel();
+    else openPanel('shipyard');
   }
 });
 
+// Tersane Listesini Oluşturma
+function renderShipyardList() {
+  if (!currentUser) return;
+  shipyardListEl.innerHTML = '';
+
+  Object.values(SHIP_MODELS).forEach(model => {
+    const isOwned = currentUser.ownedShips.includes(model.id);
+    const isEquipped = currentUser.equippedShip === model.id;
+
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'market-item';
+
+    let btnHtml = '';
+    if (isEquipped) {
+      btnHtml = `<button class="buy-btn equipped" type="button" disabled>Kullanımda</button>`;
+    } else if (isOwned) {
+      btnHtml = `<button class="buy-btn equip-ship-btn" type="button" data-id="${model.id}">Kullan</button>`;
+    } else {
+      const canAfford = player && player.score >= model.cost;
+      btnHtml = `<button class="buy-btn buy-ship-btn" type="button" data-id="${model.id}" data-cost="${model.cost}" ${!canAfford ? 'disabled' : ''}>${model.cost} Altın</button>`;
+    }
+
+    itemDiv.innerHTML = `
+      <div class="market-item-info">
+        <span class="market-item-title">${model.name}</span>
+        <span class="market-item-sub">${model.desc}</span>
+      </div>
+      ${btnHtml}
+    `;
+    shipyardListEl.appendChild(itemDiv);
+  });
+
+  // Satın Alma ve Donatma Buton Olayları
+  shipyardListEl.querySelectorAll('.buy-ship-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const modelId = btn.dataset.id;
+      const cost = Number(btn.dataset.cost);
+      const model = SHIP_MODELS[modelId];
+
+      if (player.score < cost) {
+        marketFeedbackEl.style.color = '#f87171';
+        marketFeedbackEl.textContent = 'Yetersiz altın!';
+        return;
+      }
+
+      player.score -= cost;
+      currentUser.ownedShips.push(modelId);
+      currentUser.equippedShip = modelId;
+      saveUserSessionAndStorage();
+
+      player.shipModel = model;
+      shipTitleEl.textContent = model.name;
+
+      addFloatingText(player.x, player.y - 45, `${model.name} açıldı!`, '#4ade80');
+      marketFeedbackEl.style.color = '#4ade80';
+      marketFeedbackEl.textContent = `Tebrikler! ${model.name} satın alındı ve kuşanıldı.`;
+
+      updateHUD();
+      renderShipyardList();
+    });
+  });
+
+  shipyardListEl.querySelectorAll('.equip-ship-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const modelId = btn.dataset.id;
+      const model = SHIP_MODELS[modelId];
+
+      currentUser.equippedShip = modelId;
+      saveUserSessionAndStorage();
+
+      player.shipModel = model;
+      shipTitleEl.textContent = model.name;
+
+      marketFeedbackEl.style.color = '#4ade80';
+      marketFeedbackEl.textContent = `${model.name} kuşanıldı!`;
+
+      updateHUD();
+      renderShipyardList();
+    });
+  });
+}
+
+function saveUserSessionAndStorage() {
+  localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
+  const users = loadUsers();
+  const idx = users.findIndex(u => u.id === currentUser.id);
+  if (idx !== -1) {
+    users[idx].ownedShips = currentUser.ownedShips;
+    users[idx].equippedShip = currentUser.equippedShip;
+    saveUsers(users);
+  }
+}
+
+// Cephane Satın Alma Mantığı
 let marketFeedbackTimer = null;
-marketBuyBtns.forEach(btn => {
+ammoBuyBtns.forEach(btn => {
   btn.addEventListener('click', e => {
     e.stopPropagation();
     if (!player || isGameOver) return;
@@ -621,10 +886,13 @@ function updateMarketUI() {
   if (!player) return;
   marketGoldEl.textContent = player.score;
   marketAmmoEl.textContent = player.ammo;
-  marketBuyBtns.forEach(btn => {
+  ammoBuyBtns.forEach(btn => {
     const cost = Number(btn.dataset.cost);
     btn.disabled = player.score < cost;
   });
+  if (sectionShipyard.classList.contains('active')) {
+    renderShipyardList();
+  }
 }
 
 const WORLD_SIZE = 2400;
@@ -702,6 +970,9 @@ function initGame() {
 
   const now = Date.now();
   const captain = currentUser ? currentUser.username : 'Test';
+  const equippedId = currentUser && currentUser.equippedShip ? currentUser.equippedShip : 'standard';
+  const activeModel = SHIP_MODELS[equippedId] || SHIP_MODELS.standard;
+
   player = {
     id: currentUser ? currentUser.id : 'player',
     x: 0, y: 0, a: 0, speed: 0, maxSpeed: PLAYER_MAX_SPEED,
@@ -711,10 +982,13 @@ function initGame() {
     score: 0,
     ammo: STARTING_AMMO,
     name: captain,
+    shipModel: activeModel,
     wake: [],
     lastHitTime: now,
     lastRegenTick: now
   };
+
+  shipTitleEl.textContent = activeModel.name;
 
   shots = [];
   particles = [];
@@ -1303,6 +1577,7 @@ function drawRangeRing(wx, wy) {
   ctx.restore();
 }
 
+// Seçilen Gemi Modelinin Renk Paletine Göre Özelleştirilmiş 3D Çizimi
 function draw3DShip(p, isEnemy = false, isSelected = false) {
   for (const w of p.wake || []) {
     ctx.save();
@@ -1357,7 +1632,16 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
 
   ctx.rotate(p.a || 0);
 
-  ctx.fillStyle = isEnemy ? '#190706' : '#2b1406';
+  // Model renkleri (Oyuncu kendi gemi modeline sahip, düşmanlar standart kızıl sancak renklerinde)
+  const m = isEnemy ? {
+    hullColor: '#450a0a',
+    deckColor: '#5c1f1a',
+    trimColor: '#f87171',
+    sailColor: '#ef4444',
+    flagColor: '#dc2626'
+  } : (p.shipModel || SHIP_MODELS.standard);
+
+  ctx.fillStyle = '#190706';
   ctx.beginPath();
   ctx.moveTo(33, 5);
   ctx.quadraticCurveTo(15, 22, -25, 18);
@@ -1368,15 +1652,9 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
   ctx.fill();
 
   const hullGrad = ctx.createLinearGradient(0, -18, 0, 18);
-  if (isEnemy) {
-    hullGrad.addColorStop(0, '#7f1d1d');
-    hullGrad.addColorStop(0.45, '#450a0a');
-    hullGrad.addColorStop(1, '#1c0505');
-  } else {
-    hullGrad.addColorStop(0, '#b46932');
-    hullGrad.addColorStop(0.45, '#6e3b16');
-    hullGrad.addColorStop(1, '#3b1d08');
-  }
+  hullGrad.addColorStop(0, m.trimColor);
+  hullGrad.addColorStop(0.45, m.hullColor);
+  hullGrad.addColorStop(1, '#1c0505');
 
   ctx.fillStyle = hullGrad;
   ctx.beginPath();
@@ -1388,18 +1666,13 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
   ctx.closePath();
   ctx.fill();
 
-  ctx.strokeStyle = isEnemy ? '#f87171' : '#f6d388';
+  ctx.strokeStyle = m.trimColor;
   ctx.lineWidth = 2;
   ctx.stroke();
 
   const deckGrad = ctx.createLinearGradient(-20, -10, 24, 10);
-  if (isEnemy) {
-    deckGrad.addColorStop(0, '#5c1f1a');
-    deckGrad.addColorStop(1, '#8c352b');
-  } else {
-    deckGrad.addColorStop(0, '#8f5629');
-    deckGrad.addColorStop(1, '#c98549');
-  }
+  deckGrad.addColorStop(0, m.deckColor);
+  deckGrad.addColorStop(1, m.trimColor);
   ctx.fillStyle = deckGrad;
   ctx.beginPath();
   ctx.moveTo(27, 0);
@@ -1419,19 +1692,19 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
     ctx.stroke();
   }
 
-  ctx.fillStyle = isEnemy ? '#3b0d0b' : '#572d10';
+  ctx.fillStyle = m.hullColor;
   ctx.fillRect(-24, -8, 9, 16);
   ctx.fillRect(17, -6, 8, 12);
 
   for (const cx of [-11, -2, 7, 15]) {
     ctx.fillStyle = '#1e293b';
     ctx.fillRect(cx, -14.5, 5, 4);
-    ctx.fillStyle = '#f59e0b';
+    ctx.fillStyle = m.trimColor;
     ctx.fillRect(cx + 3.5, -14.5, 1.5, 4);
 
     ctx.fillStyle = '#0f172a';
     ctx.fillRect(cx, 10.5, 5, 4);
-    ctx.fillStyle = '#f59e0b';
+    ctx.fillStyle = m.trimColor;
     ctx.fillRect(cx + 3.5, 10.5, 1.5, 4);
   }
 
@@ -1457,24 +1730,18 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
     ctx.ellipse(mx + 4, 3, s.curve * 0.7, s.h * 0.75, 0.2, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = isEnemy ? '#3f1d18' : '#5c3314';
+    ctx.fillStyle = '#5c3314';
     ctx.beginPath();
     ctx.arc(mx, 0, 2.5, 0, Math.PI * 2);
     ctx.fill();
 
     const sailGrad = ctx.createLinearGradient(mx - s.curve, -s.h, mx + s.curve, s.h);
-    if (isEnemy) {
-      sailGrad.addColorStop(0, '#ef4444');
-      sailGrad.addColorStop(0.5, '#b91c1c');
-      sailGrad.addColorStop(1, '#450a0a');
-    } else {
-      sailGrad.addColorStop(0, '#fffbeb');
-      sailGrad.addColorStop(0.55, '#f5ebd6');
-      sailGrad.addColorStop(1, '#cbb382');
-    }
+    sailGrad.addColorStop(0, '#ffffff');
+    sailGrad.addColorStop(0.55, m.sailColor);
+    sailGrad.addColorStop(1, '#94a3b8');
 
     ctx.fillStyle = sailGrad;
-    ctx.strokeStyle = isEnemy ? '#7f1d1d' : '#b89b67';
+    ctx.strokeStyle = m.trimColor;
     ctx.lineWidth = 1.1;
 
     ctx.beginPath();
@@ -1486,14 +1753,14 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
     ctx.stroke();
   });
 
-  ctx.strokeStyle = isEnemy ? '#7f1d1d' : '#6e3b16';
+  ctx.strokeStyle = m.hullColor;
   ctx.lineWidth = 2.4;
   ctx.beginPath();
   ctx.moveTo(28, 0);
   ctx.lineTo(42, 0);
   ctx.stroke();
 
-  ctx.fillStyle = isEnemy ? '#dc2626' : '#fef3c7';
+  ctx.fillStyle = m.sailColor;
   ctx.beginPath();
   ctx.moveTo(22, 0);
   ctx.quadraticCurveTo(33, 6, 41, 0);
@@ -1502,7 +1769,7 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
   ctx.fill();
 
   const flagWave = Math.sin(Date.now() / 160 + (p.x || 0) * 0.05) * 3;
-  ctx.fillStyle = isEnemy ? '#ef4444' : '#fbbf24';
+  ctx.fillStyle = m.flagColor;
   ctx.beginPath();
   ctx.moveTo(-29, 0);
   ctx.lineTo(-41, -5 + flagWave);
@@ -1604,7 +1871,7 @@ function draw() {
 
   for (const isl of islands) {
     if (isl.x + isl.r < cam.x - 150 || isl.x - isl.r > cam.x + viewW + 150 ||
-        isl.y + isl.r < cam.y - 150 || isl.y - isl.r > cam.y + viewH + 150) continue;
+        isl.y + isl.r < cam.y - 150 || isl.y + isl.r > cam.y + viewH + 150) continue;
     ctx.fillStyle = '#e9c46a';
     ctx.beginPath(); ctx.arc(isl.x, isl.y, isl.r, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#2a9d8f';
@@ -1703,7 +1970,7 @@ function draw() {
     ctx.restore();
   }
 
-  ctx.restore();
+    ctx.restore();
 
   drawMinimap();
   requestAnimationFrame(draw);
