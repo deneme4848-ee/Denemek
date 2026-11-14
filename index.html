@@ -12,7 +12,6 @@
     }
     #game { display: block; width: 100%; height: 100%; position: fixed; inset: 0; z-index: 0; }
 
-    /* ÜST MERKEZ: SEVİYE ROZETİ + CAN & DENEYİM BARI */
     #top-vital-hud {
       position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
       width: min(94vw, 540px); display: flex; align-items: center; gap: 8px;
@@ -54,7 +53,6 @@
       letter-spacing: 0.3px;
     }
 
-    /* SOL ÜST: KÜÇÜLTÜLMÜŞ PARŞÖMEN HARİTA + KOORDİNAT + YAN İKONLAR */
     #top-left-hud {
       position: fixed; top: 66px; left: 10px;
       display: flex; align-items: flex-start; gap: 8px;
@@ -96,7 +94,6 @@
     .tool-icon-btn span.ico { font-size: 15px; line-height: 1.1; }
     .tool-icon-btn span.lbl { font-size: 8px; font-weight: 800; color: #fde68a; }
 
-    /* SAĞ ÜST: KAPTAN & ALTIN BİLGİ KARTI */
     #top-right-hud {
       position: fixed; top: 66px; right: 10px; z-index: 6;
       background: rgba(7, 20, 31, 0.9); backdrop-filter: blur(6px);
@@ -117,7 +114,6 @@
     }
     .ship-sub-name { font-size: 10px; color: #94a3b8; text-align: right; }
 
-    /* ALT DOCK: CEPHANE YUVALARI, HEDEF BİLGİSİ VE ATEŞ ET */
     #bottom-dock {
       position: fixed; bottom: 12px; left: 10px; right: 10px;
       display: flex; justify-content: space-between; align-items: flex-end;
@@ -191,7 +187,6 @@
       to { box-shadow: 0 0 24px rgba(239, 68, 68, 0.95); }
     }
 
-    /* MARKET & TERSANE MODALİ */
     #market-panel {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
       width: min(92vw, 350px); max-height: 76vh; overflow-y: auto;
@@ -253,7 +248,6 @@
 
   <div id="game"></div>
 
-  <!-- ÜST MERKEZ: SEVİYE + CAN VE DENEYİM BARI -->
   <div id="top-vital-hud">
     <div class="level-crest">
       <span>SEVİYE</span>
@@ -271,7 +265,6 @@
     </div>
   </div>
 
-  <!-- SOL ÜST: KÜÇÜLTÜLMÜŞ PARŞÖMEN HARİTA + KOORDİNAT + YAN BUTONLAR -->
   <div id="top-left-hud">
     <div class="radar-card">
       <div class="radar-title">Harita 1</div>
@@ -290,7 +283,6 @@
     </div>
   </div>
 
-  <!-- SAĞ ÜST: KAPTAN VE ALTIN PANELİ -->
   <div id="top-right-hud">
     <div class="captain-row">
       <strong id="captain-name">Test</strong>
@@ -303,7 +295,6 @@
     <div class="ship-sub-name" id="ship-title">8 Yönlü Efsanevi Gemi</div>
   </div>
 
-  <!-- ALT DOCK: GÜLLE YUVALARI + HEDEF KARTI + ATEŞ ET -->
   <div id="bottom-dock">
     <div class="ammo-dock-container">
       <div class="active-ammo-banner" id="active-ammo-info">Seçili: Demir Gülle (180 Hasar)</div>
@@ -346,7 +337,6 @@
     </div>
   </div>
 
-  <!-- MARKET & TERSANE PENCERESİ -->
   <div id="market-panel">
     <div class="market-header">
       <strong>⚓ Cephane Marketi & Tersane</strong>
@@ -395,14 +385,12 @@
     <div id="market-feedback"></div>
   </div>
 
-  <!-- OYUN SONU EKRANI -->
   <div id="gameover">
     <h1>GEMİN BATTI!</h1>
     <p id="final-score">Toplanan Altın: 0</p>
     <button id="restart-btn">YENİDEN YELKEN AÇ</button>
   </div>
 
-  <!-- GİRİŞ EKRANI -->
   <div id="auth-overlay">
     <div class="auth-card">
       <div class="auth-brand">
@@ -501,8 +489,8 @@ const SHIP_MODELS = {
   standard: { id: 'standard', name: '8 Yönlü Efsanevi Gemi', desc: 'Şeffaf PNG Sprite Filosu', cost: 0 }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v16';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v16';
+const USERS_STORAGE_KEY = 'pirate3d_users_v17';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v17';
 let authMode = 'login';
 let currentUser = null;
 
@@ -561,15 +549,15 @@ if (authForm) {
 if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeItem(SESSION_STORAGE_KEY); location.reload(); });
 
 // ==========================================================
-// THREE.JS SAHNE & OYUN MOTORU
+// THREE.JS SAHNE & OYUN MOTORU (100x100 DÜNYA BOYUTU)
 // ==========================================================
 let scene, camera, renderer;
 let playerSprite, playerNeonRing, enemies = [], rangeRingMesh, oceanTexture, oceanBumpTexture;
 let raycaster, planeGeo, mouse;
 let shipTextures = {};
 let textureLoader;
-const WORLD_SIZE = 4000;
-const ATTACK_RANGE = 280; // Menzil biraz düşürüldü
+const WORLD_SIZE = 1000; // Harita 100-100 ölçeğine (1000 birim) indirgendi
+const ATTACK_RANGE = 280;
 const AGGRO_RANGE = 280;
 const BASE_SHIP_HEIGHT = 95;
 
@@ -628,12 +616,12 @@ function createStaticOceanTextures() {
   const mapTex = new THREE.CanvasTexture(colorCanvas);
   mapTex.wrapS = THREE.RepeatWrapping;
   mapTex.wrapT = THREE.RepeatWrapping;
-  mapTex.repeat.set(32, 32);
+  mapTex.repeat.set(16, 16);
 
   const bumpTex = new THREE.CanvasTexture(bumpCanvas);
   bumpTex.wrapS = THREE.RepeatWrapping;
   bumpTex.wrapT = THREE.RepeatWrapping;
-  bumpTex.repeat.set(32, 32);
+  bumpTex.repeat.set(16, 16);
 
   return { mapTex, bumpTex };
 }
@@ -773,7 +761,6 @@ function initThreeGame() {
   ocean.rotation.x = -Math.PI / 2;
   scene.add(ocean);
 
-  // Menzil Çemberi
   const ringGeo = new THREE.RingGeometry(ATTACK_RANGE - 3, ATTACK_RANGE, 64);
   const ringMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.6 });
   rangeRingMesh = new THREE.Mesh(ringGeo, ringMat);
@@ -781,7 +768,6 @@ function initThreeGame() {
   rangeRingMesh.position.y = 0.6;
   scene.add(rangeRingMesh);
 
-  // Mavimsi neon dönen çember
   const neonGeo = new THREE.RingGeometry(32, 38, 48);
   const neonMat = new THREE.MeshBasicMaterial({ color: 0x0ea5e9, side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
   playerNeonRing = new THREE.Mesh(neonGeo, neonMat);
@@ -837,7 +823,7 @@ function initThreeGame() {
 }
 
 // ==========================================================
-// OYUN MANTIĞI & NPC SALDIRI/MENZİL YÖNETİMİ
+// OYUN MANTIĞI
 // ==========================================================
 let player, gameIslands = [];
 let targetPos = null, selectedEnemyId = null, isAttacking = false, isGameOver = false;
@@ -861,25 +847,25 @@ function startGameLogic() {
   const initialData = shipTextures.top || Object.values(shipTextures)[0];
   const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1 });
   playerSprite = new THREE.Sprite(mat);
-  // center.set(0.5, 0.4) yapılarak gemi sudan yukarı (daha az batık) konuma getirildi
-  playerSprite.center.set(0.5, 0.4);
+  // center.set(0.5, 0.7) yapılarak gemi sudan tamamen yukarı çıkarıldı
+  playerSprite.center.set(0.5, 0.7);
   applyNormalizedSprite(playerSprite, player.a);
   scene.add(playerSprite);
 
   gameIslands.forEach(isl => scene.remove(isl.mesh));
   gameIslands = [];
-  const islGeo = new THREE.CylinderGeometry(60, 100, 45, 6);
+  const islGeo = new THREE.CylinderGeometry(40, 70, 35, 6);
   const islMat = new THREE.MeshStandardMaterial({ color: 0x0f382b, roughness: 0.9 });
-  for (let i = 0; i < 18; i++) {
+  for (let i = 0; i < 8; i++) {
     const mesh = new THREE.Mesh(islGeo, islMat);
-    mesh.position.set((Math.random() - 0.5) * 3500, 10, (Math.random() - 0.5) * 3500);
+    mesh.position.set((Math.random() - 0.5) * 800, 10, (Math.random() - 0.5) * 800);
     scene.add(mesh);
-    gameIslands.push({ mesh, r: 80 });
+    gameIslands.push({ mesh, r: 60 });
   }
 
   enemies.forEach(en => scene.remove(en.sprite));
   enemies = [];
-  for (let i = 0; i < 8; i++) spawnEnemySprite(i + 1);
+  for (let i = 0; i < 6; i++) spawnEnemySprite(i + 1);
 
   selectAmmoSlot('iron');
   updateTargetCard();
@@ -890,14 +876,14 @@ function startGameLogic() {
 function spawnEnemySprite(id) {
   let ex, ez;
   do {
-    ex = (Math.random() - 0.5) * 3000;
-    ez = (Math.random() - 0.5) * 3000;
-  } while (Math.hypot(ex, ez) < 500);
+    ex = (Math.random() - 0.5) * 800;
+    ez = (Math.random() - 0.5) * 800;
+  } while (Math.hypot(ex, ez) < 300);
 
   const initialData = shipTextures.top || Object.values(shipTextures)[0];
   const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1, color: 0xd1fae5 });
   const sprite = new THREE.Sprite(mat);
-  sprite.center.set(0.5, 0.4);
+  sprite.center.set(0.5, 0.7);
   applyNormalizedSprite(sprite, 0);
   sprite.position.set(ex, 2, ez);
   sprite.userData.enemyId = id;
@@ -1006,7 +992,8 @@ function animate3D() {
   player.x += Math.cos(player.a) * player.speed;
   player.z += Math.sin(player.a) * player.speed;
 
-  coordDisplayEl.textContent = `X: ${Math.round(player.x / 10)} · Y: ${Math.round(player.z / 10)}`;
+  // Harita 100x100 ölçeğine uygun koordinat gösterimi (-50 ile +50 arası)
+  coordDisplayEl.textContent = `X: ${Math.round((player.x / (WORLD_SIZE / 2)) * 50)} · Y: ${Math.round((player.z / (WORLD_SIZE / 2)) * 50)}`;
 
   if (playerSprite) {
     playerSprite.position.set(player.x, 2, player.z);
@@ -1029,17 +1016,14 @@ function animate3D() {
     const activeSpeed = en.slowTimer > 0 ? en.baseSpeed * 0.5 : en.baseSpeed;
     const distToPlayer = Math.hypot(player.x - en.x, player.z - en.z);
 
-    // DÜZELTİLEN NPC DAVRANIŞI: Menzile girince durup saldırır, çıkınca rastgele gezinir
     if (distToPlayer <= AGGRO_RANGE) {
       en.a = Math.atan2(player.z - en.z, player.x - en.x);
       
-      // Eğer menzilin dışındaysa oyuncuya doğru yaklaş, menzile girdiyse dur!
       if (distToPlayer > ATTACK_RANGE - 20) {
         en.x += Math.cos(en.a) * (activeSpeed * 1.25);
         en.z += Math.sin(en.a) * (activeSpeed * 1.25);
       }
 
-      // Menzil içindeyse saniyede 1 kez ateş et
       if (distToPlayer <= ATTACK_RANGE && (now - en.lastAttackTime >= 1000)) {
         en.lastAttackTime = now;
         player.hp = Math.max(0, player.hp - 30);
@@ -1063,8 +1047,8 @@ function animate3D() {
       en.z += Math.sin(en.a) * (activeSpeed * 0.75);
     }
 
-    en.x = Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, en.x));
-    en.z = Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, en.z));
+    en.x = Math.max(-WORLD_SIZE/2, Math.min(WORLD_SIZE/2, en.x));
+    en.z = Math.max(-WORLD_SIZE/2, Math.min(WORLD_SIZE/2, en.z));
 
     if (en.sprite) {
       en.sprite.position.set(en.x, 2, en.z);
@@ -1072,7 +1056,6 @@ function animate3D() {
     }
   }
 
-  // Oyuncunun saniyede 1 atış mantığı
   if (isAttacking && selectedEnemyId) {
     const target = enemies.find(e => e.id === selectedEnemyId);
     const ammoKey = player.selectedAmmo;
@@ -1135,7 +1118,7 @@ function drawMinimap() {
   mctx.stroke();
 
   if (!player) return;
-  const scale = (w * 0.46) / WORLD_SIZE;
+  const scale = (w * 0.46) / (WORLD_SIZE / 2);
   const cx = w / 2, cy = h / 2;
 
   mctx.fillStyle = '#3f6212';
