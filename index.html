@@ -114,6 +114,29 @@
     }
     .ship-sub-name { font-size: 10px; color: #94a3b8; text-align: right; }
 
+    /* Geminin Altındaki Can Barı & İsim / Filo Etiketi */
+    #player-label {
+      position: fixed; z-index: 5; pointer-events: none;
+      transform: translate(-50%, -50%);
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+    }
+    .ship-hp-track {
+      width: 60px; height: 6px; background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 3px; overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.8);
+    }
+    #player-ship-hp-fill {
+      width: 100%; height: 100%; background: #22c55e; transition: width 0.15s, background-color 0.2s;
+    }
+    .ship-name-tag {
+      font-size: 11px; font-weight: 900; color: #fff;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap;
+    }
+    .ship-fleet-tag {
+      font-size: 10px; font-weight: 800; color: #fde68a;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap;
+    }
+
     #bottom-dock {
       position: fixed; bottom: 12px; left: 10px; right: 10px;
       display: flex; justify-content: space-between; align-items: flex-end;
@@ -247,6 +270,15 @@
 <body>
 
   <div id="game"></div>
+
+  <!-- Geminin Altındaki Can Barı & İsim / Filo Etiketi -->
+  <div id="player-label">
+    <div class="ship-hp-track">
+      <div id="player-ship-hp-fill"></div>
+    </div>
+    <div class="ship-name-tag" id="tag-username">Test</div>
+    <div class="ship-fleet-tag">[TST]</div>
+  </div>
 
   <div id="top-vital-hud">
     <div class="level-crest">
@@ -478,7 +510,10 @@ const fillTestBtn = document.querySelector('#fill-test-btn');
 const miniCanvas = document.querySelector('#minimap');
 const mctx = miniCanvas.getContext('2d');
 
-// Hassas Eşikli Sayı Kısaltma Fonksiyonu (1m'den düşünce 999k yazar)
+const playerLabelEl = document.querySelector('#player-label');
+const playerShipHpFillEl = document.querySelector('#player-ship-hp-fill');
+const tagUsernameEl = document.querySelector('#tag-username');
+
 function formatShortNumber(num) {
   if (num >= 1000000000) return (num / 1000000000).toFixed(num % 1000000000 !== 0 ? 1 : 0) + 't';
   if (num >= 1000000)    return (num / 1000000).toFixed(num % 1000000 !== 0 ? 1 : 0) + 'm';
@@ -489,16 +524,16 @@ function formatShortNumber(num) {
 const AMMO_TYPES = {
   iron:   { id: 'iron',   name: 'Demir Gülle',    damage: 180, slow: 1.0,  desc: '180 Hasar' },
   chain:  { id: 'chain',  name: 'Zincirli Gülle', damage: 140, slow: 0.5,  desc: '140 Hasar + Yavaşlatma' },
-  fire:   { id: 'fire',   name: 'Ateşli Gülle',   damage: 290, slow: 1.0,  desc: '290 Patlayıcı Hasar' },
-  dragon: { id: 'dragon', name: 'Ejder Güllesi', damage: 450, slow: 0.85, desc: '450 Efsanevi Hasar' }
+  fire:   { id: 'fire',   name: 'Alevli Gülle',   damage: 290, slow: 1.0,  desc: '290 Patlayıcı Hasar' },
+  dragon: { id: 'dragon', name: 'Ejderha Nefesi', damage: 450, slow: 0.85, desc: '450 Efsanevi Hasar' }
 };
 
 const SHIP_MODELS = {
   standard: { id: 'standard', name: '8 Yönlü Efsanevi Gemi', desc: 'Şeffaf PNG Sprite Filosu', cost: 0 }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v21';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v21';
+const USERS_STORAGE_KEY = 'pirate3d_users_v22';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v22';
 let authMode = 'login';
 let currentUser = null;
 
@@ -533,6 +568,7 @@ function completeLogin(user) {
   currentUser = { id: user.id, username: user.username, ownedShips: user.ownedShips || ['standard'], equippedShip: user.equippedShip || 'standard' };
   localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
   captainNameEl.textContent = currentUser.username;
+  tagUsernameEl.textContent = currentUser.username;
   authOverlay.style.display = 'none';
   initThreeGame();
 }
@@ -569,9 +605,7 @@ const ATTACK_RANGE = 280;
 const AGGRO_RANGE = 280;
 const BASE_SHIP_HEIGHT = 95;
 
-// GEMİ VE ÇEMBER YÜKSEKLİK SABİTLERİ (Dilediğin gibi kolayca değiştirebilirsin)
-const SHIP_Y_POS = 50;
-const RING_OFFSET = -65; // Çemberin gemiye olan dikey mesafe farkı
+const SHIP_Y_POS = 52;
 
 function createStaticOceanTextures() {
   const size = 1024;
@@ -780,11 +814,12 @@ function initThreeGame() {
   rangeRingMesh.position.y = 0.6;
   scene.add(rangeRingMesh);
 
+  // Mavi neon çember doğrudan su yüzeyine yakın bir konuma sabitlendi
   const neonGeo = new THREE.RingGeometry(32, 38, 48);
   const neonMat = new THREE.MeshBasicMaterial({ color: 0x0ea5e9, side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
   playerNeonRing = new THREE.Mesh(neonGeo, neonMat);
   playerNeonRing.rotation.x = -Math.PI / 2;
-  playerNeonRing.position.y = SHIP_Y_POS + RING_OFFSET;
+  playerNeonRing.position.y = 0.8;
   scene.add(playerNeonRing);
 
   raycaster = new THREE.Raycaster();
@@ -981,7 +1016,7 @@ function animate3D() {
 
   const now = Date.now();
   if (player.hp < player.maxHp && (now - player.lastDamagedTime > 5000)) {
-    player.hp = Math.min(player.maxHp, player.hp + 12);
+    player.hp = Math.min(player.maxHp, player.hp + 12000);
     updateHUD();
   }
 
@@ -1011,11 +1046,20 @@ function animate3D() {
   }
 
   if (playerNeonRing) {
-    playerNeonRing.position.set(player.x, SHIP_Y_POS + RING_OFFSET, player.z);
+    playerNeonRing.position.set(player.x, 0.8, player.z);
     playerNeonRing.rotation.z += 0.02;
   }
 
   rangeRingMesh.position.set(player.x, 0.6, player.z);
+
+  // Geminin ekran üzerindeki 2D konumunu hesaplayıp altındaki can/isim etiketini güncelliyoruz
+  if (playerSprite) {
+    const tempVector = new THREE.Vector3(player.x, SHIP_Y_POS, player.z);
+    tempVector.project(camera);
+    const xPx = (tempVector.x *  .5 + .5) * window.innerWidth;
+    const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 32; // Geminin hemen altında durması için dikey ofset
+    playerLabelEl.style.transform = `translate(-50%, -50%) translate(${xPx}px, ${yPx}px)`;
+  }
 
   camera.position.x += (player.x - camera.position.x) * 0.08;
   camera.position.z += (player.z + 540 - camera.position.z) * 0.08;
@@ -1036,7 +1080,7 @@ function animate3D() {
 
       if (distToPlayer <= ATTACK_RANGE && (now - en.lastAttackTime >= 1000)) {
         en.lastAttackTime = now;
-        player.hp = Math.max(0, player.hp - 30);
+        player.hp = Math.max(0, player.hp - 150000);
         player.lastDamagedTime = now;
         updateHUD();
         if (player.hp <= 0) {
@@ -1161,6 +1205,17 @@ function updateHUD() {
   hpBarEl.style.width = ((player.hp / player.maxHp) * 100) + '%';
   expBarEl.style.width = ((player.exp / player.maxExp) * 100) + '%';
   marketGoldEl.textContent = player.score.toLocaleString();
+
+  // Geminin altındaki can barı güncellemesi ve renk değişimi (Yeşil -> Sarı -> Kırmızı)
+  const hpPercent = Math.max(0, Math.min(100, (player.hp / player.maxHp) * 100));
+  playerShipHpFillEl.style.width = hpPercent + '%';
+  if (hpPercent > 50) {
+    playerShipHpFillEl.style.backgroundColor = '#22c55e'; // Yeşil
+  } else if (hpPercent > 20) {
+    playerShipHpFillEl.style.backgroundColor = '#eab308'; // Sarı
+  } else {
+    playerShipHpFillEl.style.backgroundColor = '#ef4444'; // Kırmızı
+  }
 
   Object.keys(qtyEls).forEach(type => {
     const count = player.ammo[type] || 0;
