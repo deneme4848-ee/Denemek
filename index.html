@@ -159,6 +159,7 @@ window.addEventListener('resize', resize);
 resize();
 
 const WORLD_SIZE = 2400;
+const ATTACK_RANGE = 420;
 
 let player, enemies, islands, treasures, shots, particles, floatingTexts, isGameOver;
 let targetPos = null;
@@ -361,7 +362,8 @@ canvas.addEventListener('pointerdown', e => {
     const now = Date.now();
     if (lastClickEnemyId === clickedEnemy.id && now - lastClickTime < 650) {
       selectedEnemyId = clickedEnemy.id;
-      isAttacking = true;
+      const dist = Math.hypot(clickedEnemy.x - player.x, clickedEnemy.y - player.y);
+      isAttacking = dist <= ATTACK_RANGE;
       lastClickEnemyId = null;
       lastClickTime = 0;
     } else {
@@ -392,7 +394,13 @@ attackBtn.addEventListener('pointerdown', e => {
   const selectedEnemy = enemies.find(en => en.id === selectedEnemyId);
   if (!selectedEnemy) return;
 
-  isAttacking = !isAttacking;
+  if (!isAttacking) {
+    const dist = Math.hypot(selectedEnemy.x - player.x, selectedEnemy.y - player.y);
+    if (dist > ATTACK_RANGE) return;
+    isAttacking = true;
+  } else {
+    isAttacking = false;
+  }
   syncAttackButton();
 });
 
@@ -430,7 +438,6 @@ function update() {
 
   const now = Date.now();
 
-  // Can 1000'in altındaysa: 5 sn saldırı almazsa her 5 sn'de +100 tamir
   if (player.hp < player.maxHp) {
     const sinceHit = now - player.lastHitTime;
     if (sinceHit >= 5000) {
@@ -490,19 +497,24 @@ function update() {
     }
   }
 
-  // Seçili düşmana doğrudan kilitli ateş
+  // Menzilden çıkıldığında saldırı otomatik iptal olur; tekrar girince kendiliğinden başlamaz
   if (isAttacking && selectedEnemy) {
-    const desiredAngle = Math.atan2(selectedEnemy.y - player.y, selectedEnemy.x - player.x);
-    if (!targetPos) {
-      player.a = lerpAngle(player.a, desiredAngle, 0.12);
-    }
-    if (now - lastPlayerShot > 520) {
-      lastPlayerShot = now;
-      fireLockedCannon(player, selectedEnemy.id, true);
+    const distToEnemy = Math.hypot(selectedEnemy.x - player.x, selectedEnemy.y - player.y);
+    if (distToEnemy > ATTACK_RANGE) {
+      isAttacking = false;
+      syncAttackButton();
+    } else {
+      const desiredAngle = Math.atan2(selectedEnemy.y - player.y, selectedEnemy.x - player.x);
+      if (!targetPos) {
+        player.a = lerpAngle(player.a, desiredAngle, 0.12);
+      }
+      if (now - lastPlayerShot > 520) {
+        lastPlayerShot = now;
+        fireLockedCannon(player, selectedEnemy.id, true);
+      }
     }
   }
 
-  // Hazine toplama
   for (let i = treasures.length - 1; i >= 0; i--) {
     const tr = treasures[i];
     if (Math.hypot(player.x - tr.x, player.y - tr.y) < 34) {
@@ -515,7 +527,6 @@ function update() {
     }
   }
 
-  // Düşman Yapay Zekası
   for (let i = enemies.length - 1; i >= 0; i--) {
     const e = enemies[i];
     const distToPlayer = Math.hypot(player.x - e.x, player.y - e.y);
@@ -557,7 +568,6 @@ function update() {
     }
   }
 
-  // Kilitli Top Gülleleri
   for (let i = shots.length - 1; i >= 0; i--) {
     const s = shots[i];
 
@@ -624,7 +634,6 @@ function update() {
     }
   }
 
-  // Parçacıklar
   for (let i = particles.length - 1; i >= 0; i--) {
     const pt = particles[i];
     pt.x += pt.vx;
@@ -633,7 +642,6 @@ function update() {
     if (pt.life <= 0) particles.splice(i, 1);
   }
 
-  // Kısa süreli hasar rakamı animasyonları
   for (let i = floatingTexts.length - 1; i >= 0; i--) {
     const ft = floatingTexts[i];
     const elapsed = now - ft.createdAt;
@@ -644,6 +652,19 @@ function update() {
     ft.y -= 0.75;
     ft.alpha = 1 - elapsed / ft.duration;
   }
+}
+
+function drawRangeRing(sx, sy) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(sx, sy, ATTACK_RANGE, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.035)';
+  ctx.fill();
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+  ctx.setLineDash([10, 8]);
+  ctx.stroke();
+  ctx.restore();
 }
 
 function drawRealisticShip(p, sx, sy, camX, camY, isEnemy = false, isSelected = false) {
@@ -842,6 +863,8 @@ function draw() {
   ctx.lineWidth = 4;
   ctx.strokeRect(-WORLD_SIZE - camX, -WORLD_SIZE - camY, WORLD_SIZE * 2, WORLD_SIZE * 2);
 
+  drawRangeRing(W / 2, H / 2);
+
   if (targetPos) {
     const tx = targetPos.x - camX;
     const ty = targetPos.y - camY;
@@ -899,7 +922,6 @@ function draw() {
   }
   ctx.globalAlpha = 1;
 
-  // Kısa süreli hasar / tamir rakamları
   for (const ft of floatingTexts) {
     ctx.save();
     ctx.globalAlpha = Math.max(0, ft.alpha);
