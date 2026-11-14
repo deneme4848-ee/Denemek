@@ -3,10 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası 2D - Prototip</title>
+  <title>Korsan Dünyası 2D</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
-    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #073b59; color: #fff; font-family: system-ui, -apple-system, sans-serif; }
+    html, body {
+      margin: 0; width: 100%; height: 100%; overflow: hidden;
+      background: #073b59; color: #fff; font-family: system-ui, -apple-system, sans-serif;
+    }
     canvas { display: block; width: 100%; height: 100%; touch-action: manipulation; cursor: crosshair; }
 
     #hud {
@@ -15,36 +18,59 @@
       pointer-events: none; text-shadow: 0 2px 4px rgba(0,0,0,0.8);
     }
     .panel {
-      background: rgba(0, 30, 48, 0.78); backdrop-filter: blur(4px);
+      background: rgba(0, 30, 48, 0.8); backdrop-filter: blur(4px);
       padding: 8px 14px; border-radius: 12px; font-size: 13px;
-      border: 1px solid rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.16);
     }
     #hp-bar-bg {
-      width: 120px; height: 8px; background: rgba(255,255,255,0.2);
+      width: 130px; height: 8px; background: rgba(255,255,255,0.2);
       border-radius: 4px; margin-top: 6px; overflow: hidden;
     }
     #hp-bar {
       width: 100%; height: 100%; background: #4ade80; transition: width 0.2s, background 0.2s;
     }
     #minimap {
-      width: 90px; height: 90px; border-radius: 50%;
-      background: rgba(0, 24, 38, 0.85); border: 2px solid rgba(233, 211, 161, 0.5);
+      width: 92px; height: 92px; border-radius: 50%;
+      background: rgba(0, 24, 38, 0.88); border: 2px solid rgba(233, 211, 161, 0.55);
     }
     #hint {
       position: fixed; top: 76px; left: 12px; font-size: 12px;
-      background: rgba(0, 30, 48, 0.65); padding: 5px 10px; border-radius: 8px;
-      pointer-events: none;
+      background: rgba(0, 30, 48, 0.7); padding: 6px 10px; border-radius: 8px;
+      pointer-events: none; max-width: 72vw;
     }
-    #fire {
-      position: fixed; right: 24px; bottom: 36px; width: 88px; height: 88px;
-      border-radius: 50%; border: 3px solid #ffd783; background: rgba(163, 61, 34, 0.88);
-      color: white; font-weight: 800; font-size: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-      cursor: pointer; touch-action: manipulation; z-index: 5;
+
+    /* Alt Orta Saldırı / Atış Kes Butonu */
+    #combat-bar {
+      position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+      z-index: 6; display: flex; gap: 10px; align-items: center;
     }
-    #fire:active { transform: scale(0.93); background: #c24929; }
+    #attack-btn {
+      min-width: 170px; height: 52px; padding: 0 24px;
+      border-radius: 999px; border: 2px solid rgba(255,255,255,0.25);
+      background: rgba(15, 35, 50, 0.75); color: rgba(255,255,255,0.4);
+      font-size: 15px; font-weight: 800; letter-spacing: 0.6px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+      cursor: not-allowed; transition: all 0.16s ease;
+      touch-action: manipulation;
+    }
+    #attack-btn.active {
+      border-color: #ffd783;
+      background: linear-gradient(180deg, #c24929, #8f2d14);
+      color: #fff;
+      cursor: pointer;
+    }
+    #attack-btn.active:active { transform: scale(0.96); }
+    #attack-btn.firing {
+      border-color: #fda4af;
+      background: linear-gradient(180deg, #dc2626, #7f1d1d);
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 0 18px rgba(239, 68, 68, 0.6);
+    }
+
     #gameover {
-      display: none; position: fixed; inset: 0; background: rgba(0, 18, 28, 0.85);
-      flex-direction: column; align-items: center; justify-content: center; z-index: 10;
+      display: none; position: fixed; inset: 0; background: rgba(0, 18, 28, 0.86);
+      flex-direction: column; align-items: center; justify-content: center; z-index: 12;
       text-align: center; padding: 20px;
     }
     #gameover h1 { color: #ffd783; margin: 0 0 10px; font-size: 32px; }
@@ -64,12 +90,14 @@
       <div><strong>Kaptan</strong> · Altın: <span id="score">0</span></div>
       <div id="hp-bar-bg"><div id="hp-bar"></div></div>
     </div>
-    <canvas id="minimap" width="90" height="90"></canvas>
+    <canvas id="minimap" width="92" height="92"></canvas>
   </div>
 
-  <div id="hint">Gitmek istediğin yere tek dokun / tıkla · TOP AT ile saldır</div>
+  <div id="hint">Denize tek tıkla: Yelken aç · Düşmana 1 tık: Seç · 2 tık: Saldır</div>
 
-  <button id="fire">TOP AT</button>
+  <div id="combat-bar">
+    <button id="attack-btn" disabled>SALDIR</button>
+  </div>
 
   <div id="gameover">
     <h1>GEMİN BATTI!</h1>
@@ -85,6 +113,7 @@ const mctx = miniCanvas.getContext('2d');
 
 const scoreEl = document.querySelector('#score');
 const hpBarEl = document.querySelector('#hp-bar');
+const attackBtn = document.querySelector('#attack-btn');
 const gameOverEl = document.querySelector('#gameover');
 const finalScoreEl = document.querySelector('#final-score');
 
@@ -100,21 +129,52 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
-// Harita Sınırları
 const WORLD_SIZE = 2400;
 
-// Oyun Durumu
-let player, enemies, islands, treasures, shots, particles, isGameOver, targetPos;
-let lastShotTime = 0;
+let player, enemies, islands, treasures, shots, particles, isGameOver;
+let targetPos = null;
+let selectedEnemyId = null;
+let isAttacking = false;
+let lastPlayerShot = 0;
+let lastClickEnemyId = null;
+let lastClickTime = 0;
+let nextEnemyId = 1;
+
+function syncAttackButton() {
+  const selectedEnemy = enemies.find(e => e.id === selectedEnemyId);
+  if (!selectedEnemy || isGameOver) {
+    selectedEnemyId = selectedEnemy ? selectedEnemy.id : null;
+    isAttacking = false;
+    attackBtn.disabled = true;
+    attackBtn.textContent = 'SALDIR';
+    attackBtn.className = '';
+    return;
+  }
+
+  attackBtn.disabled = false;
+  if (isAttacking) {
+    attackBtn.textContent = 'ATIŞ KES';
+    attackBtn.className = 'firing';
+  } else {
+    attackBtn.textContent = 'SALDIR';
+    attackBtn.className = 'active';
+  }
+}
 
 function initGame() {
   isGameOver = false;
   targetPos = null;
+  selectedEnemyId = null;
+  isAttacking = false;
+  lastClickEnemyId = null;
+  lastClickTime = 0;
   gameOverEl.style.display = 'none';
 
   player = {
-    x: 0, y: 0, a: 0, speed: 0, maxSpeed: 3.6,
-    hp: 100, maxHp: 100, score: 0, name: 'Kaptan'
+    id: 'player',
+    x: 0, y: 0, a: 0, speed: 0, maxSpeed: 3.7,
+    hp: 100, maxHp: 100, score: 0, name: 'Kara İnci',
+    wake: []
   };
 
   shots = [];
@@ -123,13 +183,12 @@ function initGame() {
   treasures = [];
   enemies = [];
 
-  // Rastgele Adalar Oluştur
   for (let i = 0; i < 18; i++) {
     let ix, iy;
     do {
       ix = (Math.random() - 0.5) * WORLD_SIZE * 1.8;
       iy = (Math.random() - 0.5) * WORLD_SIZE * 1.8;
-    } while (Math.hypot(ix, iy) < 220);
+    } while (Math.hypot(ix, iy) < 230);
     islands.push({
       x: ix, y: iy,
       r: 45 + Math.random() * 55,
@@ -137,13 +196,11 @@ function initGame() {
     });
   }
 
-  // Hazine Sandıkları
   for (let i = 0; i < 15; i++) spawnTreasure();
-
-  // Düşman Korsan Gemileri
   for (let i = 0; i < 7; i++) spawnEnemy();
 
   updateHUD();
+  syncAttackButton();
 }
 
 function spawnTreasure() {
@@ -159,16 +216,18 @@ function spawnEnemy() {
   do {
     ex = (Math.random() - 0.5) * WORLD_SIZE * 1.7;
     ey = (Math.random() - 0.5) * WORLD_SIZE * 1.7;
-  } while (Math.hypot(ex - player.x, ey - player.y) < 400);
+  } while (Math.hypot(ex - player.x, ey - player.y) < 420);
 
   enemies.push({
+    id: nextEnemyId++,
     x: ex, y: ey,
     a: Math.random() * Math.PI * 2,
-    hp: 60, maxHp: 60,
+    hp: 70, maxHp: 70,
     lastShot: 0,
     turnTimer: 0,
     targetAngle: Math.random() * Math.PI * 2,
-    name: 'Korsan Avcısı'
+    name: 'Kızıl Sancak',
+    wake: []
   });
 }
 
@@ -195,44 +254,94 @@ function createExplosion(x, y, color = '#ff9e2c', count = 14) {
   }
 }
 
-function fireCannon(shooter, isPlayer) {
-  const now = Date.now();
-  if (isPlayer) {
-    if (now - lastShotTime < 420) return;
-    lastShotTime = now;
-  }
+function fireCannon(shooter, target, isPlayer) {
+  const ang = target ? Math.atan2(target.y - shooter.y, target.x - shooter.x) : shooter.a;
+  // Bordadan top atışı
+  const side = Math.random() < 0.5 ? 1 : -1;
+  const broadsideAngle = ang + (Math.PI / 2) * side * 0.35;
+  const muzzleX = shooter.x + Math.cos(shooter.a) * 12 + Math.cos(shooter.a + Math.PI / 2) * side * 9;
+  const muzzleY = shooter.y + Math.sin(shooter.a) * 12 + Math.sin(shooter.a + Math.PI / 2) * side * 9;
+
   shots.push({
-    x: shooter.x + Math.cos(shooter.a) * 22,
-    y: shooter.y + Math.sin(shooter.a) * 22,
-    vx: Math.cos(shooter.a) * 8.5,
-    vy: Math.sin(shooter.a) * 8.5,
+    x: muzzleX,
+    y: muzzleY,
+    vx: Math.cos(broadsideAngle) * 8.8,
+    vy: Math.sin(broadsideAngle) * 8.8,
     isPlayer,
-    life: 65
+    life: 70
   });
-  createExplosion(shooter.x + Math.cos(shooter.a) * 20, shooter.y + Math.sin(shooter.a) * 20, '#e2e8f0', 5);
+
+  createExplosion(muzzleX, muzzleY, '#e2e8f0', 5);
 }
 
-// Tek Tıklama / Tek Dokunma ile Hedef Belirleme (Eski hedefi iptal edip yenisine döner)
+// Canvas Tıklama / Dokunma: Düşman seçimi (1 tık) veya Çift Tıkla Saldırı (2 tık), değilse hedefe yelken
 canvas.addEventListener('pointerdown', e => {
   if (isGameOver) return;
+
   const camX = player.x - W / 2;
   const camY = player.y - H / 2;
-  const worldX = Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, e.clientX + camX));
-  const worldY = Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, e.clientY + camY));
-  targetPos = { x: worldX, y: worldY };
+  const worldX = e.clientX + camX;
+  const worldY = e.clientY + camY;
+
+  // Tıklanan noktada düşman gemisi var mı?
+  let clickedEnemy = null;
+  let bestDist = 34;
+  for (const enemy of enemies) {
+    const d = Math.hypot(worldX - enemy.x, worldY - enemy.y);
+    if (d <= bestDist) {
+      bestDist = d;
+      clickedEnemy = enemy;
+    }
+  }
+
+  if (clickedEnemy) {
+    const now = Date.now();
+    if (lastClickEnemyId === clickedEnemy.id && now - lastClickTime < 650) {
+      // 2. kez üst üste aynı düşmana tıklandı -> Saldırı başlat
+      selectedEnemyId = clickedEnemy.id;
+      isAttacking = true;
+      lastClickEnemyId = null;
+      lastClickTime = 0;
+    } else {
+      // 1. tıklama -> Sadece seç
+      selectedEnemyId = clickedEnemy.id;
+      lastClickEnemyId = clickedEnemy.id;
+      lastClickTime = now;
+    }
+    syncAttackButton();
+    return;
+  }
+
+  // Boş denize tıklandı -> Seçimi kaldır, saldırıyı durdur, yeni hedefe git
+  selectedEnemyId = null;
+  isAttacking = false;
+  lastClickEnemyId = null;
+  syncAttackButton();
+
+  targetPos = {
+    x: Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, worldX)),
+    y: Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, worldY))
+  };
 });
 
-document.querySelector('#fire').addEventListener('pointerdown', e => {
+// Alt Saldırı / Atış Kes Butonu
+attackBtn.addEventListener('pointerdown', e => {
   e.preventDefault();
   e.stopPropagation();
-  if (!isGameOver) fireCannon(player, true);
+  if (isGameOver || attackBtn.disabled) return;
+
+  const selectedEnemy = enemies.find(en => en.id === selectedEnemyId);
+  if (!selectedEnemy) return;
+
+  isAttacking = !isAttacking;
+  syncAttackButton();
 });
+
 document.querySelector('#restart-btn').addEventListener('click', e => {
   e.stopPropagation();
   initGame();
 });
 
-// Açı yumuşatma
 function lerpAngle(a, b, t) {
   let diff = b - a;
   while (diff < -Math.PI) diff += Math.PI * 2;
@@ -240,16 +349,42 @@ function lerpAngle(a, b, t) {
   return a + diff * t;
 }
 
+function updateWake(ship, isMoving) {
+  if (isMoving && Math.random() < 0.45) {
+    ship.wake.push({
+      x: ship.x - Math.cos(ship.a) * 20,
+      y: ship.y - Math.sin(ship.a) * 20,
+      r: 4,
+      alpha: 0.45
+    });
+  }
+  for (let i = ship.wake.length - 1; i >= 0; i--) {
+    const w = ship.wake[i];
+    w.r += 0.25;
+    w.alpha -= 0.012;
+    if (w.alpha <= 0) ship.wake.splice(i, 1);
+  }
+}
+
 function update() {
   if (isGameOver) return;
 
-  // Tıklanan / dokunulan hedefe doğru hareket
+  const selectedEnemy = enemies.find(en => en.id === selectedEnemyId);
+  if (!selectedEnemy && (selectedEnemyId !== null || isAttacking)) {
+    selectedEnemyId = null;
+    isAttacking = false;
+    syncAttackButton();
+  }
+
+  // Oyuncu hareketi
+  let moving = false;
   if (targetPos) {
     const distToTarget = Math.hypot(targetPos.x - player.x, targetPos.y - player.y);
     if (distToTarget > 14) {
       const targetA = Math.atan2(targetPos.y - player.y, targetPos.x - player.x);
-      player.a = lerpAngle(player.a, targetA, 0.14);
-      player.speed = Math.min(player.maxSpeed, player.speed + 0.18);
+      player.a = lerpAngle(player.a, targetA, 0.13);
+      player.speed = Math.min(player.maxSpeed, player.speed + 0.16);
+      moving = true;
     } else {
       targetPos = null;
       player.speed *= 0.9;
@@ -260,21 +395,34 @@ function update() {
 
   player.x += Math.cos(player.a) * player.speed;
   player.y += Math.sin(player.a) * player.speed;
-
-  // Harita sınırı
   player.x = Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, player.x));
   player.y = Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, player.y));
+  updateWake(player, player.speed > 0.4);
 
   // Adalarla çarpışma (Oyuncu)
   for (const isl of islands) {
     const dist = Math.hypot(player.x - isl.x, player.y - isl.y);
-    const minDist = isl.r + 16;
+    const minDist = isl.r + 18;
     if (dist < minDist) {
       const ang = Math.atan2(player.y - isl.y, player.x - isl.x);
       player.x = isl.x + Math.cos(ang) * minDist;
       player.y = isl.y + Math.sin(ang) * minDist;
       player.speed *= 0.5;
       targetPos = null;
+    }
+  }
+
+  // Seçili düşmana saldırı modu aktifse otomatik ateş et
+  const now = Date.now();
+  if (isAttacking && selectedEnemy) {
+    const dist = Math.hypot(selectedEnemy.x - player.x, selectedEnemy.y - player.y);
+    const desiredAngle = Math.atan2(selectedEnemy.y - player.y, selectedEnemy.x - player.x);
+    if (!targetPos) {
+      player.a = lerpAngle(player.a, desiredAngle, 0.08);
+    }
+    if (dist < 440 && now - lastPlayerShot > 520) {
+      lastPlayerShot = now;
+      fireCannon(player, selectedEnemy, true);
     }
   }
 
@@ -292,21 +440,22 @@ function update() {
   }
 
   // Düşman Yapay Zekası
-  const now = Date.now();
   for (let i = enemies.length - 1; i >= 0; i--) {
     const e = enemies[i];
     const distToPlayer = Math.hypot(player.x - e.x, player.y - e.y);
+    let eSpeed = 1.4;
 
-    if (distToPlayer < 480) {
+    if (distToPlayer < 460) {
       const angToPlayer = Math.atan2(player.y - e.y, player.x - e.x);
       e.a = lerpAngle(e.a, angToPlayer, 0.05);
-      if (distToPlayer > 160) {
-        e.x += Math.cos(e.a) * 2.1;
-        e.y += Math.sin(e.a) * 2.1;
+      if (distToPlayer > 175) {
+        eSpeed = 2.0;
+        e.x += Math.cos(e.a) * eSpeed;
+        e.y += Math.sin(e.a) * eSpeed;
       }
-      if (distToPlayer < 360 && now - e.lastShot > 1700) {
+      if (distToPlayer < 350 && now - e.lastShot > 1800) {
         e.lastShot = now;
-        fireCannon(e, false);
+        fireCannon(e, player, false);
       }
     } else {
       e.turnTimer--;
@@ -315,16 +464,18 @@ function update() {
         e.turnTimer = 120 + Math.random() * 150;
       }
       e.a = lerpAngle(e.a, e.targetAngle, 0.03);
-      e.x += Math.cos(e.a) * 1.4;
-      e.y += Math.sin(e.a) * 1.4;
+      e.x += Math.cos(e.a) * eSpeed;
+      e.y += Math.sin(e.a) * eSpeed;
     }
+
+    updateWake(e, true);
 
     for (const isl of islands) {
       const dist = Math.hypot(e.x - isl.x, e.y - isl.y);
-      if (dist < isl.r + 16) {
+      if (dist < isl.r + 18) {
         const ang = Math.atan2(e.y - isl.y, e.x - isl.x);
-        e.x = isl.x + Math.cos(ang) * (isl.r + 16);
-        e.y = isl.y + Math.sin(ang) * (isl.r + 16);
+        e.x = isl.x + Math.cos(ang) * (isl.r + 18);
+        e.y = isl.y + Math.sin(ang) * (isl.r + 18);
         e.targetAngle = ang;
       }
     }
@@ -349,28 +500,35 @@ function update() {
     if (!hit && s.isPlayer) {
       for (let j = enemies.length - 1; j >= 0; j--) {
         const e = enemies[j];
-        if (Math.hypot(s.x - e.x, s.y - e.y) < 22) {
+        if (Math.hypot(s.x - e.x, s.y - e.y) < 24) {
           hit = true;
-          e.hp -= 20;
+          e.hp -= 18;
           createExplosion(s.x, s.y, '#ff7b00', 8);
           if (e.hp <= 0) {
-            createExplosion(e.x, e.y, '#ef4444', 22);
+            createExplosion(e.x, e.y, '#ef4444', 24);
+            if (selectedEnemyId === e.id) {
+              selectedEnemyId = null;
+              isAttacking = false;
+              syncAttackButton();
+            }
             enemies.splice(j, 1);
             player.score += 100;
             updateHUD();
-            setTimeout(spawnEnemy, 2500);
+            setTimeout(spawnEnemy, 2600);
           }
           break;
         }
       }
     } else if (!hit && !s.isPlayer) {
-      if (Math.hypot(s.x - player.x, s.y - player.y) < 20) {
+      if (Math.hypot(s.x - player.x, s.y - player.y) < 22) {
         hit = true;
-        player.hp -= 12;
+        player.hp -= 11;
         createExplosion(s.x, s.y, '#ef4444', 10);
         updateHUD();
         if (player.hp <= 0) {
           isGameOver = true;
+          isAttacking = false;
+          syncAttackButton();
           finalScoreEl.textContent = 'Toplanan Altın: ' + player.score;
           gameOverEl.style.display = 'flex';
         }
@@ -390,49 +548,161 @@ function update() {
   }
 }
 
-function drawShip(p, sx, sy, isEnemy = false) {
+// Daha Gerçekçi Gemi Çizimi (Köpük izi, ahşap gövde, güverte, lombozlar, direkler, yelken, bayrak)
+function drawRealisticShip(p, sx, sy, camX, camY, isEnemy = false, isSelected = false) {
+  // Gemi arkası köpük izi
+  for (const w of p.wake || []) {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, w.alpha);
+    ctx.fillStyle = '#e0f2fe';
+    ctx.beginPath();
+    ctx.arc(w.x - camX, w.y - camY, w.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Seçili düşman için belirgin kırmızı çember
+  if (isEnemy && isSelected) {
+    const pulse = 30 + Math.sin(Date.now() / 150) * 3;
+    ctx.save();
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([8, 5]);
+    ctx.beginPath();
+    ctx.arc(sx, sy, pulse, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(239, 68, 68, 0.14)';
+    ctx.beginPath();
+    ctx.arc(sx, sy, pulse, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
   ctx.save();
   ctx.translate(sx, sy);
 
+  // Düşman can barı
   if (isEnemy && p.hp < p.maxHp) {
-    ctx.fillStyle = 'rgba(0,0,0,0.5)';
-    ctx.fillRect(-18, -32, 36, 5);
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(-20, -36, 40, 5);
     ctx.fillStyle = '#ef4444';
-    ctx.fillRect(-18, -32, 36 * (p.hp / p.maxHp), 5);
+    ctx.fillRect(-20, -36, 40 * (p.hp / p.maxHp), 5);
   }
 
   ctx.rotate(p.a || 0);
 
-  ctx.fillStyle = isEnemy ? '#2b1b17' : '#54351f';
+  // Gövde gölgesi
+  ctx.fillStyle = 'rgba(0, 20, 35, 0.35)';
   ctx.beginPath();
-  ctx.moveTo(22, 0);
-  ctx.lineTo(9, 13);
-  ctx.lineTo(-17, 10);
-  ctx.lineTo(-22, 0);
-  ctx.lineTo(-17, -10);
-  ctx.lineTo(9, -13);
+  ctx.moveTo(27, 4);
+  ctx.quadraticCurveTo(10, 18, -22, 13);
+  ctx.lineTo(-27, 4);
+  ctx.lineTo(-22, -6);
+  ctx.quadraticCurveTo(10, -10, 27, 4);
   ctx.closePath();
   ctx.fill();
-  ctx.strokeStyle = isEnemy ? '#f87171' : '#e9d3a1';
-  ctx.lineWidth = 2;
+
+  // Ana Gövde (Ahşap)
+  const hullGrad = ctx.createLinearGradient(0, -14, 0, 14);
+  if (isEnemy) {
+    hullGrad.addColorStop(0, '#4a1c16');
+    hullGrad.addColorStop(0.5, '#2b100d');
+    hullGrad.addColorStop(1, '#180807');
+  } else {
+    hullGrad.addColorStop(0, '#8c5327');
+    hullGrad.addColorStop(0.5, '#5c3314');
+    hullGrad.addColorStop(1, '#381d09');
+  }
+
+  ctx.fillStyle = hullGrad;
+  ctx.beginPath();
+  ctx.moveTo(28, 0); // Pruva mahmuzu
+  ctx.quadraticCurveTo(12, 15, -21, 11);
+  ctx.lineTo(-26, 0);
+  ctx.lineTo(-21, -11);
+  ctx.quadraticCurveTo(12, -15, 28, 0);
+  ctx.closePath();
+  ctx.fill();
+
+  // Küpeşte (kenar kaplama)
+  ctx.strokeStyle = isEnemy ? '#fca5a5' : '#f3d59b';
+  ctx.lineWidth = 1.8;
   ctx.stroke();
 
-  ctx.fillStyle = isEnemy ? '#dc2626' : '#f5e6c7';
-  ctx.beginPath(); ctx.moveTo(-7, -2); ctx.lineTo(8, 0); ctx.lineTo(-7, 7); ctx.closePath(); ctx.fill();
-  ctx.beginPath(); ctx.moveTo(-7, 1); ctx.lineTo(8, 0); ctx.lineTo(-7, -7); ctx.closePath(); ctx.fill();
+  // İç güverte tahtası
+  ctx.fillStyle = isEnemy ? '#6b2920' : '#a86b38';
+  ctx.beginPath();
+  ctx.moveTo(21, 0);
+  ctx.quadraticCurveTo(8, 10, -17, 7);
+  ctx.lineTo(-20, 0);
+  ctx.lineTo(-17, -7);
+  ctx.quadraticCurveTo(8, -10, 21, 0);
+  ctx.closePath();
+  ctx.fill();
+
+  // Bordadaki top lombozları
+  ctx.fillStyle = '#0f172a';
+  for (const lx of [-8, 1, 10]) {
+    ctx.fillRect(lx, -10.5, 4, 2.2);
+    ctx.fillRect(lx, 8.3, 4, 2.2);
+  }
+
+  // Ana Direk ve Kıç Direk
+  ctx.strokeStyle = '#3b2314';
+  ctx.lineWidth = 2.6;
+  ctx.beginPath();
+  ctx.moveTo(-10, 0);
+  ctx.lineTo(8, 0);
+  ctx.stroke();
+
+  // Şişkin Yelkenler (Ana Yelken + Flok Yelken)
+  ctx.fillStyle = isEnemy ? '#dc2626' : '#f8ecd2';
+  ctx.strokeStyle = isEnemy ? '#7f1d1d' : '#cbb382';
+  ctx.lineWidth = 1;
+
+  // Ana yelken
+  ctx.beginPath();
+  ctx.moveTo(-4, -11);
+  ctx.quadraticCurveTo(6, 0, -4, 11);
+  ctx.quadraticCurveTo(-1, 0, -4, -11);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Ön yelken
+  ctx.beginPath();
+  ctx.moveTo(8, -8);
+  ctx.quadraticCurveTo(19, 0, 8, 8);
+  ctx.quadraticCurveTo(11, 0, 8, -8);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Kıç Bayrağı
+  ctx.fillStyle = isEnemy ? '#ef4444' : '#fbbf24';
+  ctx.beginPath();
+  ctx.moveTo(-22, 0);
+  ctx.lineTo(-31, -4);
+  ctx.lineTo(-29, 0);
+  ctx.lineTo(-31, 4);
+  ctx.closePath();
+  ctx.fill();
 
   ctx.restore();
 
-  ctx.fillStyle = isEnemy ? '#fca5a5' : 'white';
+  // İsim etiketi
+  ctx.fillStyle = isEnemy ? (isSelected ? '#fecaca' : '#fca5a5') : '#ffffff';
   ctx.textAlign = 'center';
-  ctx.font = '12px system-ui';
-  ctx.fillText(p.name, sx, sy - 20);
+  ctx.font = '600 12px system-ui';
+  ctx.fillText(p.name, sx, sy - 25);
 }
 
 function drawMinimap() {
-  mctx.clearRect(0, 0, 90, 90);
+  mctx.clearRect(0, 0, 92, 92);
   const scale = 42 / WORLD_SIZE;
-  const cx = 45, cy = 45;
+  const cx = 46, cy = 46;
 
   mctx.fillStyle = '#d97706';
   for (const isl of islands) {
@@ -446,10 +716,10 @@ function drawMinimap() {
     mctx.fillRect(cx + tr.x * scale - 1.5, cy + tr.y * scale - 1.5, 3, 3);
   }
 
-  mctx.fillStyle = '#ef4444';
   for (const e of enemies) {
+    mctx.fillStyle = e.id === selectedEnemyId ? '#ffffff' : '#ef4444';
     mctx.beginPath();
-    mctx.arc(cx + e.x * scale, cy + e.y * scale, 2.5, 0, Math.PI * 2);
+    mctx.arc(cx + e.x * scale, cy + e.y * scale, e.id === selectedEnemyId ? 3.5 : 2.5, 0, Math.PI * 2);
     mctx.fill();
   }
 
@@ -486,12 +756,12 @@ function draw() {
   }
   ctx.globalAlpha = 1;
 
-  // Harita Sınır Çizgisi
+  // Harita Sınırı
   ctx.strokeStyle = 'rgba(255, 215, 131, 0.35)';
   ctx.lineWidth = 4;
   ctx.strokeRect(-WORLD_SIZE - camX, -WORLD_SIZE - camY, WORLD_SIZE * 2, WORLD_SIZE * 2);
 
-  // Tıklanan Hedef Halkası
+  // Hedef Noktası Halkası
   if (targetPos) {
     const tx = targetPos.x - camX;
     const ty = targetPos.y - camY;
@@ -538,12 +808,12 @@ function draw() {
   // Düşman Gemileri
   for (const e of enemies) {
     const sx = e.x - camX, sy = e.y - camY;
-    if (sx < -80 || sx > W + 80 || sy < -80 || sy > H + 80) continue;
-    drawShip(e, sx, sy, true);
+    if (sx < -100 || sx > W + 100 || sy < -100 || sy > H + 100) continue;
+    drawRealisticShip(e, sx, sy, camX, camY, true, e.id === selectedEnemyId);
   }
 
-  // Oyuncu Gemisi (Ekran merkezinde)
-  drawShip(player, W / 2, H / 2, false);
+  // Oyuncu Gemisi
+  drawRealisticShip(player, W / 2, H / 2, camX, camY, false, false);
 
   // Parçacıklar
   for (const pt of particles) {
