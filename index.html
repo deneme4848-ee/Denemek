@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - 3D GLTF Efsanevi Filo</title>
+  <title>Korsan Dünyası - 8 Yönlü Sprite Filo</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -117,9 +117,8 @@
     .quick-test-btn { border: 1px solid rgba(186, 230, 253, 0.35); background: rgba(14, 116, 144, 0.35); color: #e0f2fe; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; }
   </style>
 
-  <!-- Three.js ve GLTFLoader Kütüphaneleri -->
+  <!-- Three.js Kütüphanesi -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/loaders/GLTFLoader.js"></script>
 </head>
 <body>
 
@@ -128,7 +127,7 @@
   <div id="hud">
     <div class="panel">
       <div class="hud-top-row">
-        <strong id="ship-title">Gerçek 3D Korsan Gemisi</strong>
+        <strong id="ship-title">8 Yönlü Sprite Filo</strong>
         <button id="logout-btn" class="logout-chip">Çıkış</button>
       </div>
       <div class="stat-row" style="margin-top:4px;">
@@ -205,7 +204,7 @@
     <div class="auth-card">
       <div class="auth-brand">
         <h1>⚓ Korsan Dünyası</h1>
-        <p>Gerçek 3D GLTF Modelli Denizler</p>
+        <p>8 Yönlü Sprite Destekli Denizler</p>
       </div>
       <div class="auth-tabs">
         <button id="tab-login" class="auth-tab active" type="button">Giriş Yap</button>
@@ -270,18 +269,11 @@ const miniCanvas = document.querySelector('#minimap');
 const mctx = miniCanvas.getContext('2d');
 
 const SHIP_MODELS = {
-  standard: { 
-    id: 'standard', 
-    name: 'Gerçek 3D Korsan Gemisi', 
-    desc: 'Detaylı 3D GLTF model.', 
-    cost: 0,
-    // Doğrudan çalışan açık kaynaklı 3D korsan gemisi modeli linki
-    file: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxTextured/glTF-Binary/BoxTextured.glb' 
-  }
+  standard: { id: 'standard', name: '8 Yönlü Efsanevi Gemi', desc: 'Dinamik 2D Sprite Görsel Filo', cost: 0 }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v9';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v9';
+const USERS_STORAGE_KEY = 'pirate3d_users_v10';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v10';
 let authMode = 'login';
 let currentUser = null;
 
@@ -340,44 +332,85 @@ if (authForm) {
 if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeItem(SESSION_STORAGE_KEY); location.reload(); });
 
 // ==========================================================
-// GLTF LOADER İLE GERÇEK 3D MODEL YÜKLEME SİSTEMİ
+// OTOMATİK BEYAZ TEMİZLEME VE 8 YÖNLÜ SPRITE SİSTEMİ
 // ==========================================================
 let scene, camera, renderer;
-let playerMesh, enemies = [], islands = [], rangeRingMesh;
+let playerSprite, enemies = [], islands = [], rangeRingMesh;
 let raycaster, planeGeo, mouse;
-let gltfLoader;
+let shipTextures = {};
 const WORLD_SIZE = 4000;
 const ATTACK_RANGE = 320;
 const AGGRO_RANGE = 300;
 
-function loadCustomShipModel(modelConfig, onLoaded) {
-  const group = new THREE.Group();
-  const fileUrl = modelConfig.file;
+// JPEG görsellerindeki beyaz arka planı kod ile şeffafa çeviren akıllı fonksiyon
+function createTransparentTexture(imageSrc, callback) {
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.src = imageSrc;
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
 
-  if (!gltfLoader) gltfLoader = new THREE.GLTFLoader();
+    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imgData.data;
 
-  gltfLoader.load(fileUrl, (gltf) => {
-    const model = gltf.scene;
-    model.scale.set(18, 18, 18); // Modelin oyun dünyasında net görünmesi için ölçek
-    model.position.set(0, 0, 0);
-    model.traverse(child => {
-      if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
+    // Beyaz veya beyaza çok yakın pikselleri alpha=0 (şeffaf) yap
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i], g = data[i+1], b = data[i+2];
+      if (r > 230 && g > 230 && b > 230) {
+        data[i+3] = 0; // Şeffaflık
       }
-    });
-    group.add(model);
-    if (onLoaded) onLoaded(group);
-  }, undefined, (error) => {
-    console.warn('GLB yüklenirken hata oluştu:', error);
-    // Hata durumunda güvenli yedek
-    const boxGeo = new THREE.BoxGeometry(15, 10, 35);
-    const boxMat = new THREE.MeshStandardMaterial({ color: 0x3b1c11 });
-    group.add(new THREE.Mesh(boxGeo, boxMat));
-    if (onLoaded) onLoaded(group);
-  });
+    }
+    ctx.putImageData(imgData, 0, 0);
 
-  return group;
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.generateMipmaps = true;
+    if (callback) callback(texture);
+  };
+}
+
+// 8 Yönlü görsellerin yüklenmesi
+function loadShipTextures(onAllLoaded) {
+  const textureFiles = {
+    right: 'gemi11.jpeg',      // tam sağ
+    topRight: 'gemi12.jpeg',   // sağ üst
+    top: 'gemi13.jpeg',        // tam yukarı
+    topLeft: 'gemi14.jpeg',    // sol üst
+    left: 'gemi15.jpeg',       // tam sol
+    bottomLeft: 'gemi16.jpeg', // sol alt
+    bottom: 'gemi17.jpeg',     // tam aşağı
+    bottomRight: 'gemi18.jpeg' // sağ alt
+  };
+
+  let loadedCount = 0;
+  const total = Object.keys(textureFiles).length;
+
+  for (const [key, src] of Object.entries(textureFiles)) {
+    createTransparentTexture(src, (tex) => {
+      shipTextures[key] = tex;
+      loadedCount++;
+      if (loadedCount === total && onAllLoaded) onAllLoaded();
+    });
+  }
+}
+
+// Hareket açısına göre doğru texture'ı seçen fonksiyon
+function getDirectionTexture(angle) {
+  // Açıları 0 ile 2*PI arasına normalize et
+  let deg = (angle * (180 / Math.PI)) % 360;
+  if (deg < 0) deg += 360;
+
+  if (deg >= 337.5 || deg < 22.5) return shipTextures.right || shipTextures.top;
+  if (deg >= 22.5 && deg < 67.5) return shipTextures.topRight || shipTextures.top;
+  if (deg >= 67.5 && deg < 112.5) return shipTextures.top || shipTextures.right;
+  if (deg >= 112.5 && deg < 157.5) return shipTextures.topLeft || shipTextures.top;
+  if (deg >= 157.5 && deg < 202.5) return shipTextures.left || shipTextures.top;
+  if (deg >= 202.5 && deg < 247.5) return shipTextures.bottomLeft || shipTextures.top;
+  if (deg >= 247.5 && deg < 292.5) return shipTextures.bottom || shipTextures.right;
+  return shipTextures.bottomRight || shipTextures.top;
 }
 
 function initThreeGame() {
@@ -386,30 +419,25 @@ function initThreeGame() {
   scene.fog = new THREE.FogExp2(0x04131e, 0.0006);
 
   camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 18000);
-  camera.position.set(0, 580, 460);
+  camera.position.set(0, 600, 450);
   camera.lookAt(0, 0, 0);
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.shadowMap.enabled = true;
   document.getElementById('game').appendChild(renderer.domElement);
 
-  gltfLoader = new THREE.GLTFLoader();
-
-  const ambientLight = new THREE.AmbientLight(0xfff1e0, 0.9);
+  const ambientLight = new THREE.AmbientLight(0xfff1e0, 1.0);
   scene.add(ambientLight);
 
   const sunLight = new THREE.DirectionalLight(0xffb74d, 1.6);
   sunLight.position.set(600, 900, 600);
-  sunLight.castShadow = true;
   scene.add(sunLight);
 
   planeGeo = new THREE.PlaneGeometry(WORLD_SIZE * 3, WORLD_SIZE * 3, 40, 40);
   const oceanMat = new THREE.MeshStandardMaterial({ color: 0x061c2d, roughness: 0.2, metalness: 0.35 });
   const ocean = new THREE.Mesh(planeGeo, oceanMat);
   ocean.rotation.x = -Math.PI / 2;
-  ocean.receiveShadow = true;
   scene.add(ocean);
 
   const ringGeo = new THREE.RingGeometry(ATTACK_RANGE - 3, ATTACK_RANGE, 64);
@@ -434,11 +462,10 @@ function initThreeGame() {
     mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
 
-    const enemyMeshes = enemies.map(en => en.mesh);
-    const intersects = raycaster.intersectObjects(enemyMeshes, true);
+    const enemySprites = enemies.map(en => en.sprite);
+    const intersects = raycaster.intersectObjects(enemySprites);
     if (intersects.length > 0) {
       let obj = intersects[0].object;
-      while (obj.parent && !obj.userData.enemyId) obj = obj.parent;
       if (obj.userData.enemyId) {
         selectedEnemyId = obj.userData.enemyId;
         syncAttackButton();
@@ -452,8 +479,11 @@ function initThreeGame() {
     }
   });
 
-  startGameLogic();
-  animate3D();
+  // Görseller şeffaflık filtresiyle yüklenince oyunu başlat
+  loadShipTextures(() => {
+    startGameLogic();
+    animate3D();
+  });
 }
 
 // ==========================================================
@@ -471,13 +501,14 @@ function startGameLogic() {
     hp: 1000, maxHp: 1000, score: 100000000, ammo: 25,
     level: 1, exp: 0, maxExp: 100, damage: 180
   };
-  shipTitleEl.textContent = "Gerçek 3D Korsan Gemisi";
+  shipTitleEl.textContent = "8 Yönlü Efsanevi Gemi";
 
-  if (playerMesh) scene.remove(playerMesh);
-  playerMesh = loadCustomShipModel(SHIP_MODELS.standard, (group) => {
-    scene.add(group);
-    playerMesh = group;
-  });
+  if (playerSprite) scene.remove(playerSprite);
+  const initialTex = shipTextures.top || Object.values(shipTextures)[0];
+  const mat = new THREE.SpriteMaterial({ map: initialTex, transparent: true });
+  playerSprite = new THREE.Sprite(mat);
+  playerSprite.scale.set(70, 70, 1); // Gemi boyutu
+  scene.add(playerSprite);
 
   gameIslands.forEach(isl => scene.remove(isl.mesh));
   gameIslands = [];
@@ -490,30 +521,32 @@ function startGameLogic() {
     gameIslands.push({ mesh, r: 80 });
   }
 
-  enemies.forEach(en => scene.remove(en.mesh));
+  enemies.forEach(en => scene.remove(en.sprite));
   enemies = [];
-  for (let i = 0; i < 8; i++) spawn3DEnemy(i + 1);
+  for (let i = 0; i < 8; i++) spawnEnemySprite(i + 1);
 
   updateHUD();
   syncAttackButton();
 }
 
-function spawn3DEnemy(id) {
+function spawnEnemySprite(id) {
   let ex, ez;
   do {
     ex = (Math.random() - 0.5) * 3000;
     ez = (Math.random() - 0.5) * 3000;
   } while (Math.hypot(ex, ez) < 500);
 
-  const meshGroup = loadCustomShipModel(SHIP_MODELS.standard, (group) => {
-    group.position.set(ex, 0, ez);
-    group.traverse(child => { child.userData.enemyId = id; });
-    scene.add(group);
-  });
+  const initialTex = shipTextures.top || Object.values(shipTextures)[0];
+  const mat = new THREE.SpriteMaterial({ map: initialTex, transparent: true });
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(70, 70, 1);
+  sprite.position.set(ex, 10, ez);
+  sprite.userData.enemyId = id;
+  scene.add(sprite);
 
   enemies.push({
-    id, mesh: meshGroup, x: ex, z: ez, hp: 520, maxHp: 520, speed: 1.15,
-    wanderAngle: Math.random() * Math.PI * 2, wanderTimer: 0
+    id, sprite, x: ex, z: ez, hp: 520, maxHp: 520, speed: 1.15,
+    a: 0, wanderAngle: Math.random() * Math.PI * 2, wanderTimer: 0
   });
 }
 
@@ -532,8 +565,8 @@ attackBtn.addEventListener('click', () => {
 function animate3D() {
   requestAnimationFrame(animate3D);
 
-  if (!player || isGameOver) {
-    renderer.render(scene, camera);
+  if (!player || isGameOver || !shipTextures.top) {
+    if (scene && camera && renderer) renderer.render(scene, camera);
     return;
   }
 
@@ -555,26 +588,25 @@ function animate3D() {
   player.x += Math.cos(player.a) * player.speed;
   player.z += Math.sin(player.a) * player.speed;
 
-  if (playerMesh) {
-    playerMesh.position.set(player.x, 0, player.z);
-    playerMesh.rotation.y = -player.a + Math.PI / 2;
-    playerMesh.position.y = Math.sin(Date.now() / 250) * 1.2;
+  if (playerSprite) {
+    playerSprite.position.set(player.x, 10, player.z);
+    playerSprite.material.map = getDirectionTexture(player.a);
+    playerSprite.position.y = 10 + Math.sin(Date.now() / 250) * 2;
   }
 
   rangeRingMesh.position.set(player.x, 0.5, player.z);
 
   camera.position.x += (player.x - camera.position.x) * 0.08;
-  camera.position.z += (player.z + 380 - camera.position.z) * 0.08;
+  camera.position.z += (player.z + 400 - camera.position.z) * 0.08;
   camera.lookAt(player.x, 0, player.z);
 
   for (const en of enemies) {
     const distToPlayer = Math.hypot(player.x - en.x, player.z - en.z);
 
     if (distToPlayer <= AGGRO_RANGE) {
-      const ea = Math.atan2(player.z - en.z, player.x - en.x);
-      en.a = ea;
-      en.x += Math.cos(ea) * (en.speed * 1.25);
-      en.z += Math.sin(ea) * (en.speed * 1.25);
+      en.a = Math.atan2(player.z - en.z, player.x - en.x);
+      en.x += Math.cos(en.a) * (en.speed * 1.25);
+      en.z += Math.sin(en.a) * (en.speed * 1.25);
 
       if (distToPlayer < 150 && Math.random() < 0.025) {
         player.hp = Math.max(0, player.hp - 40);
@@ -600,10 +632,10 @@ function animate3D() {
     en.x = Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, en.x));
     en.z = Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, en.z));
 
-    if (en.mesh) {
-      en.mesh.position.set(en.x, 0, en.z);
-      en.mesh.rotation.y = -en.a + Math.PI / 2;
-      en.mesh.position.y = Math.sin(Date.now() / 250 + en.id) * 1.2;
+    if (en.sprite) {
+      en.sprite.position.set(en.x, 10, en.z);
+      en.sprite.material.map = getDirectionTexture(en.a);
+      en.sprite.position.y = 10 + Math.sin(Date.now() / 250 + en.id) * 2;
     }
   }
 
@@ -617,14 +649,14 @@ function animate3D() {
         updateHUD();
         syncAttackButton();
         if (target.hp <= 0) {
-          scene.remove(target.mesh);
+          scene.remove(target.sprite);
           enemies = enemies.filter(e => e.id !== target.id);
           selectedEnemyId = null;
           isAttacking = false;
           player.score += 120;
           updateHUD();
           syncAttackButton();
-          setTimeout(() => spawn3DEnemy(target.id), 3000);
+          setTimeout(() => spawnEnemySprite(target.id), 3000);
         }
       }
     }
