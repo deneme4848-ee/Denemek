@@ -489,8 +489,8 @@ const SHIP_MODELS = {
   standard: { id: 'standard', name: '8 Yönlü Efsanevi Gemi', desc: 'Şeffaf PNG Sprite Filosu', cost: 0 }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v17';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v17';
+const USERS_STORAGE_KEY = 'pirate3d_users_v18';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v18';
 let authMode = 'login';
 let currentUser = null;
 
@@ -556,7 +556,7 @@ let playerSprite, playerNeonRing, enemies = [], rangeRingMesh, oceanTexture, oce
 let raycaster, planeGeo, mouse;
 let shipTextures = {};
 let textureLoader;
-const WORLD_SIZE = 1000; // Harita 100-100 ölçeğine (1000 birim) indirgendi
+const WORLD_SIZE = 1000;
 const ATTACK_RANGE = 280;
 const AGGRO_RANGE = 280;
 const BASE_SHIP_HEIGHT = 95;
@@ -847,8 +847,8 @@ function startGameLogic() {
   const initialData = shipTextures.top || Object.values(shipTextures)[0];
   const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1 });
   playerSprite = new THREE.Sprite(mat);
-  // center.set(0.5, 0.7) yapılarak gemi sudan tamamen yukarı çıkarıldı
-  playerSprite.center.set(0.5, 0.7);
+  // Gemi pivotu sudan tamamen çıkarıldı ve yükseltildi
+  playerSprite.center.set(0.5, 0.95);
   applyNormalizedSprite(playerSprite, player.a);
   scene.add(playerSprite);
 
@@ -883,9 +883,9 @@ function spawnEnemySprite(id) {
   const initialData = shipTextures.top || Object.values(shipTextures)[0];
   const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1, color: 0xd1fae5 });
   const sprite = new THREE.Sprite(mat);
-  sprite.center.set(0.5, 0.7);
+  sprite.center.set(0.5, 0.95);
   applyNormalizedSprite(sprite, 0);
-  sprite.position.set(ex, 2, ez);
+  sprite.position.set(ex, 12, ez);
   sprite.userData.enemyId = id;
   scene.add(sprite);
 
@@ -992,11 +992,10 @@ function animate3D() {
   player.x += Math.cos(player.a) * player.speed;
   player.z += Math.sin(player.a) * player.speed;
 
-  // Harita 100x100 ölçeğine uygun koordinat gösterimi (-50 ile +50 arası)
   coordDisplayEl.textContent = `X: ${Math.round((player.x / (WORLD_SIZE / 2)) * 50)} · Y: ${Math.round((player.z / (WORLD_SIZE / 2)) * 50)}`;
 
   if (playerSprite) {
-    playerSprite.position.set(player.x, 2, player.z);
+    playerSprite.position.set(player.x, 12, player.z);
     applyNormalizedSprite(playerSprite, player.a);
   }
 
@@ -1051,7 +1050,7 @@ function animate3D() {
     en.z = Math.max(-WORLD_SIZE/2, Math.min(WORLD_SIZE/2, en.z));
 
     if (en.sprite) {
-      en.sprite.position.set(en.x, 2, en.z);
+      en.sprite.position.set(en.x, 12, en.z);
       applyNormalizedSprite(en.sprite, en.a);
     }
   }
