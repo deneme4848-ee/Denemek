@@ -159,9 +159,11 @@ window.addEventListener('resize', resize);
 resize();
 
 const WORLD_SIZE = 2400;
-const ATTACK_RANGE = 230; // Azaltılmış menzil
-const PLAYER_MAX_SPEED = 1.85; // Önceki 3.7 hızının yarı yarıya azaltılmış hali
-const ENEMY_MAX_SPEED = PLAYER_MAX_SPEED * (2 / 3); // Oyuncudan 1/3 daha yavaş
+const CAMERA_ZOOM = 0.72; // Haritayı daha geniş gösteren kamera uzaklaştırma oranı
+const ATTACK_RANGE = 230;
+const ENEMY_ATTACK_RANGE = ATTACK_RANGE / 2; // NPC atış menzili oyuncunun yarısı kadar
+const PLAYER_MAX_SPEED = 1.85;
+const ENEMY_MAX_SPEED = PLAYER_MAX_SPEED * (2 / 3);
 const ENEMY_DAMAGE = 10;
 const ENEMY_FIRE_INTERVAL = 3000;
 
@@ -173,6 +175,29 @@ let lastPlayerShot = 0;
 let lastClickEnemyId = null;
 let lastClickTime = 0;
 let nextEnemyId = 1;
+
+function getCameraOrigin() {
+  return {
+    x: player.x - (W / CAMERA_ZOOM) / 2,
+    y: player.y - (H / CAMERA_ZOOM) / 2
+  };
+}
+
+function screenToWorld(clientX, clientY) {
+  const cam = getCameraOrigin();
+  return {
+    x: cam.x + clientX / CAMERA_ZOOM,
+    y: cam.y + clientY / CAMERA_ZOOM
+  };
+}
+
+function worldToScreen(wx, wy) {
+  const cam = getCameraOrigin();
+  return {
+    x: (wx - cam.x) * CAMERA_ZOOM,
+    y: (wy - cam.y) * CAMERA_ZOOM
+  };
+}
 
 function syncAttackButton() {
   const selectedEnemy = enemies.find(e => e.id === selectedEnemyId);
@@ -257,9 +282,9 @@ function spawnTreasure() {
 function spawnEnemy() {
   let ex, ey;
   do {
-    ex = (Math.random() - 0.5) * 1400;
-    ey = (Math.random() - 0.5) * 1400;
-  } while (Math.hypot(ex - player.x, ey - player.y) < 180);
+    ex = (Math.random() - 0.5) * 1200;
+    ey = (Math.random() - 0.5) * 1200;
+  } while (Math.hypot(ex - player.x, ey - player.y) < 160);
 
   enemies.push({
     id: nextEnemyId++,
@@ -426,18 +451,16 @@ function fireLockedCannon(shooter, target, isPlayer) {
   });
 }
 
-// Hareket halindeyken de düşman seçmeye ve hedef değiştirmeye izin verir
 canvas.addEventListener('pointerdown', e => {
   if (isGameOver) return;
   e.preventDefault();
 
-  const camX = player.x - W / 2;
-  const camY = player.y - H / 2;
-  const worldX = e.clientX + camX;
-  const worldY = e.clientY + camY;
+  const world = screenToWorld(e.clientX, e.clientY);
+  const worldX = world.x;
+  const worldY = world.y;
 
   let clickedEnemy = null;
-  let bestDist = 44;
+  let bestDist = 48;
   for (const enemy of enemies) {
     const d = Math.hypot(worldX - enemy.x, worldY - enemy.y);
     if (d <= bestDist) {
@@ -463,11 +486,9 @@ canvas.addEventListener('pointerdown', e => {
     return;
   }
 
-  // Boş denize tıklandığında mevcut saldırı durumunu bozmadan yeni hedefe yelken aç
-  selectedEnemyId = null;
+  // Haritaya (boş denize) tıklandığında mevcut düşman seçimi ve saldırı butonu deaktif olmaz;
+  // sadece yeni hedef noktasına yelken açılır
   lastClickEnemyId = null;
-  syncAttackButton();
-
   targetPos = {
     x: Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, worldX)),
     y: Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, worldY))
@@ -586,7 +607,7 @@ function update() {
     }
   }
 
-  // Saldırı devam ederken hareket edilse bile menzilden çıkmadıkça ateş kesilmez
+  // Hareket halindeyken de menzil dışına çıkmadıkça ateş devam eder
   if (isAttacking && selectedEnemy) {
     const distToEnemy = Math.hypot(selectedEnemy.x - player.x, selectedEnemy.y - player.y);
     if (distToEnemy > ATTACK_RANGE) {
@@ -610,7 +631,7 @@ function update() {
     }
   }
 
-  // NPC gemileri oyuncudan 1/3 daha yavaş hareket eder
+  // NPC gemileri: hızı oyuncudan 1/3 daha yavaş, atış menzili oyuncunun yarısı kadar
   for (let i = enemies.length - 1; i >= 0; i--) {
     const e = enemies[i];
     const distToPlayer = Math.hypot(player.x - e.x, player.y - e.y);
@@ -624,7 +645,7 @@ function update() {
         e.x += Math.cos(e.a) * eSpeed;
         e.y += Math.sin(e.a) * eSpeed;
       }
-      if (distToPlayer < 420 && now - e.lastShot > ENEMY_FIRE_INTERVAL) {
+      if (distToPlayer <= ENEMY_ATTACK_RANGE && now - e.lastShot > ENEMY_FIRE_INTERVAL) {
         e.lastShot = now;
         fireLockedCannon(e, player, false);
       }
@@ -773,26 +794,26 @@ function update() {
   }
 }
 
-function drawRangeRing(sx, sy) {
+function drawRangeRing(wx, wy) {
   ctx.save();
   ctx.beginPath();
-  ctx.arc(sx, sy, ATTACK_RANGE, 0, Math.PI * 2);
+  ctx.arc(wx, wy, ATTACK_RANGE, 0, Math.PI * 2);
   ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
   ctx.fill();
-  ctx.lineWidth = 1.8;
+  ctx.lineWidth = 2;
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
   ctx.setLineDash([10, 8]);
   ctx.stroke();
   ctx.restore();
 }
 
-function drawRealisticShip(p, sx, sy, camX, camY, isEnemy = false, isSelected = false) {
+function drawRealisticShip(p, isEnemy = false, isSelected = false) {
   for (const w of p.wake || []) {
     ctx.save();
     ctx.globalAlpha = Math.max(0, w.alpha);
     ctx.fillStyle = '#e0f2fe';
     ctx.beginPath();
-    ctx.arc(w.x - camX, w.y - camY, w.r, 0, Math.PI * 2);
+    ctx.arc(w.x, w.y, w.r, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
   }
@@ -804,19 +825,19 @@ function drawRealisticShip(p, sx, sy, camX, camY, isEnemy = false, isSelected = 
     ctx.lineWidth = 3;
     ctx.setLineDash([8, 5]);
     ctx.beginPath();
-    ctx.arc(sx, sy, pulse, 0, Math.PI * 2);
+    ctx.arc(p.x, p.y, pulse, 0, Math.PI * 2);
     ctx.stroke();
 
     ctx.setLineDash([]);
     ctx.fillStyle = 'rgba(239, 68, 68, 0.14)';
     ctx.beginPath();
-    ctx.arc(sx, sy, pulse, 0, Math.PI * 2);
+    ctx.arc(p.x, p.y, pulse, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
   }
 
   ctx.save();
-  ctx.translate(sx, sy);
+  ctx.translate(p.x, p.y);
 
   if (isEnemy && p.hp < p.maxHp) {
     ctx.fillStyle = 'rgba(0,0,0,0.6)';
@@ -919,7 +940,7 @@ function drawRealisticShip(p, sx, sy, camX, camY, isEnemy = false, isSelected = 
   ctx.fillStyle = isEnemy ? (isSelected ? '#fecaca' : '#fca5a5') : '#ffffff';
   ctx.textAlign = 'center';
   ctx.font = '600 12px system-ui';
-  ctx.fillText(p.name, sx, sy - 25);
+  ctx.fillText(p.name, p.x, p.y - 25);
 }
 
 function drawMinimap() {
@@ -955,102 +976,100 @@ function drawMinimap() {
 function draw() {
   update();
 
+  const cam = getCameraOrigin();
+  const viewW = W / CAMERA_ZOOM;
+  const viewH = H / CAMERA_ZOOM;
+
+  ctx.save();
   ctx.clearRect(0, 0, W, H);
   ctx.fillStyle = '#087da0';
   ctx.fillRect(0, 0, W, H);
 
-  const camX = player.x - W / 2;
-  const camY = player.y - H / 2;
+  ctx.scale(CAMERA_ZOOM, CAMERA_ZOOM);
+  ctx.translate(-cam.x, -cam.y);
 
+  // Hareketli Dalgalar
   const t = Date.now() / 800;
   ctx.strokeStyle = '#54bdd0';
   ctx.globalAlpha = 0.25;
-  const offsetY = -(camY % 35);
-  for (let y = offsetY - 35; y < H + 35; y += 35) {
+  const startY = Math.floor(cam.y / 35) * 35;
+  for (let y = startY - 35; y < cam.y + viewH + 70; y += 35) {
     ctx.beginPath();
-    for (let x = 0; x < W; x += 12) {
-      const worldX = x + camX;
-      const worldY = y + camY;
-      const yy = y + Math.sin(worldX / 45 + t + worldY * 0.02) * 3;
-      x === 0 ? ctx.moveTo(x, yy) : ctx.lineTo(x, yy);
+    for (let x = Math.floor(cam.x / 16) * 16; x < cam.x + viewW + 32; x += 16) {
+      const yy = y + Math.sin(x / 45 + t + y * 0.02) * 3;
+      x === Math.floor(cam.x / 16) * 16 ? ctx.moveTo(x, yy) : ctx.lineTo(x, yy);
     }
     ctx.stroke();
   }
   ctx.globalAlpha = 1;
 
+  // Harita Sınırı
   ctx.strokeStyle = 'rgba(255, 215, 131, 0.35)';
   ctx.lineWidth = 4;
-  ctx.strokeRect(-WORLD_SIZE - camX, -WORLD_SIZE - camY, WORLD_SIZE * 2, WORLD_SIZE * 2);
+  ctx.strokeRect(-WORLD_SIZE, -WORLD_SIZE, WORLD_SIZE * 2, WORLD_SIZE * 2);
 
-  // Geminin etrafında hafif saydam beyaz menzil çerçevesi
-  drawRangeRing(W / 2, H / 2);
+  // Geminin etrafında gözü yormayan hafif saydam beyaz menzil çerçevesi
+  drawRangeRing(player.x, player.y);
 
   if (targetPos) {
-    const tx = targetPos.x - camX;
-    const ty = targetPos.y - camY;
     const pulse = 10 + Math.sin(Date.now() / 140) * 3;
     ctx.save();
     ctx.strokeStyle = 'rgba(255, 215, 131, 0.85)';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.arc(tx, ty, pulse, 0, Math.PI * 2);
+    ctx.arc(targetPos.x, targetPos.y, pulse, 0, Math.PI * 2);
     ctx.stroke();
     ctx.restore();
   }
 
   for (const isl of islands) {
-    const sx = isl.x - camX, sy = isl.y - camY;
-    if (sx < -150 || sx > W + 150 || sy < -150 || sy > H + 150) continue;
+    if (isl.x + isl.r < cam.x - 150 || isl.x - isl.r > cam.x + viewW + 150 ||
+        isl.y + isl.r < cam.y - 150 || isl.y - isl.r > cam.y + viewH + 150) continue;
     ctx.fillStyle = '#e9c46a';
-    ctx.beginPath(); ctx.arc(sx, sy, isl.r, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(isl.x, isl.y, isl.r, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#2a9d8f';
-    ctx.beginPath(); ctx.arc(sx, sy, isl.r * 0.72, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(isl.x, isl.y, isl.r * 0.72, 0, Math.PI * 2); ctx.fill();
   }
 
   for (const tr of treasures) {
-    const sx = tr.x - camX, sy = tr.y - camY;
-    if (sx < -50 || sx > W + 50 || sy < -50 || sy > H + 50) continue;
+    if (tr.x < cam.x - 80 || tr.x > cam.x + viewW + 80 ||
+        tr.y < cam.y - 80 || tr.y > cam.y + viewH + 80) continue;
     const bob = Math.sin(Date.now() / 300 + tr.bob) * 2;
     ctx.fillStyle = '#92400e';
-    ctx.fillRect(sx - 9, sy - 7 + bob, 18, 14);
+    ctx.fillRect(tr.x - 9, tr.y - 7 + bob, 18, 14);
     ctx.strokeStyle = '#fbbf24';
     ctx.lineWidth = 2;
-    ctx.strokeRect(sx - 9, sy - 7 + bob, 18, 14);
+    ctx.strokeRect(tr.x - 9, tr.y - 7 + bob, 18, 14);
   }
 
   for (const s of shots) {
-    const sx = s.x - camX;
-    const sy = s.y - camY;
-    const psx = s.prevX - camX;
-    const psy = s.prevY - camY;
-
     ctx.save();
     ctx.strokeStyle = s.isPlayer ? 'rgba(253, 224, 71, 0.45)' : 'rgba(248, 113, 113, 0.45)';
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(psx, psy);
-    ctx.lineTo(sx, sy);
+    ctx.moveTo(s.prevX, s.prevY);
+    ctx.lineTo(s.x, s.y);
     ctx.stroke();
 
     ctx.fillStyle = s.isPlayer ? '#0f172a' : '#7f1d1d';
     ctx.beginPath();
-    ctx.arc(sx, sy, 5, 0, Math.PI * 2);
+    ctx.arc(s.x, s.y, 5, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.fillStyle = s.isPlayer ? '#fde047' : '#fca5a5';
     ctx.beginPath();
-    ctx.arc(sx, sy, 2.2, 0, Math.PI * 2);
+    ctx.arc(s.x, s.y, 2.2, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
   }
 
   for (const e of enemies) {
-    const sx = e.x - camX, sy = e.y - camY;
-    if (sx < -100 || sx > W + 100 || sy < -100 || sy > H + 100) continue;
-    drawRealisticShip(e, sx, sy, camX, camY, true, e.id === selectedEnemyId);
+    if (e.x < cam.x - 120 || e.x > cam.x + viewW + 120 ||
+        e.y < cam.y - 120 || e.y > cam.y + viewH + 120) continue;
+    drawRealisticShip(e, true, e.id === selectedEnemyId);
   }
 
-  drawRealisticShip(player, W / 2, H / 2, camX, camY, false, false);
+  drawRealisticShip(player, false, false);
 
   for (const sw of shockwaves) {
     ctx.save();
@@ -1058,7 +1077,7 @@ function draw() {
     ctx.strokeStyle = sw.color;
     ctx.lineWidth = 2.5;
     ctx.beginPath();
-    ctx.arc(sw.x - camX, sw.y - camY, sw.r, 0, Math.PI * 2);
+    ctx.arc(sw.x, sw.y, sw.r, 0, Math.PI * 2);
     ctx.stroke();
     ctx.restore();
   }
@@ -1068,16 +1087,14 @@ function draw() {
     ctx.globalAlpha = Math.max(0, pt.life);
     ctx.fillStyle = pt.color;
     ctx.beginPath();
-    ctx.arc(pt.x - camX, pt.y - camY, pt.size, 0, Math.PI * 2);
+    ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
   }
 
   for (const fl of flashes) {
-    const fx = fl.x - camX;
-    const fy = fl.y - camY;
     ctx.save();
-    ctx.translate(fx, fy);
+    ctx.translate(fl.x, fl.y);
     ctx.rotate(fl.angle);
     ctx.globalAlpha = Math.max(0, fl.life);
     const grad = ctx.createRadialGradient(0, 0, 1, 0, 0, fl.radius);
@@ -1098,11 +1115,13 @@ function draw() {
     ctx.textAlign = 'center';
     ctx.lineWidth = 3;
     ctx.strokeStyle = 'rgba(0, 0, 0, 0.75)';
-    ctx.strokeText(ft.text, ft.x - camX, ft.y - camY);
+    ctx.strokeText(ft.text, ft.x, ft.y);
     ctx.fillStyle = ft.color;
-    ctx.fillText(ft.text, ft.x - camX, ft.y - camY);
+    ctx.fillText(ft.text, ft.x, ft.y);
     ctx.restore();
   }
+
+  ctx.restore();
 
   drawMinimap();
   requestAnimationFrame(draw);
