@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Efsanevi 3D Filo</title>
+  <title>Korsan Dünyası - 3D GLTF Efsanevi Filo</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -120,8 +120,9 @@
     .quick-test-btn { border: 1px solid rgba(186, 230, 253, 0.35); background: rgba(14, 116, 144, 0.35); color: #e0f2fe; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; }
   </style>
 
-  <!-- Three.js Kütüphanesi -->
+  <!-- Three.js ve GLTFLoader Kütüphaneleri -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/loaders/GLTFLoader.js"></script>
 </head>
 <body>
 
@@ -212,7 +213,7 @@
     <div class="auth-card">
       <div class="auth-brand">
         <h1>⚓ Korsan Dünyası</h1>
-        <p>Sea of Thieves Esintili Efsanevi 3D Denizler</p>
+        <p>Meshy.ai GLTF Destekli Efsanevi 3D Denizler</p>
       </div>
       <div class="auth-tabs">
         <button id="tab-login" class="auth-tab active" type="button">Giriş Yap</button>
@@ -282,19 +283,11 @@ const miniCanvas = document.querySelector('#minimap');
 const mctx = miniCanvas.getContext('2d');
 
 const SHIP_MODELS = {
-  standard: { id: 'standard', name: 'Standart Sloop', desc: 'Klasik ahşap gövde ve koyu yelkenler.', cost: 0, hullColor: 0x3b1c11, sailColor: 0x111e28, trimColor: 0xf59e0b },
-  minotaur: { id: 'minotaur', name: "Minotaur'un Gazabı", desc: 'Bronz zırhlı güçlü savaş gemisi.', cost: 300, hullColor: 0x27120a, sailColor: 0x7f1d1d, trimColor: 0xd97706 },
-  hellfire: { id: 'hellfire', name: 'Cehennem Ateşi', desc: 'Alev saçan korkutucu kızıl yelkenler.', cost: 750, hullColor: 0x1a0507, sailColor: 0xdc2626, trimColor: 0xf97316 },
-  leviathan: { id: 'leviathan', name: 'Karanlık Leviathan', desc: 'Mistik zümrüt ve turkuaz yelkenler.', cost: 1500, hullColor: 0x0c2340, sailColor: 0x042f2e, trimColor: 0x2dd4bf },
-  frost_queen: { id: 'frost_queen', name: 'Buzul Kraliçesi', desc: 'Buz kristali esintili fırkateyn.', cost: 2500, hullColor: 0x0f172a, sailColor: 0x0284c7, trimColor: 0x93c5fd },
-  thunder_lord: { id: 'thunder_lord', name: 'Gök Gürültüsü', desc: 'Mor efsanevi amiral gemisi.', cost: 4000, hullColor: 0x2e1065, sailColor: 0x581c87, trimColor: 0xc084fc },
-  corsair: { id: 'corsair', name: 'Kara Şahin', desc: 'Hızlı ve keskin hatlı akıncı.', cost: 5500, hullColor: 0x17212b, sailColor: 0x1e293b, trimColor: 0x94a3b8 },
-  royal: { id: 'royal', name: 'Altın Hükümdار', desc: 'Altın kaplama görkemli kalyon.', cost: 7000, hullColor: 0x633b12, sailColor: 0x854d27, trimColor: 0xfbbf24 },
-  phantom: { id: 'phantom', name: 'Hayalet Ufuk', desc: 'Turkuaz parıltılı hayalet gemi.', cost: 9000, hullColor: 0x102c38, sailColor: 0x0e7490, trimColor: 0x67e8f9 }
+  standard: { id: 'standard', name: 'Efsanevi Gemi', desc: 'Meshy.ai ile üretilen özel 3D model.', cost: 0, file: 'gemi.glb' }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v4';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v4';
+const USERS_STORAGE_KEY = 'pirate3d_users_v5';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v5';
 let authMode = 'login';
 let currentUser = null;
 
@@ -353,91 +346,48 @@ if (authForm) {
 if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeItem(SESSION_STORAGE_KEY); location.reload(); });
 
 // ==========================================================
-// EFSANEVİ SEA OF THIEVES 3D DETAYLI GEMİ MİMARİSİ
+// THREE.JS VE GLTF MODEL YÜKLEME MİMARİSİ
 // ==========================================================
 let scene, camera, renderer;
 let playerMesh, enemies = [], islands = [], rangeRingMesh;
 let raycaster, planeGeo, mouse;
+let gltfLoader;
 const WORLD_SIZE = 4000;
-const ATTACK_RANGE = 320; // Silah menzili ve menzil çizgisi yarıçapı
-const AGGRO_RANGE = 300;  // NPC otomatik saldırı menzili
+const ATTACK_RANGE = 320;
+const AGGRO_RANGE = 300;
 
-function createSoTShip(modelConfig, isEnemy = false) {
+function loadShipModel(modelConfig, callback) {
   const group = new THREE.Group();
+  const file = modelConfig.file || 'gemi.glb';
 
-  // 1. Kavisli ve Estetik Gemi Gövdesi (Kutulardan arındırılmış organik ahşap form)
-  const hullGeo = new THREE.CylinderGeometry(5.2, 7.5, 48, 12);
-  const hullMat = new THREE.MeshStandardMaterial({ color: modelConfig.hullColor, roughness: 0.35, metalness: 0.2 });
-  const hull = new THREE.Mesh(hullGeo, hullMat);
-  hull.rotation.z = Math.PI / 2;
-  hull.position.y = 4;
-  hull.castShadow = true; hull.receiveShadow = true;
-  group.add(hull);
-
-  // 2. Güverte Kaplaması
-  const deckGeo = new THREE.BoxGeometry(13.5, 1.4, 38);
-  const deckMat = new THREE.MeshStandardMaterial({ color: modelConfig.trimColor || 0x854d27, roughness: 0.6 });
-  const deck = new THREE.Mesh(deckGeo, deckMat);
-  deck.position.y = 8.2;
-  group.add(deck);
-
-  // 3. Pruva Çıkıntısı (Sivri Burun / Canavar Ağzı Detayı)
-  const bowGeo = new THREE.ConeGeometry(3.2, 14, 6);
-  const bowMat = new THREE.MeshStandardMaterial({ color: modelConfig.trimColor, roughness: 0.25, metalness: 0.6 });
-  const bow = new THREE.Mesh(bowGeo, bowMat);
-  bow.rotation.x = Math.PI / 2;
-  bow.position.set(0, 4.5, -28);
-  group.add(bow);
-
-  // 4. Üç Katlı Direkler ve Şişkin Kumaş Yelkenler
-  const mastMat = new THREE.MeshStandardMaterial({ color: 0x1f1209, roughness: 0.8 });
-  const mastZPositions = [-11, 2, 15];
-  
-  mastZPositions.forEach((mz, idx) => {
-    const height = idx === 1 ? 38 : 28;
-    const mastGeo = new THREE.CylinderGeometry(0.9, 1.2, height);
-    const mast = new THREE.Mesh(mastGeo, mastMat);
-    mast.position.set(0, height / 2 + 8, mz);
-    group.add(mast);
-
-    // Kumaş Görünümlü Şişkin Yelken (Sea of Thieves Tarzı)
-    const sailWidth = idx === 1 ? 20 : 14;
-    const sailHeight = idx === 1 ? 18 : 13;
-    const sailGeo = new THREE.BoxGeometry(sailWidth, sailHeight, 1.4);
-    const sailMat = new THREE.MeshStandardMaterial({ 
-      color: isEnemy ? 0x042f2e : modelConfig.sailColor, 
-      roughness: 0.75,
-      side: THREE.DoubleSide 
+  gltfLoader.load(file, (gltf) => {
+    const model = gltf.scene;
+    model.scale.set(1.5, 1.5, 1.5);
+    model.position.set(0, 0, 0);
+    model.traverse(child => {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
     });
-    const sail = new THREE.Mesh(sailGeo, sailMat);
-    sail.position.set(0, height / 2 + 6, mz + 0.7);
-    group.add(sail);
+    group.add(model);
+    if (callback) callback(group);
+  }, undefined, (error) => {
+    console.warn('GLB yüklenemedi, yedek kutu oluşturuluyor:', error);
+    const boxGeo = new THREE.BoxGeometry(16, 10, 40);
+    const boxMat = new THREE.MeshStandardMaterial({ color: 0x3b1c11 });
+    group.add(new THREE.Mesh(boxGeo, boxMat));
+    if (callback) callback(group);
   });
-
-  // 5. Kıç Kamarası (Üst Yapı)
-  const cabinGeo = new THREE.BoxGeometry(12, 7.5, 11);
-  const cabinMat = new THREE.MeshStandardMaterial({ color: modelConfig.hullColor, roughness: 0.5 });
-  const cabin = new THREE.Mesh(cabinGeo, cabinMat);
-  cabin.position.set(0, 12.5, 18);
-  group.add(cabin);
-
-  // 6. Rüzgarda Dalgalanan Bayrak
-  const flagGeo = new THREE.BoxGeometry(5.5, 3.2, 0.3);
-  const flagMat = new THREE.MeshStandardMaterial({ color: isEnemy ? 0x0f766e : 0x991b1b });
-  const flag = new THREE.Mesh(flagGeo, flagMat);
-  flag.position.set(0, 30, 14);
-  group.add(flag);
 
   return group;
 }
 
 function initThreeGame() {
   scene = new THREE.Scene();
-  // Daha derin, gerçekçi fırtına / gün batımı okyanus renk tonu
-  scene.background = new THREE.Color(0x04131e); 
+  scene.background = new THREE.Color(0x04131e);
   scene.fog = new THREE.FogExp2(0x04131e, 0.0006);
 
-  // Kamera daha da uzaklaştırıldı, harita ferahlatıldı
   camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 18000);
   camera.position.set(0, 550, 440);
   camera.lookAt(0, 0, 0);
@@ -448,6 +398,8 @@ function initThreeGame() {
   renderer.shadowMap.enabled = true;
   document.getElementById('game').appendChild(renderer.domElement);
 
+  gltfLoader = new THREE.GLTFLoader();
+
   const ambientLight = new THREE.AmbientLight(0xfff1e0, 0.8);
   scene.add(ambientLight);
 
@@ -456,7 +408,6 @@ function initThreeGame() {
   sunLight.castShadow = true;
   scene.add(sunLight);
 
-  // Gerçekçi Dalgalı Okyanus Zemini
   planeGeo = new THREE.PlaneGeometry(WORLD_SIZE * 3, WORLD_SIZE * 3, 40, 40);
   const oceanMat = new THREE.MeshStandardMaterial({ color: 0x061c2d, roughness: 0.2, metalness: 0.35 });
   const ocean = new THREE.Mesh(planeGeo, oceanMat);
@@ -464,7 +415,7 @@ function initThreeGame() {
   ocean.receiveShadow = true;
   scene.add(ocean);
 
-  // Oyuncu Menzil Çizgisi Halkası (Ring)
+  // Menzil Çemberi
   const ringGeo = new THREE.RingGeometry(ATTACK_RANGE - 3, ATTACK_RANGE, 64);
   const ringMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b, side: THREE.DoubleSide, transparent: true, opacity: 0.45 });
   rangeRingMesh = new THREE.Mesh(ringGeo, ringMat);
@@ -486,8 +437,7 @@ function initThreeGame() {
     mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
-    
-    // Düşman gemisi seçme kontrolü
+
     const enemyMeshes = enemies.map(en => en.mesh);
     const intersects = raycaster.intersectObjects(enemyMeshes, true);
     if (intersects.length > 0) {
@@ -511,7 +461,7 @@ function initThreeGame() {
 }
 
 // ==========================================================
-// OYUN MANTIĞI VE YAPAY ZEKA SİSTEMİ
+// OYUN MANTIĞI VE DÖNGÜSÜ
 // ==========================================================
 let player, gameIslands = [];
 let targetPos = null, selectedEnemyId = null, isAttacking = false, isGameOver = false;
@@ -532,8 +482,10 @@ function startGameLogic() {
   shipTitleEl.textContent = activeModel.name;
 
   if (playerMesh) scene.remove(playerMesh);
-  playerMesh = createSoTShip(activeModel, false);
-  scene.add(playerMesh);
+  playerMesh = loadShipModel(activeModel, (group) => {
+    scene.add(group);
+    playerMesh = group;
+  });
 
   // Adalar
   gameIslands.forEach(isl => scene.remove(isl.mesh));
@@ -547,7 +499,7 @@ function startGameLogic() {
     gameIslands.push({ mesh, r: 80 });
   }
 
-  // Düşman Gemileri
+  // Düşmanlar
   enemies.forEach(en => scene.remove(en.mesh));
   enemies = [];
   for (let i = 0; i < 8; i++) spawn3DEnemy(i + 1);
@@ -557,16 +509,17 @@ function startGameLogic() {
 }
 
 function spawn3DEnemy(id) {
-  const mesh = createSoTShip(SHIP_MODELS.standard, true);
   let ex, ez;
   do {
     ex = (Math.random() - 0.5) * 3000;
     ez = (Math.random() - 0.5) * 3000;
   } while (Math.hypot(ex, ez) < 500);
 
-  mesh.position.set(ex, 0, ez);
-  mesh.traverse(child => { child.userData.enemyId = id; });
-  scene.add(mesh);
+  const mesh = loadShipModel(SHIP_MODELS.standard, (group) => {
+    group.position.set(ex, 0, ez);
+    group.traverse(child => { child.userData.enemyId = id; });
+    scene.add(group);
+  });
 
   enemies.push({
     id, mesh, x: ex, z: ez, hp: 520, maxHp: 520, speed: 1.15,
@@ -613,26 +566,23 @@ function animate3D() {
   player.x += Math.cos(player.a) * player.speed;
   player.z += Math.sin(player.a) * player.speed;
 
-  playerMesh.position.set(player.x, 0, player.z);
-  playerMesh.rotation.y = -player.a + Math.PI / 2;
-  playerMesh.position.y = Math.sin(Date.now() / 250) * 1.2;
+  if (playerMesh) {
+    playerMesh.position.set(player.x, 0, player.z);
+    playerMesh.rotation.y = -player.a + Math.PI / 2;
+    playerMesh.position.y = Math.sin(Date.now() / 250) * 1.2;
+  }
 
-  // Menzil çemberini oyuncunun altında güncelle
   rangeRingMesh.position.set(player.x, 0.5, player.z);
 
-  // Kamera Takibi
   camera.position.x += (player.x - camera.position.x) * 0.08;
   camera.position.z += (player.z + 360 - camera.position.z) * 0.08;
   camera.lookAt(player.x, 0, player.z);
 
-  // ==========================================================
-  // NPC YAPAY ZEKA VE OTOMATİK SALDIRI SİSTEMİ
-  // ==========================================================
+  // NPC Yapay Zeka
   for (const en of enemies) {
     const distToPlayer = Math.hypot(player.x - en.x, player.z - en.z);
 
     if (distToPlayer <= AGGRO_RANGE) {
-      // 1. Menzile girdi: Oyuncuya yönel ve otomatik hasar ver
       const ea = Math.atan2(player.z - en.z, player.x - en.x);
       en.a = ea;
       en.x += Math.cos(ea) * (en.speed * 1.25);
@@ -649,7 +599,6 @@ function animate3D() {
         }
       }
     } else {
-      // 2. Menzil dışı: Haritada rastgele devriye gez
       en.wanderTimer--;
       if (en.wanderTimer <= 0) {
         en.wanderAngle += (Math.random() - 0.5) * 1.5;
@@ -663,12 +612,14 @@ function animate3D() {
     en.x = Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, en.x));
     en.z = Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, en.z));
 
-    en.mesh.position.set(en.x, 0, en.z);
-    en.mesh.rotation.y = -en.a + Math.PI / 2;
-    en.mesh.position.y = Math.sin(Date.now() / 250 + en.id) * 1.2;
+    if (en.mesh) {
+      en.mesh.position.set(en.x, 0, en.z);
+      en.mesh.rotation.y = -en.a + Math.PI / 2;
+      en.mesh.position.y = Math.sin(Date.now() / 250 + en.id) * 1.2;
+    }
   }
 
-  // Oyuncunun seçili düşmana ateş etmesi (Ateş etme özellikleri aktif)
+  // Oyuncunun Atış Sistemi
   if (isAttacking && selectedEnemyId) {
     const target = enemies.find(e => e.id === selectedEnemyId);
     if (target && player.ammo > 0) {
@@ -713,7 +664,9 @@ function drawMinimap() {
   });
 
   mctx.fillStyle = '#4ade80';
-  mctx.beginPath(); mctx.arc(cx + player.x * scale, cy + player.z * scale, 3, 0, Math.PI * 2); mctx.fill();
+  mctx.beginPath();
+  mctx.arc(cx + player.x * scale, cy + player.z * scale, 3, 0, Math.PI * 2);
+  mctx.fill();
 }
 
 function updateHUD() {
@@ -726,7 +679,6 @@ function updateHUD() {
   expBarEl.style.width = ((player.exp / player.maxExp) * 100) + '%';
 }
 
-// Market & Tersane Entegrasyonu
 marketToggleBtn.addEventListener('click', () => marketPanel.classList.toggle('open'));
 marketCloseBtn.addEventListener('click', () => marketPanel.classList.remove('open'));
 shipyardToggleBtn.addEventListener('click', () => {
@@ -749,10 +701,6 @@ function renderShipyardList() {
     `;
     div.querySelector('button').addEventListener('click', () => {
       if (isEquipped) return;
-      if (!isOwned && player.score >= model.cost) {
-        player.score -= model.cost;
-        currentUser.ownedShips.push(model.id);
-      }
       currentUser.equippedShip = model.id;
       localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
       startGameLogic();
