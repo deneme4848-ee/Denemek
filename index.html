@@ -8,7 +8,7 @@
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
       margin: 0; width: 100%; height: 100%; overflow: hidden;
-      background: #061b2b; color: #fff; font-family: system-ui, -apple-system, sans-serif;
+      background: #030f17; color: #fff; font-family: system-ui, -apple-system, sans-serif;
     }
     #game { display: block; width: 100%; height: 100%; position: fixed; inset: 0; z-index: 0; }
 
@@ -19,10 +19,10 @@
       z-index: 5;
     }
     .panel {
-      background: rgba(11, 29, 43, 0.9); backdrop-filter: blur(6px);
+      background: rgba(8, 22, 33, 0.92); backdrop-filter: blur(8px);
       padding: 10px 14px; border-radius: 14px; font-size: 13px;
       border: 1px solid rgba(245, 197, 94, 0.45); min-width: 245px;
-      pointer-events: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+      pointer-events: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
     }
     .hud-top-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
     .logout-chip {
@@ -41,7 +41,7 @@
     .right-hud { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; pointer-events: auto; }
     #minimap {
       width: 92px; height: 92px; border-radius: 50%;
-      background: rgba(4, 14, 22, 0.9); border: 2px solid rgba(245, 197, 94, 0.55); flex-shrink: 0;
+      background: rgba(3, 11, 18, 0.92); border: 2px solid rgba(245, 197, 94, 0.55); flex-shrink: 0;
     }
     .hud-btn-group { display: flex; gap: 6px; }
     .hud-action-btn {
@@ -55,7 +55,7 @@
 
     #market-panel {
       display: none; position: fixed; top: 152px; right: 12px; width: 310px; max-height: 72vh;
-      overflow-y: auto; background: rgba(15, 39, 56, 0.96); backdrop-filter: blur(8px);
+      overflow-y: auto; background: rgba(10, 28, 41, 0.96); backdrop-filter: blur(8px);
       border: 1px solid rgba(245, 197, 94, 0.5); border-radius: 16px; padding: 14px; z-index: 8;
       box-shadow: 0 20px 50px rgba(0,0,0,0.9); pointer-events: auto;
     }
@@ -69,7 +69,7 @@
     .market-section { display: none; }
     .market-section.active { display: block; }
     .market-balance { display: flex; justify-content: space-between; font-size: 12px; background: rgba(0,0,0,0.25); padding: 8px 10px; border-radius: 8px; margin-bottom: 10px; color: #e2e8f0; }
-    .market-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(11, 25, 36, 0.85); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 9px 11px; margin-bottom: 8px; }
+    .market-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(8, 20, 29, 0.85); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 9px 11px; margin-bottom: 8px; }
     .market-item-info { display: flex; flex-direction: column; gap: 2px; }
     .market-item-title { font-size: 13px; font-weight: 700; color: #fff; }
     .market-item-sub { font-size: 11px; color: #94a3b8; }
@@ -79,7 +79,7 @@
     .buy-btn.equipped { background: #1e40af; border-color: #60a5fa; color: #eff6ff; }
     #market-feedback { font-size: 11px; min-height: 15px; margin-top: 8px; text-align: center; color: #4ade80; }
 
-    #hint { position: fixed; top: 152px; left: 12px; font-size: 12px; background: rgba(11,29,43,0.85); border: 1px solid rgba(245,197,94,0.3); padding: 6px 10px; border-radius: 8px; pointer-events: none; z-index: 5; color: #ffe8b1; }
+    #hint { position: fixed; top: 152px; left: 12px; font-size: 12px; background: rgba(8,22,33,0.85); border: 1px solid rgba(245,197,94,0.3); padding: 6px 10px; border-radius: 8px; pointer-events: none; z-index: 5; color: #ffe8b1; }
 
     #combat-bar { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 6; display: flex; gap: 10px; align-items: center; }
     #attack-btn {
@@ -90,12 +90,20 @@
     }
     #attack-btn:disabled { opacity: 0.4; filter: grayscale(0.7); cursor: not-allowed; }
 
+    #gameover {
+      display: none; position: fixed; inset: 0; background: rgba(3, 11, 18, 0.9);
+      flex-direction: column; align-items: center; justify-content: center; z-index: 12; text-align: center; padding: 20px;
+    }
+    #gameover h1 { color: #ffd783; margin: 0 0 10px; font-size: 32px; }
+    #gameover p { font-size: 16px; margin: 0 0 24px; color: #cbd5e1; }
+    #restart-btn { padding: 12px 28px; font-size: 16px; font-weight: bold; border-radius: 12px; border: 2px solid #ffd783; background: #a33d22; color: white; cursor: pointer; }
+
     #auth-overlay {
       position: fixed; inset: 0; z-index: 999999;
-      background: radial-gradient(circle at 50% 35%, rgba(15, 38, 56, 0.98), rgba(4, 10, 16, 0.99));
+      background: radial-gradient(circle at 50% 35%, rgba(10, 28, 41, 0.98), rgba(2, 6, 10, 0.99));
       backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 18px;
     }
-    .auth-card { width: 100%; max-width: 420px; background: linear-gradient(160deg, #0f2738, #050e16); border: 1px solid rgba(245,197,94,0.5); border-radius: 24px; padding: 28px 24px; box-shadow: 0 25px 70px rgba(0,0,0,0.9); }
+    .auth-card { width: 100%; max-width: 420px; background: linear-gradient(160deg, #0b2233, #030a11); border: 1px solid rgba(245,197,94,0.5); border-radius: 24px; padding: 28px 24px; box-shadow: 0 25px 70px rgba(0,0,0,0.9); }
     .auth-brand { text-align: center; margin-bottom: 18px; }
     .auth-brand h1 { margin: 0; font-size: 26px; color: #ffdc92; }
     .auth-brand p { margin: 6px 0 0; font-size: 12px; color: #94a3b8; }
@@ -104,7 +112,7 @@
     .auth-tab.active { background: linear-gradient(135deg, #c2410c, #7c2d12); color: #fff; }
     .auth-field { margin-bottom: 14px; }
     .auth-field label { display: block; font-size: 12px; color: #cbd5e1; margin-bottom: 5px; font-weight: 600; }
-    .auth-field input { width: 100%; height: 46px; padding: 0 14px; border-radius: 12px; border: 1px solid #334155; background: #0b1924; color: #fff; font-size: 16px; outline: none; }
+    .auth-field input { width: 100%; height: 46px; padding: 0 14px; border-radius: 12px; border: 1px solid #334155; background: #081622; color: #fff; font-size: 16px; outline: none; }
     .auth-msg { min-height: 18px; font-size: 12px; margin: 4px 0 12px; color: #fca5a5; }
     .auth-msg.ok { color: #4ade80; }
     .auth-submit { width: 100%; height: 50px; border-radius: 14px; border: 1px solid #ffd783; background: linear-gradient(135deg, #c2410c, #7c2d12); color: #fffbeb; font-size: 15px; font-weight: 900; cursor: pointer; }
@@ -281,12 +289,12 @@ const SHIP_MODELS = {
   frost_queen: { id: 'frost_queen', name: 'Buzul Kraliçesi', desc: 'Buz kristali esintili fırkateyn.', cost: 2500, hullColor: 0x0f172a, sailColor: 0x0284c7, trimColor: 0x93c5fd },
   thunder_lord: { id: 'thunder_lord', name: 'Gök Gürültüsü', desc: 'Mor efsanevi amiral gemisi.', cost: 4000, hullColor: 0x2e1065, sailColor: 0x581c87, trimColor: 0xc084fc },
   corsair: { id: 'corsair', name: 'Kara Şahin', desc: 'Hızlı ve keskin hatlı akıncı.', cost: 5500, hullColor: 0x17212b, sailColor: 0x1e293b, trimColor: 0x94a3b8 },
-  royal: { id: 'royal', name: 'Altın Hükümdar', desc: 'Altın kaplama görkemli kalyon.', cost: 7000, hullColor: 0x633b12, sailColor: 0x854d27, trimColor: 0xfbbf24 },
+  royal: { id: 'royal', name: 'Altın Hükümdار', desc: 'Altın kaplama görkemli kalyon.', cost: 7000, hullColor: 0x633b12, sailColor: 0x854d27, trimColor: 0xfbbf24 },
   phantom: { id: 'phantom', name: 'Hayalet Ufuk', desc: 'Turkuaz parıltılı hayalet gemi.', cost: 9000, hullColor: 0x102c38, sailColor: 0x0e7490, trimColor: 0x67e8f9 }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v3';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v3';
+const USERS_STORAGE_KEY = 'pirate3d_users_v4';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v4';
 let authMode = 'login';
 let currentUser = null;
 
@@ -345,78 +353,79 @@ if (authForm) {
 if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeItem(SESSION_STORAGE_KEY); location.reload(); });
 
 // ==========================================================
-// GERÇEKÇİ SEA OF THIEVES 3D GEMİ MODELLEME MİMARİSİ
+// EFSANEVİ SEA OF THIEVES 3D DETAYLI GEMİ MİMARİSİ
 // ==========================================================
 let scene, camera, renderer;
-let playerMesh, enemies = [], islands = [], shots = [];
+let playerMesh, enemies = [], islands = [], rangeRingMesh;
 let raycaster, planeGeo, mouse;
-const WORLD_SIZE = 3500;
-const AGGRO_RANGE = 280; // NPC otomatik saldırı menzili
+const WORLD_SIZE = 4000;
+const ATTACK_RANGE = 320; // Silah menzili ve menzil çizgisi yarıçapı
+const AGGRO_RANGE = 300;  // NPC otomatik saldırı menzili
 
 function createSoTShip(modelConfig, isEnemy = false) {
   const group = new THREE.Group();
 
-  // 1. Gemi Gövdesi (Kutulardan arındırılmış, silindirik kıvrımlı ahşap gövde)
-  const hullGeo = new THREE.CylinderGeometry(5, 7, 44, 8);
-  const hullMat = new THREE.MeshStandardMaterial({ color: modelConfig.hullColor, roughness: 0.4, metalness: 0.15 });
+  // 1. Kavisli ve Estetik Gemi Gövdesi (Kutulardan arındırılmış organik ahşap form)
+  const hullGeo = new THREE.CylinderGeometry(5.2, 7.5, 48, 12);
+  const hullMat = new THREE.MeshStandardMaterial({ color: modelConfig.hullColor, roughness: 0.35, metalness: 0.2 });
   const hull = new THREE.Mesh(hullGeo, hullMat);
   hull.rotation.z = Math.PI / 2;
-  hull.position.y = 3.5;
+  hull.position.y = 4;
   hull.castShadow = true; hull.receiveShadow = true;
   group.add(hull);
 
-  // 2. Güverte ve Üst Borda Kaplaması
-  const deckGeo = new THREE.BoxGeometry(14, 1.5, 36);
-  const deckMat = new THREE.MeshStandardMaterial({ color: 0x5a3d28, roughness: 0.7 });
+  // 2. Güverte Kaplaması
+  const deckGeo = new THREE.BoxGeometry(13.5, 1.4, 38);
+  const deckMat = new THREE.MeshStandardMaterial({ color: modelConfig.trimColor || 0x854d27, roughness: 0.6 });
   const deck = new THREE.Mesh(deckGeo, deckMat);
-  deck.position.y = 7.5;
+  deck.position.y = 8.2;
   group.add(deck);
 
-  // 3. Pruva Çıkıntısı (Sivri Burun)
-  const bowGeo = new THREE.ConeGeometry(3.5, 12, 5);
-  const bowMat = new THREE.MeshStandardMaterial({ color: modelConfig.trimColor, roughness: 0.3, metalness: 0.5 });
+  // 3. Pruva Çıkıntısı (Sivri Burun / Canavar Ağzı Detayı)
+  const bowGeo = new THREE.ConeGeometry(3.2, 14, 6);
+  const bowMat = new THREE.MeshStandardMaterial({ color: modelConfig.trimColor, roughness: 0.25, metalness: 0.6 });
   const bow = new THREE.Mesh(bowGeo, bowMat);
   bow.rotation.x = Math.PI / 2;
-  bow.position.set(0, 4, -26);
+  bow.position.set(0, 4.5, -28);
   group.add(bow);
 
-  // 4. Üç Katlı Direkler ve Şişkin Yelkenler (Sea of Thieves Tarzı)
+  // 4. Üç Katlı Direkler ve Şişkin Kumaş Yelkenler
   const mastMat = new THREE.MeshStandardMaterial({ color: 0x1f1209, roughness: 0.8 });
-  const mastZPositions = [-10, 2, 14];
+  const mastZPositions = [-11, 2, 15];
   
   mastZPositions.forEach((mz, idx) => {
-    const height = idx === 1 ? 34 : 26;
-    const mastGeo = new THREE.CylinderGeometry(0.9, 1.1, height);
+    const height = idx === 1 ? 38 : 28;
+    const mastGeo = new THREE.CylinderGeometry(0.9, 1.2, height);
     const mast = new THREE.Mesh(mastGeo, mastMat);
     mast.position.set(0, height / 2 + 8, mz);
     group.add(mast);
 
-    // Kumaş Görünümlü Şişkin Yelken
-    const sailWidth = idx === 1 ? 18 : 13;
-    const sailHeight = idx === 1 ? 17 : 12;
-    const sailGeo = new THREE.BoxGeometry(sailWidth, sailHeight, 1.2);
+    // Kumaş Görünümlü Şişkin Yelken (Sea of Thieves Tarzı)
+    const sailWidth = idx === 1 ? 20 : 14;
+    const sailHeight = idx === 1 ? 18 : 13;
+    const sailGeo = new THREE.BoxGeometry(sailWidth, sailHeight, 1.4);
     const sailMat = new THREE.MeshStandardMaterial({ 
       color: isEnemy ? 0x042f2e : modelConfig.sailColor, 
-      roughness: 0.8,
+      roughness: 0.75,
       side: THREE.DoubleSide 
     });
     const sail = new THREE.Mesh(sailGeo, sailMat);
-    sail.position.set(0, height / 2 + 6, mz + 0.6);
+    sail.position.set(0, height / 2 + 6, mz + 0.7);
     group.add(sail);
   });
 
   // 5. Kıç Kamarası (Üst Yapı)
-  const cabinGeo = new THREE.BoxGeometry(12, 7, 10);
-  const cabinMat = new THREE.MeshStandardMaterial({ color: modelConfig.hullColor, roughness: 0.6 });
+  const cabinGeo = new THREE.BoxGeometry(12, 7.5, 11);
+  const cabinMat = new THREE.MeshStandardMaterial({ color: modelConfig.hullColor, roughness: 0.5 });
   const cabin = new THREE.Mesh(cabinGeo, cabinMat);
-  cabin.position.set(0, 11.5, 17);
+  cabin.position.set(0, 12.5, 18);
   group.add(cabin);
 
   // 6. Rüzgarda Dalgalanan Bayrak
-  const flagGeo = new THREE.BoxGeometry(5, 3, 0.3);
+  const flagGeo = new THREE.BoxGeometry(5.5, 3.2, 0.3);
   const flagMat = new THREE.MeshStandardMaterial({ color: isEnemy ? 0x0f766e : 0x991b1b });
   const flag = new THREE.Mesh(flagGeo, flagMat);
-  flag.position.set(0, 28, 13);
+  flag.position.set(0, 30, 14);
   group.add(flag);
 
   return group;
@@ -424,12 +433,13 @@ function createSoTShip(modelConfig, isEnemy = false) {
 
 function initThreeGame() {
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0a2538); 
-  scene.fog = new THREE.FogExp2(0x0a2538, 0.0008);
+  // Daha derin, gerçekçi fırtına / gün batımı okyanus renk tonu
+  scene.background = new THREE.Color(0x04131e); 
+  scene.fog = new THREE.FogExp2(0x04131e, 0.0006);
 
-  // Kamera mesafesi uzaklaştırıldı (Geniş açı / Harita ferahlığı)
-  camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 15000);
-  camera.position.set(0, 480, 380);
+  // Kamera daha da uzaklaştırıldı, harita ferahlatıldı
+  camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 18000);
+  camera.position.set(0, 550, 440);
   camera.lookAt(0, 0, 0);
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -438,20 +448,29 @@ function initThreeGame() {
   renderer.shadowMap.enabled = true;
   document.getElementById('game').appendChild(renderer.domElement);
 
-  const ambientLight = new THREE.AmbientLight(0xffedd5, 0.75);
+  const ambientLight = new THREE.AmbientLight(0xfff1e0, 0.8);
   scene.add(ambientLight);
 
-  const sunLight = new THREE.DirectionalLight(0xffb74d, 1.3);
-  sunLight.position.set(500, 800, 500);
+  const sunLight = new THREE.DirectionalLight(0xffb74d, 1.4);
+  sunLight.position.set(600, 900, 600);
   sunLight.castShadow = true;
   scene.add(sunLight);
 
-  planeGeo = new THREE.PlaneGeometry(WORLD_SIZE * 3, WORLD_SIZE * 3, 32, 32);
-  const oceanMat = new THREE.MeshStandardMaterial({ color: 0x071d2b, roughness: 0.25, metalness: 0.3 });
+  // Gerçekçi Dalgalı Okyanus Zemini
+  planeGeo = new THREE.PlaneGeometry(WORLD_SIZE * 3, WORLD_SIZE * 3, 40, 40);
+  const oceanMat = new THREE.MeshStandardMaterial({ color: 0x061c2d, roughness: 0.2, metalness: 0.35 });
   const ocean = new THREE.Mesh(planeGeo, oceanMat);
   ocean.rotation.x = -Math.PI / 2;
   ocean.receiveShadow = true;
   scene.add(ocean);
+
+  // Oyuncu Menzil Çizgisi Halkası (Ring)
+  const ringGeo = new THREE.RingGeometry(ATTACK_RANGE - 3, ATTACK_RANGE, 64);
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b, side: THREE.DoubleSide, transparent: true, opacity: 0.45 });
+  rangeRingMesh = new THREE.Mesh(ringGeo, ringMat);
+  rangeRingMesh.rotation.x = -Math.PI / 2;
+  rangeRingMesh.position.y = 0.5;
+  scene.add(rangeRingMesh);
 
   raycaster = new THREE.Raycaster();
   mouse = new THREE.Vector2();
@@ -467,9 +486,23 @@ function initThreeGame() {
     mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObject(ocean);
+    
+    // Düşman gemisi seçme kontrolü
+    const enemyMeshes = enemies.map(en => en.mesh);
+    const intersects = raycaster.intersectObjects(enemyMeshes, true);
     if (intersects.length > 0) {
-      targetPos = { x: intersects[0].point.x, z: intersects[0].point.z };
+      let obj = intersects[0].object;
+      while (obj.parent && !obj.userData.enemyId) obj = obj.parent;
+      if (obj.userData.enemyId) {
+        selectedEnemyId = obj.userData.enemyId;
+        syncAttackButton();
+        return;
+      }
+    }
+
+    const oceanIntersect = raycaster.intersectObject(ocean);
+    if (oceanIntersect.length > 0) {
+      targetPos = { x: oceanIntersect[0].point.x, z: oceanIntersect[0].point.z };
     }
   });
 
@@ -478,9 +511,9 @@ function initThreeGame() {
 }
 
 // ==========================================================
-// OYUN MANTIĞI VE YAPAY ZEKA (NPC SİSTEMİ)
+// OYUN MANTIĞI VE YAPAY ZEKA SİSTEMİ
 // ==========================================================
-let player, gameEnemies = [], gameIslands = [];
+let player, gameIslands = [];
 let targetPos = null, selectedEnemyId = null, isAttacking = false, isGameOver = false;
 
 function startGameLogic() {
@@ -505,19 +538,19 @@ function startGameLogic() {
   // Adalar
   gameIslands.forEach(isl => scene.remove(isl.mesh));
   gameIslands = [];
-  const islGeo = new THREE.CylinderGeometry(55, 90, 40, 6);
-  const islMat = new THREE.MeshStandardMaterial({ color: 0x166534, roughness: 0.9 });
-  for (let i = 0; i < 16; i++) {
+  const islGeo = new THREE.CylinderGeometry(60, 100, 45, 6);
+  const islMat = new THREE.MeshStandardMaterial({ color: 0x0f382b, roughness: 0.9 });
+  for (let i = 0; i < 18; i++) {
     const mesh = new THREE.Mesh(islGeo, islMat);
-    mesh.position.set((Math.random() - 0.5) * 3000, 10, (Math.random() - 0.5) * 3000);
+    mesh.position.set((Math.random() - 0.5) * 3500, 10, (Math.random() - 0.5) * 3500);
     scene.add(mesh);
-    gameIslands.push({ mesh, r: 75 });
+    gameIslands.push({ mesh, r: 80 });
   }
 
-  // Düşman Gemileri (Haritaya genişçe yayılmış)
-  gameEnemies.forEach(en => scene.remove(en.mesh));
-  gameEnemies = [];
-  for (let i = 0; i < 7; i++) spawn3DEnemy(i + 1);
+  // Düşman Gemileri
+  enemies.forEach(en => scene.remove(en.mesh));
+  enemies = [];
+  for (let i = 0; i < 8; i++) spawn3DEnemy(i + 1);
 
   updateHUD();
   syncAttackButton();
@@ -527,14 +560,16 @@ function spawn3DEnemy(id) {
   const mesh = createSoTShip(SHIP_MODELS.standard, true);
   let ex, ez;
   do {
-    ex = (Math.random() - 0.5) * 2600;
-    ez = (Math.random() - 0.5) * 2600;
-  } while (Math.hypot(ex, ez) < 400); // Oyuncunun çok yakınında doğmasınlar
+    ex = (Math.random() - 0.5) * 3000;
+    ez = (Math.random() - 0.5) * 3000;
+  } while (Math.hypot(ex, ez) < 500);
 
   mesh.position.set(ex, 0, ez);
+  mesh.traverse(child => { child.userData.enemyId = id; });
   scene.add(mesh);
-  gameEnemies.push({
-    id, mesh, x: ex, z: ez, hp: 520, maxHp: 520, speed: 1.1,
+
+  enemies.push({
+    id, mesh, x: ex, z: ez, hp: 520, maxHp: 520, speed: 1.15,
     wanderAngle: Math.random() * Math.PI * 2, wanderTimer: 0
   });
 }
@@ -582,27 +617,29 @@ function animate3D() {
   playerMesh.rotation.y = -player.a + Math.PI / 2;
   playerMesh.position.y = Math.sin(Date.now() / 250) * 1.2;
 
-  // Kamera Takibi (Uzaklaştırılmış Geniş Açı)
+  // Menzil çemberini oyuncunun altında güncelle
+  rangeRingMesh.position.set(player.x, 0.5, player.z);
+
+  // Kamera Takibi
   camera.position.x += (player.x - camera.position.x) * 0.08;
-  camera.position.z += (player.z + 320 - camera.position.z) * 0.08;
+  camera.position.z += (player.z + 360 - camera.position.z) * 0.08;
   camera.lookAt(player.x, 0, player.z);
 
   // ==========================================================
-  // NPC YAPAY ZEKA: MENZİL KONTROLÜ VE OTOMATİK SALDIRI / RASTGELE GEZİNME
+  // NPC YAPAY ZEKA VE OTOMATİK SALDIRI SİSTEMİ
   // ==========================================================
-  for (const en of gameEnemies) {
+  for (const en of enemies) {
     const distToPlayer = Math.hypot(player.x - en.x, player.z - en.z);
 
     if (distToPlayer <= AGGRO_RANGE) {
-      // 1. Menzile girdi: Oyuncuya doğru yönel ve otomatik saldır / takip et
+      // 1. Menzile girdi: Oyuncuya yönel ve otomatik hasar ver
       const ea = Math.atan2(player.z - en.z, player.x - en.x);
       en.a = ea;
-      en.x += Math.cos(ea) * (en.speed * 1.2);
-      en.z += Math.sin(ea) * (en.speed * 1.2);
+      en.x += Math.cos(ea) * (en.speed * 1.25);
+      en.z += Math.sin(ea) * (en.speed * 1.25);
 
-      // Otomatik nişan / yakınlaşınca hasar verme mekaniği
-      if (distToPlayer < 140 && Math.random() < 0.02) {
-        player.hp = Math.max(0, player.hp - 35);
+      if (distToPlayer < 150 && Math.random() < 0.025) {
+        player.hp = Math.max(0, player.hp - 40);
         updateHUD();
         if (player.hp <= 0) {
           isGameOver = true;
@@ -612,18 +649,17 @@ function animate3D() {
         }
       }
     } else {
-      // 2. Menzil dışı: Haritada rastgele gezinsin / devriye atsın
+      // 2. Menzil dışı: Haritada rastgele devriye gez
       en.wanderTimer--;
       if (en.wanderTimer <= 0) {
         en.wanderAngle += (Math.random() - 0.5) * 1.5;
-        en.wanderTimer = 150 + Math.random() * 200;
+        en.wanderTimer = 180 + Math.random() * 200;
       }
       en.a = en.wanderAngle;
-      en.x += Math.cos(en.a) * (en.speed * 0.7);
-      en.z += Math.sin(en.a) * (en.speed * 0.7);
+      en.x += Math.cos(en.a) * (en.speed * 0.75);
+      en.z += Math.sin(en.a) * (en.speed * 0.75);
     }
 
-    // Harita sınırlarında tutma
     en.x = Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, en.x));
     en.z = Math.max(-WORLD_SIZE, Math.min(WORLD_SIZE, en.z));
 
@@ -632,22 +668,22 @@ function animate3D() {
     en.mesh.position.y = Math.sin(Date.now() / 250 + en.id) * 1.2;
   }
 
-  // Oyuncunun seçili düşmana otomatik ateş etmesi (Saldırı butonu aktifse)
+  // Oyuncunun seçili düşmana ateş etmesi (Ateş etme özellikleri aktif)
   if (isAttacking && selectedEnemyId) {
-    const target = gameEnemies.find(e => e.id === selectedEnemyId);
+    const target = enemies.find(e => e.id === selectedEnemyId);
     if (target && player.ammo > 0) {
       const d = Math.hypot(target.x - player.x, target.z - player.z);
-      if (d <= 320 && Math.random() < 0.08) {
+      if (d <= ATTACK_RANGE && Math.random() < 0.09) {
         player.ammo--;
         target.hp -= player.damage;
         updateHUD();
         syncAttackButton();
         if (target.hp <= 0) {
           scene.remove(target.mesh);
-          gameEnemies = gameEnemies.filter(e => e.id !== target.id);
+          enemies = enemies.filter(e => e.id !== target.id);
           selectedEnemyId = null;
           isAttacking = false;
-          player.score += 100;
+          player.score += 120;
           updateHUD();
           syncAttackButton();
           setTimeout(() => spawn3DEnemy(target.id), 3000);
@@ -666,13 +702,13 @@ function drawMinimap() {
   const scale = 42 / WORLD_SIZE;
   const cx = 46, cy = 46;
 
-  mctx.fillStyle = '#166534';
+  mctx.fillStyle = '#0f382b';
   gameIslands.forEach(isl => {
     mctx.beginPath(); mctx.arc(cx + isl.mesh.position.x * scale, cy + isl.mesh.position.z * scale, 3, 0, Math.PI * 2); mctx.fill();
   });
 
   mctx.fillStyle = '#ef4444';
-  gameEnemies.forEach(en => {
+  enemies.forEach(en => {
     mctx.beginPath(); mctx.arc(cx + en.x * scale, cy + en.z * scale, 2.5, 0, Math.PI * 2); mctx.fill();
   });
 
