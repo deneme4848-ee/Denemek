@@ -10,7 +10,7 @@
       margin: 0; width: 100%; height: 100%; overflow: hidden;
       background: #073b59; color: #fff; font-family: system-ui, -apple-system, sans-serif;
     }
-    canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
+    canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: crosshair; pointer-events: auto; }
 
     #hud {
       position: fixed; top: 12px; left: 12px; right: 12px;
@@ -188,13 +188,14 @@
       border: 2px solid #ffd783; background: #a33d22; color: white; cursor: pointer;
     }
 
-    /* Giriş ve Kayıt Ol Ekranı */
+    /* Giriş ve Kayıt Ol Ekranı (Tıklama kilitlerini çözen z-index ve pointer-events ayarları) */
     #auth-overlay {
-      position: fixed; inset: 0; z-index: 99999;
+      position: fixed; inset: 0; z-index: 999999;
       background: radial-gradient(circle at top, rgba(8, 125, 160, 0.85), rgba(3, 21, 34, 0.98));
       backdrop-filter: blur(6px);
       display: flex; align-items: center; justify-content: center;
       padding: 18px;
+      pointer-events: auto !important;
       user-select: text; -webkit-user-select: text;
     }
     .auth-card {
@@ -204,7 +205,7 @@
       border-radius: 18px;
       padding: 24px 22px;
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
-      pointer-events: auto;
+      pointer-events: auto !important;
     }
     .auth-brand { text-align: center; margin-bottom: 18px; }
     .auth-brand h1 { margin: 0; font-size: 24px; color: #ffd783; letter-spacing: 0.4px; }
@@ -212,21 +213,23 @@
     .auth-tabs {
       display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
       background: rgba(255, 255, 255, 0.06); padding: 4px; border-radius: 12px; margin-bottom: 16px;
+      pointer-events: auto;
     }
     .auth-tab {
       border: none; background: transparent; color: #cbd5e1; padding: 9px 10px;
       border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s ease;
+      pointer-events: auto;
     }
     .auth-tab.active {
       background: linear-gradient(180deg, #c24929, #8f2d14); color: #fff;
       box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
     }
-    .auth-field { margin-bottom: 12px; }
+    .auth-field { margin-bottom: 12px; pointer-events: auto; }
     .auth-field label { display: block; font-size: 12px; color: #cbd5e1; margin-bottom: 5px; font-weight: 600; }
     .auth-field input {
       width: 100%; height: 42px; padding: 0 12px; border-radius: 10px;
       border: 1px solid rgba(255, 255, 255, 0.18); background: rgba(15, 43, 64, 0.88);
-      color: #fff; font-size: 14px; outline: none;
+      color: #fff; font-size: 14px; outline: none; pointer-events: auto;
     }
     .auth-field input:focus { border-color: #ffd783; }
     .auth-msg { min-height: 18px; font-size: 12px; margin: 4px 0 12px; color: #fca5a5; }
@@ -235,15 +238,18 @@
       width: 100%; height: 44px; border-radius: 12px; border: 1px solid #ffd783;
       background: linear-gradient(180deg, #c24929, #8f2d14); color: #fff;
       font-size: 14px; font-weight: 800; letter-spacing: 0.4px; cursor: pointer;
+      pointer-events: auto !important;
     }
     .auth-submit:hover { filter: brightness(1.08); }
     .quick-test-box {
       margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.1);
       display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; color: #bae6fd;
+      pointer-events: auto;
     }
     .quick-test-btn {
       border: 1px solid rgba(186, 230, 253, 0.35); background: rgba(14, 116, 144, 0.35);
       color: #e0f2fe; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap;
+      pointer-events: auto !important;
     }
   </style>
 </head>
@@ -1327,4 +1333,397 @@ function draw3DShip(p, isEnemy = false, isSelected = false) {
   ctx.save();
   ctx.translate(p.x, p.y);
 
-  if (is
+  if (isEnemy && p.hp < p.maxHp) {
+    ctx.fillStyle = 'rgba(0,0,0,0.68)';
+    ctx.fillRect(-24, -48, 48, 6);
+    ctx.fillStyle = '#ef4444';
+    ctx.fillRect(-24, -48, 48 * (p.hp / p.maxHp), 6);
+  }
+
+  ctx.save();
+  ctx.translate(7, 13);
+  ctx.rotate(p.a || 0);
+  ctx.scale(1, 0.85);
+  ctx.fillStyle = 'rgba(2, 22, 38, 0.42)';
+  ctx.beginPath();
+  ctx.moveTo(34, 0);
+  ctx.quadraticCurveTo(16, 19, -26, 15);
+  ctx.lineTo(-32, 0);
+  ctx.lineTo(-26, -15);
+  ctx.quadraticCurveTo(16, -19, 34, 0);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
+  ctx.rotate(p.a || 0);
+
+  ctx.fillStyle = isEnemy ? '#190706' : '#2b1406';
+  ctx.beginPath();
+  ctx.moveTo(33, 5);
+  ctx.quadraticCurveTo(15, 22, -25, 18);
+  ctx.lineTo(-31, 6);
+  ctx.lineTo(-25, 11);
+  ctx.quadraticCurveTo(15, 14, 33, 0);
+  ctx.closePath();
+  ctx.fill();
+
+  const hullGrad = ctx.createLinearGradient(0, -18, 0, 18);
+  if (isEnemy) {
+    hullGrad.addColorStop(0, '#7f1d1d');
+    hullGrad.addColorStop(0.45, '#450a0a');
+    hullGrad.addColorStop(1, '#1c0505');
+  } else {
+    hullGrad.addColorStop(0, '#b46932');
+    hullGrad.addColorStop(0.45, '#6e3b16');
+    hullGrad.addColorStop(1, '#3b1d08');
+  }
+
+  ctx.fillStyle = hullGrad;
+  ctx.beginPath();
+  ctx.moveTo(34, 0);
+  ctx.quadraticCurveTo(16, 18, -25, 14);
+  ctx.lineTo(-31, 0);
+  ctx.lineTo(-25, -14);
+  ctx.quadraticCurveTo(16, -18, 34, 0);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = isEnemy ? '#f87171' : '#f6d388';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  const deckGrad = ctx.createLinearGradient(-20, -10, 24, 10);
+  if (isEnemy) {
+    deckGrad.addColorStop(0, '#5c1f1a');
+    deckGrad.addColorStop(1, '#8c352b');
+  } else {
+    deckGrad.addColorStop(0, '#8f5629');
+    deckGrad.addColorStop(1, '#c98549');
+  }
+  ctx.fillStyle = deckGrad;
+  ctx.beginPath();
+  ctx.moveTo(27, 0);
+  ctx.quadraticCurveTo(11, 12, -21, 9);
+  ctx.lineTo(-25, 0);
+  ctx.lineTo(-21, -9);
+  ctx.quadraticCurveTo(11, -12, 27, 0);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.22)';
+  ctx.lineWidth = 1;
+  for (const dx of [-14, -6, 2, 10, 18]) {
+    ctx.beginPath();
+    ctx.moveTo(dx, -7);
+    ctx.lineTo(dx, 7);
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = isEnemy ? '#3b0d0b' : '#572d10';
+  ctx.fillRect(-24, -8, 9, 16);
+  ctx.fillRect(17, -6, 8, 12);
+
+  for (const cx of [-11, -2, 7, 15]) {
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(cx, -14.5, 5, 4);
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillRect(cx + 3.5, -14.5, 1.5, 4);
+
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(cx, 10.5, 5, 4);
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillRect(cx + 3.5, 10.5, 1.5, 4);
+  }
+
+  const masts = [-12, 1, 14];
+  const sailSizes = [
+    { w: 12, h: 15, curve: 6 },
+    { w: 15, h: 19, curve: 8 },
+    { w: 10, h: 13, curve: 5 }
+  ];
+
+  ctx.strokeStyle = '#2d1608';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(-16, 0);
+  ctx.lineTo(24, 0);
+  ctx.stroke();
+
+  masts.forEach((mx, idx) => {
+    const s = sailSizes[idx];
+
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.24)';
+    ctx.beginPath();
+    ctx.ellipse(mx + 4, 3, s.curve * 0.7, s.h * 0.75, 0.2, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = isEnemy ? '#3f1d18' : '#5c3314';
+    ctx.beginPath();
+    ctx.arc(mx, 0, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    const sailGrad = ctx.createLinearGradient(mx - s.curve, -s.h, mx + s.curve, s.h);
+    if (isEnemy) {
+      sailGrad.addColorStop(0, '#ef4444');
+      sailGrad.addColorStop(0.5, '#b91c1c');
+      sailGrad.addColorStop(1, '#450a0a');
+    } else {
+      sailGrad.addColorStop(0, '#fffbeb');
+      sailGrad.addColorStop(0.55, '#f5ebd6');
+      sailGrad.addColorStop(1, '#cbb382');
+    }
+
+    ctx.fillStyle = sailGrad;
+    ctx.strokeStyle = isEnemy ? '#7f1d1d' : '#b89b67';
+    ctx.lineWidth = 1.1;
+
+    ctx.beginPath();
+    ctx.moveTo(mx - 2, -s.h);
+    ctx.quadraticCurveTo(mx + s.curve + 4, 0, mx - 2, s.h);
+    ctx.quadraticCurveTo(mx + s.curve * 0.25, 0, mx - 2, -s.h);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  });
+
+  ctx.strokeStyle = isEnemy ? '#7f1d1d' : '#6e3b16';
+  ctx.lineWidth = 2.4;
+  ctx.beginPath();
+  ctx.moveTo(28, 0);
+  ctx.lineTo(42, 0);
+  ctx.stroke();
+
+  ctx.fillStyle = isEnemy ? '#dc2626' : '#fef3c7';
+  ctx.beginPath();
+  ctx.moveTo(22, 0);
+  ctx.quadraticCurveTo(33, 6, 41, 0);
+  ctx.quadraticCurveTo(33, -6, 22, 0);
+  ctx.closePath();
+  ctx.fill();
+
+  const flagWave = Math.sin(Date.now() / 160 + (p.x || 0) * 0.05) * 3;
+  ctx.fillStyle = isEnemy ? '#ef4444' : '#fbbf24';
+  ctx.beginPath();
+  ctx.moveTo(-29, 0);
+  ctx.lineTo(-41, -5 + flagWave);
+  ctx.lineTo(-38, 0 + flagWave * 0.5);
+  ctx.lineTo(-41, 5 + flagWave);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.restore();
+
+  ctx.fillStyle = isEnemy ? (isSelected ? '#fecaca' : '#fca5a5') : '#ffffff';
+  ctx.textAlign = 'center';
+  ctx.font = '700 12px system-ui';
+  ctx.fillText(p.name, p.x, p.y - 34);
+}
+
+function drawMinimap() {
+  mctx.clearRect(0, 0, 92, 92);
+  if (!player) return;
+  const scale = 42 / WORLD_SIZE;
+  const cx = 46, cy = 46;
+
+  mctx.fillStyle = '#d97706';
+  for (const isl of islands) {
+    mctx.beginPath();
+    mctx.arc(cx + isl.x * scale, cy + isl.y * scale, Math.max(2, isl.r * scale), 0, Math.PI * 2);
+    mctx.fill();
+  }
+
+  mctx.fillStyle = '#facc15';
+  for (const tr of treasures) {
+    mctx.fillRect(cx + tr.x * scale - 1.5, cy + tr.y * scale - 1.5, 3, 3);
+  }
+
+  for (const e of enemies) {
+    mctx.fillStyle = e.id === selectedEnemyId ? '#ffffff' : '#ef4444';
+    mctx.beginPath();
+    mctx.arc(cx + e.x * scale, cy + e.y * scale, e.id === selectedEnemyId ? 3.5 : 2.5, 0, Math.PI * 2);
+    mctx.fill();
+  }
+
+  mctx.fillStyle = '#4ade80';
+  mctx.beginPath();
+  mctx.arc(cx + player.x * scale, cy + player.y * scale, 3.2, 0, Math.PI * 2);
+  mctx.fill();
+}
+
+function draw() {
+  update();
+
+  ctx.save();
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#087da0';
+  ctx.fillRect(0, 0, W, H);
+
+  if (!player) {
+    ctx.restore();
+    requestAnimationFrame(draw);
+    return;
+  }
+
+  const cam = getCameraOrigin();
+  const viewW = W / CAMERA_ZOOM;
+  const viewH = H / CAMERA_ZOOM;
+
+  ctx.scale(CAMERA_ZOOM, CAMERA_ZOOM);
+  ctx.translate(-cam.x, -cam.y);
+
+  const t = Date.now() / 800;
+  ctx.strokeStyle = '#54bdd0';
+  ctx.globalAlpha = 0.25;
+  const startY = Math.floor(cam.y / 35) * 35;
+  for (let y = startY - 35; y < cam.y + viewH + 70; y += 35) {
+    ctx.beginPath();
+    for (let x = Math.floor(cam.x / 16) * 16; x < cam.x + viewW + 32; x += 16) {
+      const yy = y + Math.sin(x / 45 + t + y * 0.02) * 3;
+      x === Math.floor(cam.x / 16) * 16 ? ctx.moveTo(x, yy) : ctx.lineTo(x, yy);
+    }
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  ctx.strokeStyle = 'rgba(255, 215, 131, 0.35)';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(-WORLD_SIZE, -WORLD_SIZE, WORLD_SIZE * 2, WORLD_SIZE * 2);
+
+  drawRangeRing(player.x, player.y);
+
+  if (targetPos) {
+    const pulse = 10 + Math.sin(Date.now() / 140) * 3;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255, 215, 131, 0.85)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(targetPos.x, targetPos.y, pulse, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  for (const isl of islands) {
+    if (isl.x + isl.r < cam.x - 150 || isl.x - isl.r > cam.x + viewW + 150 ||
+        isl.y + isl.r < cam.y - 150 || isl.y - isl.r > cam.y + viewH + 150) continue;
+    ctx.fillStyle = '#e9c46a';
+    ctx.beginPath(); ctx.arc(isl.x, isl.y, isl.r, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#2a9d8f';
+    ctx.beginPath(); ctx.arc(isl.x, isl.y, isl.r * 0.72, 0, Math.PI * 2); ctx.fill();
+  }
+
+  for (const tr of treasures) {
+    if (tr.x < cam.x - 80 || tr.x > cam.x + viewW + 80 ||
+        tr.y < cam.y - 80 || tr.y > cam.y + viewH + 80) continue;
+    const bob = Math.sin(Date.now() / 300 + tr.bob) * 2;
+    ctx.fillStyle = '#92400e';
+    ctx.fillRect(tr.x - 9, tr.y - 7 + bob, 18, 14);
+    ctx.strokeStyle = '#fbbf24';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(tr.x - 9, tr.y - 7 + bob, 18, 14);
+  }
+
+  for (const s of shots) {
+    ctx.save();
+    ctx.strokeStyle = s.isPlayer ? 'rgba(253, 224, 71, 0.45)' : 'rgba(248, 113, 113, 0.45)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(s.prevX, s.prevY);
+    ctx.lineTo(s.x, s.y);
+    ctx.stroke();
+
+    ctx.fillStyle = s.isPlayer ? '#0f172a' : '#7f1d1d';
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = s.isPlayer ? '#fde047' : '#fca5a5';
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, 2.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  for (const e of enemies) {
+    if (e.x < cam.x - 120 || e.x > cam.x + viewW + 120 ||
+        e.y < cam.y - 120 || e.y > cam.y + viewH + 120) continue;
+    draw3DShip(e, true, e.id === selectedEnemyId);
+  }
+
+  draw3DShip(player, false, false);
+
+  for (const sw of shockwaves) {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, sw.alpha);
+    ctx.strokeStyle = sw.color;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(sw.x, sw.y, sw.r, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  for (const pt of particles) {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, pt.life);
+    ctx.fillStyle = pt.color;
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  for (const fl of flashes) {
+    const fx = fl.x;
+    const fy = fl.y;
+    ctx.save();
+    ctx.translate(fx, fy);
+    ctx.rotate(fl.angle);
+    ctx.globalAlpha = Math.max(0, fl.life);
+    const grad = ctx.createRadialGradient(0, 0, 1, 0, 0, fl.radius);
+    grad.addColorStop(0, '#ffffff');
+    grad.addColorStop(0.45, '#fde047');
+    grad.addColorStop(1, 'rgba(249, 115, 22, 0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(0, 0, fl.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  for (const ft of floatingTexts) {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, ft.alpha);
+    ctx.font = '800 14px system-ui';
+    ctx.textAlign = 'center';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.75)';
+    ctx.strokeText(ft.text, ft.x, ft.y);
+    ctx.fillStyle = ft.color;
+    ctx.fillText(ft.text, ft.x, ft.y);
+    ctx.restore();
+  }
+
+  ctx.restore();
+
+  drawMinimap();
+  requestAnimationFrame(draw);
+}
+
+loadUsers();
+try {
+  const savedSession = JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY) || 'null');
+  if (savedSession && savedSession.username) {
+    completeLogin(savedSession);
+  } else {
+    authUsernameInput.value = 'Test';
+    authPasswordInput.value = 'test';
+  }
+} catch {
+  authUsernameInput.value = 'Test';
+  authPasswordInput.value = 'test';
+}
+
+draw();
+</script>
+</body>
+</html>
