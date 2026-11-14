@@ -1056,13 +1056,13 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
   });
   const mesh = new THREE.Mesh(pGeo, pMat);
   
-  const GULLE_Y_OFFSET = 2; // Eski orijinal yükseklik ayarı
+  const GULLE_Y_OFFSET = 15; // Eski orijinal yükseklik ayarı
   mesh.position.set(startX, SHIP_Y_POS - GULLE_Y_OFFSET, startZ);
   scene.add(mesh);
 
   activeProjectiles.push({
     mesh, x: startX, z: startZ, targetX, targetZ,
-    speed: 6, 
+    speed: 3, 
     ammoKey, onHit, sparkTimer: 0,
     yOffset: GULLE_Y_OFFSET
   });
