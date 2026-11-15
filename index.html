@@ -138,7 +138,6 @@
       text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap;
     }
 
-    /* Boss Uyarı Bannerı */
     #boss-alert {
       position: fixed; top: 68px; left: 50%; transform: translateX(-50%);
       background: linear-gradient(90deg, rgba(127, 29, 29, 0.95), rgba(185, 28, 28, 0.95));
@@ -150,7 +149,6 @@
     }
     #boss-alert.show { opacity: 1; }
 
-    /* Yüzen Hasar Yazıları Animasyonu */
     .floating-dmg {
       position: fixed; z-index: 10; pointer-events: none;
       font-weight: 900; font-size: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.9);
@@ -243,7 +241,7 @@
 
     #market-panel {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: min(92vw, 350px); max-height: 76vh; overflow-y: auto;
+      width: min(94vw, 400px); max-height: 80vh; overflow-y: auto;
       background: rgba(9, 24, 36, 0.97); backdrop-filter: blur(10px);
       border: 2px solid rgba(245, 197, 94, 0.6); border-radius: 18px; padding: 16px; z-index: 15;
       box-shadow: 0 25px 65px rgba(0,0,0,0.95); pointer-events: auto;
@@ -562,15 +560,23 @@ const AMMO_TYPES = {
   dragon: { id: 'dragon', name: 'Ejderha Nefesi', damage: 450, slow: 0.85, desc: '450 Efsanevi Hasar', color: 0x3b82f6 }
 };
 
+// 10 ADET YEPYENİ TAMAMEN BAĞIMSIZ GÖRSEL TERSANE TASARIMI (BUFF YOK - SADECE STİL)
 const SHIP_MODELS = {
-  standard: { id: 'standard', name: '8 Yönlü Efsanevi Gemi', desc: 'Şeffaf PNG Sprite Filosu', cost: 0 },
-  ghost:    { id: 'ghost',    name: 'Hayalet Fırkateyn',    desc: 'Karanlık sisli sulara özel gizli gövde', cost: 5000000 },
-  gold:     { id: 'gold',     name: 'Altın Korsan',        desc: 'Servet ve ihtişam saçan yaldızlı kalyon', cost: 15000000 },
-  dragon:   { id: 'dragon',   name: 'Kızıl Ejder',         desc: 'Ejderha nefesi gücünü artıran efsane', cost: 35000000 }
+  standard: { id: 'standard', name: '8 Yönlü Efsanevi Gemi', desc: 'Standart Şeffaf PNG Sprite Filosu', cost: 0, tint: 0xffffff },
+  nebula:   { id: 'nebula',   name: '🌌 Nebula Gözcüsü',     desc: 'Uzayın derinliklerindeki mor bulutsulardan ilham alan gövde', cost: 2500000, tint: 0x8b5cf6 },
+  sakura:   { id: 'sakura',   name: '🌸 Kiraz Çiçeği (Sakura)', desc: 'Uzak doğunun zarif pembe ve beyaz yapraklarıyla süslenmiş', cost: 6000000, tint: 0xf472b6 },
+  glacier:  { id: 'glacier',  name: '💎 Kutupsal Safir',     desc: 'Kutup buzullarından gelen kristal mavisi donanma', cost: 12000000, tint: 0x38bdf8 },
+  toxic:    { id: 'toxic',    name: '☣️ Radyoaktif Zehir',    desc: 'Karanlıkta parlayan zehirli yeşil asit detayları', cost: 25000000, tint: 0x4ade80 },
+  caramel:  { id: 'caramel',  name: '🍫 Karamel Fırtınası',   desc: 'Sıcak kahverengi ve bronz tonlarının uyumu', cost: 45000000, tint: 0xd97706 },
+  peacock:  { id: 'peacock',  name: '🦚 Kral Tavus Kuşu',    desc: 'Mor, turkuaz ve zümrüt yeşilinin canlı parıltısı', cost: 75000000, tint: 0x06b6d4 },
+  sunset:   { id: 'sunset',   name: '🌅 Gün Batımı Korsanı',  desc: 'Ufuktaki son ışıkların turuncu ve kızıl tonları', cost: 120000000, tint: 0xf97316 },
+  mahogany: { id: 'mahogany', name: '🪵 Antik Maun Ağacı',   desc: 'Asil koyu ahşap kaplamalı usta işi oymalı kalyon', cost: 200000000, tint: 0x78350f },
+  silver:   { id: 'silver',   name: '🌙 Ay Işığı Gümüşü',    desc: 'Gecenin karanlığında gümüş rengi parıltılar saçan', cost: 350000000, tint: 0x94a3b8 },
+  cosmic:   { id: 'cosmic',   name: '🔮 Kozmik Mor',        desc: 'Evrenin ötesinden gelen gizemli mor enerji izleri', cost: 600000000, tint: 0xc084fc }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v28';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v28';
+const USERS_STORAGE_KEY = 'pirate3d_users_v30';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v30';
 let authMode = 'login';
 let currentUser = null;
 
@@ -641,7 +647,7 @@ if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeIt
 let scene, camera, renderer;
 let playerSprite, playerNeonRing, enemies = [], rangeRingMesh, oceanTexture, oceanBumpTexture;
 let clickMarkerGroup, clickOuterRing, clickInnerRing, clickRipples = [];
-let selectedEnemyRing = null; // Seçili düşman kırmızı çemberi
+let selectedEnemyRing = null;
 let activeProjectiles = [], particleSystems = [];
 let raycaster, planeGeo, mouse;
 let shipTextures = {};
@@ -918,7 +924,6 @@ function initThreeGame() {
   playerNeonRing.position.y = 0.8;
   scene.add(playerNeonRing);
 
-  // Seçilen Düşman Gemisinin Altındaki Kırmızı Çember (Hedef Göstergesi)
   const selRingGeo = new THREE.RingGeometry(26, 32, 48);
   const selRingMat = new THREE.MeshBasicMaterial({ color: 0xef4444, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
   selectedEnemyRing = new THREE.Mesh(selRingGeo, selRingMat);
@@ -1019,11 +1024,18 @@ function showBossBanner(msg) {
   setTimeout(() => bossAlertEl.classList.remove('show'), 4500);
 }
 
+function getEquippedShipModel() {
+  if (!currentUser) return SHIP_MODELS.standard;
+  return SHIP_MODELS[currentUser.equippedShip] || SHIP_MODELS.standard;
+}
+
 function startGameLogic() {
   isGameOver = false; targetPos = null; selectedEnemyId = null; isAttacking = false;
   gameOverEl.style.display = 'none';
   if (clickMarkerGroup) clickMarkerGroup.visible = false;
   if (selectedEnemyRing) selectedEnemyRing.visible = false;
+
+  const model = getEquippedShipModel();
 
   player = {
     x: 0, z: 0, a: -Math.PI / 2, speed: 0, maxSpeed: 1.85,
@@ -1036,11 +1048,20 @@ function startGameLogic() {
 
   if (playerSprite) scene.remove(playerSprite);
   const initialData = shipTextures.top || Object.values(shipTextures)[0];
-  const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1 });
+  const mat = new THREE.SpriteMaterial({ 
+    map: initialData.texture, 
+    transparent: true, 
+    alphaTest: 0.1,
+    color: model.tint 
+  });
   playerSprite = new THREE.Sprite(mat);
   playerSprite.center.set(0.5, 0.95);
   applyNormalizedSprite(playerSprite, player.a);
   scene.add(playerSprite);
+
+  if (playerNeonRing) {
+    playerNeonRing.material.color.setHex(model.tint);
+  }
 
   gameIslands.forEach(isl => scene.remove(isl.mesh));
   gameIslands = [];
@@ -1221,7 +1242,6 @@ function showFloatingDamage(wx, wz, text, colorHex) {
   setTimeout(() => div.remove(), 900);
 }
 
-// Gülle Ateşleme (Oyuncu veya Düşmanlar için ortak)
 function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit, isEnemy = false) {
   const ammoSpec = isEnemy ? { color: 0xef4444 } : AMMO_TYPES[ammoKey];
   const pGeo = new THREE.SphereGeometry(isEnemy ? 5.5 : 6.5, 16, 16);
@@ -1266,7 +1286,7 @@ function animate3D() {
     const dist = Math.hypot(dx, dz);
     if (dist > 8) {
       player.a = Math.atan2(dz, dx);
-      player.speed = Math.min(player.maxSpeed, player.speed + 0.12);
+      player.speed = Math.min(1.85, player.speed + 0.12);
     } else {
       targetPos = null;
       player.speed *= 0.9;
@@ -1314,7 +1334,6 @@ function animate3D() {
 
   rangeRingMesh.position.set(player.x, 0.6, player.z);
 
-  // Seçili Düşman Kırmızı Çember Konumu Güncelleme
   if (selectedEnemyId && selectedEnemyRing) {
     const selTarget = enemies.find(e => e.id === selectedEnemyId);
     if (selTarget) {
@@ -1415,7 +1434,6 @@ function animate3D() {
         en.z += Math.sin(en.a) * (activeSpeed * 1.25);
       }
 
-      // Düşman Oyuncuya Ateş Ettiğinde Gülle Efekti
       if (distToPlayer <= ATTACK_RANGE && (now - en.lastAttackTime >= (en.isBoss ? 1400 : 1000))) {
         en.lastAttackTime = now;
 
@@ -1499,7 +1517,7 @@ function animate3D() {
 
             if (target.isBoss) {
               showFloatingDamage(player.x, player.z, `+${target.rewardGold.toLocaleString()} ALTIN!`, '#fbbf24');
-              showBossBanner("🏆 KIZIL SAKAL BATIRILDI! +5.000 ALTIN KAZANDIN!");
+              showBossBanner(`🏆 KIZIL SAKAL BATIRILDI! +${target.rewardGold.toLocaleString()} ALTIN KAZANDIN!`);
             }
 
             while (player.exp >= player.maxExp) {
@@ -1707,8 +1725,8 @@ function renderShipyardList() {
       currentUser.ownedShips.push(shipId);
       currentUser.equippedShip = shipId;
 
-      updateHUD();
       shipTitleEl.textContent = SHIP_MODELS[shipId].name;
+      startGameLogic();
       renderShipyardList();
 
       marketFeedbackEl.style.color = '#4ade80';
@@ -1728,6 +1746,7 @@ function renderShipyardList() {
       }
       currentUser.equippedShip = shipId;
       shipTitleEl.textContent = SHIP_MODELS[shipId].name;
+      startGameLogic();
       renderShipyardList();
 
       marketFeedbackEl.style.color = '#4ade80';
