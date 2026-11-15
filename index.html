@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Ada Savaşları & Kule Savunması</title>
+  <title>Korsan Dünyası - Kale Adası & Star Sistemi</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -82,7 +82,7 @@
       pointer-events: auto; display: flex; flex-direction: column; gap: 6px;
     }
     .tool-icon-btn {
-      width: 40px; height: 40px; border-radius: 10px;
+      width: 42px; height: 42px; border-radius: 10px;
       background: linear-gradient(155deg, #172a3a, #091520);
       border: 1.5px solid rgba(245, 197, 94, 0.55); color: #fef3c7;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -94,11 +94,12 @@
     .tool-icon-btn span.ico { font-size: 15px; line-height: 1.1; }
     .tool-icon-btn span.lbl { font-size: 8px; font-weight: 800; color: #fde68a; }
 
+    /* SAĞ ÜST PANEL - ALTIN + STAR PUAN MENÜSÜ */
     #top-right-hud {
       position: fixed; top: 66px; right: 10px; z-index: 6;
-      background: rgba(7, 20, 31, 0.9); backdrop-filter: blur(6px);
-      border: 1px solid rgba(245, 197, 94, 0.45); border-radius: 12px;
-      padding: 8px 11px; min-width: 145px; box-shadow: 0 8px 25px rgba(0,0,0,0.8);
+      background: rgba(7, 20, 31, 0.92); backdrop-filter: blur(6px);
+      border: 1px solid rgba(245, 197, 94, 0.5); border-radius: 12px;
+      padding: 8px 11px; min-width: 158px; box-shadow: 0 8px 25px rgba(0,0,0,0.85);
       display: flex; flex-direction: column; gap: 5px;
     }
     .captain-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
@@ -107,11 +108,14 @@
       border: 1px solid rgba(252, 165, 165, 0.45); background: rgba(153, 27, 27, 0.85);
       color: #fee2e2; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 6px; cursor: pointer;
     }
-    .gold-row {
+    .currency-row {
       display: flex; align-items: center; justify-content: space-between;
-      font-size: 12px; font-weight: 800; color: #fbbf24;
-      background: rgba(0,0,0,0.35); padding: 4px 8px; border-radius: 7px;
+      font-size: 12px; font-weight: 800;
+      background: rgba(0,0,0,0.42); padding: 4px 8px; border-radius: 7px;
+      border: 1px solid rgba(255,255,255,0.06);
     }
+    .gold-val { color: #fbbf24; }
+    .star-val { color: #38bdf8; text-shadow: 0 0 8px rgba(56, 189, 248, 0.45); }
     .ship-sub-name { font-size: 10px; color: #94a3b8; text-align: right; }
 
     #player-label {
@@ -137,14 +141,33 @@
       text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap;
     }
 
+    /* KULE ÜSTÜ ETİKETLERİ ("Profesyonel Kule" + Can Barı) */
+    .tower-label-tag {
+      position: fixed; z-index: 4; pointer-events: none;
+      transform: translate(-50%, 0);
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      will-change: transform;
+    }
+    .tower-hp-bar-bg {
+      width: 54px; height: 5px; background: rgba(0,0,0,0.8);
+      border: 1px solid rgba(255,255,255,0.35); border-radius: 2px; overflow: hidden;
+    }
+    .tower-hp-fill {
+      width: 100%; height: 100%; background: #22c55e; transition: width 0.15s;
+    }
+    .tower-title-txt {
+      font-size: 9px; font-weight: 800; color: #fef08a;
+      text-shadow: 0 1px 3px #000, 0 0 5px #000; white-space: nowrap;
+    }
+
     .floating-dmg {
       position: fixed; z-index: 10; pointer-events: none;
-      font-weight: 900; font-size: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.9);
-      animation: floatUpAndFade 0.9s ease-out forwards;
+      font-weight: 900; font-size: 15px; text-shadow: 0 2px 4px rgba(0,0,0,0.95);
+      animation: floatUpAndFade 0.95s ease-out forwards;
       transform: translate(-50%, -50%);
     }
     @keyframes floatUpAndFade {
-      0% { opacity: 1; transform: translate(-50%, 0) scale(1.2); }
+      0% { opacity: 1; transform: translate(-50%, 0) scale(1.15); }
       100% { opacity: 0; transform: translate(-50%, -55px) scale(0.9); }
     }
 
@@ -193,10 +216,10 @@
     #target-card {
       display: none; background: rgba(15, 23, 42, 0.92);
       border: 1.5px solid #ef4444; border-radius: 10px;
-      padding: 6px 10px; min-width: 145px; box-shadow: 0 8px 20px rgba(0,0,0,0.85);
+      padding: 6px 10px; min-width: 155px; box-shadow: 0 8px 20px rgba(0,0,0,0.85);
     }
     #target-card.visible { display: block; }
-    .target-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: #fca5a5; margin-bottom: 4px; }
+    .target-header { display: flex; justify-content: space-between; gap: 8px; font-size: 11px; font-weight: 800; color: #fca5a5; margin-bottom: 4px; }
     .target-hp-bg { width: 100%; height: 7px; background: rgba(255,255,255,0.15); border-radius: 4px; overflow: hidden; }
     #target-hp-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #dc2626, #f97316); transition: width 0.15s; }
 
@@ -223,7 +246,7 @@
 
     #market-panel {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: min(92vw, 350px); max-height: 76vh; overflow-y: auto;
+      width: min(92vw, 370px); max-height: 78vh; overflow-y: auto;
       background: rgba(9, 24, 36, 0.97); backdrop-filter: blur(10px);
       border: 2px solid rgba(245, 197, 94, 0.6); border-radius: 18px; padding: 16px; z-index: 15;
       box-shadow: 0 25px 65px rgba(0,0,0,0.95); pointer-events: auto;
@@ -232,17 +255,18 @@
     .market-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 8px; margin-bottom: 10px; }
     .market-header strong { color: #ffd783; font-size: 15px; }
     .market-close { background: rgba(255,255,255,0.1); border: none; color: #cbd5e1; width: 28px; height: 28px; border-radius: 8px; font-weight: 700; cursor: pointer; }
-    .market-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
-    .market-tab-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 7px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .market-tabs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 10px; }
+    .market-tab-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 7px 4px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; }
     .market-tab-btn.active { background: linear-gradient(135deg, #d97706, #92400e); color: #fff; border-color: #ffd783; }
     .market-section { display: none; }
     .market-section.active { display: block; }
-    .market-balance { display: flex; justify-content: space-between; font-size: 12px; background: rgba(0,0,0,0.35); padding: 8px 10px; border-radius: 8px; margin-bottom: 10px; color: #e2e8f0; }
+    .market-balance { display: flex; justify-content: space-between; font-size: 12px; background: rgba(0,0,0,0.4); padding: 8px 10px; border-radius: 8px; margin-bottom: 10px; color: #e2e8f0; }
     .market-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(6, 16, 24, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 9px 11px; margin-bottom: 8px; }
     .market-item-info { display: flex; flex-direction: column; gap: 2px; }
     .market-item-title { font-size: 13px; font-weight: 700; color: #fff; }
     .market-item-sub { font-size: 11px; color: #94a3b8; }
-    .buy-btn { padding: 6px 12px; border-radius: 8px; border: 1px solid #ffd783; background: linear-gradient(135deg, #d97706, #92400e); color: #fff; font-size: 12px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+    .buy-btn { padding: 6px 11px; border-radius: 8px; border: 1px solid #ffd783; background: linear-gradient(135deg, #d97706, #92400e); color: #fff; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+    .buy-btn.star-btn { border-color: #38bdf8; background: linear-gradient(135deg, #0284c7, #1e3a8a); }
     .buy-btn:disabled { opacity: 0.42; background: rgba(30, 41, 59, 0.8); cursor: not-allowed; }
     .buy-btn.equipped { background: #1e40af; border-color: #60a5fa; color: #eff6ff; }
     #market-feedback { font-size: 12px; min-height: 16px; margin-top: 6px; text-align: center; color: #4ade80; font-weight: 700; }
@@ -281,13 +305,14 @@
 <body>
 
   <div id="game"></div>
+  <div id="tower-labels-layer"></div>
 
   <div id="player-label">
     <div class="ship-hp-track">
       <div id="player-ship-hp-fill"></div>
     </div>
     <div class="ship-name-tag" id="tag-username">Test</div>
-    <div class="ship-fleet-tag" id="tag-fleet">[TST]</div>
+    <div class="ship-fleet-tag" id="tag-fleet">[BAF]</div>
   </div>
 
   <div id="top-vital-hud">
@@ -322,6 +347,10 @@
         <span class="ico">⚓</span>
         <span class="lbl">Tersane</span>
       </button>
+      <button id="starshop-toggle-btn" class="tool-icon-btn" type="button" title="Star Dükkanı (S)">
+        <span class="ico">⭐</span>
+        <span class="lbl">Star</span>
+      </button>
     </div>
   </div>
 
@@ -330,9 +359,13 @@
       <strong id="captain-name">Test</strong>
       <button id="logout-btn" class="logout-chip" type="button">Çıkış</button>
     </div>
-    <div class="gold-row">
-      <span>🪙</span>
-      <span id="score">100,000,000</span>
+    <div class="currency-row">
+      <span>🪙 Altın</span>
+      <span id="score" class="gold-val">100m</span>
+    </div>
+    <div class="currency-row">
+      <span>⭐ Star</span>
+      <span id="star-points" class="star-val">2.500</span>
     </div>
     <div class="ship-sub-name" id="ship-title">8 Yönlü Efsanevi Gemi</div>
   </div>
@@ -367,8 +400,8 @@
     <div class="right-combat-cluster">
       <div id="target-card">
         <div class="target-header">
-          <span id="target-name">Korsan Fırkateyni</span>
-          <span id="target-hp-text">520/520</span>
+          <span id="target-name">Profesyonel Kule</span>
+          <span id="target-hp-text">1200/1200</span>
         </div>
         <div class="target-hp-bg"><div id="target-hp-bar"></div></div>
       </div>
@@ -381,16 +414,19 @@
 
   <div id="market-panel">
     <div class="market-header">
-      <strong>⚓ Cephane Marketi & Tersane</strong>
+      <strong>⚓ Cephane, Star & Tersane</strong>
       <button id="market-close-btn" class="market-close" type="button">✕</button>
     </div>
     <div class="market-tabs">
-      <button id="tab-market" class="market-tab-btn active" type="button">Gülle & Cephane</button>
+      <button id="tab-market" class="market-tab-btn active" type="button">Cephane</button>
+      <button id="tab-star" class="market-tab-btn" type="button">⭐ Star Menü</button>
       <button id="tab-shipyard" class="market-tab-btn" type="button">Tersane</button>
     </div>
     <div class="market-balance">
-      <span>Hazine: <strong id="market-gold" style="color:#ffd783;">100,000,000</strong> Altın</span>
+      <span>🪙 <strong id="market-gold" style="color:#ffd783;">100m</strong></span>
+      <span>⭐ <strong id="market-star" style="color:#38bdf8;">2.500</strong></span>
     </div>
+
     <div id="section-market" class="market-section active">
       <div class="market-item">
         <div class="market-item-info">
@@ -421,6 +457,38 @@
         <button class="buy-btn ammo-buy-btn" type="button" data-type="dragon" data-amount="10" data-cost="120">120 Altın</button>
       </div>
     </div>
+
+    <div id="section-star" class="market-section">
+      <div class="market-item">
+        <div class="market-item-info">
+          <span class="market-item-title">⭐ Acil Tamir Paketi</span>
+          <span class="market-item-sub">Gemi canını anında +250.000 yeniler</span>
+        </div>
+        <button class="buy-btn star-btn star-buy-btn" type="button" data-perk="repair" data-cost="250">250 Star</button>
+      </div>
+      <div class="market-item">
+        <div class="market-item-info">
+          <span class="market-item-title">⚡ Topçu Ustası (+Hasar)</span>
+          <span class="market-item-sub">Tüm gülle hasarını kalıcı +50 artırır</span>
+        </div>
+        <button class="buy-btn star-btn star-buy-btn" type="button" data-perk="damage" data-cost="500">500 Star</button>
+      </div>
+      <div class="market-item">
+        <div class="market-item-info">
+          <span class="market-item-title">⛵ Rüzgar Yelkeni (+Hız)</span>
+          <span class="market-item-sub">Gemi maksimum hızını kalıcı artırır</span>
+        </div>
+        <button class="buy-btn star-btn star-buy-btn" type="button" data-perk="speed" data-cost="400">400 Star</button>
+      </div>
+      <div class="market-item">
+        <div class="market-item-info">
+          <span class="market-item-title">🐉 500x Ejderha Cephanesi</span>
+          <span class="market-item-sub">Kule kuşatmaları için özel cephanelik</span>
+        </div>
+        <button class="buy-btn star-btn star-buy-btn" type="button" data-perk="dragon_pack" data-cost="300">300 Star</button>
+      </div>
+    </div>
+
     <div id="section-shipyard" class="market-section">
       <div id="shipyard-list"></div>
     </div>
@@ -437,7 +505,7 @@
     <div class="auth-card">
       <div class="auth-brand">
         <h1>⚓ Korsan Dünyası</h1>
-        <p>Ada Savaşları & Savunma Kuleleri</p>
+        <p>Kale Adası Savaşları & Star Sistemi</p>
       </div>
       <div class="auth-tabs">
         <button id="tab-login" class="auth-tab active" type="button">Giriş Yap</button>
@@ -468,6 +536,7 @@
 
 <script>
 const scoreEl = document.querySelector('#score');
+const starPointsEl = document.querySelector('#star-points');
 const levelEl = document.querySelector('#level');
 const hpTextEl = document.querySelector('#hp-text');
 const expTextEl = document.querySelector('#exp-text');
@@ -500,15 +569,19 @@ const logoutBtn = document.querySelector('#logout-btn');
 
 const marketToggleBtn = document.querySelector('#market-toggle-btn');
 const shipyardToggleBtn = document.querySelector('#shipyard-toggle-btn');
+const starshopToggleBtn = document.querySelector('#starshop-toggle-btn');
 const marketPanel = document.querySelector('#market-panel');
 const marketCloseBtn = document.querySelector('#market-close-btn');
 const marketGoldEl = document.querySelector('#market-gold');
+const marketStarEl = document.querySelector('#market-star');
 const marketFeedbackEl = document.querySelector('#market-feedback');
 const shipyardListEl = document.querySelector('#shipyard-list');
 
 const tabMarket = document.querySelector('#tab-market');
+const tabStar = document.querySelector('#tab-star');
 const tabShipyard = document.querySelector('#tab-shipyard');
 const sectionMarket = document.querySelector('#section-market');
+const sectionStar = document.querySelector('#section-star');
 const sectionShipyard = document.querySelector('#section-shipyard');
 
 const authOverlay = document.querySelector('#auth-overlay');
@@ -530,6 +603,7 @@ const playerShipHpFillEl = document.querySelector('#player-ship-hp-fill');
 const tagUsernameEl = document.querySelector('#tag-username');
 const tagFleetEl = document.querySelector('#tag-fleet');
 const islandOwnerTitleEl = document.querySelector('#island-owner-title');
+const towerLabelsLayer = document.querySelector('#tower-labels-layer');
 
 function formatShortNumber(num) {
   if (num >= 1000000000) return (num / 1000000000).toFixed(num % 1000000000 !== 0 ? 1 : 0) + 't';
@@ -562,8 +636,8 @@ const SHIP_MODELS = {
   void_destroyer: { id: 'void_destroyer', name: 'Hiçlik Yokedicisi',   desc: 'Evrenin derinliklerinden gelen mor kozmik enerji yayan son teknoloji', cost: 500000000, tint: 0xd946ef, emissive: 0x86198f, extraCanvasType: 'void' }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v29';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v29';
+const USERS_STORAGE_KEY = 'pirate3d_users_v30';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v30';
 let authMode = 'login';
 let currentUser = null;
 
@@ -633,21 +707,21 @@ if (authForm) {
 if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeItem(SESSION_STORAGE_KEY); location.reload(); });
 
 // ==========================================================
-// THREE.JS SAHNE & OYUN MOTORU
+// THREE.JS SAHNE & GRAFİKSEL KALE ADASI MOTORU
 // ==========================================================
 let scene, camera, renderer;
-let playerSprite, playerNeonRing, enemies = [], defenseTowers = [], fortressIsland = null, rangeRingMesh, oceanTexture, oceanBumpTexture;
-let activeProjectiles = [], particleSystems = [];
+let playerSprite, playerNeonRing, enemies = [], defenseTowers = [], fortressGroup = null, rangeRingMesh, oceanTexture, oceanBumpTexture;
+let activeProjectiles = [], particleSystems = [], towerBraziers = [];
 let raycaster, planeGeo, mouse;
 let shipTextures = {};
 let textureLoader;
-const WORLD_SIZE = 1000;
+const WORLD_SIZE = 1200;
 const ATTACK_RANGE = 280;
 const AGGRO_RANGE = 280;
 const BASE_SHIP_HEIGHT = 95;
 const SHIP_Y_POS = 110;
 
-let islandOwnerFleet = null; // Adanın sahibi olan filo
+let islandOwnerFleet = null;
 
 function createStaticOceanTextures() {
   const size = 1024;
@@ -657,9 +731,9 @@ function createStaticOceanTextures() {
   const ctx = colorCanvas.getContext('2d');
 
   const grad = ctx.createRadialGradient(size/2, size/2, 50, size/2, size/2, size/1.2);
-  grad.addColorStop(0, '#0c4a6e');
-  grad.addColorStop(0.5, '#07334d');
-  grad.addColorStop(1, '#042033');
+  grad.addColorStop(0, '#0a3d5c');
+  grad.addColorStop(0.5, '#062940');
+  grad.addColorStop(1, '#031826');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, size, size);
 
@@ -675,7 +749,7 @@ function createStaticOceanTextures() {
     ctx.rotate(rot);
     ctx.beginPath();
     ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
-    ctx.strokeStyle = i % 2 === 0 ? 'rgba(56, 189, 248, 0.09)' : 'rgba(14, 165, 233, 0.07)';
+    ctx.strokeStyle = i % 2 === 0 ? 'rgba(56, 189, 248, 0.08)' : 'rgba(14, 165, 233, 0.06)';
     ctx.lineWidth = 1.5;
     ctx.stroke();
     ctx.restore();
@@ -885,13 +959,215 @@ function applySpriteByAngle(sprite, angle, baseHeight = BASE_SHIP_HEIGHT, shipId
   }
 }
 
+// ==========================================================
+// FOTOĞRAFTAKİ KALE ADASI & PROFESYONEL KULE GRAFİK OLUŞTURUCU
+// ==========================================================
+function buildGraphicalFortressIsland() {
+  if (fortressGroup) {
+    scene.remove(fortressGroup);
+  }
+  fortressGroup = new THREE.Group();
+  towerBraziers = [];
+
+  // Malzemeler (Kum, Kaya, Taş Duvar, Kiremit Çatı, Altın Kubbe)
+  const sandMat = new THREE.MeshStandardMaterial({ color: 0x9c8265, roughness: 0.92 });
+  const rockMat = new THREE.MeshStandardMaterial({ color: 0x4b463e, roughness: 0.88 });
+  const wallMat = new THREE.MeshStandardMaterial({ color: 0x78716c, roughness: 0.75, metalness: 0.1 });
+  const roofMat = new THREE.MeshStandardMaterial({ color: 0x3f3f46, roughness: 0.6 });
+  const goldMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.25, metalness: 0.8 });
+
+  // 1. MERKEZİ ADA KUM TABANI VE KAYALIK PLATFORM
+  const centerSand = new THREE.Mesh(new THREE.CylinderGeometry(82, 108, 12, 24), sandMat);
+  centerSand.position.y = 4;
+  fortressGroup.add(centerSand);
+
+  const centerRock = new THREE.Mesh(new THREE.CylinderGeometry(64, 80, 14, 18), rockMat);
+  centerRock.position.y = 12;
+  fortressGroup.add(centerRock);
+
+  // 2. MERKEZ KALE SARAYI (Fotoğraftaki Ana Yapı & Minareli Kuleler)
+  const mainKeep = new THREE.Mesh(new THREE.BoxGeometry(52, 34, 44), wallMat);
+  mainKeep.position.set(0, 32, 0);
+  fortressGroup.add(mainKeep);
+
+  const sideWing = new THREE.Mesh(new THREE.BoxGeometry(28, 26, 36), wallMat);
+  sideWing.position.set(34, 28, 4);
+  fortressGroup.add(sideWing);
+
+  // Piramit Çatılar
+  const mainRoof = new THREE.Mesh(new THREE.ConeGeometry(42, 22, 4), roofMat);
+  mainRoof.rotation.y = Math.PI / 4;
+  mainRoof.position.set(0, 60, 0);
+  fortressGroup.add(mainRoof);
+
+  const wingRoof = new THREE.Mesh(new THREE.ConeGeometry(26, 16, 4), roofMat);
+  wingRoof.rotation.y = Math.PI / 4;
+  wingRoof.position.set(34, 49, 4);
+  fortressGroup.add(wingRoof);
+
+  // Kale Tepesi Altın Alem / Kubbe
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(5, 16, 16), goldMat);
+  dome.position.set(0, 72, 0);
+  fortressGroup.add(dome);
+
+  // Ön İki İnce Kale Kulesi (Minare/Gözetleme Kulesi Görünümü)
+  [[-26, 22], [-10, 28]].forEach(([mx, mz]) => {
+    const spireBody = new THREE.Mesh(new THREE.CylinderGeometry(3.8, 4.8, 48, 12), wallMat);
+    spireBody.position.set(mx, 38, mz);
+    fortressGroup.add(spireBody);
+
+    const spireCap = new THREE.Mesh(new THREE.ConeGeometry(5.5, 14, 12), roofMat);
+    spireCap.position.set(mx, 68, mz);
+    fortressGroup.add(spireCap);
+  });
+
+  // 3. DIŞ HİLAL SUR DUVARLARI (Kuzey ve Güney Yayları - Doğu ve Batı Girişleri Açık)
+  const wallRadius = 215;
+  const arcConfigs = [
+    { start: -Math.PI * 0.84, end: -Math.PI * 0.16 }, // Kuzey Sur Yayı
+    { start:  Math.PI * 0.16, end:  Math.PI * 0.84 }  // Güney Sur Yayı
+  ];
+
+  arcConfigs.forEach(arc => {
+    const segments = 22;
+    const step = (arc.end - arc.start) / segments;
+    for (let i = 0; i <= segments; i++) {
+      const ang = arc.start + i * step;
+      const wx = Math.cos(ang) * wallRadius;
+      const wz = Math.sin(ang) * wallRadius;
+
+      // Sur Altı Kum/Kaya Şeridi
+      const berm = new THREE.Mesh(new THREE.CylinderGeometry(18, 25, 10, 10), sandMat);
+      berm.position.set(wx, 3, wz);
+      fortressGroup.add(berm);
+
+      // Taş Sur Duvarı Segmenti
+      const wallSeg = new THREE.Mesh(new THREE.BoxGeometry(24, 20, 13), wallMat);
+      wallSeg.position.set(wx, 14, wz);
+      wallSeg.rotation.y = -ang + Math.PI / 2;
+      fortressGroup.add(wallSeg);
+
+      // Sur Üstü Ateş Çanakları (Brazier) - Görseldeki Kırmızı Alevli Burçlar
+      if (i % 4 === 2) {
+        const bastion = new THREE.Mesh(new THREE.CylinderGeometry(11, 13, 24, 12), rockMat);
+        bastion.position.set(wx, 16, wz);
+        fortressGroup.add(bastion);
+
+        const fireBowl = new THREE.Mesh(
+          new THREE.CylinderGeometry(8.5, 6, 4, 12),
+          new THREE.MeshBasicMaterial({ color: 0xff4500 })
+        );
+        fireBowl.position.set(wx, 29, wz);
+        fortressGroup.add(fireBowl);
+        towerBraziers.push(fireBowl);
+      }
+    }
+  });
+
+  scene.add(fortressGroup);
+}
+
+// Görseldeki "Profesyonel Kule" 3D Modelini Oluşturur
+function createProfessionalTowerMesh() {
+  const group = new THREE.Group();
+
+  const baseMat = new THREE.MeshStandardMaterial({ color: 0xd6d3d1, roughness: 0.65 });
+  const woodMat = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.8 });
+  const roofMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.5 });
+
+  // Taş Alt Kaide
+  const pedestal = new THREE.Mesh(new THREE.BoxGeometry(16, 12, 16), baseMat);
+  pedestal.position.y = 6;
+  group.add(pedestal);
+
+  // 4 Köşeli Ahşap/Taş İskelet Gövde
+  const colPositions = [[-5, -5], [5, -5], [-5, 5], [5, 5]];
+  colPositions.forEach(([cx, cz]) => {
+    const pillar = new THREE.Mesh(new THREE.BoxGeometry(2.8, 24, 2.8), baseMat);
+    pillar.position.set(cx, 22, cz);
+    group.add(pillar);
+  });
+
+  // Üst Gözetleme Balkonu
+  const platform = new THREE.Mesh(new THREE.BoxGeometry(18, 4, 18), woodMat);
+  platform.position.y = 34;
+  group.add(platform);
+
+  // Sivri Kule Çatısı
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(13, 12, 4), roofMat);
+  roof.rotation.y = Math.PI / 4;
+  roof.position.y = 42;
+  group.add(roof);
+
+  // Görünmez büyük tıklama kutusu (Mobilde/Masaüstünde kolay seçilsin diye)
+  const hitBox = new THREE.Mesh(
+    new THREE.CylinderGeometry(16, 16, 52, 8),
+    new THREE.MeshBasicMaterial({ visible: false })
+  );
+  hitBox.position.y = 26;
+  group.add(hitBox);
+
+  return { group, hitBox };
+}
+
+function spawnAllDefenseTowers() {
+  // Eski kuleleri ve HTML etiketlerini temizle
+  defenseTowers.forEach(t => {
+    scene.remove(t.group);
+    if (t.labelEl) t.labelEl.remove();
+  });
+  defenseTowers = [];
+  towerLabelsLayer.innerHTML = '';
+
+  // Görseldeki gibi: 6 adet dış sur kulesi + 6 adet iç lagün çevresi kulesi = 12 Profesyonel Kule
+  const towerCoordinates = [
+    // Dış Sur Kuleleri
+    { x: -165, z: -135 }, { x: 0, z: -205 }, { x: 165, z: -135 },
+    { x: -165, z:  135 }, { x: 0, z:  205 }, { x: 165, z:  135 },
+    // İç Kale Çevresi Kuleleri
+    { x: -82, z: -55 }, { x: 0, z: -85 }, { x: 82, z: -55 },
+    { x: -82, z:  55 }, { x: 0, z:  85 }, { x: 82, z:  55 }
+  ];
+
+  towerCoordinates.forEach((pos, idx) => {
+    const id = idx + 1;
+    const { group, hitBox } = createProfessionalTowerMesh();
+    group.position.set(pos.x, 4, pos.z);
+    hitBox.userData.towerId = id;
+    scene.add(group);
+
+    // Kule üstü HTML Can Barı & "Profesyonel Kule" etiketi
+    const labelDiv = document.createElement('div');
+    labelDiv.className = 'tower-label-tag';
+    labelDiv.innerHTML = `
+      <div class="tower-hp-bar-bg"><div class="tower-hp-fill" id="thp-${id}"></div></div>
+      <div class="tower-title-txt">Profesyonel Kule</div>
+    `;
+    towerLabelsLayer.appendChild(labelDiv);
+
+    defenseTowers.push({
+      id,
+      name: `Profesyonel Kule #${id}`,
+      group,
+      hitBox,
+      labelEl: labelDiv,
+      hpFillEl: labelDiv.querySelector(`#thp-${id}`),
+      x: pos.x,
+      z: pos.z,
+      hp: 1200,
+      maxHp: 1200,
+      lastAttackTime: 0
+    });
+  });
+}
+
 function initThreeGame() {
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x052236);
-  scene.fog = new THREE.FogExp2(0x052236, 0.0003);
+  scene.background = new THREE.Color(0x041d2e);
+  scene.fog = new THREE.FogExp2(0x041d2e, 0.00028);
 
   camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 18000);
-  camera.position.set(0, 720, 540);
+  camera.position.set(0, 740, 560);
   camera.lookAt(0, 0, 0);
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -901,10 +1177,10 @@ function initThreeGame() {
 
   textureLoader = new THREE.TextureLoader();
 
-  const ambientLight = new THREE.AmbientLight(0xe0f2fe, 0.95);
+  const ambientLight = new THREE.AmbientLight(0xe0f2fe, 1.0);
   scene.add(ambientLight);
 
-  const sunLight = new THREE.DirectionalLight(0xffedd5, 1.8);
+  const sunLight = new THREE.DirectionalLight(0xffedd5, 1.85);
   sunLight.position.set(500, 850, 400);
   scene.add(sunLight);
 
@@ -925,7 +1201,7 @@ function initThreeGame() {
   scene.add(ocean);
 
   const ringGeo = new THREE.RingGeometry(ATTACK_RANGE - 3, ATTACK_RANGE, 64);
-  const ringMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.6 });
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.55 });
   rangeRingMesh = new THREE.Mesh(ringGeo, ringMat);
   rangeRingMesh.rotation.x = -Math.PI / 2;
   rangeRingMesh.position.y = 0.6;
@@ -972,11 +1248,11 @@ function initThreeGame() {
     mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
 
-    // Kulelere tıklanıp seçilebilmesi
-    const towerMeshes = defenseTowers.map(t => t.mesh);
-    const towerIntersects = raycaster.intersectObjects(towerMeshes);
+    // Kule seçimi
+    const towerHitBoxes = defenseTowers.map(t => t.hitBox);
+    const towerIntersects = raycaster.intersectObjects(towerHitBoxes);
     if (towerIntersects.length > 0) {
-      let obj = towerIntersects.object || towerIntersects[0].object;
+      const obj = towerIntersects[0].object;
       if (obj.userData.towerId) {
         selectedEnemyId = 'tower_' + obj.userData.towerId;
         isAttacking = false;
@@ -986,10 +1262,11 @@ function initThreeGame() {
       }
     }
 
+    // Düşman gemi seçimi
     const enemySprites = enemies.map(en => en.sprite);
     const intersects = raycaster.intersectObjects(enemySprites);
     if (intersects.length > 0) {
-      let obj = intersects[0].object;
+      const obj = intersects[0].object;
       if (obj.userData.enemyId) {
         selectedEnemyId = obj.userData.enemyId;
         isAttacking = false;
@@ -999,6 +1276,7 @@ function initThreeGame() {
       }
     }
 
+    // Denize tıklayıp hareket etme
     const oceanIntersect = raycaster.intersectObject(ocean);
     if (oceanIntersect.length > 0) {
       targetPos = { x: oceanIntersect[0].point.x, z: oceanIntersect[0].point.z };
@@ -1012,9 +1290,9 @@ function initThreeGame() {
 }
 
 // ==========================================================
-// OYUN MANTIĞI & ADA / KULE SİSTEMİ
+// OYUN MANTIĞI & STAR PUANI / ADA KULE SİSTEMİ
 // ==========================================================
-let player, gameIslands = [];
+let player;
 let targetPos = null, selectedEnemyId = null, isAttacking = false, isGameOver = false;
 let lastPlayerAttackTime = 0;
 let nextNpcIdCounter = 1;
@@ -1026,8 +1304,11 @@ function startGameLogic() {
   gameOverEl.style.display = 'none';
 
   player = {
-    x: 250, z: 250, a: -Math.PI / 2, speed: 0, maxSpeed: 1.85,
-    hp: 1000000, maxHp: 1000000, score: 100000000,
+    x: 310, z: 0, a: Math.PI, speed: 0, maxSpeed: 1.9,
+    hp: 1000000, maxHp: 1000000,
+    score: 100000000,
+    stars: 2500,
+    bonusDamage: 0,
     level: 1, exp: 0, maxExp: 100,
     selectedAmmo: 'iron',
     ammo: { iron: 1000000, chain: 1000000, fire: 1000000, dragon: 1000000 },
@@ -1043,57 +1324,9 @@ function startGameLogic() {
   applySpriteByAngle(playerSprite, player.a, BASE_SHIP_HEIGHT, currentShipId);
   scene.add(playerSprite);
 
-  gameIslands.forEach(isl => scene.remove(isl.mesh));
-  gameIslands = [];
-  
-  // Normal Rastgele Adalar
-  const islGeo = new THREE.CylinderGeometry(40, 70, 35, 6);
-  const islMat = new THREE.MeshStandardMaterial({ color: 0x0f382b, roughness: 0.9 });
-  for (let i = 0; i < 5; i++) {
-    const mesh = new THREE.Mesh(islGeo, islMat);
-    mesh.position.set((Math.random() - 0.5) * 800, 10, (Math.random() - 0.5) * 800);
-    scene.add(mesh);
-    gameIslands.push({ mesh, r: 60 });
-  }
-
-  // ---- GÖNDERDİĞİN RESİMDEKİ MERKEZİ KALE ADASI (KULELER İLE ÇEVRİLİ) ----
-  if (fortressIsland) scene.remove(fortressIsland.mesh);
-  const fortGeo = new THREE.CylinderGeometry(140, 180, 45, 12);
-  const fortMat = new THREE.MeshStandardMaterial({ color: 0x1e3a2f, roughness: 0.8 });
-  const fortMesh = new THREE.Mesh(fortGeo, fortMat);
-  fortMesh.position.set(0, 15, 0);
-  scene.add(fortMesh);
-  fortressIsland = { mesh: fortMesh, x: 0, z: 0, r: 150 };
-
-  // Savunma Kulelerini Oluştur (Resimdeki dairesel çember konumu)
-  defenseTowers.forEach(t => scene.remove(t.mesh));
-  defenseTowers = [];
-
-  const towerGeo = new THREE.CylinderGeometry(12, 16, 30, 8);
-  const towerMat = new THREE.MeshStandardMaterial({ color: 0x8b5cf6, metalness: 0.3, roughness: 0.4 });
-  const towerCount = 8;
-  const towerRadius = 180;
-
-  for (let i = 0; i < towerCount; i++) {
-    const angle = (i / towerCount) * Math.PI * 2;
-    const tx = Math.cos(angle) * towerRadius;
-    const tz = Math.sin(angle) * towerRadius;
-    const tMesh = new THREE.Mesh(towerGeo, towerMat);
-    tMesh.position.set(tx, 25, tz);
-    tMesh.userData.towerId = i + 1;
-    scene.add(tMesh);
-
-    defenseTowers.push({
-      id: i + 1,
-      name: `Profesyonel Kule #${i + 1}`,
-      mesh: tMesh,
-      x: tx,
-      z: tz,
-      hp: 1200,
-      maxHp: 1200,
-      lastAttackTime: 0
-    });
-  }
+  // Fotoğraftaki Grafiksel Kale Adasını ve Kuleleri Oluştur
+  buildGraphicalFortressIsland();
+  spawnAllDefenseTowers();
 
   enemies.forEach(en => scene.remove(en.sprite));
   enemies = [];
@@ -1112,9 +1345,9 @@ function startGameLogic() {
 function spawnEnemySprite(id) {
   let ex, ez;
   do {
-    ex = (Math.random() - 0.5) * 700;
-    ez = (Math.random() - 0.5) * 700;
-  } while (Math.hypot(ex, ez) < 350);
+    ex = (Math.random() - 0.5) * 950;
+    ez = (Math.random() - 0.5) * 950;
+  } while (Math.hypot(ex, ez) < 320);
 
   const initialData = shipTextures.top || Object.values(shipTextures)[0];
   const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1 });
@@ -1125,7 +1358,6 @@ function spawnEnemySprite(id) {
   sprite.userData.enemyId = id;
   scene.add(sprite);
 
-  // Rastgele düşman filoları atayalım
   const enemyFleets = ['[RED]', '[SKULL]', '[KRAKEN]', '[BLACK]'];
   const assignedFleet = enemyFleets[Math.floor(Math.random() * enemyFleets.length)];
 
@@ -1144,7 +1376,8 @@ function selectAmmoSlot(type) {
     slot.classList.toggle('selected', slot.dataset.type === type);
   });
   const info = AMMO_TYPES[type];
-  activeAmmoInfoEl.textContent = `Seçili: ${info.name} (${info.desc})`;
+  const totalDmg = info.damage + (player.bonusDamage || 0);
+  activeAmmoInfoEl.textContent = `Seçili: ${info.name} (${totalDmg} Hasar)`;
   syncAttackButton();
 }
 
@@ -1157,17 +1390,9 @@ window.addEventListener('keydown', e => {
   if (e.key === '2') selectAmmoSlot('chain');
   if (e.key === '3') selectAmmoSlot('fire');
   if (e.key === '4') selectAmmoSlot('dragon');
-  if (e.key.toLowerCase() === 'm') {
-    marketPanel.classList.toggle('open');
-    tabMarket.classList.add('active'); tabShipyard.classList.remove('active');
-    sectionMarket.classList.add('active'); sectionShipyard.classList.remove('active');
-  }
-  if (e.key.toLowerCase() === 't') {
-    marketPanel.classList.toggle('open');
-    tabShipyard.classList.add('active'); tabMarket.classList.remove('active');
-    sectionShipyard.classList.add('active'); sectionMarket.classList.remove('active');
-    renderShipyardList();
-  }
+  if (e.key.toLowerCase() === 'm') openMarketTab('market');
+  if (e.key.toLowerCase() === 's') openMarketTab('star');
+  if (e.key.toLowerCase() === 't') openMarketTab('shipyard');
 });
 
 function updateTargetCard() {
@@ -1175,7 +1400,7 @@ function updateTargetCard() {
     targetCardEl.classList.remove('visible');
     return;
   }
-  
+
   if (String(selectedEnemyId).startsWith('tower_')) {
     const tId = parseInt(selectedEnemyId.replace('tower_', ''));
     const tower = defenseTowers.find(t => t.id === tId);
@@ -1185,7 +1410,8 @@ function updateTargetCard() {
       return;
     }
     targetCardEl.classList.add('visible');
-    targetNameEl.textContent = tower.name;
+    const ownerTag = islandOwnerFleet ? ` ${islandOwnerFleet}` : ' [TARAFSIZ]';
+    targetNameEl.textContent = `Profesyonel Kule${ownerTag}`;
     targetHpTextEl.textContent = `${Math.ceil(tower.hp)}/${tower.maxHp}`;
     targetHpBarEl.style.width = Math.max(0, (tower.hp / tower.maxHp) * 100) + '%';
     return;
@@ -1235,7 +1461,7 @@ function showFloatingDamage(wx, wz, text, colorHex) {
   div.style.left = x + 'px';
   div.style.top = y + 'px';
 
-  setTimeout(() => div.remove(), 900);
+  setTimeout(() => div.remove(), 950);
 }
 
 function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit, isEnemy = false) {
@@ -1254,7 +1480,7 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit, isEnem
 
   activeProjectiles.push({
     mesh, x: startX, z: startZ, targetX, targetZ,
-    speed: 6, 
+    speed: 6.5, 
     ammoKey, onHit, sparkTimer: 0,
     yOffset: GULLE_Y_OFFSET,
     isEnemy
@@ -1276,6 +1502,13 @@ function animate3D() {
   }
 
   const now = Date.now();
+
+  // Ateş çanaklarında titreyen alev efekti
+  towerBraziers.forEach((b, i) => {
+    const s = 0.92 + Math.sin(now * 0.012 + i) * 0.18;
+    b.scale.set(s, s * 1.2, s);
+  });
+
   if (player.hp < player.maxHp && (now - player.lastDamagedTime > 5000)) {
     const healAmount = 5000;
     player.hp = Math.min(player.maxHp, player.hp + healAmount);
@@ -1298,8 +1531,15 @@ function animate3D() {
     player.speed *= 0.92;
   }
 
-  player.x += Math.cos(player.a) * player.speed;
-  player.z += Math.sin(player.a) * player.speed;
+  // Merkez adanın tam ortasına (kale binasına) çarpmayı önle, lagünde yüzebilsin
+  const nextX = player.x + Math.cos(player.a) * player.speed;
+  const nextZ = player.z + Math.sin(player.a) * player.speed;
+  if (Math.hypot(nextX, nextZ) > 95) {
+    player.x = nextX;
+    player.z = nextZ;
+  } else {
+    player.speed = 0;
+  }
 
   coordDisplayEl.textContent = `X: ${Math.round((player.x / (WORLD_SIZE / 2)) * 50)} · Y: ${Math.round((player.z / (WORLD_SIZE / 2)) * 50)}`;
 
@@ -1324,8 +1564,23 @@ function animate3D() {
     playerLabelEl.style.transform = `translate(-50%, 0) translate(${xPx}px, ${yPx}px)`;
   }
 
+  // Her kule üzerindeki "Profesyonel Kule" + Can Barı etiketini 3D sahneye hizala
+  defenseTowers.forEach(t => {
+    if (!t.labelEl) return;
+    const v = new THREE.Vector3(t.x, 52, t.z);
+    v.project(camera);
+    if (v.z > 1) {
+      t.labelEl.style.display = 'none';
+    } else {
+      t.labelEl.style.display = 'flex';
+      const tx = (v.x * 0.5 + 0.5) * window.innerWidth;
+      const ty = (v.y * -0.5 + 0.5) * window.innerHeight - 16;
+      t.labelEl.style.transform = `translate(-50%, 0) translate(${tx}px, ${ty}px)`;
+    }
+  });
+
   camera.position.x += (player.x - camera.position.x) * 0.08;
-  camera.position.z += (player.z + 540 - camera.position.z) * 0.08;
+  camera.position.z += (player.z + 560 - camera.position.z) * 0.08;
   camera.lookAt(player.x, 0, player.z);
 
   // Mermi animasyonları
@@ -1378,22 +1633,21 @@ function animate3D() {
   }
 
   // ==========================================================
-  // SAVUNMA KULELERİ YAPAY ZEKA VE ATEŞ SİSTEMİ
+  // SAVUNMA KULELERİ: YAKLAŞANA ATEŞ AÇAR, SAHİP FİLOYA VURMAZ
   // ==========================================================
+  const isPlayerInOwnerFleet = Boolean(islandOwnerFleet && currentUser.fleet === islandOwnerFleet);
+
   for (const tower of defenseTowers) {
     const distToPlayer = Math.hypot(player.x - tower.x, player.z - tower.z);
-    const towerRange = 240;
+    const towerRange = 230;
 
-    // EĞER KULLANICI ADANIN SAHİBİ OLAN FİLOADan DEĞİLSE VE MENZİL İÇİNDEYSE ATEŞ AÇ
-    const isPlayerInOwnerFleet = (islandOwnerFleet && currentUser.fleet === islandOwnerFleet);
-
-    if (distToPlayer <= towerRange && !isPlayerInOwnerFleet && (now - tower.lastAttackTime >= 2500)) {
+    if (distToPlayer <= towerRange && !isPlayerInOwnerFleet && (now - tower.lastAttackTime >= 2400)) {
       tower.lastAttackTime = now;
 
       fireProjectile(tower.x, tower.z, player.x, player.z, 'fire', () => {
-        player.hp = Math.max(0, player.hp - 80);
+        player.hp = Math.max(0, player.hp - 95);
         player.lastDamagedTime = now;
-        showFloatingDamage(player.x, player.z, '-80 (Kule)', '#ef4444');
+        showFloatingDamage(player.x, player.z, '-95 (Kule)', '#ef4444');
         updateHUD();
         if (player.hp <= 0) {
           isGameOver = true;
@@ -1456,13 +1710,14 @@ function animate3D() {
   }
 
   // ==========================================================
-  // OYUNCUNUN KULEYE VEYA DÜŞMANA SALDIRISI
+  // OYUNCUNUN KULEYE VEYA DÜŞMAN GEMİSİNE SALDIRISI
   // ==========================================================
   if (isAttacking && selectedEnemyId) {
     const ammoKey = player.selectedAmmo;
     const ammoSpec = AMMO_TYPES[ammoKey];
+    const finalDamage = ammoSpec.damage + (player.bonusDamage || 0);
 
-    // EĞER SEÇİLEN HEDEF BİR KULE İSE
+    // HEDEF KULE İSE
     if (String(selectedEnemyId).startsWith('tower_')) {
       const tId = parseInt(selectedEnemyId.replace('tower_', ''));
       const tower = defenseTowers.find(t => t.id === tId);
@@ -1473,29 +1728,36 @@ function animate3D() {
           lastPlayerAttackTime = now;
 
           fireProjectile(player.x, player.z, tower.x, tower.z, ammoKey, () => {
-            tower.hp -= ammoSpec.damage;
-            showFloatingDamage(tower.x, tower.z, '-' + ammoSpec.damage, '#f97316');
+            tower.hp -= finalDamage;
+            if (tower.hpFillEl) {
+              tower.hpFillEl.style.width = Math.max(0, (tower.hp / tower.maxHp) * 100) + '%';
+            }
+            showFloatingDamage(tower.x, tower.z, '-' + finalDamage, '#f97316');
 
             updateTargetCard();
             updateHUD();
             syncAttackButton();
 
             if (tower.hp <= 0) {
-              scene.remove(tower.mesh);
-              tower.mesh.geometry.dispose();
-              tower.mesh.material.dispose();
+              scene.remove(tower.group);
+              if (tower.labelEl) tower.labelEl.remove();
 
               defenseTowers = defenseTowers.filter(t => t.id !== tower.id);
               selectedEnemyId = null;
               isAttacking = false;
 
-              // ---- İSTEDİĞİN ÖZELLİK: SON KULEYİ BATIRAN KULLANICININ FİLOSU ADAYA SAHİP OLUR ----
+              // Kule yıkıldığında Star Puanı + EXP ödülü
+              player.stars += 120;
+              player.exp += 25;
+              showFloatingDamage(tower.x, tower.z, '+120 ⭐ Star', '#38bdf8');
+
+              // SON KULEYİ BATIRAN KULLANICININ FİLOSU ADAYA SAHİP OLUR VE KULELER YENİ FİLO ADINA DİKİLİR
               if (defenseTowers.length === 0) {
                 islandOwnerFleet = currentUser.fleet;
-                islandOwnerTitleEl.textContent = `Ada Sahibi: ${islandOwnerFleet} (${currentUser.username})`;
-                alert(`Tebrikler Kaptan! Son kuleyi batırdınız. ${islandOwnerFleet} filosu adanın mülkiyetini ele geçirdi! Artık kuleler filonuza ateş etmeyecek.`);
-              } else {
-                alert(`Kule yıkıldı! Kalan kule: ${defenseTowers.length}`);
+                islandOwnerTitleEl.textContent = `Ada: ${islandOwnerFleet}`;
+                player.stars += 1000;
+                showFloatingDamage(player.x, player.z, `ADA FETHEDİLDİ! +1000 ⭐`, '#fbbf24');
+                spawnAllDefenseTowers(); // Tüm kuleler artık bu filoyu koruyacak şekilde yeniden dikilir
               }
 
               updateTargetCard();
@@ -1506,7 +1768,7 @@ function animate3D() {
         }
       }
     } else {
-      // Normal düşman gemisine saldırı
+      // HEDEF DÜŞMAN GEMİSİ İSE
       const target = enemies.find(e => e.id === selectedEnemyId);
       if (target && player.ammo[ammoKey] > 0) {
         const d = Math.hypot(target.x - player.x, target.z - player.z);
@@ -1514,10 +1776,10 @@ function animate3D() {
           lastPlayerAttackTime = now;
 
           fireProjectile(player.x, player.z, target.x, target.z, ammoKey, () => {
-            target.hp -= ammoSpec.damage;
+            target.hp -= finalDamage;
             if (ammoSpec.slow < 1.0) target.slowTimer = 240;
 
-            showFloatingDamage(target.x, target.z, '-' + ammoSpec.damage, '#f97316');
+            showFloatingDamage(target.x, target.z, '-' + finalDamage, '#f97316');
 
             updateTargetCard();
             updateHUD();
@@ -1530,6 +1792,8 @@ function animate3D() {
               isAttacking = false;
               player.exp += 35;
               player.score += 5000;
+              player.stars += 75;
+              showFloatingDamage(target.x, target.z, '+75 ⭐', '#38bdf8');
               if (player.exp >= player.maxExp) {
                 player.level++;
                 player.exp -= player.maxExp;
@@ -1569,30 +1833,29 @@ function drawMinimap() {
   const scale = w / WORLD_SIZE;
   const cx = w / 2, cy = h / 2;
 
-  // Adalar minimap
-  mctx.fillStyle = '#3f6212';
-  gameIslands.forEach(isl => {
-    mctx.beginPath();
-    mctx.arc(cx + isl.mesh.position.x * scale, cy + isl.mesh.position.z * scale, 2.5, 0, Math.PI * 2);
-    mctx.fill();
-  });
+  // Kale Adası Dış Sur Çemberi
+  mctx.strokeStyle = '#57534e';
+  mctx.lineWidth = 2;
+  mctx.beginPath();
+  mctx.arc(cx, cy, 215 * scale, 0, Math.PI * 2);
+  mctx.stroke();
 
-  // Merkez Kale Adası
-  if (fortressIsland) {
-    mctx.fillStyle = '#0f766e';
-    mctx.beginPath();
-    mctx.arc(cx, cy, 6, 0, Math.PI * 2);
-    mctx.fill();
-  }
+  // Merkez Kale
+  mctx.fillStyle = '#0f766e';
+  mctx.beginPath();
+  mctx.arc(cx, cy, 6, 0, Math.PI * 2);
+  mctx.fill();
 
-  // Savunma Kuleleri Minimap (Mor renkli)
-  mctx.fillStyle = '#8b5cf6';
+  // Savunma Kuleleri Minimap (Sahip filoya aitse mavi, düşmansa mor/kırmızı)
+  const isFriendlyIsland = Boolean(islandOwnerFleet && currentUser.fleet === islandOwnerFleet);
+  mctx.fillStyle = isFriendlyIsland ? '#38bdf8' : '#a855f7';
   defenseTowers.forEach(t => {
     mctx.beginPath();
-    mctx.arc(cx + t.x * scale, cy + t.z * scale, 2, 0, Math.PI * 2);
+    mctx.arc(cx + t.x * scale, cy + t.z * scale, 1.8, 0, Math.PI * 2);
     mctx.fill();
   });
 
+  // Düşman Gemiler
   mctx.fillStyle = '#dc2626';
   enemies.forEach(en => {
     mctx.beginPath();
@@ -1600,6 +1863,7 @@ function drawMinimap() {
     mctx.fill();
   });
 
+  // Oyuncu Gemisi
   mctx.fillStyle = '#22c55e';
   mctx.beginPath();
   mctx.arc(cx + player.x * scale, cy + player.z * scale, 3.2, 0, Math.PI * 2);
@@ -1608,6 +1872,7 @@ function drawMinimap() {
 
 function updateHUD() {
   scoreEl.textContent = formatShortNumber(player.score);
+  starPointsEl.textContent = player.stars.toLocaleString();
   levelEl.textContent = player.level;
   
   hpTextEl.textContent = `Can ${Math.ceil(player.hp).toLocaleString()} / ${player.maxHp.toLocaleString()}`;
@@ -1616,6 +1881,7 @@ function updateHUD() {
   hpBarEl.style.width = ((player.hp / player.maxHp) * 100) + '%';
   expBarEl.style.width = ((player.exp / player.maxExp) * 100) + '%';
   marketGoldEl.textContent = formatShortNumber(player.score);
+  marketStarEl.textContent = player.stars.toLocaleString();
 
   const hpPercent = Math.max(0, Math.min(100, (player.hp / player.maxHp) * 100));
   playerShipHpFillEl.style.width = hpPercent + '%';
@@ -1635,29 +1901,34 @@ function updateHUD() {
   });
 }
 
-marketToggleBtn.addEventListener('click', () => {
-  marketPanel.classList.toggle('open');
-  tabMarket.classList.add('active'); tabShipyard.classList.remove('active');
-  sectionMarket.classList.add('active'); sectionShipyard.classList.remove('active');
-});
-shipyardToggleBtn.addEventListener('click', () => {
-  marketPanel.classList.toggle('open');
-  tabShipyard.classList.add('active'); tabMarket.classList.remove('active');
-  sectionShipyard.classList.add('active'); sectionMarket.classList.remove('active');
-  renderShipyardList();
-});
+function openMarketTab(tabName) {
+  marketPanel.classList.add('open');
+  [tabMarket, tabStar, tabShipyard].forEach(b => b.classList.remove('active'));
+  [sectionMarket, sectionStar, sectionShipyard].forEach(s => s.classList.remove('active'));
+
+  if (tabName === 'market') {
+    tabMarket.classList.add('active');
+    sectionMarket.classList.add('active');
+  } else if (tabName === 'star') {
+    tabStar.classList.add('active');
+    sectionStar.classList.add('active');
+  } else {
+    tabShipyard.classList.add('active');
+    sectionShipyard.classList.add('active');
+    renderShipyardList();
+  }
+}
+
+marketToggleBtn.addEventListener('click', () => openMarketTab('market'));
+starshopToggleBtn.addEventListener('click', () => openMarketTab('star'));
+shipyardToggleBtn.addEventListener('click', () => openMarketTab('shipyard'));
 marketCloseBtn.addEventListener('click', () => marketPanel.classList.remove('open'));
 
-tabMarket.addEventListener('click', () => {
-  tabMarket.classList.add('active'); tabShipyard.classList.remove('active');
-  sectionMarket.classList.add('active'); sectionShipyard.classList.remove('active');
-});
-tabShipyard.addEventListener('click', () => {
-  tabShipyard.classList.add('active'); tabMarket.classList.remove('active');
-  sectionShipyard.classList.add('active'); sectionMarket.classList.remove('active');
-  renderShipyardList();
-});
+tabMarket.addEventListener('click', () => openMarketTab('market'));
+tabStar.addEventListener('click', () => openMarketTab('star'));
+tabShipyard.addEventListener('click', () => openMarketTab('shipyard'));
 
+// Altın ile Cephane Satın Alma
 document.querySelectorAll('.ammo-buy-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     if (!player) return;
@@ -1678,8 +1949,44 @@ document.querySelectorAll('.ammo-buy-btn').forEach(btn => {
     syncAttackButton();
 
     marketFeedbackEl.style.color = '#4ade80';
-    marketFeedbackEl.textContent = `Başarıyla satın alındı!`;
+    marketFeedbackEl.textContent = 'Cephane satın alındı!';
     setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+  });
+});
+
+// Star Puanı ile Güçlendirme Satın Alma
+document.querySelectorAll('.star-buy-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (!player) return;
+    const perk = btn.dataset.perk;
+    const cost = parseInt(btn.dataset.cost);
+
+    if (player.stars < cost) {
+      marketFeedbackEl.style.color = '#f87171';
+      marketFeedbackEl.textContent = 'Yeterli Star puanı yok!';
+      setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+      return;
+    }
+
+    player.stars -= cost;
+    if (perk === 'repair') {
+      player.hp = Math.min(player.maxHp, player.hp + 250000);
+      marketFeedbackEl.textContent = 'Gemi +250.000 tamir edildi!';
+    } else if (perk === 'damage') {
+      player.bonusDamage += 50;
+      selectAmmoSlot(player.selectedAmmo);
+      marketFeedbackEl.textContent = 'Top hasarı +50 artırıldı!';
+    } else if (perk === 'speed') {
+      player.maxSpeed += 0.35;
+      marketFeedbackEl.textContent = 'Gemi hızı kalıcı artırıldı!';
+    } else if (perk === 'dragon_pack') {
+      player.ammo.dragon += 500;
+      marketFeedbackEl.textContent = '+500 Ejderha Nefesi eklendi!';
+    }
+
+    marketFeedbackEl.style.color = '#38bdf8';
+    updateHUD();
+    setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2200);
   });
 });
 
