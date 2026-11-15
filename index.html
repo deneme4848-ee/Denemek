@@ -138,7 +138,7 @@
       text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap;
     }
 
-    /* Yüzen Hasar Yazıları Animasyonu */
+    /* Yüzen Hasar ve İyileşme Yazıları Animasyonu */
     .floating-dmg {
       position: fixed; z-index: 10; pointer-events: none;
       font-weight: 900; font-size: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.9);
@@ -548,8 +548,8 @@ const SHIP_MODELS = {
   dragon:   { id: 'dragon',   name: 'Kızıl Ejder',         desc: 'Ejderha nefesi gücünü artıran efsane', cost: 35000000 }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v28';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v28';
+const USERS_STORAGE_KEY = 'pirate3d_users_v29';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v29';
 let authMode = 'login';
 let currentUser = null;
 
@@ -620,6 +620,7 @@ if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeIt
 let scene, camera, renderer;
 let playerSprite, playerNeonRing, enemies = [], rangeRingMesh, oceanTexture, oceanBumpTexture;
 let activeProjectiles = [], particleSystems = [];
+let enemySelectRingMesh = null; // Düşman altındaki kırmızı seçilme çemberi
 let raycaster, planeGeo, mouse;
 let shipTextures = {};
 let textureLoader;
@@ -627,7 +628,7 @@ const WORLD_SIZE = 1000;
 const ATTACK_RANGE = 280;
 const AGGRO_RANGE = 280;
 const BASE_SHIP_HEIGHT = 95;
-const SHIP_Y_POS = 110; // ASLA DEĞİŞMEYECEK SABİT DEĞER
+const SHIP_Y_POS = 110; // Sabit ayar korundu
 
 function createStaticOceanTextures() {
   const size = 1024;
@@ -843,6 +844,15 @@ function initThreeGame() {
   playerNeonRing.position.y = 0.8;
   scene.add(playerNeonRing);
 
+  // Seçilen Düşman Gemisi Altındaki Kırmızı Çember (Başlangıçta gizli)
+  const enemyRingGeo = new THREE.RingGeometry(30, 36, 48);
+  const enemyRingMat = new THREE.MeshBasicMaterial({ color: 0xef4444, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
+  enemySelectRingMesh = new THREE.Mesh(enemyRingGeo, enemyRingMat);
+  enemySelectRingMesh.rotation.x = -Math.PI / 2;
+  enemySelectRingMesh.position.y = 0.9;
+  enemySelectRingMesh.visible = false;
+  scene.add(enemySelectRingMesh);
+
   raycaster = new THREE.Raycaster();
   mouse = new THREE.Vector2();
 
@@ -872,6 +882,7 @@ function initThreeGame() {
       let obj = intersects[0].object;
       if (obj.userData.enemyId) {
         selectedEnemyId = obj.userData.enemyId;
+        isAttacking = false; // Tıkladığında önce seçer, saldırıyı başlatmaz veya durdurur
         updateTargetCard();
         syncAttackButton();
         return;
@@ -995,17 +1006,24 @@ window.addEventListener('keydown', e => {
 function updateTargetCard() {
   if (!selectedEnemyId) {
     targetCardEl.classList.remove('visible');
+    if (enemySelectRingMesh) enemySelectRingMesh.visible = false;
     return;
   }
   const target = enemies.find(e => e.id === selectedEnemyId);
   if (!target) {
     targetCardEl.classList.remove('visible');
+    if (enemySelectRingMesh) enemySelectRingMesh.visible = false;
     return;
   }
   targetCardEl.classList.add('visible');
   targetNameEl.textContent = target.name;
   targetHpTextEl.textContent = `${Math.ceil(target.hp)}/${target.maxHp}`;
   targetHpBarEl.style.width = Math.max(0, (target.hp / target.maxHp) * 100) + '%';
+  
+  if (enemySelectRingMesh) {
+    enemySelectRingMesh.visible = true;
+    enemySelectRingMesh.position.set(target.x, 0.9, target.z);
+  }
 }
 
 function syncAttackButton() {
@@ -1026,7 +1044,7 @@ attackBtn.addEventListener('click', () => {
 
 restartBtn.addEventListener('click', () => startGameLogic());
 
-// Yüzen Hasar Yazısı Gösterme Fonksiyonu (Floating Damage Text)
+// Yüzen Hasar ve İyileşme Yazısı Gösterme Fonksiyonu
 function showFloatingDamage(wx, wz, text, colorHex) {
   const div = document.createElement('div');
   div.className = 'floating-dmg';
@@ -1044,25 +1062,25 @@ function showFloatingDamage(wx, wz, text, colorHex) {
   setTimeout(() => div.remove(), 900);
 }
 
-// Gülle Ateşleme Fonksiyonu (Daha büyük ve görkemli gülleler)
+// Gülle Ateşleme Fonksiyonu (Daha da zenginleştirilmiş ve göz alıcı efektler)
 function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
   const ammoSpec = AMMO_TYPES[ammoKey];
-  const pGeo = new THREE.SphereGeometry(6.5, 16, 16); // Daha büyük gülle boyutu
+  const pGeo = new THREE.SphereGeometry(7.5, 16, 16); // Daha büyük gülle küresi
   const pMat = new THREE.MeshStandardMaterial({ 
     color: ammoSpec.color, 
     emissive: ammoSpec.color,
-    emissiveIntensity: 1.0,
-    roughness: 0.15 
+    emissiveIntensity: 1.5,
+    roughness: 0.1 
   });
   const mesh = new THREE.Mesh(pGeo, pMat);
   
-  const GULLE_Y_OFFSET = 50; // Eski orijinal yükseklik ayarı
+  const GULLE_Y_OFFSET = 2;
   mesh.position.set(startX, SHIP_Y_POS - GULLE_Y_OFFSET, startZ);
   scene.add(mesh);
 
   activeProjectiles.push({
     mesh, x: startX, z: startZ, targetX, targetZ,
-    speed: 5, 
+    speed: 6, 
     ammoKey, onHit, sparkTimer: 0,
     yOffset: GULLE_Y_OFFSET
   });
@@ -1078,7 +1096,12 @@ function animate3D() {
 
   const now = Date.now();
   if (player.hp < player.maxHp && (now - player.lastDamagedTime > 5000)) {
-    player.hp = Math.min(player.maxHp, player.hp + 5000);
+    const healAmount = 5000;
+    player.hp = Math.min(player.maxHp, player.hp + healAmount);
+    
+    // Can Yenilendiğinde Oyuncu Gemisinin Üstünde Yeşil İyileşme Yazısı Göster
+    showFloatingDamage(player.x, player.z, '+' + healAmount.toLocaleString(), '#22c55e');
+
     updateHUD();
   }
 
@@ -1114,11 +1137,20 @@ function animate3D() {
 
   rangeRingMesh.position.set(player.x, 0.6, player.z);
 
+  // Eğer düşman seçiliyse kırmızı çemberi düşmanın konumunda güncelle
+  if (selectedEnemyId && enemySelectRingMesh && enemySelectRingMesh.visible) {
+    const target = enemies.find(e => e.id === selectedEnemyId);
+    if (target) {
+      enemySelectRingMesh.position.set(target.x, 0.9, target.z);
+      enemySelectRingMesh.rotation.z += 0.03;
+    }
+  }
+
   if (playerSprite) {
     const tempVector = new THREE.Vector3(player.x, SHIP_Y_POS, player.z);
     tempVector.project(camera);
     const xPx = (tempVector.x *  .5 + .5) * window.innerWidth;
-    const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 100;
+    const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 55;
     playerLabelEl.style.transform = `translate(-50%, 0) translate(${xPx}px, ${yPx}px)`;
   }
 
@@ -1126,7 +1158,7 @@ function animate3D() {
   camera.position.z += (player.z + 540 - camera.position.z) * 0.08;
   camera.lookAt(player.x, 0, player.z);
 
-  // Gülle ve Büyütülmüş Parçacık Efektleri
+  // Gülle ve Çok Daha Göz Alıcı / Yoğun Parçacık Efektleri
   for (let i = activeProjectiles.length - 1; i >= 0; i--) {
     const p = activeProjectiles[i];
     const dx = p.targetX - p.x;
@@ -1143,33 +1175,33 @@ function animate3D() {
       p.x += (dx / dist) * p.speed;
       p.z += (dz / dist) * p.speed;
       p.mesh.position.set(p.x, SHIP_Y_POS - p.yOffset, p.z);
-      p.mesh.rotation.x += 0.15;
-      p.mesh.rotation.y += 0.15;
+      p.mesh.rotation.x += 0.2;
+      p.mesh.rotation.y += 0.2;
 
       p.sparkTimer++;
       if (p.sparkTimer % 1 === 0) {
         let sparkColor = 0xffa500;
         if (p.ammoKey === 'fire') {
-          sparkColor = Math.random() > 0.5 ? 0xff0000 : 0xff7700;
+          sparkColor = Math.random() > 0.4 ? 0xff2200 : 0xffaa00;
         } else if (p.ammoKey === 'dragon') {
-          const colors = [0x3b82f6, 0xa855f7, 0x10b981];
+          const colors = [0x3b82f6, 0x8b5cf6, 0x06b6d4, 0xec4899];
           sparkColor = colors[Math.floor(Math.random() * colors.length)];
         } else if (p.ammoKey === 'chain') {
-          sparkColor = 0xaaaaaa;
+          sparkColor = 0xcccccc;
         } else {
-          sparkColor = 0x666666;
+          sparkColor = 0x888888;
         }
 
-        const sparkGeo = new THREE.SphereGeometry(2.4, 8, 8); // Daha büyük kıvılcım tanecikleri
-        const sparkMat = new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 0.95 });
+        const sparkGeo = new THREE.SphereGeometry(3.2, 8, 8); // Çok daha büyük ve göz alıcı kıvılcımlar
+        const sparkMat = new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 0.98 });
         const sparkMesh = new THREE.Mesh(sparkGeo, sparkMat);
         sparkMesh.position.set(
-          p.x + (Math.random() - 0.5) * 8, 
-          SHIP_Y_POS - p.yOffset + (Math.random() - 0.5) * 8, 
-          p.z + (Math.random() - 0.5) * 8
+          p.x + (Math.random() - 0.5) * 10, 
+          SHIP_Y_POS - p.yOffset + (Math.random() - 0.5) * 10, 
+          p.z + (Math.random() - 0.5) * 10
         );
         scene.add(sparkMesh);
-        particleSystems.push({ mesh: sparkMesh, life: 22 });
+        particleSystems.push({ mesh: sparkMesh, life: 28 });
       }
     }
   }
@@ -1177,7 +1209,7 @@ function animate3D() {
   for (let i = particleSystems.length - 1; i >= 0; i--) {
     const pt = particleSystems[i];
     pt.life--;
-    pt.mesh.scale.multiplyScalar(0.90);
+    pt.mesh.scale.multiplyScalar(0.88);
     if (pt.life <= 0) {
       scene.remove(pt.mesh);
       pt.mesh.geometry.dispose();
@@ -1204,7 +1236,6 @@ function animate3D() {
         player.hp = Math.max(0, player.hp - 100);
         player.lastDamagedTime = now;
         
-        // Oyuncu Hasar Aldığında Üstünde Hasar Yazısı Göster
         showFloatingDamage(player.x, player.z, '-100', '#ef4444');
 
         updateHUD();
@@ -1250,7 +1281,6 @@ function animate3D() {
           target.hp -= ammoSpec.damage;
           if (ammoSpec.slow < 1.0) target.slowTimer = 240;
 
-          // Düşmana Hasar Verildiğinde Üstünde Hasar Yazısı Göster
           showFloatingDamage(target.x, target.z, '-' + ammoSpec.damage, '#f97316');
 
           updateTargetCard();
@@ -1262,6 +1292,7 @@ function animate3D() {
             enemies = enemies.filter(e => e.id !== target.id);
             selectedEnemyId = null;
             isAttacking = false;
+            if (enemySelectRingMesh) enemySelectRingMesh.visible = false;
             player.score += 150;
             player.exp += 35;
             if (player.exp >= player.maxExp) {
