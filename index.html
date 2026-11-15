@@ -114,7 +114,7 @@
     }
     .ship-sub-name { font-size: 10px; color: #94a3b8; text-align: right; }
 
-    /* Geminin Altındaki Can Barı & İsim / Filo Etiketi (Y: 100 Sabit) */
+    /* Oyuncu Gemisi Altı Etiketi (Y: 100 Sabit) */
     #player-label {
       position: fixed; z-index: 5; pointer-events: none;
       transform: translate(-50%, 0);
@@ -135,6 +135,25 @@
     }
     .ship-fleet-tag {
       font-size: 10px; font-weight: 800; color: #fde68a;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap;
+    }
+
+    /* NPC Gemileri Altı Etiketleri ve Can Barları */
+    .npc-label {
+      position: fixed; z-index: 5; pointer-events: none;
+      transform: translate(-50%, 0);
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      will-change: transform;
+    }
+    .npc-hp-track {
+      width: 50px; height: 5px; background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 3px; overflow: hidden;
+    }
+    .npc-hp-fill {
+      width: 100%; height: 100%; background: #ef4444; transition: width 0.15s;
+    }
+    .npc-name-tag {
+      font-size: 10px; font-weight: 800; color: #fca5a5;
       text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap;
     }
 
@@ -284,7 +303,7 @@
 
   <div id="game"></div>
 
-  <!-- Geminin Altındaki Can Barı & İsim / Filo Etiketi (Y: 100 Sabit) -->
+  <!-- Oyuncu Gemisi Altı Can Barı & Etiketi (Y: 100 Sabit) -->
   <div id="player-label">
     <div class="ship-hp-track">
       <div id="player-ship-hp-fill"></div>
@@ -292,6 +311,9 @@
     <div class="ship-name-tag" id="tag-username">Test</div>
     <div class="ship-fleet-tag">[TST]</div>
   </div>
+
+  <!-- Dinamik NPC Etiketleri Konteyneri -->
+  <div id="npc-labels-container"></div>
 
   <div id="top-vital-hud">
     <div class="level-crest">
@@ -499,6 +521,7 @@ const marketCloseBtn = document.querySelector('#market-close-btn');
 const marketGoldEl = document.querySelector('#market-gold');
 const marketFeedbackEl = document.querySelector('#market-feedback');
 const shipyardListEl = document.querySelector('#shipyard-list');
+const npcLabelsContainer = document.querySelector('#npc-labels-container');
 
 const tabMarket = document.querySelector('#tab-market');
 const tabShipyard = document.querySelector('#tab-shipyard');
@@ -543,8 +566,8 @@ const SHIP_MODELS = {
   dragon:   { id: 'dragon',   name: 'Kızıl Ejder',         desc: 'Ejderha nefesi gücünü artıran efsane', cost: 35000000, tint: 0xef4444, emissive: 0x991b1b }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v32';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v32';
+const USERS_STORAGE_KEY = 'pirate3d_users_v33';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v33';
 let authMode = 'login';
 let currentUser = null;
 
@@ -779,13 +802,13 @@ function getDirectionSpriteData(angle) {
   return shipTextures.topRight || shipTextures.top;
 }
 
-function applyNormalizedSprite(sprite, angle, baseHeight = BASE_SHIP_HEIGHT) {
+// Oyuncu sprite'ı (Tersaneden seçilen tasarıma göre renk alır)
+function applyPlayerSprite(sprite, angle, baseHeight = BASE_SHIP_HEIGHT) {
   const data = getDirectionSpriteData(angle);
   if (!data) return;
   sprite.material.map = data.texture;
   sprite.scale.set(baseHeight * data.aspect, baseHeight, 1);
   
-  // Seçili gemi modeline göre renk ve parıltı ayarı (Tasarım Sistemi)
   const currentShipId = currentUser?.equippedShip || 'standard';
   const modelSpec = SHIP_MODELS[currentShipId] || SHIP_MODELS.standard;
   sprite.material.color.setHex(modelSpec.tint);
@@ -793,6 +816,17 @@ function applyNormalizedSprite(sprite, angle, baseHeight = BASE_SHIP_HEIGHT) {
     sprite.material.emissive = new THREE.Color(modelSpec.emissive);
     sprite.material.emissiveIntensity = 0.4;
   }
+}
+
+// NPC sprite'ı (HER ZAMAN orijinal ve sabit standart görünümde kalır)
+function applyNpcSprite(sprite, angle, baseHeight = BASE_SHIP_HEIGHT) {
+  const data = getDirectionSpriteData(angle);
+  if (!data) return;
+  sprite.material.map = data.texture;
+  sprite.scale.set(baseHeight * data.aspect, baseHeight, 1);
+  sprite.material.color.setHex(0xffffff);
+  sprite.material.emissive = new THREE.Color(0x000000);
+  sprite.material.emissiveIntensity = 0;
 }
 
 function initThreeGame() {
@@ -929,7 +963,7 @@ function startGameLogic() {
   const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1 });
   playerSprite = new THREE.Sprite(mat);
   playerSprite.center.set(0.5, 0.95);
-  applyNormalizedSprite(playerSprite, player.a);
+  applyPlayerSprite(playerSprite, player.a);
   scene.add(playerSprite);
 
   gameIslands.forEach(isl => scene.remove(isl.mesh));
@@ -945,6 +979,7 @@ function startGameLogic() {
 
   enemies.forEach(en => scene.remove(en.sprite));
   enemies = [];
+  npcLabelsContainer.innerHTML = '';
   for (let i = 0; i < 6; i++) spawnEnemySprite(i + 1);
 
   selectAmmoSlot('iron');
@@ -961,16 +996,26 @@ function spawnEnemySprite(id) {
   } while (Math.hypot(ex, ez) < 300);
 
   const initialData = shipTextures.top || Object.values(shipTextures)[0];
-  const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1, color: 0xd1fae5 });
+  const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1 });
   const sprite = new THREE.Sprite(mat);
   sprite.center.set(0.5, 0.95);
-  applyNormalizedSprite(sprite, 0);
+  applyNpcSprite(sprite, 0);
   sprite.position.set(ex, SHIP_Y_POS, ez);
   sprite.userData.enemyId = id;
   scene.add(sprite);
 
+  // NPC Altı HTML Can Barı ve "Korsan" Etiketi
+  const labelDiv = document.createElement('div');
+  labelDiv.className = 'npc-label';
+  labelDiv.id = `npc-label-${id}`;
+  labelDiv.innerHTML = `
+    <div class="npc-hp-track"><div class="npc-hp-fill" id="npc-hp-fill-${id}"></div></div>
+    <div class="npc-name-tag">Korsan</div>
+  `;
+  npcLabelsContainer.appendChild(labelDiv);
+
   enemies.push({
-    id, name: `Korsan Gemisi #${id}`, sprite, x: ex, z: ez,
+    id, name: `Korsan Gemisi #${id}`, sprite, labelEl: labelDiv,
     hp: 520, maxHp: 520, baseSpeed: 1.15, slowTimer: 0,
     a: 0, wanderAngle: Math.random() * Math.PI * 2, wanderTimer: 0,
     lastAttackTime: 0
@@ -1124,7 +1169,7 @@ function animate3D() {
 
   if (playerSprite) {
     playerSprite.position.set(player.x, SHIP_Y_POS, player.z);
-    applyNormalizedSprite(playerSprite, player.a);
+    applyPlayerSprite(playerSprite, player.a);
   }
 
   if (playerNeonRing) {
@@ -1260,7 +1305,21 @@ function animate3D() {
 
     if (en.sprite) {
       en.sprite.position.set(en.x, SHIP_Y_POS, en.z);
-      applyNormalizedSprite(en.sprite, en.a);
+      applyNpcSprite(en.sprite, en.a); // NPC tasarımı hep sabit kalır
+    }
+
+    // NPC Altı Can Barı / Etiket Konum Güncellemesi
+    if (en.labelEl) {
+      const v = new THREE.Vector3(en.x, SHIP_Y_POS, en.z);
+      v.project(camera);
+      const nx = (v.x * 0.5 + 0.5) * window.innerWidth;
+      const ny = (v.y * -0.5 + 0.5) * window.innerHeight + 55;
+      en.labelEl.style.transform = `translate(-50%, 0) translate(${nx}px, ${ny}px)`;
+
+      const fillEl = document.getElementById(`npc-hp-fill-${en.id}`);
+      if (fillEl) {
+        fillEl.style.width = Math.max(0, (en.hp / en.maxHp) * 100) + '%';
+      }
     }
   }
 
@@ -1286,6 +1345,7 @@ function animate3D() {
           syncAttackButton();
 
           if (target.hp <= 0) {
+            if (target.labelEl) target.labelEl.remove();
             scene.remove(target.sprite);
             enemies = enemies.filter(e => e.id !== target.id);
             selectedEnemyId = null;
@@ -1484,7 +1544,7 @@ function renderShipyardList() {
 
       updateHUD();
       shipTitleEl.textContent = SHIP_MODELS[shipId].name;
-      if (playerSprite) applyNormalizedSprite(playerSprite, player.a);
+      if (playerSprite) applyPlayerSprite(playerSprite, player.a);
       renderShipyardList();
 
       marketFeedbackEl.style.color = '#4ade80';
@@ -1504,7 +1564,7 @@ function renderShipyardList() {
       }
       currentUser.equippedShip = shipId;
       shipTitleEl.textContent = SHIP_MODELS[shipId].name;
-      if (playerSprite) applyNormalizedSprite(playerSprite, player.a);
+      if (playerSprite) applyPlayerSprite(playerSprite, player.a);
       renderShipyardList();
 
       marketFeedbackEl.style.color = '#4ade80';
