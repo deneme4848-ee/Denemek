@@ -620,7 +620,7 @@ let activeProjectiles = [], particleSystems = [];
 let raycaster, planeGeo, mouse;
 let shipTextures = {};
 let textureLoader;
-let selectedRingMesh = null; // Seçili gemi kırmızı çemberi
+let selectedRingMesh = null;
 const WORLD_SIZE = 1000;
 const ATTACK_RANGE = 280;
 const AGGRO_RANGE = 280;
@@ -841,7 +841,6 @@ function initThreeGame() {
   playerNeonRing.position.y = 0.8;
   scene.add(playerNeonRing);
 
-  // Seçilen geminin altındaki kırmızı çember
   const selRingGeo = new THREE.RingGeometry(34, 40, 48);
   const selRingMat = new THREE.MeshBasicMaterial({ color: 0xef4444, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
   selectedRingMesh = new THREE.Mesh(selRingGeo, selRingMat);
@@ -966,7 +965,7 @@ function spawnEnemySprite(id) {
     id, name: `Korsan Gemisi #${id}`, sprite, x: ex, z: ez,
     hp: 520, maxHp: 520, baseSpeed: 1.15, slowTimer: 0,
     a: 0, wanderAngle: Math.random() * Math.PI * 2, wanderTimer: 0,
-    lastAttackTime: 0, isAggro: false // Başlangıçta pasifler!
+    lastAttackTime: 0, isAggro: false
   });
 }
 
@@ -1126,7 +1125,6 @@ function animate3D() {
 
   rangeRingMesh.position.set(player.x, 0.6, player.z);
 
-  // Eğer bir hedef seçiliyse kırmızı çemberi o geminin altında güncelle
   if (selectedEnemyId && selectedRingMesh) {
     const target = enemies.find(e => e.id === selectedEnemyId);
     if (target) {
@@ -1211,7 +1209,6 @@ function animate3D() {
     const activeSpeed = en.slowTimer > 0 ? en.baseSpeed * 0.5 : en.baseSpeed;
     const distToPlayer = Math.hypot(player.x - en.x, player.z - en.z);
 
-    // DÜŞMAN YAPAY ZEKASI: Sadece "isAggro" (öfkelenmiş/saldırıya uğramış) ise oyuncuyu takip eder ve saldırır!
     if (en.isAggro) {
       en.a = Math.atan2(player.z - en.z, player.x - en.x);
       
@@ -1236,7 +1233,6 @@ function animate3D() {
         }
       }
     } else {
-      // Pasif gezinme (Wander) - Oyuncuyu kesinlikle takip etmez, kendi yönünde salınır.
       en.wanderTimer--;
       if (en.wanderTimer <= 0) {
         en.wanderAngle += (Math.random() - 0.5) * 1.5;
@@ -1267,7 +1263,6 @@ function animate3D() {
         lastPlayerAttackTime = now;
         player.ammo[ammoKey]--;
 
-        // Ateş edildiği anda hedef gemiyi öfkelendir (isAggro = true)
         target.isAggro = true;
 
         fireProjectile(player.x, player.z, target.x, target.z, ammoKey, () => {
