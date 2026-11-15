@@ -1151,13 +1151,13 @@ function showFloatingDamage(wx, wz, text, colorHex) {
   setTimeout(() => div.remove(), 900);
 }
 
-function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
-  const ammoSpec = AMMO_TYPES[ammoKey];
+function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit, isEnemy = false) {
+  const ammoSpec = isEnemy ? { color: 0xff2200, speed: 6 } : AMMO_TYPES[ammoKey];
   const pGeo = new THREE.SphereGeometry(7.5, 16, 16);
   const pMat = new THREE.MeshStandardMaterial({ 
-    color: ammoSpec.color, 
-    emissive: ammoSpec.color,
-    emissiveIntensity: 1.5,
+    color: isEnemy ? 0xff2200 : ammoSpec.color, 
+    emissive: isEnemy ? 0xff0000 : ammoSpec.color,
+    emissiveIntensity: 2.0,
     roughness: 0.1 
   });
   const mesh = new THREE.Mesh(pGeo, pMat);
@@ -1170,7 +1170,8 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
     mesh, x: startX, z: startZ, targetX, targetZ,
     speed: 6, 
     ammoKey, onHit, sparkTimer: 0,
-    yOffset: GULLE_Y_OFFSET
+    yOffset: GULLE_Y_OFFSET,
+    isEnemy
   });
 }
 
@@ -1262,19 +1263,21 @@ function animate3D() {
 
       p.sparkTimer++;
       if (p.sparkTimer % 1 === 0) {
-        let sparkColor = 0xffa500;
-        if (p.ammoKey === 'fire') {
-          sparkColor = Math.random() > 0.4 ? 0xff2200 : 0xffaa00;
-        } else if (p.ammoKey === 'dragon') {
-          const colors = [0x3b82f6, 0x8b5cf6, 0x06b6d4, 0xec4899];
-          sparkColor = colors[Math.floor(Math.random() * colors.length)];
-        } else if (p.ammoKey === 'chain') {
-          sparkColor = 0xcccccc;
-        } else {
-          sparkColor = 0x888888;
+        let sparkColor = p.isEnemy ? 0xff3300 : 0xffa500;
+        if (!p.isEnemy) {
+          if (p.ammoKey === 'fire') {
+            sparkColor = Math.random() > 0.4 ? 0xff2200 : 0xffaa00;
+          } else if (p.ammoKey === 'dragon') {
+            const colors = [0x3b82f6, 0x8b5cf6, 0x06b6d4, 0xec4899];
+            sparkColor = colors[Math.floor(Math.random() * colors.length)];
+          } else if (p.ammoKey === 'chain') {
+            sparkColor = 0xcccccc;
+          } else {
+            sparkColor = 0x888888;
+          }
         }
 
-        const sparkGeo = new THREE.SphereGeometry(3.2, 8, 8);
+        const sparkGeo = new THREE.SphereGeometry(p.isEnemy ? 4.5 : 3.2, 8, 8);
         const sparkMat = new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 0.98 });
         const sparkMesh = new THREE.Mesh(sparkGeo, sparkMat);
         sparkMesh.position.set(
@@ -1327,7 +1330,7 @@ function animate3D() {
             gameOverEl.style.display = 'flex';
             finalScoreEl.textContent = 'Toplanan Altın: ' + formatShortNumber(player.score);
           }
-        });
+        }, true);
       }
     } else {
       en.wanderTimer--;
@@ -1387,7 +1390,7 @@ function animate3D() {
             updateHUD();
             syncAttackButton();
           }
-        });
+        }, false);
 
       }
     } else if (player.ammo[ammoKey] <= 0) {
@@ -1557,7 +1560,7 @@ function renderShipyardList() {
         return;
       }
       player.score -= cost;
-      if (!currentUser.ownedShips.includes(shipId)) currentUser.ownedShips.path ? currentUser.ownedShips.push(shipId) : currentUser.ownedShips.push(shipId);
+      if (!currentUser.ownedShips.includes(shipId)) currentUser.ownedShips.push(shipId);
       currentUser.equippedShip = shipId;
 
       const users = loadUsers();
