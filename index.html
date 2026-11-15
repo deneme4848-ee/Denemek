@@ -623,8 +623,8 @@ const SHIP_MODELS = {
   dragon:   { id: 'dragon',   name: 'Kızıl Ejder', desc: 'Ejderha Gücü', cost: 35000000, img: 'gemi18.png' }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v39';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v39';
+const USERS_STORAGE_KEY = 'pirate3d_users_v40';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v40';
 let authMode = 'login';
 let currentUser = null;
 
@@ -705,7 +705,7 @@ const WORLD_SIZE = 1000;
 const ATTACK_RANGE = 280;
 const CASTLE_AGGRO_RANGE = 330;
 const BASE_SHIP_HEIGHT = 85;
-let castleTowerMeshes = []; // Tıklama tespiti için kule meshleri
+let castleTowerMeshes = [];
 
 function createStaticOceanTextures() {
   const size = 1024;
@@ -873,23 +873,20 @@ function applyNormalizedSprite(sprite, angle, baseHeight = BASE_SHIP_HEIGHT) {
 // ==========================================================
 function buildCastleIsland() {
   castleGroup = new THREE.Group();
-  // Adanın konumu daha da yukarıda (Kuzeyde, Z: -350)
   castleGroup.position.set(0, 0, -350);
 
-  // 1. Ada Zemin Tabanı (Kumlu / Kayalık Ada dokusu)
   const islandGeo = new THREE.CylinderGeometry(150, 170, 32, 36);
   const islandMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.85, metalness: 0.1 });
   const islandMesh = new THREE.Mesh(islandGeo, islandMat);
   islandMesh.position.y = 14;
   castleGroup.add(islandMesh);
 
-  // 2. Hilal (At Nalanı) Şeklinde Sur Duvarı (Önü açık, arkası kapalı)
   const wallRadius = 120;
-  const wallCount = 20; // Tam çember yerine arkada 20 parça bırakıp önde giriş bırakağız
+  const wallCount = 20;
   const wallMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.8, metalness: 0.2 });
 
   for (let i = 0; i < wallCount; i++) {
-    const angle = (i / wallCount) * Math.PI * 1.6 - (Math.PI * 0.8); // Önde geniş açık koy girişi bırakır
+    const angle = (i / wallCount) * Math.PI * 1.6 - (Math.PI * 0.8);
     const wx = Math.cos(angle) * wallRadius;
     const wz = Math.sin(angle) * wallRadius;
 
@@ -900,7 +897,6 @@ function buildCastleIsland() {
     castleGroup.add(wMesh);
   }
 
-  // 3. İçerideki Görkemli Kale Yapısı
   const keepGeo = new THREE.BoxGeometry(45, 60, 45);
   const keepMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6, metalness: 0.3 });
   const keepMesh = new THREE.Mesh(keepGeo, keepMat);
@@ -913,7 +909,6 @@ function buildCastleIsland() {
   roofMesh.position.set(0, 95, 20);
   castleGroup.add(roofMesh);
 
-  // 4. Surlar Üzerinde 15 Adet Savunma Kulesi (Tıklanabilir & Canlı)
   castleTowers = [];
   castleTowerMeshes = [];
   const towerCount = 15;
@@ -928,7 +923,6 @@ function buildCastleIsland() {
     const towerMesh = new THREE.Mesh(tGeo, tMat);
     towerMesh.position.set(tx, 45, tz);
     
-    // Tıklanabilmesi için veri atama
     const towerId = 100 + i;
     towerMesh.userData = { towerId: towerId, name: `Kale Kulesi #${i+1}` };
     castleGroup.add(towerMesh);
@@ -1010,7 +1004,6 @@ function initThreeGame() {
   playerNeonRing.position.y = 0.8;
   scene.add(playerNeonRing);
 
-  // Seçilen hedef (Gemi veya Kale Kulesi) için kırmızı çember
   const selRingGeo = new THREE.RingGeometry(30, 36, 48);
   const selRingMat = new THREE.MeshBasicMaterial({ color: 0xef4444, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
   selectedRingMesh = new THREE.Mesh(selRingGeo, selRingMat);
@@ -1042,34 +1035,31 @@ function initThreeGame() {
     mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
 
-    // 1. Önce düşman gemilerine tıklandı mı bak
     const enemySprites = enemies.map(en => en.sprite);
     const intersectsEnemies = raycaster.intersectObjects(enemySprites);
     if (intersectsEnemies.length > 0) {
       let obj = intersectsEnemies[0].object;
       if (obj.userData.enemyId) {
         selectedEnemyId = obj.userData.enemyId;
-        selectedTowerId = null; // Gemiyse kule seçimini sıfırla
+        selectedTowerId = null;
         updateTargetCard();
         syncAttackButton();
         return;
       }
     }
 
-    // 2. Kulelere tıklandı mı bak
     const intersectsTowers = raycaster.intersectObjects(castleTowerMeshes);
     if (intersectsTowers.length > 0) {
       let obj = intersectsTowers[0].object;
       if (obj.userData.towerId) {
         selectedTowerId = obj.userData.towerId;
-        selectedEnemyId = null; // Kuleyse gemi seçimini sıfırla
+        selectedEnemyId = null;
         updateTargetCard();
         syncAttackButton();
         return;
       }
     }
 
-    // 3. Boş denize tıklandıysa hareket et
     const oceanIntersect = raycaster.intersectObject(ocean);
     if (oceanIntersect.length > 0) {
       targetPos = { x: oceanIntersect[0].point.x, z: oceanIntersect[0].point.z };
@@ -1347,7 +1337,6 @@ function animate3D() {
 
   rangeRingMesh.position.set(player.x, 0.6, player.z);
 
-  // Kırmızı hedef çemberinin güncellenmesi (Gemi veya Kule)
   if (selectedRingMesh) {
     if (selectedEnemyId) {
       const target = enemies.find(e => e.id === selectedEnemyId);
@@ -1380,7 +1369,6 @@ function animate3D() {
   camera.position.z += (player.z + 680 - camera.position.z) * 0.08;
   camera.lookAt(player.x, 0, player.z);
 
-  // KALE KULELERİNİN OYUNCUYA SALDIRISI
   if (castleGroup) {
     const castleWorldX = castleGroup.position.x;
     const castleWorldZ = castleGroup.position.z;
@@ -1544,7 +1532,6 @@ function animate3D() {
     }
   }
 
-  // OYUNCUNUN ATEŞ ETME MANTIĞI (Gemiye veya Seçilen Kuleye)
   if (isAttacking && (selectedEnemyId || selectedTowerId)) {
     const ammoKey = player.selectedAmmo;
     const ammoSpec = AMMO_TYPES[ammoKey];
@@ -1605,6 +1592,7 @@ function animate3D() {
               castleGroup.remove(tower.mesh);
               tower.mesh.geometry.dispose();
               tower.mesh.material.dispose();
+              castleTowerMeshes = castleTowerMeshes.filter(m => m !== tower.mesh);
               selectedTowerId = null;
               isAttacking = false;
               if (selectedRingMesh) selectedRingMesh.visible = false;
@@ -1642,7 +1630,6 @@ function drawMinimap() {
   const scale = w / WORLD_SIZE;
   const cx = w / 2, cy = h / 2;
 
-  // Hilal Ada Minimap Konumu (-350)
   mctx.fillStyle = '#475569';
   mctx.beginPath();
   mctx.arc(cx + 0, cy + (-350 * scale), 22 * scale, 0, Math.PI * 2);
