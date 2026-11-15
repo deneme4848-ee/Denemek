@@ -13,28 +13,28 @@
     #game { display: block; width: 100%; height: 100%; position: fixed; inset: 0; z-index: 0; }
 
     #top-vital-hud {
-      position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
-      width: min(94vw, 540px); display: flex; align-items: center; gap: 8px;
+      position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
+      width: min(90vw, 480px); display: flex; align-items: center; gap: 6px;
       z-index: 6; pointer-events: none;
     }
     .level-crest {
-      width: 44px; height: 44px; flex-shrink: 0; border-radius: 12px;
+      width: 38px; height: 38px; flex-shrink: 0; border-radius: 10px;
       background: linear-gradient(145deg, #1e293b, #09131d);
-      border: 2px solid #f59e0b; box-shadow: 0 4px 15px rgba(0,0,0,0.85);
+      border: 2px solid #f59e0b; box-shadow: 0 4px 12px rgba(0,0,0,0.85);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
-    .level-crest span { font-size: 9px; color: #fbbf24; font-weight: 800; letter-spacing: 0.5px; }
-    .level-crest strong { font-size: 16px; color: #fff; line-height: 1; }
+    .level-crest span { font-size: 8px; color: #fbbf24; font-weight: 800; letter-spacing: 0.5px; }
+    .level-crest strong { font-size: 14px; color: #fff; line-height: 1; }
 
     .vital-bars-wrap {
-      flex: 1; display: flex; flex-direction: column; gap: 4px;
+      flex: 1; display: flex; flex-direction: column; gap: 3px;
       background: rgba(6, 17, 27, 0.88); backdrop-filter: blur(6px);
-      padding: 5px 7px; border-radius: 11px; border: 1px solid rgba(245, 197, 94, 0.4);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.75);
+      padding: 4px 6px; border-radius: 10px; border: 1px solid rgba(245, 197, 94, 0.4);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.75);
     }
     .vital-track {
-      position: relative; width: 100%; height: 16px;
-      background: rgba(15, 23, 42, 0.9); border-radius: 6px; overflow: hidden;
+      position: relative; width: 100%; height: 14px;
+      background: rgba(15, 23, 42, 0.9); border-radius: 5px; overflow: hidden;
       border: 1px solid rgba(255,255,255,0.1);
     }
     #hp-bar {
@@ -49,70 +49,70 @@
     }
     .vital-label {
       position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: 800; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.95);
+      font-size: 10px; font-weight: 800; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.95);
       letter-spacing: 0.3px;
     }
 
     #top-left-hud {
-      position: fixed; top: 66px; left: 10px;
-      display: flex; align-items: flex-start; gap: 8px;
+      position: fixed; top: 56px; left: 8px;
+      display: flex; align-items: flex-start; gap: 6px;
       z-index: 6; pointer-events: none;
     }
     .radar-card {
       pointer-events: auto; background: rgba(7, 20, 31, 0.92);
-      border: 2px solid rgba(217, 119, 6, 0.65); border-radius: 12px;
-      padding: 4px; box-shadow: 0 10px 28px rgba(0,0,0,0.85);
-      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      border: 2px solid rgba(217, 119, 6, 0.65); border-radius: 10px;
+      padding: 3px; box-shadow: 0 8px 24px rgba(0,0,0,0.85);
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
     }
     .radar-title {
-      font-size: 9px; font-weight: 800; color: #fcd34d; letter-spacing: 0.5px;
+      font-size: 8px; font-weight: 800; color: #fcd34d; letter-spacing: 0.5px;
       text-transform: uppercase;
     }
     #minimap {
-      width: 82px; height: 82px; border-radius: 6px;
+      width: 70px; height: 70px; border-radius: 5px;
       background: #e6d5b8; border: 1px solid #92400e; display: block;
     }
     .coord-pill {
-      width: 100%; text-align: center; font-size: 10px; font-weight: 800;
-      background: rgba(2, 8, 14, 0.85); color: #fef08a; padding: 2px 4px;
-      border-radius: 5px; border: 1px solid rgba(245, 158, 11, 0.3);
+      width: 100%; text-align: center; font-size: 9px; font-weight: 800;
+      background: rgba(2, 8, 14, 0.85); color: #fef08a; padding: 2px 3px;
+      border-radius: 4px; border: 1px solid rgba(245, 158, 11, 0.3);
     }
 
     .side-tool-col {
-      pointer-events: auto; display: flex; flex-direction: column; gap: 6px;
+      pointer-events: auto; display: flex; flex-direction: column; gap: 5px;
     }
     .tool-icon-btn {
-      width: 40px; height: 40px; border-radius: 10px;
+      width: 36px; height: 36px; border-radius: 9px;
       background: linear-gradient(155deg, #172a3a, #091520);
       border: 1.5px solid rgba(245, 197, 94, 0.55); color: #fef3c7;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,0.75);
+      cursor: pointer; box-shadow: 0 5px 14px rgba(0,0,0,0.75);
       transition: transform 0.12s, border-color 0.15s;
     }
     .tool-icon-btn:hover { border-color: #fbbf24; transform: translateY(-1px); }
     .tool-icon-btn:active { transform: scale(0.94); }
-    .tool-icon-btn span.ico { font-size: 15px; line-height: 1.1; }
-    .tool-icon-btn span.lbl { font-size: 8px; font-weight: 800; color: #fde68a; }
+    .tool-icon-btn span.ico { font-size: 13px; line-height: 1.1; }
+    .tool-icon-btn span.lbl { font-size: 7px; font-weight: 800; color: #fde68a; }
 
     #top-right-hud {
-      position: fixed; top: 66px; right: 10px; z-index: 6;
+      position: fixed; top: 56px; right: 8px; z-index: 6;
       background: rgba(7, 20, 31, 0.9); backdrop-filter: blur(6px);
-      border: 1px solid rgba(245, 197, 94, 0.45); border-radius: 12px;
-      padding: 8px 11px; min-width: 145px; box-shadow: 0 8px 25px rgba(0,0,0,0.8);
-      display: flex; flex-direction: column; gap: 5px;
+      border: 1px solid rgba(245, 197, 94, 0.45); border-radius: 10px;
+      padding: 6px 9px; min-width: 130px; box-shadow: 0 6px 20px rgba(0,0,0,0.8);
+      display: flex; flex-direction: column; gap: 4px;
     }
-    .captain-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-    .captain-row strong { font-size: 12px; color: #fffbeb; }
+    .captain-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+    .captain-row strong { font-size: 11px; color: #fffbeb; }
     .logout-chip {
       border: 1px solid rgba(252, 165, 165, 0.45); background: rgba(153, 27, 27, 0.85);
-      color: #fee2e2; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 6px; cursor: pointer;
+      color: #fee2e2; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 5px; cursor: pointer;
     }
     .gold-row {
       display: flex; align-items: center; justify-content: space-between;
-      font-size: 12px; font-weight: 800; color: #fbbf24;
-      background: rgba(0,0,0,0.35); padding: 4px 8px; border-radius: 7px;
+      font-size: 11px; font-weight: 800; color: #fbbf24;
+      background: rgba(0,0,0,0.35); padding: 3px 6px; border-radius: 6px;
     }
-    .ship-sub-name { font-size: 10px; color: #94a3b8; text-align: right; }
+    .ship-sub-name { font-size: 9px; color: #94a3b8; text-align: right; }
 
     #player-label {
       position: fixed; z-index: 5; pointer-events: none;
@@ -121,19 +121,19 @@
       will-change: transform;
     }
     .ship-hp-track {
-      width: 60px; height: 6px; background: rgba(0, 0, 0, 0.7);
+      width: 52px; height: 5px; background: rgba(0, 0, 0, 0.7);
       border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 3px; overflow: hidden;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.8);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.8);
     }
     #player-ship-hp-fill {
       width: 100%; height: 100%; background: #22c55e; transition: width 0.15s, background-color 0.2s;
     }
     .ship-name-tag {
-      font-size: 11px; font-weight: 900; color: #fff;
+      font-size: 10px; font-weight: 900; color: #fff;
       text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap;
     }
     .ship-fleet-tag {
-      font-size: 10px; font-weight: 800; color: #fde68a;
+      font-size: 9px; font-weight: 800; color: #fde68a;
       text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap;
     }
 
@@ -144,91 +144,91 @@
       will-change: transform;
     }
     .enemy-hp-track {
-      width: 50px; height: 5px; background: rgba(0, 0, 0, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 3px; overflow: hidden;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.8);
+      width: 44px; height: 4px; background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 2px; overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.8);
     }
     .enemy-hp-fill {
       width: 100%; height: 100%; background: #ef4444; transition: width 0.15s;
     }
     .enemy-name-tag {
-      font-size: 10px; font-weight: 800; color: #fca5a5;
+      font-size: 9px; font-weight: 800; color: #fca5a5;
       text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap;
     }
 
     .floating-dmg {
       position: fixed; z-index: 10; pointer-events: none;
-      font-weight: 900; font-size: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+      font-weight: 900; font-size: 15px; text-shadow: 0 2px 4px rgba(0,0,0,0.9);
       animation: floatUpAndFade 0.9s ease-out forwards;
       transform: translate(-50%, -50%);
     }
     @keyframes floatUpAndFade {
       0% { opacity: 1; transform: translate(-50%, 0) scale(1.2); }
-      100% { opacity: 0; transform: translate(-50%, -55px) scale(0.9); }
+      100% { opacity: 0; transform: translate(-50%, -50px) scale(0.9); }
     }
 
     #bottom-dock {
-      position: fixed; bottom: 12px; left: 10px; right: 10px;
+      position: fixed; bottom: 10px; left: 8px; right: 8px;
       display: flex; justify-content: space-between; align-items: flex-end;
-      gap: 10px; z-index: 6; pointer-events: none;
+      gap: 8px; z-index: 6; pointer-events: none;
     }
 
     .ammo-dock-container {
-      pointer-events: auto; display: flex; flex-direction: column; gap: 6px;
-      max-width: calc(100vw - 115px);
+      pointer-events: auto; display: flex; flex-direction: column; gap: 5px;
+      max-width: calc(100vw - 105px);
     }
     .active-ammo-banner {
       align-self: flex-start; background: rgba(6, 17, 27, 0.88);
-      border: 1px solid rgba(245, 197, 94, 0.4); border-radius: 8px;
-      padding: 4px 10px; font-size: 11px; color: #fde68a; font-weight: 700;
+      border: 1px solid rgba(245, 197, 94, 0.4); border-radius: 7px;
+      padding: 3px 8px; font-size: 10px; color: #fde68a; font-weight: 700;
     }
     .ammo-slots-row {
-      display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px;
+      display: flex; gap: 5px; overflow-x: auto; padding-bottom: 2px;
     }
     .ammo-slot {
-      position: relative; width: 58px; height: 62px; flex-shrink: 0;
-      border-radius: 11px; background: linear-gradient(165deg, #132838, #07131d);
+      position: relative; width: 48px; height: 52px; flex-shrink: 0;
+      border-radius: 9px; background: linear-gradient(165deg, #132838, #07131d);
       border: 2px solid rgba(148, 163, 184, 0.35);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      cursor: pointer; transition: all 0.15s ease; box-shadow: 0 6px 16px rgba(0,0,0,0.8);
+      cursor: pointer; transition: all 0.15s ease; box-shadow: 0 5px 12px rgba(0,0,0,0.8);
     }
     .ammo-slot.selected {
       border-color: #fbbf24; background: linear-gradient(165deg, #451a03, #1c0a00);
-      box-shadow: 0 0 16px rgba(245, 158, 11, 0.55); transform: translateY(-3px);
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.55); transform: translateY(-2px);
     }
     .ammo-slot .key-hint {
-      position: absolute; top: 3px; left: 5px; font-size: 9px; font-weight: 800; color: #94a3b8;
+      position: absolute; top: 2px; left: 4px; font-size: 8px; font-weight: 800; color: #94a3b8;
     }
-    .ammo-slot .ammo-ico { font-size: 22px; line-height: 1.1; }
+    .ammo-slot .ammo-ico { font-size: 18px; line-height: 1.1; }
     .ammo-slot .ammo-qty {
-      font-size: 11px; font-weight: 900; color: #fff; margin-top: 2px;
-      background: rgba(0,0,0,0.55); padding: 1px 6px; border-radius: 5px;
+      font-size: 10px; font-weight: 900; color: #fff; margin-top: 1px;
+      background: rgba(0,0,0,0.55); padding: 1px 5px; border-radius: 4px;
     }
     .ammo-slot.empty { opacity: 0.45; }
 
     .right-combat-cluster {
-      pointer-events: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+      pointer-events: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
     }
     #target-card {
       display: none; background: rgba(15, 23, 42, 0.92);
-      border: 1.5px solid #ef4444; border-radius: 10px;
-      padding: 6px 10px; min-width: 145px; box-shadow: 0 8px 20px rgba(0,0,0,0.85);
+      border: 1.5px solid #ef4444; border-radius: 9px;
+      padding: 5px 8px; min-width: 130px; box-shadow: 0 6px 16px rgba(0,0,0,0.85);
     }
     #target-card.visible { display: block; }
-    .target-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: #fca5a5; margin-bottom: 4px; }
-    .target-hp-bg { width: 100%; height: 7px; background: rgba(255,255,255,0.15); border-radius: 4px; overflow: hidden; }
+    .target-header { display: flex; justify-content: space-between; font-size: 10px; font-weight: 800; color: #fca5a5; margin-bottom: 3px; }
+    .target-hp-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.15); border-radius: 3px; overflow: hidden; }
     #target-hp-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #dc2626, #f97316); transition: width 0.15s; }
 
     #attack-btn {
-      width: 84px; height: 84px; border-radius: 50%;
-      border: 3px solid #fbbf24;
+      width: 72px; height: 72px; border-radius: 50%;
+      border: 2.5px solid #fbbf24;
       background: radial-gradient(circle at 35% 30%, #ea580c, #7c2d12 75%, #431407);
-      color: #fffbeb; font-size: 12px; font-weight: 900; letter-spacing: 0.4px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.85), inset 0 2px 6px rgba(255,255,255,0.3);
-      cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+      color: #fffbeb; font-size: 11px; font-weight: 900; letter-spacing: 0.4px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.85), inset 0 2px 5px rgba(255,255,255,0.3);
+      cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
       transition: all 0.16s ease;
     }
-    #attack-btn .crosshair { font-size: 24px; line-height: 1; }
+    #attack-btn .crosshair { font-size: 20px; line-height: 1; }
     #attack-btn.firing {
       border-color: #ef4444;
       background: radial-gradient(circle at 35% 30%, #dc2626, #7f1d1d 80%);
@@ -237,34 +237,42 @@
     #attack-btn:disabled { opacity: 0.4; filter: grayscale(0.8); cursor: not-allowed; animation: none; }
     @keyframes pulseFire {
       from { box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
-      to { box-shadow: 0 0 24px rgba(239, 68, 68, 0.95); }
+      to { box-shadow: 0 0 22px rgba(239, 68, 68, 0.95); }
     }
 
+    /* Liman Paneli (Görsel referanslı geniş tab sekmeleri) */
     #market-panel {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: min(92vw, 350px); max-height: 76vh; overflow-y: auto;
-      background: rgba(9, 24, 36, 0.97); backdrop-filter: blur(10px);
-      border: 2px solid rgba(245, 197, 94, 0.6); border-radius: 18px; padding: 16px; z-index: 15;
+      width: min(94vw, 520px); max-height: 82vh; overflow-y: auto;
+      background: rgba(9, 24, 36, 0.98); backdrop-filter: blur(10px);
+      border: 2px solid rgba(245, 197, 94, 0.65); border-radius: 16px; padding: 14px; z-index: 15;
       box-shadow: 0 25px 65px rgba(0,0,0,0.95); pointer-events: auto;
     }
     #market-panel.open { display: block; }
-    .market-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 8px; margin-bottom: 10px; }
-    .market-header strong { color: #ffd783; font-size: 15px; }
-    .market-close { background: rgba(255,255,255,0.1); border: none; color: #cbd5e1; width: 28px; height: 28px; border-radius: 8px; font-weight: 700; cursor: pointer; }
-    .market-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
-    .market-tab-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 7px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .market-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 7px; margin-bottom: 8px; }
+    .market-header strong { color: #ffd783; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .market-close { background: rgba(255,255,255,0.1); border: none; color: #cbd5e1; width: 26px; height: 26px; border-radius: 7px; font-weight: 700; cursor: pointer; }
+    
+    .port-tabs-scroll {
+      display: flex; gap: 4px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 8px;
+    }
+    .market-tab-btn {
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1;
+      padding: 6px 10px; border-radius: 7px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+    }
     .market-tab-btn.active { background: linear-gradient(135deg, #d97706, #92400e); color: #fff; border-color: #ffd783; }
+    
     .market-section { display: none; }
     .market-section.active { display: block; }
-    .market-balance { display: flex; justify-content: space-between; font-size: 12px; background: rgba(0,0,0,0.35); padding: 8px 10px; border-radius: 8px; margin-bottom: 10px; color: #e2e8f0; }
-    .market-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(6, 16, 24, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 9px 11px; margin-bottom: 8px; }
+    .market-balance { display: flex; justify-content: space-between; font-size: 11px; background: rgba(0,0,0,0.35); padding: 7px 9px; border-radius: 7px; margin-bottom: 8px; color: #e2e8f0; }
+    .market-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(6, 16, 24, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 9px; padding: 8px 10px; margin-bottom: 7px; }
     .market-item-info { display: flex; flex-direction: column; gap: 2px; }
-    .market-item-title { font-size: 13px; font-weight: 700; color: #fff; }
-    .market-item-sub { font-size: 11px; color: #94a3b8; }
-    .buy-btn { padding: 6px 12px; border-radius: 8px; border: 1px solid #ffd783; background: linear-gradient(135deg, #d97706, #92400e); color: #fff; font-size: 12px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+    .market-item-title { font-size: 12px; font-weight: 700; color: #fff; }
+    .market-item-sub { font-size: 10px; color: #94a3b8; }
+    .buy-btn { padding: 5px 10px; border-radius: 7px; border: 1px solid #ffd783; background: linear-gradient(135deg, #d97706, #92400e); color: #fff; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap; }
     .buy-btn:disabled { opacity: 0.42; background: rgba(30, 41, 59, 0.8); cursor: not-allowed; }
     .buy-btn.equipped { background: #1e40af; border-color: #60a5fa; color: #eff6ff; }
-    #market-feedback { font-size: 12px; min-height: 16px; margin-top: 6px; text-align: center; color: #4ade80; font-weight: 700; }
+    #market-feedback { font-size: 11px; min-height: 14px; margin-top: 5px; text-align: center; color: #4ade80; font-weight: 700; }
 
     #gameover {
       display: none; position: fixed; inset: 0; background: rgba(3, 11, 18, 0.92);
@@ -329,17 +337,14 @@
   <div id="top-left-hud">
     <div class="radar-card">
       <div class="radar-title">Harita 1</div>
-      <canvas id="minimap" width="82" height="82"></canvas>
+      <canvas id="minimap" width="70" height="70"></canvas>
       <div class="coord-pill" id="coord-display">X: 0 · Y: 0</div>
     </div>
     <div class="side-tool-col">
-      <button id="market-toggle-btn" class="tool-icon-btn" type="button" title="Market (M)">
-        <span class="ico">⚖️</span>
-        <span class="lbl">Market</span>
-      </button>
-      <button id="shipyard-toggle-btn" class="tool-icon-btn" type="button" title="Tersane (T)">
+      <!-- Tek Liman Butonu -->
+      <button id="port-toggle-btn" class="tool-icon-btn" type="button" title="Liman (M)">
         <span class="ico">⚓</span>
-        <span class="lbl">Tersane</span>
+        <span class="lbl">Liman</span>
       </button>
     </div>
   </div>
@@ -398,19 +403,27 @@
     </div>
   </div>
 
+  <!-- Birleştirilmiş Liman Paneli (Market & Tersane & Diğer Sekmeler) -->
   <div id="market-panel">
     <div class="market-header">
-      <strong>⚓ Cephane Marketi & Tersane</strong>
+      <strong id="port-panel-title">⚓ LİMAN - Gülle & Cephane</strong>
       <button id="market-close-btn" class="market-close" type="button">✕</button>
     </div>
-    <div class="market-tabs">
-      <button id="tab-market" class="market-tab-btn active" type="button">Gülle & Cephane</button>
+    <!-- Referans görseldeki gibi üst sekme çubuğu -->
+    <div class="port-tabs-scroll">
+      <button id="tab-ammo" class="market-tab-btn active" type="button">Gülle</button>
       <button id="tab-shipyard" class="market-tab-btn" type="button">Tersane</button>
+      <button class="market-tab-btn" type="button" disabled style="opacity:0.5;">Genişlet</button>
+      <button class="market-tab-btn" type="button" disabled style="opacity:0.5;">Top</button>
+      <button class="market-tab-btn" type="button" disabled style="opacity:0.5;">Silah</button>
+      <button class="market-tab-btn" type="button" disabled style="opacity:0.5;">Korsan</button>
+      <button class="market-tab-btn" type="button" disabled style="opacity:0.5;">Tayfa</button>
     </div>
     <div class="market-balance">
       <span>Hazine: <strong id="market-gold" style="color:#ffd783;">100,000,000</strong> Altın</span>
     </div>
-    <div id="section-market" class="market-section active">
+    <!-- Gülle / Cephane Bölümü -->
+    <div id="section-ammo" class="market-section active">
       <div class="market-item">
         <div class="market-item-info">
           <span class="market-item-title">⚫ 25x Demir Gülle</span>
@@ -440,6 +453,7 @@
         <button class="buy-btn ammo-buy-btn" type="button" data-type="dragon" data-amount="10" data-cost="120">120 Altın</button>
       </div>
     </div>
+    <!-- Tersane Bölümü -->
     <div id="section-shipyard" class="market-section">
       <div id="shipyard-list"></div>
     </div>
@@ -513,17 +527,17 @@ const captainNameEl = document.querySelector('#captain-name');
 const shipTitleEl = document.querySelector('#ship-title');
 const logoutBtn = document.querySelector('#logout-btn');
 
-const marketToggleBtn = document.querySelector('#market-toggle-btn');
-const shipyardToggleBtn = document.querySelector('#shipyard-toggle-btn');
+const portToggleBtn = document.querySelector('#port-toggle-btn');
 const marketPanel = document.querySelector('#market-panel');
 const marketCloseBtn = document.querySelector('#market-close-btn');
 const marketGoldEl = document.querySelector('#market-gold');
 const marketFeedbackEl = document.querySelector('#market-feedback');
 const shipyardListEl = document.querySelector('#shipyard-list');
+const portPanelTitle = document.querySelector('#port-panel-title');
 
-const tabMarket = document.querySelector('#tab-market');
+const tabAmmo = document.querySelector('#tab-ammo');
 const tabShipyard = document.querySelector('#tab-shipyard');
-const sectionMarket = document.querySelector('#section-market');
+const sectionAmmo = document.querySelector('#section-ammo');
 const sectionShipyard = document.querySelector('#section-shipyard');
 
 const authOverlay = document.querySelector('#auth-overlay');
@@ -564,8 +578,8 @@ const SHIP_MODELS = {
   dragon:   { id: 'dragon',   name: 'Kızıl Ejder',         desc: 'Ejderha nefesi gücünü artıran efsane', cost: 35000000 }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v31';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v31';
+const USERS_STORAGE_KEY = 'pirate3d_users_v32';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v32';
 let authMode = 'login';
 let currentUser = null;
 
@@ -631,7 +645,7 @@ if (authForm) {
 if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeItem(SESSION_STORAGE_KEY); location.reload(); });
 
 // ==========================================================
-// THREE.JS SAHNE & OYUN MOTORU
+// THREE.JS SAHNE & OYUN MOTORU (Genişletilmiş Kamera)
 // ==========================================================
 let scene, camera, renderer;
 let playerSprite, playerNeonRing, enemies = [], rangeRingMesh, oceanTexture, oceanBumpTexture;
@@ -643,7 +657,7 @@ let selectedRingMesh = null;
 const WORLD_SIZE = 1000;
 const ATTACK_RANGE = 280;
 const AGGRO_RANGE = 280;
-const BASE_SHIP_HEIGHT = 95;
+const BASE_SHIP_HEIGHT = 85; // Biraz daha kompakt gemi boyutu
 const SHIP_Y_POS = 110;
 
 function createStaticOceanTextures() {
@@ -812,8 +826,9 @@ function initThreeGame() {
   scene.background = new THREE.Color(0x052236);
   scene.fog = new THREE.FogExp2(0x052236, 0.0003);
 
-  camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 18000);
-  camera.position.set(0, 720, 540);
+  // Kamerayı biraz daha uzaklaştırarak geniş açı sağladık
+  camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 1, 18000);
+  camera.position.set(0, 920, 680);
   camera.lookAt(0, 0, 0);
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -853,14 +868,14 @@ function initThreeGame() {
   rangeRingMesh.position.y = 0.6;
   scene.add(rangeRingMesh);
 
-  const neonGeo = new THREE.RingGeometry(32, 38, 48);
+  const neonGeo = new THREE.RingGeometry(28, 34, 48);
   const neonMat = new THREE.MeshBasicMaterial({ color: 0x0ea5e9, side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
   playerNeonRing = new THREE.Mesh(neonGeo, neonMat);
   playerNeonRing.rotation.x = -Math.PI / 2;
   playerNeonRing.position.y = 0.8;
   scene.add(playerNeonRing);
 
-  const selRingGeo = new THREE.RingGeometry(34, 40, 48);
+  const selRingGeo = new THREE.RingGeometry(30, 36, 48);
   const selRingMat = new THREE.MeshBasicMaterial({ color: 0xef4444, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
   selectedRingMesh = new THREE.Mesh(selRingGeo, selRingMat);
   selectedRingMesh.rotation.x = -Math.PI / 2;
@@ -1012,13 +1027,7 @@ window.addEventListener('keydown', e => {
   if (e.key === '2') selectAmmoSlot('chain');
   if (e.key === '3') selectAmmoSlot('fire');
   if (e.key === '4') selectAmmoSlot('dragon');
-  if (e.key.toLowerCase() === 'm') marketPanel.classList.toggle('open');
-  if (e.key.toLowerCase() === 't') {
-    marketPanel.classList.add('open');
-    tabShipyard.classList.add('active'); tabMarket.classList.remove('active');
-    sectionShipyard.classList.add('active'); sectionMarket.classList.remove('active');
-    renderShipyardList();
-  }
+  if (e.key.toLowerCase() === 'm') togglePortPanel();
 });
 
 function updateTargetCard() {
@@ -1081,7 +1090,7 @@ function showFloatingDamage(wx, wz, text, colorHex) {
 
 function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
   const ammoSpec = AMMO_TYPES[ammoKey];
-  const pGeo = new THREE.SphereGeometry(6.5, 16, 16);
+  const pGeo = new THREE.SphereGeometry(6, 16, 16);
   const pMat = new THREE.MeshStandardMaterial({ 
     color: ammoSpec.color, 
     emissive: ammoSpec.color,
@@ -1164,8 +1173,9 @@ function animate3D() {
     playerLabelEl.style.transform = `translate(-50%, 0) translate(${xPx}px, ${yPx}px)`;
   }
 
+  // Genişletilmiş kamera takibi
   camera.position.x += (player.x - camera.position.x) * 0.08;
-  camera.position.z += (player.z + 540 - camera.position.z) * 0.08;
+  camera.position.z += (player.z + 680 - camera.position.z) * 0.08;
   camera.lookAt(player.x, 0, player.z);
 
   for (let i = activeProjectiles.length - 1; i >= 0; i--) {
@@ -1201,7 +1211,7 @@ function animate3D() {
           sparkColor = 0x666666;
         }
 
-        const sparkGeo = new THREE.SphereGeometry(2.4, 8, 8);
+        const sparkGeo = new THREE.SphereGeometry(2.2, 8, 8);
         const sparkMat = new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 0.95 });
         const sparkMesh = new THREE.Mesh(sparkGeo, sparkMat);
         sparkMesh.position.set(
@@ -1357,20 +1367,20 @@ function drawMinimap() {
 
   if (!player) return;
 
-  // DÜZELTME: Minimap ölçeği tüm dünya sınırlarını (WORLD_SIZE) kapsayacak şekilde ayarlandı
+  // DÜZELTME: Tüm dünya haritasını (WORLD_SIZE) kusursuzca sığdıran oran
   const scale = w / WORLD_SIZE;
   const cx = w / 2, cy = h / 2;
 
   mctx.fillStyle = '#dc2626';
   enemies.forEach(en => {
     mctx.beginPath();
-    mctx.arc(cx + en.x * scale, cy + en.z * scale, 2.2, 0, Math.PI * 2);
+    mctx.arc(cx + en.x * scale, cy + en.z * scale, 2.0, 0, Math.PI * 2);
     mctx.fill();
   });
 
   mctx.fillStyle = '#1d4ed8';
   mctx.beginPath();
-  mctx.arc(cx + player.x * scale, cy + player.z * scale, 3.0, 0, Math.PI * 2);
+  mctx.arc(cx + player.x * scale, cy + player.z * scale, 2.6, 0, Math.PI * 2);
   mctx.fill();
 }
 
@@ -1403,27 +1413,28 @@ function updateHUD() {
   });
 }
 
-marketToggleBtn.addEventListener('click', () => {
+// Liman Paneli Kontrolleri
+function togglePortPanel() {
   marketPanel.classList.toggle('open');
-  tabMarket.classList.add('active'); tabShipyard.classList.remove('active');
-  sectionMarket.classList.add('active'); sectionShipyard.classList.remove('active');
-});
+}
+
+portToggleBtn.addEventListener('click', togglePortPanel);
 marketCloseBtn.addEventListener('click', () => marketPanel.classList.remove('open'));
 
-tabMarket.addEventListener('click', () => {
-  tabMarket.classList.add('active'); tabShipyard.classList.remove('active');
-  sectionMarket.classList.add('active'); sectionShipyard.classList.remove('active');
-});
-tabShipyard.addEventListener('click', () => {
-  tabShipyard.classList.add('active'); tabMarket.classList.remove('active');
-  sectionShipyard.classList.add('active'); sectionMarket.classList.remove('active');
-  renderShipyardList();
+tabAmmo.addEventListener('click', () => {
+  tabAmmo.classList.add('active');
+  tabShipyard.classList.remove('active');
+  sectionAmmo.classList.add('active');
+  sectionShipyard.classList.remove('active');
+  portPanelTitle.textContent = '⚓ LİMAN - Gülle & Cephane';
 });
 
-shipyardToggleBtn.addEventListener('click', () => {
-  marketPanel.classList.add('open');
-  tabShipyard.classList.add('active'); tabMarket.classList.remove('active');
-  sectionShipyard.classList.add('active'); sectionMarket.classList.remove('active');
+tabShipyard.addEventListener('click', () => {
+  tabShipyard.classList.add('active');
+  tabAmmo.classList.remove('active');
+  sectionShipyard.classList.add('active');
+  sectionAmmo.classList.remove('active');
+  portPanelTitle.textContent = '⚓ LİMAN - Tersane';
   renderShipyardList();
 });
 
@@ -1537,7 +1548,7 @@ function renderShipyardList() {
 }
 
 loadUsers();
-const session = JSON.render ? null : JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY) || 'null');
+const session = JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY) || 'null');
 if (session) { completeLogin(session); }
 </script>
 </body>
