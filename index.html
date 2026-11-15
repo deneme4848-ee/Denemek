@@ -243,7 +243,7 @@
     }
 
     /* ==============================================================
-       KLASİK KORSAN LİMAN & MARKET PENCERESİ (REFERANS GÖRSEL TARZI)
+       KLASİK KORSAN LİMAN & MARKET PENCERESİ
        ============================================================== */
     #port-modal-backdrop {
       display: none; position: fixed; inset: 0; z-index: 25;
@@ -262,7 +262,6 @@
       color: #f3e5c8;
     }
 
-    /* Üst Altın & Elmas Barı */
     .port-top-bar {
       display: flex; align-items: center; justify-content: space-between;
       background: linear-gradient(180deg, #3c2817, #24170c);
@@ -280,7 +279,6 @@
       color: #f5d08a; text-shadow: 0 2px 4px #000;
     }
 
-    /* Sağ Üst Yuvarlak Kırmızı/Altın Kapatma Butonu */
     .port-close-btn {
       position: absolute; top: -12px; right: -12px;
       width: 40px; height: 40px; border-radius: 50%;
@@ -293,7 +291,6 @@
     }
     .port-close-btn:hover { transform: scale(1.08); filter: brightness(1.1); }
 
-    /* Sekme Çubuğu (Tersane, Gülle, Top, Tayfa, Paketler) */
     .port-tabs-bar {
       display: flex; align-items: stretch; justify-content: space-around;
       background: linear-gradient(180deg, #24170d 0%, #160d07 100%);
@@ -319,14 +316,12 @@
     }
     .port-tab-text { font-size: 11px; font-weight: 800; white-space: nowrap; }
 
-    /* İçerik Alanı */
     .port-body {
       padding: 12px 16px 16px; overflow-y: auto; flex: 1;
     }
     .port-section { display: none; }
     .port-section.active { display: block; }
 
-    /* Stat ve Açıklama Alanı */
     .port-stats-strip {
       display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
       margin-bottom: 8px;
@@ -348,7 +343,6 @@
       line-height: 1.4; margin-bottom: 12px;
     }
 
-    /* Filtre ve Sayfalama Barı */
     .port-controls-row {
       display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
       gap: 8px; margin-bottom: 12px;
@@ -370,7 +364,6 @@
       border-color: #ffd768; color: #fff;
     }
 
-    /* 3 Sütunlu Deniz Üzeri Gemi Önizleme Kartları */
     .ship-cards-grid {
       display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
     }
@@ -423,7 +416,6 @@
       border-color: #93c5fd; cursor: default;
     }
 
-    /* Market (Gülle / Top / Tayfa) Öğeleri */
     .market-grid-list {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px;
     }
@@ -526,7 +518,7 @@
       <span>🪙</span>
       <span id="score">1,000,000,000</span>
     </div>
-    <div class="ship-sub-name" id="ship-title">Asarı Nusret</div>
+    <div class="ship-sub-name" id="ship-title">Kızıl Kalyon</div>
   </div>
 
   <div id="bottom-dock">
@@ -623,12 +615,12 @@
             <div class="port-stat-box"><span>⛵ 120</span><span class="port-stat-q">?</span></div>
           </div>
           <div class="port-info-desc">
-            Pro Puan pro gülle atılarak kazanılır. Her 10m Pro puanda %1 ekstra hasar. Her 50.000 defans puanı gemi canını %1 arttırır.
+            Star Puan özel gülle atılarak kazanılır. Her 10m Star puanda %1 ekstra hasar. Her 50.000 defans puanı gemi canını %1 arttırır.
           </div>
 
           <div class="port-controls-row">
             <select id="ship-category-filter" class="port-filter-select">
-              <option value="all">Pro Tasarımlar (Tümü)</option>
+              <option value="all">Star Tasarımlar (Tümü)</option>
               <option value="mythic">Efsanevi &amp; Mistik</option>
               <option value="war">Savaş Kalyonları</option>
             </select>
@@ -839,22 +831,23 @@ const AMMO_TYPES = {
   dragon: { id: 'dragon', name: 'Ejderha Nefesi', damage: 450, slow: 0.85, desc: '450 Efsanevi Hasar', color: 0x3b82f6 }
 };
 
+// TAMAMEN ÖZGÜN & TELİFSİZ GEMİ TASARIMLARI
 const SHIP_MODELS = {
-  standard: { id: 'standard', name: 'Asarı Nusret',       category: 'war',    desc: 'Standart Donanma Savaş Kalyonu', cost: 0 },
-  skull:    { id: 'skull',    name: 'Cenk-Aver',          category: 'mythic', desc: 'Burnunda parlayan kafatası figürü ve kemik oymaları', cost: 100000 },
-  dragon:   { id: 'dragon',   name: 'Bahri-Zafer',        category: 'mythic', desc: 'Kükreyen ejderha başlığı ve kızıl pullu zırh', cost: 500000 },
-  eagle:    { id: 'eagle',    name: 'Fırtına Kartalı',    category: 'war',    desc: 'Kanat açmış görkemli kartal figürlü amiral gemisi', cost: 1200000 },
-  lion:     { id: 'lion',     name: 'Altın Aslan',        category: 'war',    desc: 'Saf altın döküm kükreyen aslan başlığı', cost: 2500000 },
-  ghost:    { id: 'ghost',    name: 'Gecenin Hayaleti',   category: 'mythic', desc: 'Ay sfenksi motifleri ve gizemli mor aura', cost: 5000000 },
-  poseidon: { id: 'poseidon', name: 'Denizlerin Efendisi',category: 'mythic', desc: 'Devasa üççatal mızraklı okyanus hakimi', cost: 10000000 },
-  wolf:     { id: 'wolf',     name: 'Buzul Kurdu',        category: 'war',    desc: 'Kuzeyin vahşi kurt başlığı ve buz mavisi yelkenler', cost: 20000000 },
-  titan:    { id: 'titan',    name: 'Demir Yumruk',       category: 'war',    desc: 'Çift katmanlı koçbaşı zırhlı yıkılmaz dev', cost: 40000000 },
-  kraken:   { id: 'kraken',   name: 'Kraken\'in Kolu',    category: 'mythic', desc: 'Gövdesini saran zümrüt dokunaç oymaları', cost: 75000000 },
-  scales:   { id: 'scales',   name: 'Adalet Terazisi',    category: 'war',    desc: 'Antik korsan lordlarının altın terazi sembolü', cost: 150000000 }
+  standard: { id: 'standard', name: 'Kızıl Kalyon',       category: 'war',    desc: 'Standart Donanma Savaş Kalyonu', cost: 0 },
+  skull:    { id: 'skull',    name: 'Kafatası Baronu',    category: 'mythic', desc: 'Burnunda parlayan kafatası figürü ve kemik oymaları', cost: 100000 },
+  dragon:   { id: 'dragon',   name: 'Alev Ejderi',        category: 'mythic', desc: 'Kükreyen ejderha başlığı ve kızıl pullu zırh', cost: 500000 },
+  eagle:    { id: 'eagle',    name: 'Gök Şahini',         category: 'war',    desc: 'Kanat açmış görkemli şahin figürlü amiral gemisi', cost: 1200000 },
+  lion:     { id: 'lion',     name: 'Altın Yele',         category: 'war',    desc: 'Saf altın döküm kükreyen aslan başlığı', cost: 2500000 },
+  ghost:    { id: 'ghost',    name: 'Ay Sfenksi',         category: 'mythic', desc: 'Ay sfenksi motifleri ve gizemli mor aura', cost: 5000000 },
+  poseidon: { id: 'poseidon', name: 'Üççatal Muhafızı',   category: 'mythic', desc: 'Devasa üççatal mızraklı okyanus hakimi', cost: 10000000 },
+  wolf:     { id: 'wolf',     name: 'Kuzey Kurdu',        category: 'war',    desc: 'Kuzeyin vahşi kurt başlığı ve buz mavisi yelkenler', cost: 20000000 },
+  titan:    { id: 'titan',    name: 'Zırhlı Koçbaşı',     category: 'war',    desc: 'Çift katmanlı koçbaşı zırhlı yıkılmaz dev', cost: 40000000 },
+  kraken:   { id: 'kraken',   name: 'Derinlik Vantuzu',   category: 'mythic', desc: 'Gövdesini saran zümrüt dokunaç oymaları', cost: 75000000 },
+  scales:   { id: 'scales',   name: 'Korsan Mührü',       category: 'war',    desc: 'Antik korsan lordlarının altın terazi sembolü', cost: 150000000 }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v35';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v35';
+const USERS_STORAGE_KEY = 'pirate3d_users_v36';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v36';
 let authMode = 'login';
 let currentUser = null;
 
@@ -895,7 +888,7 @@ function completeLogin(user) {
   localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
   captainNameEl.textContent = currentUser.username;
   tagUsernameEl.textContent = currentUser.username;
-  shipTitleEl.textContent = SHIP_MODELS[currentUser.equippedShip]?.name || 'Asarı Nusret';
+  shipTitleEl.textContent = SHIP_MODELS[currentUser.equippedShip]?.name || 'Kızıl Kalyon';
   authOverlay.style.display = 'none';
   initThreeGame();
 }
@@ -2090,7 +2083,6 @@ portModalBackdrop.addEventListener('click', e => {
   if (e.target === portModalBackdrop) togglePortModal(false);
 });
 
-// Üst Sekme Geçişleri
 document.querySelectorAll('.port-tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.port-tab').forEach(t => t.classList.remove('active'));
@@ -2112,14 +2104,12 @@ shipCategoryFilter.addEventListener('change', () => {
   renderShipyardCards();
 });
 
-// Kart İçindeki Deniz Üzeri Canlı Gemi Önizleme Canvas'ı Çizimi
 function drawShipCardPreview(canvas, shipId) {
   const ctx = canvas.getContext('2d');
   const w = canvas.width;
   const h = canvas.height;
   ctx.clearRect(0, 0, w, h);
 
-  // 1. Okyanus Arka Planı & Dalga Dokusu (Referans görseldeki mavi deniz tonu)
   const oceanGrad = ctx.createLinearGradient(0, 0, 0, h);
   oceanGrad.addColorStop(0, '#135e87');
   oceanGrad.addColorStop(0.5, '#0d4a6e');
@@ -2127,7 +2117,6 @@ function drawShipCardPreview(canvas, shipId) {
   ctx.fillStyle = oceanGrad;
   ctx.fillRect(0, 0, w, h);
 
-  // Hafif dalga çizgileri
   ctx.strokeStyle = 'rgba(125, 211, 252, 0.14)';
   ctx.lineWidth = 1.5;
   for (let i = 0; i < 18; i++) {
@@ -2139,7 +2128,6 @@ function drawShipCardPreview(canvas, shipId) {
     ctx.stroke();
   }
 
-  // 2. Geminin Sağ-Üst (İzometrik) Görselini Çiz
   const rawTex = baseShipTextures.topRight || baseShipTextures.top || Object.values(baseShipTextures)[0];
   if (rawTex && rawTex.image) {
     const img = rawTex.image;
@@ -2167,7 +2155,6 @@ function renderShipyardCards() {
   const totalPages = Math.max(1, Math.ceil(allShips.length / SHIPS_PER_PAGE));
   if (currentShipPage > totalPages) currentShipPage = totalPages;
 
-  // Sayfa Numaraları (1, 2, 3, 4...)
   shipPaginationEl.innerHTML = '';
   for (let p = 1; p <= totalPages; p++) {
     const pBtn = document.createElement('button');
@@ -2181,7 +2168,6 @@ function renderShipyardCards() {
     shipPaginationEl.appendChild(pBtn);
   }
 
-  // Kartları Render Et
   shipyardGridEl.innerHTML = '';
   const users = loadUsers();
   const dbUser = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
@@ -2208,7 +2194,6 @@ function renderShipyardCards() {
 
     shipyardGridEl.appendChild(card);
 
-    // Önizleme canvas'ına gemiyi çiz
     const previewCanvas = card.querySelector('canvas');
     drawShipCardPreview(previewCanvas, model.id);
 
@@ -2236,7 +2221,6 @@ function renderShipyardCards() {
   });
 }
 
-// Gülle Satın Alma
 document.querySelectorAll('.ammo-buy-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     if (!player) return;
@@ -2261,7 +2245,6 @@ document.querySelectorAll('.ammo-buy-btn').forEach(btn => {
   });
 });
 
-// Top, Gövde, Tayfa & Paket Satın Alma
 document.querySelectorAll('.upgrade-buy-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     if (!player) return;
