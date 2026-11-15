@@ -114,10 +114,10 @@
     }
     .ship-sub-name { font-size: 9px; color: #94a3b8; text-align: right; }
 
-    /* Geminin hemen altında senkronize duran etiketler */
+    /* Geminin altında, tasarımın temas etmeyeceği ideal mesafe */
     #player-label {
       position: fixed; z-index: 5; pointer-events: none;
-      transform: translate(-50%, -10px);
+      transform: translate(-50%, 15px);
       display: flex; flex-direction: column; align-items: center; gap: 2px;
       will-change: transform;
     }
@@ -140,7 +140,7 @@
 
     .enemy-label {
       position: fixed; z-index: 5; pointer-events: none;
-      transform: translate(-50%, -10px);
+      transform: translate(-50%, 15px);
       display: flex; flex-direction: column; align-items: center; gap: 2px;
       will-change: transform;
     }
@@ -241,7 +241,6 @@
       to { box-shadow: 0 0 22px rgba(239, 68, 68, 0.95); }
     }
 
-    /* Modern Liman Paneli (Görsel Referanslı UI) */
     #market-panel {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
       width: min(94vw, 560px); max-height: 85vh; overflow-y: auto;
@@ -277,7 +276,6 @@
       padding: 8px; border-radius: 8px; margin-bottom: 12px; color: #e2e8f0; font-weight: 700;
     }
     
-    /* Tersane Gemi Kartları Görsel Önizleme Düzeni */
     .shipyard-grid {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;
     }
@@ -307,6 +305,10 @@
     .buy-btn:disabled { opacity: 0.42; background: rgba(30, 41, 59, 0.8); cursor: not-allowed; }
     .buy-btn.equipped { background: #1e40af; border-color: #60a5fa; color: #eff6ff; }
     #market-feedback { font-size: 11px; min-height: 14px; margin-top: 5px; text-align: center; color: #4ade80; font-weight: 700; }
+
+    .generic-tab-content {
+      text-align: center; padding: 30px 10px; color: #94a3b8; font-size: 13px; font-weight: 700;
+    }
 
     #gameover {
       display: none; position: fixed; inset: 0; background: rgba(3, 11, 18, 0.92);
@@ -391,7 +393,7 @@
       <span>🪙</span>
       <span id="score">100,000,000</span>
     </div>
-    <div class="ship-sub-name" id="ship-title">8 Yönlü Efsanevi Gemi</div>
+    <div class="ship-sub-name" id="ship-title">8 Yönlü Gemi</div>
   </div>
 
   <div id="bottom-dock">
@@ -436,7 +438,7 @@
     </div>
   </div>
 
-  <!-- Modern Liman Paneli -->
+  <!-- Güncellenmiş Liman Paneli -->
   <div id="market-panel">
     <div class="market-header">
       <strong id="port-panel-title">⚓ LİMAN - Gülle & Cephane</strong>
@@ -445,11 +447,8 @@
     <div class="port-tabs-scroll">
       <button id="tab-ammo" class="market-tab-btn active" type="button">Gülle</button>
       <button id="tab-shipyard" class="market-tab-btn" type="button">Tersane</button>
-      <button class="market-tab-btn" type="button" disabled style="opacity:0.4;">Genişlet</button>
-      <button class="market-tab-btn" type="button" disabled style="opacity:0.4;">Top</button>
-      <button class="market-tab-btn" type="button" disabled style="opacity:0.4;">Silah</button>
-      <button class="market-tab-btn" type="button" disabled style="opacity:0.4;">Korsan</button>
-      <button class="market-tab-btn" type="button" disabled style="opacity:0.4;">Tayfa</button>
+      <button id="tab-expand" class="market-tab-btn" type="button">Genişlet</button>
+      <button id="tab-crew" class="market-tab-btn" type="button">Tayfa</button>
     </div>
     <div class="market-balance">
       <span>Altın: <strong id="market-gold" style="color:#ffd783;">100,000,000</strong></span>
@@ -486,9 +485,17 @@
         <button class="buy-btn ammo-buy-btn" type="button" data-type="dragon" data-amount="10" data-cost="120">120 Altın</button>
       </div>
     </div>
-    <!-- Tersane Bölümü (Görsel Önizlemeli) -->
+    <!-- Tersane Bölümü (gemi18.png önizlemeli) -->
     <div id="section-shipyard" class="market-section">
       <div class="shipyard-grid" id="shipyard-list"></div>
+    </div>
+    <!-- Genişlet Bölümü -->
+    <div id="section-expand" class="market-section">
+      <div class="generic-tab-content">Genişletme modülleri yakında eklenecektir.</div>
+    </div>
+    <!-- Tayfa Bölümü -->
+    <div id="section-crew" class="market-section">
+      <div class="generic-tab-content">Tayfa kiralama ve yönetim paneli yakında eklenecektir.</div>
     </div>
     <div id="market-feedback"></div>
   </div>
@@ -570,8 +577,13 @@ const portPanelTitle = document.querySelector('#port-panel-title');
 
 const tabAmmo = document.querySelector('#tab-ammo');
 const tabShipyard = document.querySelector('#tab-shipyard');
+const tabExpand = document.querySelector('#tab-expand');
+const tabCrew = document.querySelector('#tab-crew');
+
 const sectionAmmo = document.querySelector('#section-ammo');
 const sectionShipyard = document.querySelector('#section-shipyard');
+const sectionExpand = document.querySelector('#section-expand');
+const sectionCrew = document.querySelector('#section-crew');
 
 const authOverlay = document.querySelector('#auth-overlay');
 const tabLogin = document.querySelector('#tab-login');
@@ -605,14 +617,14 @@ const AMMO_TYPES = {
 };
 
 const SHIP_MODELS = {
-  standard: { id: 'standard', name: '8 Yönlü Gemi', desc: 'Standart Savaş Gemisi', cost: 0, img: 'gemi13.png' },
-  ghost:    { id: 'ghost',    name: 'Hayalet Fırkateyn', desc: 'Gizli Sis Gövdesi', cost: 5000000, img: 'gemi12.png' },
-  gold:     { id: 'gold',     name: 'Altın Korsan', desc: 'İhtişamlı Altın Kalyon', cost: 15000000, img: 'gemi11.png' },
-  dragon:   { id: 'dragon',   name: 'Kızıl Ejder', desc: 'Ejderha Gücü', cost: 35000000, img: 'gemi15.png' }
+  standard: { id: 'standard', name: '8 Yönlü Gemi', desc: 'Standart Savaş Gemisi', cost: 0, img: 'gemi18.png' },
+  ghost:    { id: 'ghost',    name: 'Hayalet Fırkateyn', desc: 'Gizli Sis Gövdesi', cost: 5000000, img: 'gemi18.png' },
+  gold:     { id: 'gold',     name: 'Altın Korsan', desc: 'İhtişamlı Altın Kalyon', cost: 15000000, img: 'gemi18.png' },
+  dragon:   { id: 'dragon',   name: 'Kızıl Ejder', desc: 'Ejderha Gücü', cost: 35000000, img: 'gemi18.png' }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v33';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v33';
+const USERS_STORAGE_KEY = 'pirate3d_users_v34';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v34';
 let authMode = 'login';
 let currentUser = null;
 
@@ -986,7 +998,7 @@ function startGameLogic() {
   const initialData = shipTextures.top || Object.values(shipTextures)[0];
   const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1 });
   playerSprite = new THREE.Sprite(mat);
-  playerSprite.center.set(0.5, 0.85); // Sprite merkezini ayarlayarak etiketlerin gemiye tam yapışmasını sağladık
+  playerSprite.center.set(0.5, 0.5); // Merkez ayarı tam oturması için
   applyNormalizedSprite(playerSprite, player.a);
   scene.add(playerSprite);
 
@@ -1015,7 +1027,7 @@ function spawnEnemySprite(id) {
   const initialData = shipTextures.top || Object.values(shipTextures)[0];
   const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1, color: 0xd1fae5 });
   const sprite = new THREE.Sprite(mat);
-  sprite.center.set(0.5, 0.85);
+  sprite.center.set(0.5, 0.5);
   applyNormalizedSprite(sprite, 0);
   sprite.position.set(ex, SHIP_Y_POS, ez);
   sprite.userData.enemyId = id;
@@ -1201,7 +1213,7 @@ function animate3D() {
     const tempVector = new THREE.Vector3(player.x, SHIP_Y_POS, player.z);
     tempVector.project(camera);
     const xPx = (tempVector.x *  .5 + .5) * window.innerWidth;
-    const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 38; // Ekran ölçeğinden bağımsız gemiye tam yapışan dikey konum
+    const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 50; // Geminin altında hatasız konum
     playerLabelEl.style.transform = `translate(-50%, 0) translate(${xPx}px, ${yPx}px)`;
   }
 
@@ -1317,7 +1329,7 @@ function animate3D() {
       const tempVector = new THREE.Vector3(en.x, SHIP_Y_POS, en.z);
       tempVector.project(camera);
       const xPx = (tempVector.x *  .5 + .5) * window.innerWidth;
-      const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 38;
+      const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 50;
       en.labelEl.style.transform = `translate(-50%, 0) translate(${xPx}px, ${yPx}px)`;
 
       const hpP = Math.max(0, (en.hp / en.maxHp) * 100);
@@ -1453,22 +1465,21 @@ function togglePortPanel() {
 portToggleBtn.addEventListener('click', togglePortPanel);
 marketCloseBtn.addEventListener('click', () => marketPanel.classList.remove('open'));
 
-tabAmmo.addEventListener('click', () => {
-  tabAmmo.classList.add('active');
-  tabShipyard.classList.remove('active');
-  sectionAmmo.classList.add('active');
-  sectionShipyard.classList.remove('active');
-  portPanelTitle.textContent = '⚓ LİMAN - Gülle & Cephane';
-});
+function setActiveTab(activeBtn, activeSec, titleText) {
+  [tabAmmo, tabShipyard, tabExpand, tabCrew].forEach(b => b.classList.remove('active'));
+  [sectionAmmo, sectionShipyard, sectionExpand, sectionCrew].forEach(s => s.classList.remove('active'));
+  activeBtn.classList.add('active');
+  activeSec.classList.add('active');
+  portPanelTitle.textContent = titleText;
+}
 
+tabAmmo.addEventListener('click', () => setActiveTab(tabAmmo, sectionAmmo, '⚓ LİMAN - Gülle & Cephane'));
 tabShipyard.addEventListener('click', () => {
-  tabShipyard.classList.add('active');
-  tabAmmo.classList.remove('active');
-  sectionShipyard.classList.add('active');
-  sectionAmmo.classList.remove('active');
-  portPanelTitle.textContent = '⚓ LİMAN - Tersane';
+  setActiveTab(tabShipyard, sectionShipyard, '⚓ LİMAN - Tersane');
   renderShipyardList();
 });
+tabExpand.addEventListener('click', () => setActiveTab(tabExpand, sectionExpand, '⚓ LİMAN - Genişletme'));
+tabCrew.addEventListener('click', () => setActiveTab(tabCrew, sectionCrew, '⚓ LİMAN - Tayfa'));
 
 document.querySelectorAll('.ammo-buy-btn').forEach(btn => {
   btn.addEventListener('click', () => {
