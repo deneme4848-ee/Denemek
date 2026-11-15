@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Seafight Tarzı Kale Adası & Filo Sistemi</title>
+  <title>Korsan Dünyası - Seafight Tarzı Geniş Kamera & NPC Sistemi</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -78,11 +78,12 @@
       border-radius: 5px; border: 1px solid rgba(245, 158, 11, 0.3);
     }
 
+    /* TEK MARKET BUTONU SOL ÜSTTE */
     .side-tool-col {
       pointer-events: auto; display: flex; flex-direction: column; gap: 6px;
     }
     .tool-icon-btn {
-      width: 42px; height: 42px; border-radius: 10px;
+      width: 44px; height: 44px; border-radius: 10px;
       background: linear-gradient(155deg, #172a3a, #091520);
       border: 1.5px solid rgba(245, 197, 94, 0.55); color: #fef3c7;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -90,8 +91,7 @@
       transition: transform 0.12s, border-color 0.15s;
     }
     .tool-icon-btn:hover { border-color: #fbbf24; transform: translateY(-1px); }
-    .tool-icon-btn:active { transform: scale(0.94); }
-    .tool-icon-btn span.ico { font-size: 15px; line-height: 1.1; }
+    .tool-icon-btn span.ico { font-size: 16px; line-height: 1.1; }
     .tool-icon-btn span.lbl { font-size: 8px; font-weight: 800; color: #fde68a; }
 
     #top-right-hud {
@@ -242,7 +242,7 @@
       to { box-shadow: 0 0 24px rgba(239, 68, 68, 0.95); }
     }
 
-    /* SEAFİGHT TARZI MARKED PANEL (Görseldeki 9 Sekmeli Üst Bar) */
+    /* SEAFİGHT TARZI 9 SEKMELİ MARKET PANELİ */
     #market-panel {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
       width: min(95vw, 680px); max-height: 84vh; overflow-y: auto;
@@ -258,7 +258,6 @@
     }
     .market-close { background: rgba(220, 38, 38, 0.85); border: none; color: #fff; width: 30px; height: 30px; border-radius: 8px; font-weight: 900; cursor: pointer; }
     
-    /* ÜST 9 SEKMELİ KUTU */
     .market-tabs-grid {
       display: grid; grid-template-columns: repeat(9, 1fr); gap: 4px; margin-bottom: 12px;
       background: rgba(0,0,0,0.4); padding: 5px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);
@@ -350,18 +349,11 @@
       <canvas id="minimap" width="82" height="82"></canvas>
       <div class="coord-pill" id="coord-display">X: 0 · Y: 0</div>
     </div>
+    <!-- TEK BUTON: MARKET, TERSANE VE STAR PUAN BİRLEŞTİRİLDİ -->
     <div class="side-tool-col">
-      <button id="market-toggle-btn" class="tool-icon-btn" type="button" title="Market (M)">
+      <button id="market-main-btn" class="tool-icon-btn" type="button" title="Market (M)">
         <span class="ico">⚖️</span>
         <span class="lbl">Market</span>
-      </button>
-      <button id="shipyard-toggle-btn" class="tool-icon-btn" type="button" title="Tersane (T)">
-        <span class="ico">⚓</span>
-        <span class="lbl">Tersane</span>
-      </button>
-      <button id="starshop-toggle-btn" class="tool-icon-btn" type="button" title="Star Dükkanı (S)">
-        <span class="ico">⭐</span>
-        <span class="lbl">Star</span>
       </button>
     </div>
   </div>
@@ -424,7 +416,7 @@
     </div>
   </div>
 
-  <!-- SEAFİGHT TARZI 9 SEKMELİ MARKED PANEL -->
+  <!-- SEAFİGHT TARZI 9 SEKMELİ MARKET PANELİ -->
   <div id="market-panel">
     <div class="market-top-bar">
       <span>🪙 <strong id="market-gold" style="color:#ffd783;">100m</strong> &nbsp;|&nbsp; ⭐ <strong id="market-star" style="color:#38bdf8;">2.500</strong></span>
@@ -515,7 +507,7 @@
       </div>
     </div>
 
-    <!-- 6. FİLO SEKMESİ (Altın karşılığı filo kurma / lider olma) -->
+    <!-- 6. FİLO SEKMESİ -->
     <div id="sec-fleet" class="market-section">
       <div class="market-item">
         <div class="market-item-info">
@@ -644,9 +636,7 @@ const captainNameEl = document.querySelector('#captain-name');
 const shipTitleEl = document.querySelector('#ship-title');
 const logoutBtn = document.querySelector('#logout-btn');
 
-const marketToggleBtn = document.querySelector('#market-toggle-btn');
-const shipyardToggleBtn = document.querySelector('#shipyard-toggle-btn');
-const starshopToggleBtn = document.querySelector('#starshop-toggle-btn');
+const marketMainBtn = document.querySelector('#market-main-btn');
 const marketPanel = document.querySelector('#market-panel');
 const marketCloseBtn = document.querySelector('#market-close-btn');
 const marketGoldEl = document.querySelector('#market-gold');
@@ -720,8 +710,8 @@ const SHIP_MODELS = {
   void_destroyer: { id: 'void_destroyer', name: 'Hiçlik Yokedicisi',   desc: 'Evrenin derinliklerinden gelen mor kozmik enerji yayan son teknoloji', cost: 500000000, tint: 0xd946ef, emissive: 0x86198f, extraCanvasType: 'void' }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v31';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v31';
+const USERS_STORAGE_KEY = 'pirate3d_users_v32';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v32';
 let authMode = 'login';
 let currentUser = null;
 
@@ -791,7 +781,7 @@ if (authForm) {
 if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeItem(SESSION_STORAGE_KEY); location.reload(); });
 
 // ==========================================================
-// THREE.JS SAHNE & OYUN MOTORU
+// THREE.JS SAHNE & OYUN MOTORU (Genişletilmiş Kamera)
 // ==========================================================
 let scene, camera, renderer;
 let playerSprite, playerNeonRing, enemies = [], defenseTowers = [], fortressGroup = null, rangeRingMesh, oceanTexture, oceanBumpTexture;
@@ -1043,7 +1033,6 @@ function applySpriteByAngle(sprite, angle, baseHeight = BASE_SHIP_HEIGHT, shipId
   }
 }
 
-// Görseldeki Kaleli Ada Oluşturucu
 function buildGraphicalFortressIsland() {
   if (fortressGroup) {
     scene.remove(fortressGroup);
@@ -1082,7 +1071,6 @@ function buildGraphicalFortressIsland() {
   dome.position.set(0, 72, 0);
   fortressGroup.add(dome);
 
-  // Surlar (Gemi üstlerinden rahatça geçebilsin diye fiziksel engel kaldırıldı, dekoratif bırakıldı)
   const wallRadius = 215;
   const arcConfigs = [
     { start: -Math.PI * 0.84, end: -Math.PI * 0.16 },
@@ -1197,8 +1185,9 @@ function initThreeGame() {
   scene.background = new THREE.Color(0x041d2e);
   scene.fog = new THREE.FogExp2(0x041d2e, 0.00028);
 
+  // KAMERA DAHA UZAKTAN VE GENİŞ AÇIYLA AYARLANDI
   camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 18000);
-  camera.position.set(0, 740, 560);
+  camera.position.set(0, 980, 780);
   camera.lookAt(0, 0, 0);
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -1318,7 +1307,7 @@ function initThreeGame() {
 }
 
 // ==========================================================
-// OYUN MANTIĞI & RASTGELE DOLAŞAN NPC GEMİLER
+// OYUN MANTIĞI & AKTİF NPC GEMİ DÖNGÜSÜ
 // ==========================================================
 let player;
 let targetPos = null, selectedEnemyId = null, isAttacking = false, isGameOver = false;
@@ -1359,8 +1348,8 @@ function startGameLogic() {
   enemies = [];
   nextNpcIdCounter = 1;
 
-  // Haritada rastgele dolaşan NPC gemiler
-  for (let i = 0; i < 6; i++) {
+  // Haritada aktif olarak dolaşan NPC gemiler
+  for (let i = 0; i < 7; i++) {
     spawnEnemySprite(nextNpcIdCounter++);
   }
 
@@ -1517,7 +1506,7 @@ function animate3D() {
   requestAnimationFrame(animate3D);
 
   if (player && !isGameOver) {
-    if (enemies.length < 6) {
+    if (enemies.length < 7) {
       spawnEnemySprite(nextNpcIdCounter++);
     }
   }
@@ -1556,7 +1545,6 @@ function animate3D() {
     player.speed *= 0.92;
   }
 
-  // Surlardan ve adadan rahatça geçebilmesi için serbest hareket
   player.x += Math.cos(player.a) * player.speed;
   player.z += Math.sin(player.a) * player.speed;
 
@@ -1597,8 +1585,9 @@ function animate3D() {
     }
   });
 
+  // Kamera daha uzaktan takip ediyor
   camera.position.x += (player.x - camera.position.x) * 0.08;
-  camera.position.z += (player.z + 560 - camera.position.z) * 0.08;
+  camera.position.z += (player.z + 780 - camera.position.z) * 0.08;
   camera.lookAt(player.x, 0, player.z);
 
   for (let i = activeProjectiles.length - 1; i >= 0; i--) {
@@ -1649,7 +1638,6 @@ function animate3D() {
     }
   }
 
-  // Savunma Kuleleri: Adanın sahibi olan filo oyuncularına ateş açmaz[cite: 2]
   const isPlayerInOwnerFleet = Boolean(islandOwnerFleet && currentUser.fleet === islandOwnerFleet);
 
   for (const tower of defenseTowers) {
@@ -1674,7 +1662,6 @@ function animate3D() {
     }
   }
 
-  // Düşman gemilerin hareketi ve oyuncuyu takip etmesi
   for (const en of enemies) {
     if (en.slowTimer > 0) en.slowTimer--;
     const activeSpeed = en.slowTimer > 0 ? en.baseSpeed * 0.5 : en.baseSpeed;
@@ -1761,12 +1748,11 @@ function animate3D() {
               player.exp += 25;
               showFloatingDamage(tower.x, tower.z, '+120 ⭐ Star', '#38bdf8');
 
-              // Son kuleyi batıran oyuncunun filosu adanın sahibi olur ve kuleler o filo adına yeniden dikilir[cite: 2]
               if (defenseTowers.length === 0) {
                 islandOwnerFleet = currentUser.fleet;
                 islandOwnerTitleEl.textContent = `Ada: ${islandOwnerFleet}`;
                 player.stars += 1000;
-                showFloatingDamage(player.x, player.z, `ADA FETHEDİLDİ! +1000 ⭐`, '#fbbf24');
+                showFloatingDamage(tower.x, tower.z, `ADA FETHEDİLDİ! +1000 ⭐`, '#fbbf24');
                 spawnAllDefenseTowers(); 
               }
 
@@ -1923,12 +1909,9 @@ marketTabs.forEach(tab => {
   tab.addEventListener('click', () => openMarketTab(tab.dataset.tab));
 });
 
-marketToggleBtn.addEventListener('click', () => openMarketTab('shipyard'));
-shipyardToggleBtn.addEventListener('click', () => openMarketTab('shipyard'));
-starshopToggleBtn.addEventListener('click', () => openMarketTab('star'));
+marketMainBtn.addEventListener('click', () => openMarketTab('shipyard'));
 marketCloseBtn.addEventListener('click', () => marketPanel.classList.remove('open'));
 
-// Filo Kurma Butonu
 createFleetBtn.addEventListener('click', () => {
   const cost = 10000000;
   if (player.score < cost) {
@@ -1947,7 +1930,6 @@ createFleetBtn.addEventListener('click', () => {
   setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2500);
 });
 
-// Cephane Satın Alma
 document.querySelectorAll('.ammo-buy-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     if (!player) return;
@@ -1973,7 +1955,6 @@ document.querySelectorAll('.ammo-buy-btn').forEach(btn => {
   });
 });
 
-// Zırh Geliştirme
 document.querySelector('.upgrade-buy-btn').addEventListener('click', () => {
   if (player.score < 5000000) {
     marketFeedbackEl.style.color = '#f87171';
@@ -1990,7 +1971,6 @@ document.querySelector('.upgrade-buy-btn').addEventListener('click', () => {
   setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
 });
 
-// Star Puanı Güçlendirmeleri
 document.querySelectorAll('.star-buy-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     if (!player) return;
