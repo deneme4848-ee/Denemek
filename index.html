@@ -641,6 +641,7 @@ if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeIt
 let scene, camera, renderer;
 let playerSprite, playerNeonRing, enemies = [], rangeRingMesh, oceanTexture, oceanBumpTexture;
 let clickMarkerGroup, clickOuterRing, clickInnerRing, clickRipples = [];
+let selectedEnemyRing = null; // Seçili düşman kırmızı çemberi
 let activeProjectiles = [], particleSystems = [];
 let raycaster, planeGeo, mouse;
 let shipTextures = {};
@@ -813,7 +814,6 @@ function applyNormalizedSprite(sprite, angle, baseHeight = BASE_SHIP_HEIGHT) {
   sprite.scale.set(baseHeight * data.aspect, baseHeight, 1);
 }
 
-// Tıklama Noktası Su Halkası (Ripple) Oluşturma
 function spawnClickRipple(x, z) {
   if (clickMarkerGroup) {
     clickMarkerGroup.position.set(x, 1.0, z);
@@ -835,7 +835,6 @@ function spawnClickRipple(x, z) {
   clickRipples.push({ mesh: rMesh, scale: 1, opacity: 0.9 });
 }
 
-// Ada Çarpışma Fiziği (Yumuşak İtme / Etrafından Dolaşma)
 function resolveIslandCollisions(entity, radius = SHIP_COLLISION_RADIUS) {
   let collided = false;
   for (const isl of gameIslands) {
@@ -919,7 +918,15 @@ function initThreeGame() {
   playerNeonRing.position.y = 0.8;
   scene.add(playerNeonRing);
 
-  // Tıklama Hedef İşaretçisi (Altın & Turkuaz Çift Halka)
+  // Seçilen Düşman Gemisinin Altındaki Kırmızı Çember (Hedef Göstergesi)
+  const selRingGeo = new THREE.RingGeometry(26, 32, 48);
+  const selRingMat = new THREE.MeshBasicMaterial({ color: 0xef4444, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
+  selectedEnemyRing = new THREE.Mesh(selRingGeo, selRingMat);
+  selectedEnemyRing.rotation.x = -Math.PI / 2;
+  selectedEnemyRing.position.y = 0.85;
+  selectedEnemyRing.visible = false;
+  scene.add(selectedEnemyRing);
+
   clickMarkerGroup = new THREE.Group();
   const outerGeo = new THREE.RingGeometry(14, 18, 36);
   const outerMat = new THREE.MeshBasicMaterial({ color: 0xfbbf24, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
@@ -976,7 +983,6 @@ function initThreeGame() {
       let tx = oceanIntersect[0].point.x;
       let tz = oceanIntersect[0].point.z;
 
-      // Eğer doğrudan bir adanın içine tıklandıysa hedefi adanın kıyısına kaydır
       for (const isl of gameIslands) {
         const dx = tx - isl.mesh.position.x;
         const dz = tz - isl.mesh.position.z;
@@ -1017,6 +1023,7 @@ function startGameLogic() {
   isGameOver = false; targetPos = null; selectedEnemyId = null; isAttacking = false;
   gameOverEl.style.display = 'none';
   if (clickMarkerGroup) clickMarkerGroup.visible = false;
+  if (selectedEnemyRing) selectedEnemyRing.visible = false;
 
   player = {
     x: 0, z: 0, a: -Math.PI / 2, speed: 0, maxSpeed: 1.85,
@@ -1061,7 +1068,7 @@ function startGameLogic() {
   enemies = [];
 
   for (let i = 0; i < 6; i++) spawnEnemySprite(i + 1, false);
-  spawnEnemySprite(99, true); // Patron Gemi (Boss)
+  spawnEnemySprite(99, true);
 
   selectAmmoSlot('iron');
   updateTargetCard();
@@ -1163,11 +1170,13 @@ window.addEventListener('keydown', e => {
 function updateTargetCard() {
   if (!selectedEnemyId) {
     targetCardEl.classList.remove('visible', 'boss-target');
+    if (selectedEnemyRing) selectedEnemyRing.visible = false;
     return;
   }
   const target = enemies.find(e => e.id === selectedEnemyId);
   if (!target) {
     targetCardEl.classList.remove('visible', 'boss-target');
+    if (selectedEnemyRing) selectedEnemyRing.visible = false;
     return;
   }
   targetCardEl.classList.add('visible');
@@ -1212,9 +1221,10 @@ function showFloatingDamage(wx, wz, text, colorHex) {
   setTimeout(() => div.remove(), 900);
 }
 
-function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
-  const ammoSpec = AMMO_TYPES[ammoKey];
-  const pGeo = new THREE.SphereGeometry(6.5, 16, 16);
+// Gülle Ateşleme (Oyuncu veya Düşmanlar için ortak)
+function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit, isEnemy = false) {
+  const ammoSpec = isEnemy ? { color: 0xef4444 } : AMMO_TYPES[ammoKey];
+  const pGeo = new THREE.SphereGeometry(isEnemy ? 5.5 : 6.5, 16, 16);
   const pMat = new THREE.MeshStandardMaterial({ 
     color: ammoSpec.color, 
     emissive: ammoSpec.color,
@@ -1229,8 +1239,9 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
 
   activeProjectiles.push({
     mesh, x: startX, z: startZ, targetX, targetZ,
-    speed: 5, 
-    ammoKey, onHit, sparkTimer: 0,
+    speed: isEnemy ? 4.5 : 5, 
+    ammoKey: isEnemy ? 'enemy_ball' : ammoKey,
+    onHit, sparkTimer: 0,
     yOffset: GULLE_Y_OFFSET
   });
 }
@@ -1268,10 +1279,8 @@ function animate3D() {
   player.x += Math.cos(player.a) * player.speed;
   player.z += Math.sin(player.a) * player.speed;
 
-  // Oyuncu Ada Çarpışma Kontrolü
   resolveIslandCollisions(player, SHIP_COLLISION_RADIUS);
 
-  // Tıklama İmleci & Su Halkası Animasyonları
   if (clickMarkerGroup && clickMarkerGroup.visible) {
     const pulse = 1 + Math.sin(now * 0.008) * 0.18;
     clickOuterRing.scale.set(pulse, pulse, 1);
@@ -1304,6 +1313,20 @@ function animate3D() {
   }
 
   rangeRingMesh.position.set(player.x, 0.6, player.z);
+
+  // Seçili Düşman Kırmızı Çember Konumu Güncelleme
+  if (selectedEnemyId && selectedEnemyRing) {
+    const selTarget = enemies.find(e => e.id === selectedEnemyId);
+    if (selTarget) {
+      selectedEnemyRing.position.set(selTarget.x, 0.85, selTarget.z);
+      selectedEnemyRing.rotation.z -= 0.03;
+      selectedEnemyRing.visible = true;
+    } else {
+      selectedEnemyRing.visible = false;
+    }
+  } else if (selectedEnemyRing) {
+    selectedEnemyRing.visible = false;
+  }
 
   if (playerSprite) {
     const tempVector = new THREE.Vector3(player.x, SHIP_Y_POS, player.z);
@@ -1346,6 +1369,8 @@ function animate3D() {
           sparkColor = colors[Math.floor(Math.random() * colors.length)];
         } else if (p.ammoKey === 'chain') {
           sparkColor = 0xaaaaaa;
+        } else if (p.ammoKey === 'enemy_ball') {
+          sparkColor = 0xdc2626;
         } else {
           sparkColor = 0x666666;
         }
@@ -1390,20 +1415,24 @@ function animate3D() {
         en.z += Math.sin(en.a) * (activeSpeed * 1.25);
       }
 
+      // Düşman Oyuncuya Ateş Ettiğinde Gülle Efekti
       if (distToPlayer <= ATTACK_RANGE && (now - en.lastAttackTime >= (en.isBoss ? 1400 : 1000))) {
         en.lastAttackTime = now;
-        player.hp = Math.max(0, player.hp - en.damage);
-        player.lastDamagedTime = now;
-        
-        showFloatingDamage(player.x, player.z, `-${en.damage}`, en.isBoss ? '#dc2626' : '#ef4444');
 
-        updateHUD();
-        if (player.hp <= 0) {
-          isGameOver = true;
-          isAttacking = false;
-          gameOverEl.style.display = 'flex';
-          finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString();
-        }
+        fireProjectile(en.x, en.z, player.x, player.z, 'enemy_ball', () => {
+          player.hp = Math.max(0, player.hp - en.damage);
+          player.lastDamagedTime = now;
+          
+          showFloatingDamage(player.x, player.z, `-${en.damage}`, en.isBoss ? '#dc2626' : '#ef4444');
+
+          updateHUD();
+          if (player.hp <= 0) {
+            isGameOver = true;
+            isAttacking = false;
+            gameOverEl.style.display = 'flex';
+            finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString();
+          }
+        }, true);
       }
     } else {
       en.wanderTimer--;
@@ -1416,7 +1445,6 @@ function animate3D() {
       en.z += Math.sin(en.a) * (activeSpeed * 0.75);
     }
 
-    // Düşman & Boss Ada Çarpışma Kontrolü
     const hitIsland = resolveIslandCollisions(en, en.isBoss ? 36 : SHIP_COLLISION_RADIUS);
     if (hitIsland) {
       en.wanderAngle += Math.PI * 0.5;
@@ -1464,6 +1492,7 @@ function animate3D() {
             enemies = enemies.filter(e => e.id !== target.id);
             selectedEnemyId = null;
             isAttacking = false;
+            if (selectedEnemyRing) selectedEnemyRing.visible = false;
 
             player.score += target.rewardGold;
             player.exp += target.rewardExp;
@@ -1485,7 +1514,7 @@ function animate3D() {
             syncAttackButton();
             setTimeout(() => spawnEnemySprite(target.id, target.isBoss), target.isBoss ? 15000 : 3000);
           }
-        });
+        }, false);
 
       }
     } else if (player.ammo[ammoKey] <= 0) {
