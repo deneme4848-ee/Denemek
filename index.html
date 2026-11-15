@@ -623,8 +623,8 @@ const SHIP_MODELS = {
   dragon:   { id: 'dragon',   name: 'Kızıl Ejder', desc: 'Ejderha Gücü', cost: 35000000, img: 'gemi18.png' }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v37';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v37';
+const USERS_STORAGE_KEY = 'pirate3d_users_v38';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v38';
 let authMode = 'login';
 let currentUser = null;
 
@@ -695,7 +695,7 @@ if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeIt
 let scene, camera, renderer;
 let playerSprite, playerNeonRing, enemies = [], rangeRingMesh, oceanTexture, oceanBumpTexture;
 let castleGroup = null, castleTowers = [];
-let castleProjectiles = []; // Kulelerin sıktığı gülleler
+let castleProjectiles = [];
 let activeProjectiles = [], particleSystems = [];
 let raycaster, planeGeo, mouse;
 let shipTextures = {};
@@ -703,7 +703,7 @@ let textureLoader;
 let selectedRingMesh = null;
 const WORLD_SIZE = 1000;
 const ATTACK_RANGE = 280;
-const CASTLE_AGGRO_RANGE = 330; // Kulelerin menzili oyuncunkinden (280) biraz daha fazla
+const CASTLE_AGGRO_RANGE = 330;
 const BASE_SHIP_HEIGHT = 85;
 const SHIP_Y_POS = 110;
 
@@ -873,17 +873,14 @@ function applyNormalizedSprite(sprite, angle, baseHeight = BASE_SHIP_HEIGHT) {
 // ==========================================================
 function buildCastleIsland() {
   castleGroup = new THREE.Group();
-  // Haritanın biraz daha yukarı kısmına (Kuzeye) yerleştiriyoruz (Z: -250)
   castleGroup.position.set(0, 0, -280);
 
-  // 1. Ada Tabanı (Toprak / Kaya)
   const islandGeo = new THREE.CylinderGeometry(140, 160, 35, 32);
   const islandMat = new THREE.MeshStandardMaterial({ color: 0x2b3e50, roughness: 0.9, metalness: 0.1 });
   const islandMesh = new THREE.Mesh(islandGeo, islandMat);
   islandMesh.position.y = 15;
   castleGroup.add(islandMesh);
 
-  // 2. Surlar (Dış Çevre Duvarı)
   const wallRadius = 115;
   const wallGeo = new THREE.CylinderGeometry(wallRadius, wallRadius, 28, 32, 1, true);
   const wallMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.8, metalness: 0.2 });
@@ -891,21 +888,18 @@ function buildCastleIsland() {
   wallMesh.position.y = 30;
   castleGroup.add(wallMesh);
 
-  // 3. Ortadaki Büyük Ana Kale (Merkez Yapı)
   const keepGeo = new THREE.BoxGeometry(50, 65, 50);
   const keepMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6, metalness: 0.3 });
   const keepMesh = new THREE.Mesh(keepGeo, keepMat);
   keepMesh.position.y = 55;
   castleGroup.add(keepMesh);
 
-  // Kalenin Çatısı / Kulesi
   const roofGeo = new THREE.ConeGeometry(38, 35, 4);
   const roofMat = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.5 });
   const roofMesh = new THREE.Mesh(roofGeo, roofMat);
   roofMesh.position.y = 100;
   castleGroup.add(roofMesh);
 
-  // 4. Surlar Üzerinde 15 Adet Savunma Kulesi
   castleTowers = [];
   const towerCount = 15;
   for (let i = 0; i < towerCount; i++) {
@@ -913,21 +907,18 @@ function buildCastleIsland() {
     const tx = Math.cos(angle) * wallRadius;
     const tz = Math.sin(angle) * wallRadius;
 
-    // Kule Gövdesi
     const tGeo = new THREE.CylinderGeometry(9, 11, 40, 16);
     const tMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.7 });
     const towerMesh = new THREE.Mesh(tGeo, tMat);
     towerMesh.position.set(tx, 45, tz);
     castleGroup.add(towerMesh);
 
-    // Kule Tepe Şapkası
     const tRoofGeo = new THREE.ConeGeometry(12, 16, 12);
     const tRoofMat = new THREE.MeshStandardMaterial({ color: 0x7f1d1d, roughness: 0.5 });
     const tRoofMesh = new THREE.Mesh(tRoofGeo, tRoofMat);
     tRoofMesh.position.set(tx, 70, tz);
     castleGroup.add(tRoofMesh);
 
-    // Kule verilerini takip için diziye ekleyelim (dünya koordinatları ile)
     castleTowers.push({
       id: i + 1,
       localX: tx,
@@ -978,7 +969,6 @@ function initThreeGame() {
   ocean.rotation.x = -Math.PI / 2;
   scene.add(ocean);
 
-  // Görkemli Kale Adasını Haritanın Yukarısına (Kuzeye) İnşa Et
   buildCastleIsland();
 
   const ringGeo = new THREE.RingGeometry(ATTACK_RANGE - 3, ATTACK_RANGE, 64);
@@ -1074,7 +1064,7 @@ function startGameLogic() {
   const initialData = shipTextures.top || Object.values(shipTextures)[0];
   const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1 });
   playerSprite = new THREE.Sprite(mat);
-  playerSprite.center.set(0.5, 0.5);
+  playerSprite.center.set(0.5, 0.85); // Kusursuz orijinal merkez ayarı
   applyNormalizedSprite(playerSprite, player.a);
   scene.add(playerSprite);
 
@@ -1097,13 +1087,13 @@ function spawnEnemySprite(id) {
   let ex, ez;
   do {
     ex = (Math.random() - 0.5) * 800;
-    ez = (Math.random() - 0.5) * 600 + 100; // Düşmanlar kalenin çevresine ve güneye yerleşsin
+    ez = (Math.random() - 0.5) * 600 + 100;
   } while (Math.hypot(ex, ez) < 250);
 
   const initialData = shipTextures.top || Object.values(shipTextures)[0];
   const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1, color: 0xd1fae5 });
   const sprite = new THREE.Sprite(mat);
-  sprite.center.set(0.5, 0.5);
+  sprite.center.set(0.5, 0.85);
   applyNormalizedSprite(sprite, 0);
   sprite.position.set(ex, SHIP_Y_POS, ez);
   sprite.userData.enemyId = id;
@@ -1231,7 +1221,6 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
   });
 }
 
-// Kale Kulelerinin Oyuncuya Atış Yapması
 function fireCastleProjectile(startX, startZ, targetX, targetZ, onHit) {
   const pGeo = new THREE.SphereGeometry(5, 16, 16);
   const pMat = new THREE.MeshStandardMaterial({ 
@@ -1307,7 +1296,7 @@ function animate3D() {
     const tempVector = new THREE.Vector3(player.x, SHIP_Y_POS, player.z);
     tempVector.project(camera);
     const xPx = (tempVector.x *  .5 + .5) * window.innerWidth;
-    const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 38;
+    const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 38; // Orijinal kusursuz dikey konum (+38)
     playerLabelEl.style.transform = `translate(-50%, 0) translate(${xPx}px, ${yPx}px)`;
   }
 
@@ -1315,7 +1304,6 @@ function animate3D() {
   camera.position.z += (player.z + 680 - camera.position.z) * 0.08;
   camera.lookAt(player.x, 0, player.z);
 
-  // KALE KULELERİNİN OTOMATİK ATIŞ KONTROLÜ
   if (castleGroup) {
     const castleWorldX = castleGroup.position.x;
     const castleWorldZ = castleGroup.position.z;
@@ -1325,7 +1313,6 @@ function animate3D() {
       const towerWorldZ = castleWorldZ + tower.localZ;
       const distToPlayer = Math.hypot(player.x - towerWorldX, player.z - towerWorldZ);
 
-      // Kulelerin menzili (330 birim) içine girdiğinde ateş eder
       if (distToPlayer <= CASTLE_AGGRO_RANGE && (now - tower.lastShotTime >= 2200)) {
         tower.lastShotTime = now;
         fireCastleProjectile(towerWorldX, towerWorldZ, player.x, player.z, () => {
@@ -1344,7 +1331,6 @@ function animate3D() {
     });
   }
 
-  // Kale Güllelerinin Güncellenmesi
   for (let i = castleProjectiles.length - 1; i >= 0; i--) {
     const cp = castleProjectiles[i];
     const dx = player.x - cp.x;
@@ -1556,7 +1542,6 @@ function drawMinimap() {
   const scale = w / WORLD_SIZE;
   const cx = w / 2, cy = h / 2;
 
-  // Minimap üzerinde Kale Adası (Kuzeyde)
   mctx.fillStyle = '#475569';
   mctx.beginPath();
   mctx.arc(cx + 0, cy + (-280 * scale), 20 * scale, 0, Math.PI * 2);
@@ -1699,4 +1684,50 @@ function renderShipyardList() {
       }
       player.score -= cost;
       
-      ...
+      const users = loadUsers();
+      const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
+      if (uIdx !== -1) {
+        if (!users[uIdx].ownedShips) users[uIdx].ownedShips = ['standard'];
+        users[uIdx].ownedShips.push(shipId);
+        users[uIdx].equippedShip = shipId;
+        saveUsers(users);
+      }
+      currentUser.ownedShips.push(shipId);
+      currentUser.equippedShip = shipId;
+
+      updateHUD();
+      shipTitleEl.textContent = SHIP_MODELS[shipId].name;
+      renderShipyardList();
+
+      marketFeedbackEl.style.color = '#4ade80';
+      marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} satın alındı ve kuşanıldı!`;
+      setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2500);
+    });
+  });
+
+  shipyardListEl.querySelectorAll('.ship-equip-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const shipId = btn.dataset.id;
+      const users = loadUsers();
+      const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
+      if (uIdx !== -1) {
+        users[uIdx].equippedShip = shipId;
+        saveUsers(users);
+      }
+      currentUser.equippedShip = shipId;
+      shipTitleEl.textContent = SHIP_MODELS[shipId].name;
+      renderShipyardList();
+
+      marketFeedbackEl.style.color = '#4ade80';
+      marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} kuşanıldı!`;
+      setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+    });
+  });
+}
+
+loadUsers();
+const session = JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY) || 'null');
+if (session) { completeLogin(session); }
+</script>
+</body>
+</html>
