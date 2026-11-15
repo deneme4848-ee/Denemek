@@ -137,7 +137,6 @@
       text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap;
     }
 
-    /* NPC Gemilerinin Altındaki Can Barı & İsim Etiketi */
     .enemy-label {
       position: fixed; z-index: 5; pointer-events: none;
       transform: translate(-50%, 0);
@@ -565,8 +564,8 @@ const SHIP_MODELS = {
   dragon:   { id: 'dragon',   name: 'Kızıl Ejder',         desc: 'Ejderha nefesi gücünü artıran efsane', cost: 35000000 }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v30';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v30';
+const USERS_STORAGE_KEY = 'pirate3d_users_v31';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v31';
 let authMode = 'login';
 let currentUser = null;
 
@@ -944,9 +943,6 @@ function startGameLogic() {
   applyNormalizedSprite(playerSprite, player.a);
   scene.add(playerSprite);
 
-  // Adalar tamamen kaldırıldı
-
-  // Eski düşman HTML etiketlerini temizle
   document.querySelectorAll('.enemy-label').forEach(el => el.remove());
 
   enemies.forEach(en => {
@@ -978,7 +974,6 @@ function spawnEnemySprite(id) {
   sprite.userData.enemyId = id;
   scene.add(sprite);
 
-  // NPC Altı Can Barı & İsim Etiketi DOM Elementi
   const labelEl = document.createElement('div');
   labelEl.className = 'enemy-label';
   labelEl.innerHTML = `
@@ -1278,7 +1273,6 @@ function animate3D() {
       en.sprite.position.set(en.x, SHIP_Y_POS, en.z);
       applyNormalizedSprite(en.sprite, en.a);
 
-      // NPC Altı Can Barı ve İsim Konumlandırma (Ekran koordinatlarına göre geminin hemen altında)
       const tempVector = new THREE.Vector3(en.x, SHIP_Y_POS, en.z);
       tempVector.project(camera);
       const xPx = (tempVector.x *  .5 + .5) * window.innerWidth;
@@ -1362,10 +1356,10 @@ function drawMinimap() {
   mctx.stroke();
 
   if (!player) return;
-  const scale = (w * 0.46) / (WORLD_SIZE / 2);
-  const cx = w / 2, cy = h / 2;
 
-  // Adalar minimaptan de kaldırıldı
+  // DÜZELTME: Minimap ölçeği tüm dünya sınırlarını (WORLD_SIZE) kapsayacak şekilde ayarlandı
+  const scale = w / WORLD_SIZE;
+  const cx = w / 2, cy = h / 2;
 
   mctx.fillStyle = '#dc2626';
   enemies.forEach(en => {
@@ -1376,7 +1370,7 @@ function drawMinimap() {
 
   mctx.fillStyle = '#1d4ed8';
   mctx.beginPath();
-  mctx.arc(cx + player.x * scale, cy + player.z * scale, 2.8, 0, Math.PI * 2);
+  mctx.arc(cx + player.x * scale, cy + player.z * scale, 3.0, 0, Math.PI * 2);
   mctx.fill();
 }
 
@@ -1543,7 +1537,7 @@ function renderShipyardList() {
 }
 
 loadUsers();
-const session = JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY) || 'null');
+const session = JSON.render ? null : JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY) || 'null');
 if (session) { completeLogin(session); }
 </script>
 </body>
