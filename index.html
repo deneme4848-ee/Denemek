@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - 14 Efsanevi Gemi Filosu</title>
+  <title>Korsan Dünyası - 8 Yönlü Efsanevi Filo</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -69,9 +69,8 @@
       text-transform: uppercase;
     }
     #minimap {
-      width: 90px; height: 90px; border-radius: 6px;
+      width: 82px; height: 82px; border-radius: 6px;
       background: #e6d5b8; border: 1px solid #92400e; display: block;
-      pointer-events: auto; cursor: crosshair;
     }
     .coord-pill {
       width: 100%; text-align: center; font-size: 10px; font-weight: 800;
@@ -83,7 +82,7 @@
       pointer-events: auto; display: flex; flex-direction: column; gap: 6px;
     }
     .tool-icon-btn {
-      width: 44px; height: 44px; border-radius: 10px;
+      width: 40px; height: 40px; border-radius: 10px;
       background: linear-gradient(155deg, #172a3a, #091520);
       border: 1.5px solid rgba(245, 197, 94, 0.55); color: #fef3c7;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -115,7 +114,7 @@
     }
     .ship-sub-name { font-size: 10px; color: #94a3b8; text-align: right; }
 
-    /* Oyuncu Gemi Etiketi (Y: 100 Sabit) */
+    /* Geminin Altındaki Can Barı & İsim / Filo Etiketi */
     #player-label {
       position: fixed; z-index: 5; pointer-events: none;
       transform: translate(-50%, 0);
@@ -139,25 +138,7 @@
       text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap;
     }
 
-    /* NPC Gemi Etiketleri ve Can Barları (Y: 100 Sabit) */
-    .npc-label {
-      position: fixed; z-index: 5; pointer-events: none;
-      transform: translate(-50%, 0);
-      display: flex; flex-direction: column; align-items: center; gap: 2px;
-      will-change: transform;
-    }
-    .npc-hp-track {
-      width: 50px; height: 5px; background: rgba(0, 0, 0, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 3px; overflow: hidden;
-    }
-    .npc-hp-fill {
-      width: 100%; height: 100%; background: #ef4444; transition: width 0.15s;
-    }
-    .npc-name-tag {
-      font-size: 10px; font-weight: 800; color: #fca5a5;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap;
-    }
-
+    /* Yüzen Hasar Yazıları Animasyonu */
     .floating-dmg {
       position: fixed; z-index: 10; pointer-events: none;
       font-weight: 900; font-size: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.9);
@@ -244,7 +225,7 @@
 
     #market-panel {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: min(94vw, 380px); max-height: 80vh; overflow-y: auto;
+      width: min(92vw, 350px); max-height: 76vh; overflow-y: auto;
       background: rgba(9, 24, 36, 0.97); backdrop-filter: blur(10px);
       border: 2px solid rgba(245, 197, 94, 0.6); border-radius: 18px; padding: 16px; z-index: 15;
       box-shadow: 0 25px 65px rgba(0,0,0,0.95); pointer-events: auto;
@@ -303,7 +284,7 @@
 
   <div id="game"></div>
 
-  <!-- Oyuncu Gemi Etiketi (Y: 100 Sabit) -->
+  <!-- Geminin Altındaki Can Barı & İsim / Filo Etiketi -->
   <div id="player-label">
     <div class="ship-hp-track">
       <div id="player-ship-hp-fill"></div>
@@ -311,9 +292,6 @@
     <div class="ship-name-tag" id="tag-username">Test</div>
     <div class="ship-fleet-tag">[TST]</div>
   </div>
-
-  <!-- Dinamik NPC Etiketleri Konteyneri (Y: 100 Sabit) -->
-  <div id="npc-labels-container"></div>
 
   <div id="top-vital-hud">
     <div class="level-crest">
@@ -335,11 +313,15 @@
   <div id="top-left-hud">
     <div class="radar-card">
       <div class="radar-title">Harita 1</div>
-      <canvas id="minimap" width="90" height="90"></canvas>
+      <canvas id="minimap" width="82" height="82"></canvas>
       <div class="coord-pill" id="coord-display">X: 0 · Y: 0</div>
     </div>
     <div class="side-tool-col">
-      <button id="market-toggle-btn" class="tool-icon-btn" type="button" title="Market & Tersane (M)">
+      <button id="market-toggle-btn" class="tool-icon-btn" type="button" title="Market (M)">
+        <span class="ico">⚖️</span>
+        <span class="lbl">Market</span>
+      </button>
+      <button id="shipyard-toggle-btn" class="tool-icon-btn" type="button" title="Tersane (T)">
         <span class="ico">⚓</span>
         <span class="lbl">Tersane</span>
       </button>
@@ -353,7 +335,7 @@
     </div>
     <div class="gold-row">
       <span>🪙</span>
-      <span id="score">999,999,999</span>
+      <span id="score">100,000,000</span>
     </div>
     <div class="ship-sub-name" id="ship-title">8 Yönlü Efsanevi Gemi</div>
   </div>
@@ -365,22 +347,22 @@
         <div class="ammo-slot selected" data-type="iron">
           <span class="key-hint">1</span>
           <span class="ammo-ico">⚫</span>
-          <span class="ammo-qty" id="qty-iron">999m</span>
+          <span class="ammo-qty" id="qty-iron">1m</span>
         </div>
         <div class="ammo-slot" data-type="chain">
           <span class="key-hint">2</span>
           <span class="ammo-ico">⛓️</span>
-          <span class="ammo-qty" id="qty-chain">999m</span>
+          <span class="ammo-qty" id="qty-chain">1m</span>
         </div>
         <div class="ammo-slot" data-type="fire">
           <span class="key-hint">3</span>
           <span class="ammo-ico">🔥</span>
-          <span class="ammo-qty" id="qty-fire">999m</span>
+          <span class="ammo-qty" id="qty-fire">1m</span>
         </div>
         <div class="ammo-slot" data-type="dragon">
           <span class="key-hint">4</span>
           <span class="ammo-ico">🐉</span>
-          <span class="ammo-qty" id="qty-dragon">999m</span>
+          <span class="ammo-qty" id="qty-dragon">1m</span>
         </div>
       </div>
     </div>
@@ -402,15 +384,15 @@
 
   <div id="market-panel">
     <div class="market-header">
-      <strong>⚓ Cephane Marketi & Tersane (Sınırsız Altın)</strong>
+      <strong>⚓ Cephane Marketi & Tersane</strong>
       <button id="market-close-btn" class="market-close" type="button">✕</button>
     </div>
     <div class="market-tabs">
       <button id="tab-market" class="market-tab-btn active" type="button">Gülle & Cephane</button>
-      <button id="tab-shipyard" class="market-tab-btn" type="button">Tersane (14 Gemi)</button>
+      <button id="tab-shipyard" class="market-tab-btn" type="button">Tersane</button>
     </div>
     <div class="market-balance">
-      <span>Hazine: <strong id="market-gold" style="color:#ffd783;">999,999,999 (Sınırsız)</strong> Altın</span>
+      <span>Hazine: <strong id="market-gold" style="color:#ffd783;">100,000,000</strong> Altın</span>
     </div>
     <div id="section-market" class="market-section active">
       <div class="market-item">
@@ -418,28 +400,28 @@
           <span class="market-item-title">⚫ 25x Demir Gülle</span>
           <span class="market-item-sub">180 Hasar · Standart top güllesi</span>
         </div>
-        <button class="buy-btn ammo-buy-btn" type="button" data-type="iron" data-amount="25" data-cost="0">Ücretsiz (Sınırsız)</button>
+        <button class="buy-btn ammo-buy-btn" type="button" data-type="iron" data-amount="25" data-cost="20">20 Altın</button>
       </div>
       <div class="market-item">
         <div class="market-item-info">
           <span class="market-item-title">⛓️ 15x Zincirli Gülle</span>
           <span class="market-item-sub">140 Hasar · Düşmanı %50 yavaşlatır</span>
         </div>
-        <button class="buy-btn ammo-buy-btn" type="button" data-type="chain" data-amount="15" data-cost="0">Ücretsiz (Sınırsız)</button>
+        <button class="buy-btn ammo-buy-btn" type="button" data-type="chain" data-amount="15" data-cost="35">35 Altın</button>
       </div>
       <div class="market-item">
         <div class="market-item-info">
           <span class="market-item-title">🔥 15x Alevli Gülle</span>
           <span class="market-item-sub">290 Hasar · Yüksek yanma gücü</span>
         </div>
-        <button class="buy-btn ammo-buy-btn" type="button" data-type="fire" data-amount="15" data-cost="0">Ücretsiz (Sınırsız)</button>
+        <button class="buy-btn ammo-buy-btn" type="button" data-type="fire" data-amount="15" data-cost="60">60 Altın</button>
       </div>
       <div class="market-item">
         <div class="market-item-info">
           <span class="market-item-title">🐉 10x Ejderha Nefesi</span>
           <span class="market-item-sub">450 Hasar · Efsanevi yıkım güllesi</span>
         </div>
-        <button class="buy-btn ammo-buy-btn" type="button" data-type="dragon" data-amount="10" data-cost="0">Ücretsiz (Sınırsız)</button>
+        <button class="buy-btn ammo-buy-btn" type="button" data-type="dragon" data-amount="10" data-cost="120">120 Altın</button>
       </div>
     </div>
     <div id="section-shipyard" class="market-section">
@@ -450,7 +432,7 @@
 
   <div id="gameover">
     <h1>GEMİN BATTI!</h1>
-    <p id="final-score">Toplanan Altın: 999,999,999</p>
+    <p id="final-score">Toplanan Altın: 0</p>
     <button id="restart-btn">YENİDEN YELKEN AÇ</button>
   </div>
 
@@ -458,7 +440,7 @@
     <div class="auth-card">
       <div class="auth-brand">
         <h1>⚓ Korsan Dünyası</h1>
-        <p>Sınırsız Altın & 14 Efsanevi Tasarım</p>
+        <p>8 Yönlü Şeffaf PNG Sprite Denizleri</p>
       </div>
       <div class="auth-tabs">
         <button id="tab-login" class="auth-tab active" type="button">Giriş Yap</button>
@@ -516,12 +498,12 @@ const shipTitleEl = document.querySelector('#ship-title');
 const logoutBtn = document.querySelector('#logout-btn');
 
 const marketToggleBtn = document.querySelector('#market-toggle-btn');
+const shipyardToggleBtn = document.querySelector('#shipyard-toggle-btn');
 const marketPanel = document.querySelector('#market-panel');
 const marketCloseBtn = document.querySelector('#market-close-btn');
 const marketGoldEl = document.querySelector('#market-gold');
 const marketFeedbackEl = document.querySelector('#market-feedback');
 const shipyardListEl = document.querySelector('#shipyard-list');
-const npcLabelsContainer = document.querySelector('#npc-labels-container');
 
 const tabMarket = document.querySelector('#tab-market');
 const tabShipyard = document.querySelector('#tab-shipyard');
@@ -559,27 +541,15 @@ const AMMO_TYPES = {
   dragon: { id: 'dragon', name: 'Ejderha Nefesi', damage: 450, slow: 0.85, desc: '450 Efsanevi Hasar', color: 0x3b82f6 }
 };
 
-// 14 Efsanevi Gemi Tasarımı (Çok Belirgin, Büyük ve Fark Edilebilir Ekstra Çizimler)
 const SHIP_MODELS = {
-  standard: { id: 'standard', name: '8 Yönlü Efsanevi Gemi', desc: 'Standart Gemi Filosu', cost: 0, tint: 0xffffff, emissive: 0x000000, extraCanvasType: 'none' },
-  ghost:    { id: 'ghost',    name: 'Hayalet Fırkateyn',    desc: 'Karanlık sisli sulara özel gizli gövde', cost: 0, tint: 0x38bdf8, emissive: 0x0369a1, extraCanvasType: 'ghost' },
-  gold:     { id: 'gold',     name: 'Altın Korsan',        desc: 'Servet ve ihtişam saçan yaldızlı kalyon', cost: 0, tint: 0xfbbf24, emissive: 0xd97706, extraCanvasType: 'gold' },
-  dragon:   { id: 'dragon',   name: 'Kızıl Ejder',         desc: 'Ejderha nefesi gücünü artıran efsane', cost: 0, tint: 0xef4444, emissive: 0x991b1b, extraCanvasType: 'dragon' },
-  
-  skull_lord: { id: 'skull_lord', name: 'Kuru Kafa Lordu', desc: 'Devasa tüylü korsan bayrağı ve pruvada parlayan dev kuru kafa', cost: 0, tint: 0xf1f5f9, emissive: 0x475569, extraCanvasType: 'skull' },
-  kraken_beast: { id: 'kraken_beast', name: 'Kraken Dehşeti', desc: 'Denizlerin kabusu, dev yeşil dokunaçlarla sarılı gövde', cost: 0, tint: 0x065f46, emissive: 0x047857, extraCanvasType: 'kraken' },
-  phoenix_wing: { id: 'phoenix_wing', name: 'Zümrüdüanka', desc: 'Küllerinden doğan, alev renkli devasa dev yelken donanımı', cost: 0, tint: 0xf97316, emissive: 0xc2410c, extraCanvasType: 'phoenix' },
-  shadow_phantom: { id: 'shadow_phantom', name: 'Gölge Hayaleti', desc: 'Gecenin karanlığına bürünmüş, kalın zırh çizgili gizli fırkateyn', cost: 0, tint: 0x1e1b4b, emissive: 0x4338ca, extraCanvasType: 'shadow' },
-  titan_iron: { id: 'titan_iron', name: 'Demir Titan', desc: 'Kalın çelik zırh plakalarıyla kaplanmış devasa savaş gemisi', cost: 0, tint: 0x64748b, emissive: 0x334155, extraCanvasType: 'titan' },
-  frost_wyrm: { id: 'frost_wyrm', name: 'Buz Ejderi', desc: 'Kuzeyin buzlu denizlerinden gelen dev buz kristali pruva', cost: 0, tint: 0x93c5fd, emissive: 0x2563eb, extraCanvasType: 'frost' },
-  blood_reaper: { id: 'blood_reaper', name: 'Kızıl Azrail', desc: 'Düşman kanıyla boyanmış kana susamış korkunç savaş kalyonu', cost: 0, tint: 0x991b1b, emissive: 0x7f1d1d, extraCanvasType: 'blood' },
-  thunder_storm: { id: 'thunder_storm', name: 'Fırtına Koparan', desc: 'Yıldırım çakan direkler ve elektrik enerjisi saçan yelkenler', cost: 0, tint: 0xfde047, emissive: 0xca8a04, extraCanvasType: 'thunder' },
-  royal_emperor: { id: 'royal_emperor', name: 'İmparatorun Tacı', desc: 'Kraliyet armaları ve parlayan saf elmas işlemeli amiral gemisi', cost: 0, tint: 0xe0e7ff, emissive: 0x6366f1, extraCanvasType: 'royal' },
-  void_destroyer: { id: 'void_destroyer', name: 'Hiçlik Yokedicisi', desc: 'Evrenin derinliklerinden gelen mor kozmik enerji yayan son teknoloji', cost: 0, tint: 0xd946ef, emissive: 0x86198f, extraCanvasType: 'void' }
+  standard: { id: 'standard', name: '8 Yönlü Efsanevi Gemi', desc: 'Şeffaf PNG Sprite Filosu', cost: 0 },
+  ghost:    { id: 'ghost',    name: 'Hayalet Fırkateyn',    desc: 'Karanlık sisli sulara özel gizli gövde', cost: 5000000 },
+  gold:     { id: 'gold',     name: 'Altın Korsan',        desc: 'Servet ve ihtişam saçan yaldızlı kalyon', cost: 15000000 },
+  dragon:   { id: 'dragon',   name: 'Kızıl Ejder',         desc: 'Ejderha nefesi gücünü artıran efsane', cost: 35000000 }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v38';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v38';
+const USERS_STORAGE_KEY = 'pirate3d_users_v28';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v28';
 let authMode = 'login';
 let currentUser = null;
 
@@ -587,8 +557,7 @@ function loadUsers() {
   let users = [];
   try { users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]'); } catch { users = []; }
   if (!users.some(u => u.username.toLowerCase() === 'test')) {
-    const allShipIds = Object.keys(SHIP_MODELS);
-    users.push({ id: 'user_test', username: 'Test', password: 'test', ownedShips: allShipIds, equippedShip: 'standard' });
+    users.push({ id: 'user_test', username: 'Test', password: 'test', ownedShips: ['standard'], equippedShip: 'standard' });
     localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
   }
   return users;
@@ -612,11 +581,10 @@ if (tabRegister) tabRegister.addEventListener('click', () => setAuthMode('regist
 if (fillTestBtn) fillTestBtn.addEventListener('click', () => { authUsernameInput.value = 'Test'; authPasswordInput.value = 'test'; });
 
 function completeLogin(user) {
-  const allShipIds = Object.keys(SHIP_MODELS);
   currentUser = { 
     id: user.id, 
     username: user.username, 
-    ownedShips: allShipIds, 
+    ownedShips: user.ownedShips || ['standard'], 
     equippedShip: user.equippedShip || 'standard' 
   };
   localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
@@ -632,10 +600,9 @@ if (authForm) {
     e.preventDefault();
     const uname = authUsernameInput.value.trim(); const pass = authPasswordInput.value;
     const users = loadUsers();
-    const allShipIds = Object.keys(SHIP_MODELS);
     if (authMode === 'register') {
       if (users.some(u => u.username.toLowerCase() === uname.toLowerCase())) { authMsgEl.textContent = 'Bu isim zaten kayıtlı.'; return; }
-      const nu = { id: 'u_' + Date.now(), username: uname, password: pass, ownedShips: allShipIds, equippedShip: 'standard' };
+      const nu = { id: 'u_' + Date.now(), username: uname, password: pass, ownedShips: ['standard'], equippedShip: 'standard' };
       users.push(nu); saveUsers(users);
       setTimeout(() => completeLogin(nu), 200);
     } else {
@@ -653,7 +620,6 @@ if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeIt
 let scene, camera, renderer;
 let playerSprite, playerNeonRing, enemies = [], rangeRingMesh, oceanTexture, oceanBumpTexture;
 let activeProjectiles = [], particleSystems = [];
-let enemySelectRingMesh = null;
 let raycaster, planeGeo, mouse;
 let shipTextures = {};
 let textureLoader;
@@ -661,7 +627,7 @@ const WORLD_SIZE = 1000;
 const ATTACK_RANGE = 280;
 const AGGRO_RANGE = 280;
 const BASE_SHIP_HEIGHT = 95;
-const SHIP_Y_POS = 100; // Y: 100 Sabit (Can barı ve isimler için)
+const SHIP_Y_POS = 110; // ASLA DEĞİŞMEYECEK SABİT DEĞER
 
 function createStaticOceanTextures() {
   const size = 1024;
@@ -728,8 +694,7 @@ function createStaticOceanTextures() {
   return { mapTex, bumpTex };
 }
 
-// Çok Belirgin, Devasa ve Orijinalden Tamamen Farklı Görünen Ekstra Çizim Entegrasyonu
-function normalizeSpriteTexture(rawTexture, extraType = 'none') {
+function normalizeSpriteTexture(rawTexture) {
   const img = rawTexture.image;
   if (!img || !img.width) return { texture: rawTexture, aspect: 1 };
 
@@ -772,55 +737,6 @@ function normalizeSpriteTexture(rawTexture, extraType = 'none') {
   const tCtx = trimCanvas.getContext('2d');
   tCtx.drawImage(img, minX, minY, trimW, trimH, 0, 0, trimW, trimH);
 
-  if (extraType && extraType !== 'none') {
-    tCtx.save();
-    const cx = trimW / 2;
-    const cy = trimH / 2;
-
-    if (extraType === 'skull') {
-      tCtx.fillStyle = '#ffffff';
-      tCtx.strokeStyle = '#000000';
-      tCtx.lineWidth = 3;
-      tCtx.beginPath(); tCtx.arc(cx, cy - 18, 14, 0, Math.PI * 2); tCtx.fill(); tCtx.stroke();
-      tCtx.fillRect(cx - 8, cy - 8, 16, 14);
-      tCtx.strokeStyle = '#f8fafc'; tCtx.lineWidth = 4;
-      tCtx.beginPath(); tCtx.moveTo(cx - 22, cy - 25); tCtx.lineTo(cx + 22, cy + 15); tCtx.stroke();
-      tCtx.beginPath(); tCtx.moveTo(cx + 22, cy - 25); tCtx.lineTo(cx - 22, cy + 15); tCtx.stroke();
-    } else if (extraType === 'kraken') {
-      tCtx.strokeStyle = '#10b981'; tCtx.fillStyle = '#059669'; tCtx.lineWidth = 6;
-      tCtx.beginPath(); tCtx.moveTo(cx - 20, cy - 10); tCtx.quadraticCurveTo(cx - 45, cy + 10, cx - 25, cy + 45); tCtx.stroke();
-      tCtx.beginPath(); tCtx.moveTo(cx + 20, cy - 10); tCtx.quadraticCurveTo(cx + 45, cy + 10, cx + 25, cy + 45); tCtx.stroke();
-    } else if (extraType === 'phoenix') {
-      tCtx.fillStyle = 'rgba(249, 115, 22, 0.95)';
-      tCtx.strokeStyle = '#fff'; tCtx.lineWidth = 2;
-      tCtx.beginPath(); tCtx.ellipse(cx - 18, cy, 14, 32, -0.4, 0, Math.PI * 2); tCtx.fill(); tCtx.stroke();
-      tCtx.beginPath(); tCtx.ellipse(cx + 18, cy, 14, 32, 0.4, 0, Math.PI * 2); tCtx.fill(); tCtx.stroke();
-    } else if (extraType === 'shadow' || extraType === 'titan') {
-      tCtx.fillStyle = extraType === 'titan' ? '#94a3b8' : '#312e81';
-      tCtx.strokeStyle = '#fff'; tCtx.lineWidth = 3;
-      tCtx.fillRect(cx - 18, cy - 30, 36, 14);
-      tCtx.strokeRect(cx - 18, cy - 30, 36, 14);
-      tCtx.fillRect(cx - 22, cy - 8, 44, 16);
-      tCtx.strokeRect(cx - 22, cy - 8, 44, 16);
-    } else if (extraType === 'frost' || extraType === 'dragon') {
-      tCtx.fillStyle = extraType === 'frost' ? '#38bdf8' : '#dc2626';
-      tCtx.strokeStyle = '#fff'; tCtx.lineWidth = 3;
-      tCtx.beginPath(); tCtx.moveTo(cx, cy - 45); tCtx.lineTo(cx - 14, cy - 20); tCtx.lineTo(cx + 14, cy - 20); tCtx.closePath(); tCtx.fill(); tCtx.stroke();
-    } else if (extraType === 'blood' || extraType === 'royal') {
-      tCtx.fillStyle = extraType === 'blood' ? '#991b1b' : '#f59e0b';
-      tCtx.strokeStyle = '#fff'; tCtx.lineWidth = 3;
-      tCtx.fillRect(cx - 12, cy - 35, 24, 24);
-      tCtx.strokeRect(cx - 12, cy - 35, 24, 24);
-    } else if (extraType === 'thunder') {
-      tCtx.strokeStyle = '#fde047'; tCtx.lineWidth = 5;
-      tCtx.beginPath(); tCtx.moveTo(cx, cy - 38); tCtx.lineTo(cx - 12, cy - 10); tCtx.lineTo(cx + 8, cy - 5); tCtx.lineTo(cx - 4, cy + 30); tCtx.stroke();
-    } else if (extraType === 'void') {
-      tCtx.strokeStyle = '#d946ef'; tCtx.lineWidth = 5;
-      tCtx.beginPath(); tCtx.arc(cx, cy, 30, 0, Math.PI * 2); tCtx.stroke();
-    }
-    tCtx.restore();
-  }
-
   const normalizedTex = new THREE.CanvasTexture(trimCanvas);
   normalizedTex.generateMipmaps = true;
   return { texture: normalizedTex, aspect: trimW / trimH };
@@ -843,7 +759,7 @@ function loadShipTextures(onAllLoaded) {
 
   for (const [key, src] of Object.entries(textureFiles)) {
     textureLoader.load(src, (tex) => {
-      shipTextures[key] = normalizeSpriteTexture(tex, 'none');
+      shipTextures[key] = normalizeSpriteTexture(tex);
       loadedCount++;
       if (loadedCount === total && onAllLoaded) onAllLoaded();
     }, undefined, () => {
@@ -853,59 +769,25 @@ function loadShipTextures(onAllLoaded) {
   }
 }
 
-function getDirectionSpriteData(angle, shipId = 'standard') {
+function getDirectionSpriteData(angle) {
   let deg = (angle * (180 / Math.PI)) % 360;
   if (deg < 0) deg += 360;
 
-  let rawKey = 'top';
-  if (deg >= 337.5 || deg < 22.5) rawKey = 'right';
-  else if (deg >= 22.5 && deg < 67.5) rawKey = 'bottomRight';
-  else if (deg >= 67.5 && deg < 112.5) rawKey = 'bottom';
-  else if (deg >= 112.5 && deg < 157.5) rawKey = 'bottomLeft';
-  else if (deg >= 157.5 && deg < 202.5) rawKey = 'left';
-  else if (deg >= 202.5 && deg < 247.5) rawKey = 'topLeft';
-  else if (deg >= 247.5 && deg < 292.5) rawKey = 'top';
-  else rawKey = 'topRight';
-
-  const rawTex = shipTextures[rawKey] || shipTextures.top;
-  if (!rawTex) return null;
-
-  const modelSpec = SHIP_MODELS[shipId] || SHIP_MODELS.standard;
-  if (modelSpec.extraCanvasType && modelSpec.extraCanvasType !== 'none') {
-    const origImg = shipTextures[rawKey]?.texture?.image;
-    if (origImg) {
-      const dummyTex = new THREE.Texture(origImg);
-      dummyTex.needsUpdate = true;
-      return normalizeSpriteTexture(dummyTex, modelSpec.extraCanvasType);
-    }
-  }
-
-  return rawTex;
+  if (deg >= 337.5 || deg < 22.5) return shipTextures.right || shipTextures.top;
+  if (deg >= 22.5 && deg < 67.5) return shipTextures.bottomRight || shipTextures.top;
+  if (deg >= 67.5 && deg < 112.5) return shipTextures.bottom || shipTextures.right;
+  if (deg >= 112.5 && deg < 157.5) return shipTextures.bottomLeft || shipTextures.top;
+  if (deg >= 157.5 && deg < 202.5) return shipTextures.left || shipTextures.top;
+  if (deg >= 202.5 && deg < 247.5) return shipTextures.topLeft || shipTextures.top;
+  if (deg >= 247.5 && deg < 292.5) return shipTextures.top || shipTextures.right;
+  return shipTextures.topRight || shipTextures.top;
 }
 
-function applyPlayerSprite(sprite, angle, baseHeight = BASE_SHIP_HEIGHT) {
-  const currentShipId = currentUser?.equippedShip || 'standard';
-  const data = getDirectionSpriteData(angle, currentShipId);
+function applyNormalizedSprite(sprite, angle, baseHeight = BASE_SHIP_HEIGHT) {
+  const data = getDirectionSpriteData(angle);
   if (!data) return;
   sprite.material.map = data.texture;
   sprite.scale.set(baseHeight * data.aspect, baseHeight, 1);
-  
-  const modelSpec = SHIP_MODELS[currentShipId] || SHIP_MODELS.standard;
-  sprite.material.color.setHex(modelSpec.tint);
-  if (modelSpec.emissive) {
-    sprite.material.emissive = new THREE.Color(modelSpec.emissive);
-    sprite.material.emissiveIntensity = 0.45;
-  }
-}
-
-function applyNpcSprite(sprite, angle, baseHeight = BASE_SHIP_HEIGHT) {
-  const data = getDirectionSpriteData(angle, 'standard');
-  if (!data) return;
-  sprite.material.map = data.texture;
-  sprite.scale.set(baseHeight * data.aspect, baseHeight, 1);
-  sprite.material.color.setHex(0xffffff);
-  sprite.material.emissive = new THREE.Color(0x000000);
-  sprite.material.emissiveIntensity = 0;
 }
 
 function initThreeGame() {
@@ -961,14 +843,6 @@ function initThreeGame() {
   playerNeonRing.position.y = 0.8;
   scene.add(playerNeonRing);
 
-  const enemyRingGeo = new THREE.RingGeometry(30, 36, 48);
-  const enemyRingMat = new THREE.MeshBasicMaterial({ color: 0xef4444, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
-  enemySelectRingMesh = new THREE.Mesh(enemyRingGeo, enemyRingMat);
-  enemySelectRingMesh.rotation.x = -Math.PI / 2;
-  enemySelectRingMesh.position.y = 0.9;
-  enemySelectRingMesh.visible = false;
-  scene.add(enemySelectRingMesh);
-
   raycaster = new THREE.Raycaster();
   mouse = new THREE.Vector2();
 
@@ -981,23 +855,12 @@ function initThreeGame() {
   window.addEventListener('pointerdown', e => {
     if (
       e.target.closest('#top-vital-hud') ||
+      e.target.closest('#top-left-hud') ||
       e.target.closest('#top-right-hud') ||
       e.target.closest('#bottom-dock') ||
       e.target.closest('#market-panel') ||
-      e.target.closest('#auth-overlay') ||
-      e.target.closest('.side-tool-col')
+      e.target.closest('#auth-overlay')
     ) return;
-
-    if (e.target.closest('#minimap')) {
-      const rect = miniCanvas.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
-      const clickY = e.clientY - rect.top;
-      const w = miniCanvas.width, h = miniCanvas.height;
-      const mapWorldX = ((clickX - w / 2) / (w / 2)) * (WORLD_SIZE / 2);
-      const mapWorldZ = ((clickY - h / 2) / (h / 2)) * (WORLD_SIZE / 2);
-      targetPos = { x: mapWorldX, z: mapWorldZ };
-      return;
-    }
 
     mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -1009,7 +872,6 @@ function initThreeGame() {
       let obj = intersects[0].object;
       if (obj.userData.enemyId) {
         selectedEnemyId = obj.userData.enemyId;
-        isAttacking = false;
         updateTargetCard();
         syncAttackButton();
         return;
@@ -1034,7 +896,6 @@ function initThreeGame() {
 let player, gameIslands = [];
 let targetPos = null, selectedEnemyId = null, isAttacking = false, isGameOver = false;
 let lastPlayerAttackTime = 0;
-let nextNpcIdCounter = 1;
 
 function startGameLogic() {
   isGameOver = false; targetPos = null; selectedEnemyId = null; isAttacking = false;
@@ -1042,10 +903,10 @@ function startGameLogic() {
 
   player = {
     x: 0, z: 0, a: -Math.PI / 2, speed: 0, maxSpeed: 1.85,
-    hp: 1000000, maxHp: 1000000, score: 999999999,
+    hp: 1000000, maxHp: 1000000, score: 100000000,
     level: 1, exp: 0, maxExp: 100,
     selectedAmmo: 'iron',
-    ammo: { iron: 999999, chain: 999999, fire: 999999, dragon: 999999 },
+    ammo: { iron: 1000000, chain: 1000000, fire: 1000000, dragon: 1000000 },
     lastDamagedTime: 0
   };
 
@@ -1054,7 +915,7 @@ function startGameLogic() {
   const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1 });
   playerSprite = new THREE.Sprite(mat);
   playerSprite.center.set(0.5, 0.95);
-  applyPlayerSprite(playerSprite, player.a);
+  applyNormalizedSprite(playerSprite, player.a);
   scene.add(playerSprite);
 
   gameIslands.forEach(isl => scene.remove(isl.mesh));
@@ -1068,17 +929,9 @@ function startGameLogic() {
     gameIslands.push({ mesh, r: 60 });
   }
 
-  enemies.forEach(en => {
-    if (en.labelEl) en.labelEl.remove();
-    scene.remove(en.sprite);
-  });
+  enemies.forEach(en => scene.remove(en.sprite));
   enemies = [];
-  npcLabelsContainer.innerHTML = '';
-  nextNpcIdCounter = 1;
-
-  for (let i = 0; i < 6; i++) {
-    spawnEnemySprite(nextNpcIdCounter++);
-  }
+  for (let i = 0; i < 6; i++) spawnEnemySprite(i + 1);
 
   selectAmmoSlot('iron');
   updateTargetCard();
@@ -1094,26 +947,16 @@ function spawnEnemySprite(id) {
   } while (Math.hypot(ex, ez) < 300);
 
   const initialData = shipTextures.top || Object.values(shipTextures)[0];
-  const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1 });
+  const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1, color: 0xd1fae5 });
   const sprite = new THREE.Sprite(mat);
   sprite.center.set(0.5, 0.95);
-  applyNpcSprite(sprite, 0);
+  applyNormalizedSprite(sprite, 0);
   sprite.position.set(ex, SHIP_Y_POS, ez);
   sprite.userData.enemyId = id;
   scene.add(sprite);
 
-  // Orijinal / Sorunsuz HTML Can Barı ve İsim Yapısı
-  const labelDiv = document.createElement('div');
-  labelDiv.className = 'npc-label';
-  labelDiv.id = `npc-label-${id}`;
-  labelDiv.innerHTML = `
-    <div class="npc-hp-track"><div class="npc-hp-fill" id="npc-hp-fill-${id}"></div></div>
-    <div class="npc-name-tag">Korsan</div>
-  `;
-  npcLabelsContainer.appendChild(labelDiv);
-
   enemies.push({
-    id, name: `Korsan Gemisi #${id}`, sprite, labelEl: labelDiv,
+    id, name: `Korsan Gemisi #${id}`, sprite, x: ex, z: ez,
     hp: 520, maxHp: 520, baseSpeed: 1.15, slowTimer: 0,
     a: 0, wanderAngle: Math.random() * Math.PI * 2, wanderTimer: 0,
     lastAttackTime: 0
@@ -1140,35 +983,29 @@ window.addEventListener('keydown', e => {
   if (e.key === '2') selectAmmoSlot('chain');
   if (e.key === '3') selectAmmoSlot('fire');
   if (e.key === '4') selectAmmoSlot('dragon');
-  if (e.key.toLowerCase() === 'm' || e.key.toLowerCase() === 't') {
-    marketPanel.classList.toggle('open');
-    tabMarket.classList.add('active'); tabShipyard.classList.remove('active');
-    sectionMarket.classList.add('active'); sectionShipyard.classList.remove('active');
+  if (e.key.toLowerCase() === 'm') marketPanel.classList.toggle('open');
+  if (e.key.toLowerCase() === 't') {
+    marketPanel.classList.add('open');
+    tabShipyard.classList.add('active'); tabMarket.classList.remove('active');
+    sectionShipyard.classList.add('active'); sectionMarket.classList.remove('active');
+    renderShipyardList();
   }
 });
 
 function updateTargetCard() {
   if (!selectedEnemyId) {
     targetCardEl.classList.remove('visible');
-    if (enemySelectRingMesh) enemySelectRingMesh.visible = false;
     return;
   }
   const target = enemies.find(e => e.id === selectedEnemyId);
   if (!target) {
     targetCardEl.classList.remove('visible');
-    if (enemySelectRingMesh) enemySelectRingMesh.visible = false;
-    selectedEnemyId = null;
     return;
   }
   targetCardEl.classList.add('visible');
   targetNameEl.textContent = target.name;
   targetHpTextEl.textContent = `${Math.ceil(target.hp)}/${target.maxHp}`;
   targetHpBarEl.style.width = Math.max(0, (target.hp / target.maxHp) * 100) + '%';
-  
-  if (enemySelectRingMesh) {
-    enemySelectRingMesh.visible = true;
-    enemySelectRingMesh.position.set(target.x, 0.9, target.z);
-  }
 }
 
 function syncAttackButton() {
@@ -1189,6 +1026,7 @@ attackBtn.addEventListener('click', () => {
 
 restartBtn.addEventListener('click', () => startGameLogic());
 
+// Yüzen Hasar Yazısı Gösterme Fonksiyonu (Floating Damage Text)
 function showFloatingDamage(wx, wz, text, colorHex) {
   const div = document.createElement('div');
   div.className = 'floating-dmg';
@@ -1206,24 +1044,25 @@ function showFloatingDamage(wx, wz, text, colorHex) {
   setTimeout(() => div.remove(), 900);
 }
 
+// Gülle Ateşleme Fonksiyonu (Daha büyük ve görkemli gülleler)
 function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
   const ammoSpec = AMMO_TYPES[ammoKey];
-  const pGeo = new THREE.SphereGeometry(7.5, 16, 16);
+  const pGeo = new THREE.SphereGeometry(6.5, 16, 16); // Daha büyük gülle boyutu
   const pMat = new THREE.MeshStandardMaterial({ 
     color: ammoSpec.color, 
     emissive: ammoSpec.color,
-    emissiveIntensity: 1.5,
-    roughness: 0.1 
+    emissiveIntensity: 1.0,
+    roughness: 0.15 
   });
   const mesh = new THREE.Mesh(pGeo, pMat);
   
-  const GULLE_Y_OFFSET = 50; // Gülle yüksekliği tekrar 50 yapıldı
+  const GULLE_Y_OFFSET = 50; // Eski orijinal yükseklik ayarı
   mesh.position.set(startX, SHIP_Y_POS - GULLE_Y_OFFSET, startZ);
   scene.add(mesh);
 
   activeProjectiles.push({
     mesh, x: startX, z: startZ, targetX, targetZ,
-    speed: 6, 
+    speed: 5, 
     ammoKey, onHit, sparkTimer: 0,
     yOffset: GULLE_Y_OFFSET
   });
@@ -1232,13 +1071,6 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
 function animate3D() {
   requestAnimationFrame(animate3D);
 
-  if (player && !isGameOver) {
-    player.score = 999999999;
-    if (enemies.length < 6) {
-      spawnEnemySprite(nextNpcIdCounter++);
-    }
-  }
-
   if (!player || isGameOver) {
     if (scene && camera && renderer) renderer.render(scene, camera);
     return;
@@ -1246,9 +1078,7 @@ function animate3D() {
 
   const now = Date.now();
   if (player.hp < player.maxHp && (now - player.lastDamagedTime > 5000)) {
-    const healAmount = 5000;
-    player.hp = Math.min(player.maxHp, player.hp + healAmount);
-    showFloatingDamage(player.x, player.z, '+' + healAmount.toLocaleString(), '#22c55e');
+    player.hp = Math.min(player.maxHp, player.hp + 5000);
     updateHUD();
   }
 
@@ -1274,7 +1104,7 @@ function animate3D() {
 
   if (playerSprite) {
     playerSprite.position.set(player.x, SHIP_Y_POS, player.z);
-    applyPlayerSprite(playerSprite, player.a);
+    applyNormalizedSprite(playerSprite, player.a);
   }
 
   if (playerNeonRing) {
@@ -1284,19 +1114,11 @@ function animate3D() {
 
   rangeRingMesh.position.set(player.x, 0.6, player.z);
 
-  if (selectedEnemyId && enemySelectRingMesh && enemySelectRingMesh.visible) {
-    const target = enemies.find(e => e.id === selectedEnemyId);
-    if (target) {
-      enemySelectRingMesh.position.set(target.x, 0.9, target.z);
-      enemySelectRingMesh.rotation.z += 0.03;
-    }
-  }
-
   if (playerSprite) {
     const tempVector = new THREE.Vector3(player.x, SHIP_Y_POS, player.z);
     tempVector.project(camera);
     const xPx = (tempVector.x *  .5 + .5) * window.innerWidth;
-    const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 55;
+    const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 100;
     playerLabelEl.style.transform = `translate(-50%, 0) translate(${xPx}px, ${yPx}px)`;
   }
 
@@ -1304,6 +1126,7 @@ function animate3D() {
   camera.position.z += (player.z + 540 - camera.position.z) * 0.08;
   camera.lookAt(player.x, 0, player.z);
 
+  // Gülle ve Büyütülmüş Parçacık Efektleri
   for (let i = activeProjectiles.length - 1; i >= 0; i--) {
     const p = activeProjectiles[i];
     const dx = p.targetX - p.x;
@@ -1320,33 +1143,33 @@ function animate3D() {
       p.x += (dx / dist) * p.speed;
       p.z += (dz / dist) * p.speed;
       p.mesh.position.set(p.x, SHIP_Y_POS - p.yOffset, p.z);
-      p.mesh.rotation.x += 0.2;
-      p.mesh.rotation.y += 0.2;
+      p.mesh.rotation.x += 0.15;
+      p.mesh.rotation.y += 0.15;
 
       p.sparkTimer++;
       if (p.sparkTimer % 1 === 0) {
         let sparkColor = 0xffa500;
         if (p.ammoKey === 'fire') {
-          sparkColor = Math.random() > 0.4 ? 0xff2200 : 0xffaa00;
+          sparkColor = Math.random() > 0.5 ? 0xff0000 : 0xff7700;
         } else if (p.ammoKey === 'dragon') {
-          const colors = [0x3b82f6, 0x8b5cf6, 0x06b6d4, 0xec4899];
+          const colors = [0x3b82f6, 0xa855f7, 0x10b981];
           sparkColor = colors[Math.floor(Math.random() * colors.length)];
         } else if (p.ammoKey === 'chain') {
-          sparkColor = 0xcccccc;
+          sparkColor = 0xaaaaaa;
         } else {
-          sparkColor = 0x888888;
+          sparkColor = 0x666666;
         }
 
-        const sparkGeo = new THREE.SphereGeometry(3.2, 8, 8);
-        const sparkMat = new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 0.98 });
+        const sparkGeo = new THREE.SphereGeometry(2.4, 8, 8); // Daha büyük kıvılcım tanecikleri
+        const sparkMat = new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 0.95 });
         const sparkMesh = new THREE.Mesh(sparkGeo, sparkMat);
         sparkMesh.position.set(
-          p.x + (Math.random() - 0.5) * 10, 
-          SHIP_Y_POS - p.yOffset + (Math.random() - 0.5) * 10, 
-          p.z + (Math.random() - 0.5) * 10
+          p.x + (Math.random() - 0.5) * 8, 
+          SHIP_Y_POS - p.yOffset + (Math.random() - 0.5) * 8, 
+          p.z + (Math.random() - 0.5) * 8
         );
         scene.add(sparkMesh);
-        particleSystems.push({ mesh: sparkMesh, life: 28 });
+        particleSystems.push({ mesh: sparkMesh, life: 22 });
       }
     }
   }
@@ -1354,7 +1177,7 @@ function animate3D() {
   for (let i = particleSystems.length - 1; i >= 0; i--) {
     const pt = particleSystems[i];
     pt.life--;
-    pt.mesh.scale.multiplyScalar(0.88);
+    pt.mesh.scale.multiplyScalar(0.90);
     if (pt.life <= 0) {
       scene.remove(pt.mesh);
       pt.mesh.geometry.dispose();
@@ -1376,21 +1199,21 @@ function animate3D() {
         en.z += Math.sin(en.a) * (activeSpeed * 1.25);
       }
 
-      if (distToPlayer <= ATTACK_RANGE && (now - en.lastAttackTime >= 3000)) {
+      if (distToPlayer <= ATTACK_RANGE && (now - en.lastAttackTime >= 1000)) {
         en.lastAttackTime = now;
+        player.hp = Math.max(0, player.hp - 100);
+        player.lastDamagedTime = now;
+        
+        // Oyuncu Hasar Aldığında Üstünde Hasar Yazısı Göster
+        showFloatingDamage(player.x, player.z, '-100', '#ef4444');
 
-        fireProjectile(en.x, en.z, player.x, player.z, 'fire', () => {
-          player.hp = Math.max(0, player.hp - 100);
-          player.lastDamagedTime = now;
-          showFloatingDamage(player.x, player.z, '-100', '#ef4444');
-          updateHUD();
-          if (player.hp <= 0) {
-            isGameOver = true;
-            isAttacking = false;
-            gameOverEl.style.display = 'flex';
-            finalScoreEl.textContent = 'Toplanan Altın: Sınırsız';
-          }
-        });
+        updateHUD();
+        if (player.hp <= 0) {
+          isGameOver = true;
+          isAttacking = false;
+          gameOverEl.style.display = 'flex';
+          finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString();
+        }
       }
     } else {
       en.wanderTimer--;
@@ -1408,21 +1231,7 @@ function animate3D() {
 
     if (en.sprite) {
       en.sprite.position.set(en.x, SHIP_Y_POS, en.z);
-      applyNpcSprite(en.sprite, en.a);
-    }
-
-    // NPC HTML Can Barı ve İsim Etiketi Konumlandırma Güncellemesi (Y: 100 Sabit)
-    if (en.labelEl) {
-      const v = new THREE.Vector3(en.x, SHIP_Y_POS, en.z);
-      v.project(camera);
-      const nx = (v.x * 0.5 + 0.5) * window.innerWidth;
-      const ny = (v.y * -0.5 + 0.5) * window.innerHeight + 55;
-      en.labelEl.style.transform = `translate(-50%, 0) translate(${nx}px, ${ny}px)`;
-
-      const fillEl = document.getElementById(`npc-hp-fill-${en.id}`);
-      if (fillEl) {
-        fillEl.style.width = Math.max(0, (en.hp / en.maxHp) * 100) + '%';
-      }
+      applyNormalizedSprite(en.sprite, en.a);
     }
   }
 
@@ -1435,11 +1244,13 @@ function animate3D() {
       const d = Math.hypot(target.x - player.x, target.z - player.z);
       if (d <= ATTACK_RANGE && (now - lastPlayerAttackTime >= 1000)) {
         lastPlayerAttackTime = now;
+        player.ammo[ammoKey]--;
 
         fireProjectile(player.x, player.z, target.x, target.z, ammoKey, () => {
           target.hp -= ammoSpec.damage;
           if (ammoSpec.slow < 1.0) target.slowTimer = 240;
 
+          // Düşmana Hasar Verildiğinde Üstünde Hasar Yazısı Göster
           showFloatingDamage(target.x, target.z, '-' + ammoSpec.damage, '#f97316');
 
           updateTargetCard();
@@ -1447,12 +1258,11 @@ function animate3D() {
           syncAttackButton();
 
           if (target.hp <= 0) {
-            if (target.labelEl) target.labelEl.remove();
             scene.remove(target.sprite);
             enemies = enemies.filter(e => e.id !== target.id);
             selectedEnemyId = null;
             isAttacking = false;
-            if (enemySelectRingMesh) enemySelectRingMesh.visible = false;
+            player.score += 150;
             player.exp += 35;
             if (player.exp >= player.maxExp) {
               player.level++;
@@ -1464,6 +1274,7 @@ function animate3D() {
             updateTargetCard();
             updateHUD();
             syncAttackButton();
+            setTimeout(() => spawnEnemySprite(target.id), 3000);
           }
         });
 
@@ -1493,7 +1304,7 @@ function drawMinimap() {
   mctx.stroke();
 
   if (!player) return;
-  const scale = w / WORLD_SIZE;
+  const scale = (w * 0.46) / (WORLD_SIZE / 2);
   const cx = w / 2, cy = h / 2;
 
   mctx.fillStyle = '#3f6212';
@@ -1510,14 +1321,14 @@ function drawMinimap() {
     mctx.fill();
   });
 
-  mctx.fillStyle = '#22c55e';
+  mctx.fillStyle = '#1d4ed8';
   mctx.beginPath();
-  mctx.arc(cx + player.x * scale, cy + player.z * scale, 3.2, 0, Math.PI * 2);
+  mctx.arc(cx + player.x * scale, cy + player.z * scale, 2.8, 0, Math.PI * 2);
   mctx.fill();
 }
 
 function updateHUD() {
-  scoreEl.textContent = '999,999,999';
+  scoreEl.textContent = player.score.toLocaleString();
   levelEl.textContent = player.level;
   
   hpTextEl.textContent = `Can ${Math.ceil(player.hp).toLocaleString()} / ${player.maxHp.toLocaleString()}`;
@@ -1525,22 +1336,23 @@ function updateHUD() {
   
   hpBarEl.style.width = ((player.hp / player.maxHp) * 100) + '%';
   expBarEl.style.width = ((player.exp / player.maxExp) * 100) + '%';
-  marketGoldEl.textContent = '999,999,999 (Sınırsız)';
+  marketGoldEl.textContent = player.score.toLocaleString();
 
   const hpPercent = Math.max(0, Math.min(100, (player.hp / player.maxHp) * 100));
   playerShipHpFillEl.style.width = hpPercent + '%';
   if (hpPercent > 50) {
-    playerShipHpFillEl.style.backgroundColor = '#22c55e';
+    playerShipHpFillEl.style.backgroundColor = '#22c55e'; // Yeşil
   } else if (hpPercent > 20) {
-    playerShipHpFillEl.style.backgroundColor = '#eab308';
+    playerShipHpFillEl.style.backgroundColor = '#eab308'; // Sarı
   } else {
-    playerShipHpFillEl.style.backgroundColor = '#ef4444';
+    playerShipHpFillEl.style.backgroundColor = '#ef4444'; // Kırmızı
   }
 
   Object.keys(qtyEls).forEach(type => {
-    qtyEls[type].textContent = '999m';
+    const count = player.ammo[type] || 0;
+    qtyEls[type].textContent = formatShortNumber(count);
     const slotEl = document.querySelector(`.ammo-slot[data-type="${type}"]`);
-    if (slotEl) slotEl.classList.remove('empty');
+    if (slotEl) slotEl.classList.toggle('empty', count <= 0);
   });
 }
 
@@ -1561,27 +1373,46 @@ tabShipyard.addEventListener('click', () => {
   renderShipyardList();
 });
 
+shipyardToggleBtn.addEventListener('click', () => {
+  marketPanel.classList.add('open');
+  tabShipyard.classList.add('active'); tabMarket.classList.remove('active');
+  sectionShipyard.classList.add('active'); sectionMarket.classList.remove('active');
+  renderShipyardList();
+});
+
 document.querySelectorAll('.ammo-buy-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     if (!player) return;
     const type = btn.dataset.type;
-    const amount = 25;
+    const amount = parseInt(btn.dataset.amount, 10);
+    const cost = parseInt(btn.dataset.cost, 10);
 
+    if (player.score < cost) {
+      marketFeedbackEl.style.color = '#f87171';
+      marketFeedbackEl.textContent = 'Yetersiz altın!';
+      return;
+    }
+
+    player.score -= cost;
     player.ammo[type] = (player.ammo[type] || 0) + amount;
     updateHUD();
     syncAttackButton();
 
     marketFeedbackEl.style.color = '#4ade80';
-    marketFeedbackEl.textContent = `Sınırsız hazine ile cephane eklendi!`;
+    marketFeedbackEl.textContent = `${amount} adet ${AMMO_TYPES[type].name} satın alındı!`;
     setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
   });
 });
 
 function renderShipyardList() {
   shipyardListEl.innerHTML = '';
-  const equipped = currentUser.equippedShip || 'standard';
+  const users = loadUsers();
+  const dbUser = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
+  const owned = dbUser.ownedShips || ['standard'];
+  const equipped = dbUser.equippedShip || 'standard';
 
   Object.values(SHIP_MODELS).forEach(model => {
+    const isOwned = owned.includes(model.id);
     const isEquipped = equipped === model.id;
 
     const div = document.createElement('div');
@@ -1590,8 +1421,10 @@ function renderShipyardList() {
     let btnHtml = '';
     if (isEquipped) {
       btnHtml = `<button class="buy-btn equipped" type="button" disabled>Kullanımda</button>`;
+    } else if (isOwned) {
+      btnHtml = `<button class="buy-btn ship-equip-btn" type="button" data-id="${model.id}">Kullan</button>`;
     } else {
-      btnHtml = `<button class="buy-btn ship-equip-btn" type="button" data-id="${model.id}">Kullan (Ücretsiz)</button>`;
+      btnHtml = `<button class="buy-btn ship-buy-btn" type="button" data-id="${model.id}" data-cost="${model.cost}">${model.cost.toLocaleString()} Altın</button>`;
     }
 
     div.innerHTML = `
@@ -1602,6 +1435,38 @@ function renderShipyardList() {
       ${btnHtml}
     `;
     shipyardListEl.appendChild(div);
+  });
+
+  shipyardListEl.querySelectorAll('.ship-buy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const shipId = btn.dataset.id;
+      const cost = parseInt(btn.dataset.cost, 10);
+      if (player.score < cost) {
+        marketFeedbackEl.style.color = '#f87171';
+        marketFeedbackEl.textContent = 'Yetersiz hazine (altın)!';
+        return;
+      }
+      player.score -= cost;
+      
+      const users = loadUsers();
+      const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
+      if (uIdx !== -1) {
+        if (!users[uIdx].ownedShips) users[uIdx].ownedShips = ['standard'];
+        users[uIdx].ownedShips.push(shipId);
+        users[uIdx].equippedShip = shipId;
+        saveUsers(users);
+      }
+      currentUser.ownedShips.push(shipId);
+      currentUser.equippedShip = shipId;
+
+      updateHUD();
+      shipTitleEl.textContent = SHIP_MODELS[shipId].name;
+      renderShipyardList();
+
+      marketFeedbackEl.style.color = '#4ade80';
+      marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} satın alındı ve kuşanıldı!`;
+      setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2500);
+    });
   });
 
   shipyardListEl.querySelectorAll('.ship-equip-btn').forEach(btn => {
@@ -1615,7 +1480,6 @@ function renderShipyardList() {
       }
       currentUser.equippedShip = shipId;
       shipTitleEl.textContent = SHIP_MODELS[shipId].name;
-      if (playerSprite) applyPlayerSprite(playerSprite, player.a);
       renderShipyardList();
 
       marketFeedbackEl.style.color = '#4ade80';
