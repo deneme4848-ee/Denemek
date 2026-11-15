@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Benzersiz Özgün Tersane</title>
+  <title>Korsan Dünyası - Kişiye Özel Tersane</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -555,7 +555,7 @@ const AMMO_TYPES = {
   iron:   { id: 'iron',   name: 'Demir Gülle',    damage: 180, slow: 1.0,  desc: '180 Hasar', color: 0x555555 },
   chain:  { id: 'chain',  name: 'Zincirli Gülle', damage: 140, slow: 0.5,  desc: '140 Hasar + Yavaşlatma', color: 0x888888 },
   fire:   { id: 'fire',   name: 'Alevli Gülle',   damage: 290, slow: 1.0,  desc: '290 Patlayıcı Hasar', color: 0xff3300 },
-  dragon: { id: 'dragon', name: 'Ejderha Nefesi', damage: 450, slow: 0.85, desc: '450 Efsanevi Hasار', color: 0x3b82f6 }
+  dragon: { id: 'dragon', name: 'Ejderha Nefesi', damage: 450, slow: 0.85, desc: '450 Efsanevi Hasar', color: 0x3b82f6 }
 };
 
 const SHIP_MODELS = {
@@ -572,8 +572,8 @@ const SHIP_MODELS = {
   scales:   { id: 'scales',   name: '⚖️ Adalet Terazisi',     desc: 'Antik korsan lordlarının adalet sembolü kalyon', cost: 150000000 }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v33';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v33';
+const USERS_STORAGE_KEY = 'pirate3d_users_v34';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v34';
 let authMode = 'login';
 let currentUser = null;
 
@@ -770,7 +770,6 @@ function normalizeSpriteTexture(rawTexture) {
   return { texture: normalizedTex, aspect: trimW / trimH };
 }
 
-// Seçilen tasarımın türüne göre geminin önüne özel figür (Kuru kafa, ejder, aslan vb.) çizen akıllı sistem
 function generateCustomShipTexture(baseRawTexture, shipId) {
   if (shipId === 'standard') return normalizeSpriteTexture(baseRawTexture);
 
@@ -783,7 +782,6 @@ function generateCustomShipTexture(baseRawTexture, shipId) {
   const ctx = canvas.getContext('2d');
   ctx.drawImage(img, 0, 0);
 
-  // Geminin önüne tasarımın türüne göre figür çizimi
   const cx = canvas.width / 2;
   const cy = canvas.height / 2;
 
@@ -791,19 +789,16 @@ function generateCustomShipTexture(baseRawTexture, shipId) {
   ctx.translate(cx, cy);
   
   if (shipId === 'skull') {
-    // 💀 Kuru Kafa Figürü
     ctx.fillStyle = '#f8fafc';
     ctx.strokeStyle = '#0f172a';
     ctx.lineWidth = 4;
     ctx.beginPath();
     ctx.arc(0, -canvas.height * 0.28, 16, 0, Math.PI * 2);
     ctx.fill(); ctx.stroke();
-    // Göz çukurları
     ctx.fillStyle = '#000';
     ctx.fillRect(-6, -canvas.height * 0.32, 4, 6);
     ctx.fillRect(2, -canvas.height * 0.32, 4, 6);
   } else if (shipId === 'dragon') {
-    // 🐉 Ejderha Başlığı (Kırmızı/Altın boynuzlu)
     ctx.fillStyle = '#ef4444';
     ctx.strokeStyle = '#b91c1c';
     ctx.lineWidth = 4;
@@ -813,12 +808,10 @@ function generateCustomShipTexture(baseRawTexture, shipId) {
     ctx.lineTo(12, -canvas.height * 0.22);
     ctx.closePath();
     ctx.fill(); ctx.stroke();
-    // Boynuzlar
     ctx.fillStyle = '#fbbf24';
     ctx.fillRect(-16, -canvas.height * 0.34, 6, 12);
     ctx.fillRect(10, -canvas.height * 0.34, 6, 12);
   } else if (shipId === 'eagle') {
-    // 🦅 Kartal Figürü
     ctx.fillStyle = '#e2e8f0';
     ctx.strokeStyle = '#475569';
     ctx.lineWidth = 3;
@@ -828,7 +821,6 @@ function generateCustomShipTexture(baseRawTexture, shipId) {
     ctx.lineTo(18, -canvas.height * 0.26);
     ctx.closePath();
     ctx.fill(); ctx.stroke();
-    // Sarı Gaga
     ctx.fillStyle = '#f59e0b';
     ctx.beginPath();
     ctx.moveTo(0, -canvas.height * 0.22);
@@ -837,7 +829,6 @@ function generateCustomShipTexture(baseRawTexture, shipId) {
     ctx.closePath();
     ctx.fill();
   } else if (shipId === 'lion') {
-    // 🦁 Altın Aslan Yelesi
     ctx.fillStyle = '#d97706';
     ctx.beginPath();
     ctx.arc(0, -canvas.height * 0.28, 18, 0, Math.PI * 2);
@@ -847,7 +838,6 @@ function generateCustomShipTexture(baseRawTexture, shipId) {
     ctx.arc(0, -canvas.height * 0.28, 11, 0, Math.PI * 2);
     ctx.fill();
   } else if (shipId === 'ghost') {
-    // 🌙 Ay Sfenksi (Mor/Gümüş Mistik Sembol)
     ctx.fillStyle = '#a855f7';
     ctx.shadowColor = '#c084fc';
     ctx.shadowBlur = 12;
@@ -855,7 +845,6 @@ function generateCustomShipTexture(baseRawTexture, shipId) {
     ctx.arc(0, -canvas.height * 0.28, 14, 0, Math.PI * 2);
     ctx.fill();
   } else if (shipId === 'poseidon') {
-    // 🔱 Denizlerin Efendisi Üççatal
     ctx.strokeStyle = '#38bdf8';
     ctx.lineWidth = 6;
     ctx.beginPath();
@@ -867,7 +856,6 @@ function generateCustomShipTexture(baseRawTexture, shipId) {
     ctx.moveTo(10, -canvas.height * 0.38); ctx.lineTo(10, -canvas.height * 0.30);
     ctx.stroke();
   } else if (shipId === 'wolf') {
-    // 🐺 Buzul Kurdu
     ctx.fillStyle = '#38bdf8';
     ctx.beginPath();
     ctx.moveTo(0, -canvas.height * 0.36);
@@ -876,14 +864,12 @@ function generateCustomShipTexture(baseRawTexture, shipId) {
     ctx.closePath();
     ctx.fill();
   } else if (shipId === 'titan') {
-    // ⚓ Demir Yumruk (Zırhlı Koçbaşı)
     ctx.fillStyle = '#64748b';
     ctx.strokeStyle = '#334155';
     ctx.lineWidth = 4;
     ctx.fillRect(-12, -canvas.height * 0.32, 24, 16);
     ctx.strokeRect(-12, -canvas.height * 0.32, 24, 16);
   } else if (shipId === 'kraken') {
-    // 🐙 Kraken Dokunaçları
     ctx.strokeStyle = '#10b981';
     ctx.lineWidth = 5;
     ctx.beginPath();
@@ -891,7 +877,6 @@ function generateCustomShipTexture(baseRawTexture, shipId) {
     ctx.quadraticCurveTo(0, -canvas.height * 0.38, 12, -canvas.height * 0.25);
     ctx.stroke();
   } else if (shipId === 'scales') {
-    // ⚖️ Adalet Terazisi
     ctx.fillStyle = '#fbbf24';
     ctx.fillRect(-2, -canvas.height * 0.36, 4, 18);
     ctx.fillRect(-12, -canvas.height * 0.30, 24, 4);
@@ -899,7 +884,6 @@ function generateCustomShipTexture(baseRawTexture, shipId) {
 
   ctx.restore();
 
-  // Kırpma ve normalizasyon
   let minX = canvas.width, minY = canvas.height, maxX = 0, maxY = 0;
   let foundOpaque = false;
   try {
@@ -962,8 +946,7 @@ function loadShipTextures(onAllLoaded) {
   }
 }
 
-function getActiveShipTextures() {
-  const shipId = currentUser ? currentUser.equippedShip : 'standard';
+function getShipTexturesById(shipId = 'standard') {
   if (customShipTextures[shipId]) return customShipTextures[shipId];
 
   const generated = {};
@@ -974,8 +957,8 @@ function getActiveShipTextures() {
   return generated;
 }
 
-function getDirectionSpriteData(angle) {
-  const textures = getActiveShipTextures();
+function getDirectionSpriteData(angle, shipId = 'standard') {
+  const textures = getShipTexturesById(shipId);
   let deg = (angle * (180 / Math.PI)) % 360;
   if (deg < 0) deg += 360;
 
@@ -989,8 +972,8 @@ function getDirectionSpriteData(angle) {
   return textures.topRight || textures.top;
 }
 
-function applyNormalizedSprite(sprite, angle, baseHeight = BASE_SHIP_HEIGHT) {
-  const data = getDirectionSpriteData(angle);
+function applyNormalizedSprite(sprite, angle, baseHeight = BASE_SHIP_HEIGHT, shipId = 'standard') {
+  const data = getDirectionSpriteData(angle, shipId);
   if (!data) return;
   sprite.material.map = data.texture;
   sprite.scale.set(baseHeight * data.aspect, baseHeight, 1);
@@ -1093,7 +1076,6 @@ function initThreeGame() {
   rangeRingMesh.position.y = 0.6;
   scene.add(rangeRingMesh);
 
-  // SABİT TURKUAZ/MAVİ NEON HALKA
   const neonGeo = new THREE.RingGeometry(32, 38, 48);
   const neonMat = new THREE.MeshBasicMaterial({ color: 0x0ea5e9, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
   playerNeonRing = new THREE.Mesh(neonGeo, neonMat);
@@ -1247,7 +1229,8 @@ function startGameLogic(isFullReset = false) {
   }
 
   if (playerSprite) scene.remove(playerSprite);
-  const data = getDirectionSpriteData(player.a);
+  const playerShipId = currentUser ? currentUser.equippedShip : 'standard';
+  const data = getDirectionSpriteData(player.a, playerShipId);
   const mat = new THREE.SpriteMaterial({ 
     map: data.texture, 
     transparent: true, 
@@ -1255,7 +1238,7 @@ function startGameLogic(isFullReset = false) {
   });
   playerSprite = new THREE.Sprite(mat);
   playerSprite.center.set(0.5, 0.95);
-  applyNormalizedSprite(playerSprite, player.a);
+  applyNormalizedSprite(playerSprite, player.a, BASE_SHIP_HEIGHT, playerShipId);
   scene.add(playerSprite);
 
   selectAmmoSlot('iron');
@@ -1273,7 +1256,8 @@ function spawnEnemySprite(id, isBoss = false) {
   } while ((Math.hypot(ex, ez) < (isBoss ? 360 : 280) || isPositionInsideIsland(ex, ez, isBoss ? 110 : 85)) && tries < 60);
 
   const shipHeight = isBoss ? BASE_SHIP_HEIGHT * 1.65 : BASE_SHIP_HEIGHT;
-  const data = getDirectionSpriteData(0);
+  // NPC ve Boss'lar her zaman kendi 'standard' korsan gemisi tasarımını kullanır
+  const data = getDirectionSpriteData(0, 'standard');
   const mat = new THREE.SpriteMaterial({
     map: data.texture,
     transparent: true,
@@ -1282,7 +1266,7 @@ function spawnEnemySprite(id, isBoss = false) {
   });
   const sprite = new THREE.Sprite(mat);
   sprite.center.set(0.5, 0.95);
-  applyNormalizedSprite(sprite, 0, shipHeight);
+  applyNormalizedSprite(sprite, 0, shipHeight, 'standard');
   sprite.position.set(ex, SHIP_Y_POS, ez);
   sprite.userData.enemyId = id;
   scene.add(sprite);
@@ -1306,6 +1290,7 @@ function spawnEnemySprite(id, isBoss = false) {
   enemies.push({
     id,
     isBoss,
+    shipId: 'standard',
     name: isBoss ? "☠️ Kızıl Sakal (BOSS)" : `Korsan Gemisi #${id}`,
     sprite,
     auraMesh,
@@ -1491,8 +1476,9 @@ function animate3D() {
   coordDisplayEl.textContent = `X: ${Math.round((player.x / (WORLD_SIZE / 2)) * 50)} · Y: ${Math.round((player.z / (WORLD_SIZE / 2)) * 50)}`;
 
   if (playerSprite) {
+    const playerShipId = currentUser ? currentUser.equippedShip : 'standard';
     playerSprite.position.set(player.x, SHIP_Y_POS, player.z);
-    applyNormalizedSprite(playerSprite, player.a);
+    applyNormalizedSprite(playerSprite, player.a, BASE_SHIP_HEIGHT, playerShipId);
   }
 
   if (playerNeonRing) {
@@ -1644,7 +1630,8 @@ function animate3D() {
 
     if (en.sprite) {
       en.sprite.position.set(en.x, SHIP_Y_POS, en.z);
-      applyNormalizedSprite(en.sprite, en.a, en.shipHeight);
+      // NPC gemileri daima kendi standart tasarımını kullanır
+      applyNormalizedSprite(en.sprite, en.a, en.shipHeight, en.shipId || 'standard');
     }
     if (en.auraMesh) {
       en.auraMesh.position.set(en.x, 0.9, en.z);
@@ -1884,12 +1871,11 @@ function renderShipyardList() {
       currentUser.equippedShip = shipId;
       shipTitleEl.textContent = SHIP_MODELS[shipId].name;
       
-      // KONUM VE XP SIFIRLANMADAN ANINDA GÖRSELİ GÜNCELLE
       startGameLogic(false); 
       renderShipyardList();
 
       marketFeedbackEl.style.color = '#4ade80';
-      marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} kuşanıldı! (Tasarımın değişti)`;
+      marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} kuşanıldı! (Sadece senin gemin değişti)`;
       setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
     });
   });
