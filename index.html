@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Kale Adası & Star Sistemi</title>
+  <title>Korsan Dünyası - Seafight Tarzı Kale Adası & Filo Sistemi</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -94,12 +94,11 @@
     .tool-icon-btn span.ico { font-size: 15px; line-height: 1.1; }
     .tool-icon-btn span.lbl { font-size: 8px; font-weight: 800; color: #fde68a; }
 
-    /* SAĞ ÜST PANEL - ALTIN + STAR PUAN MENÜSÜ */
     #top-right-hud {
       position: fixed; top: 66px; right: 10px; z-index: 6;
       background: rgba(7, 20, 31, 0.92); backdrop-filter: blur(6px);
       border: 1px solid rgba(245, 197, 94, 0.5); border-radius: 12px;
-      padding: 8px 11px; min-width: 158px; box-shadow: 0 8px 25px rgba(0,0,0,0.85);
+      padding: 8px 11px; min-width: 165px; box-shadow: 0 8px 25px rgba(0,0,0,0.85);
       display: flex; flex-direction: column; gap: 5px;
     }
     .captain-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
@@ -141,7 +140,6 @@
       text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap;
     }
 
-    /* KULE ÜSTÜ ETİKETLERİ ("Profesyonel Kule" + Can Barı) */
     .tower-label-tag {
       position: fixed; z-index: 4; pointer-events: none;
       transform: translate(-50%, 0);
@@ -244,32 +242,46 @@
       to { box-shadow: 0 0 24px rgba(239, 68, 68, 0.95); }
     }
 
+    /* SEAFİGHT TARZI MARKED PANEL (Görseldeki 9 Sekmeli Üst Bar) */
     #market-panel {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: min(92vw, 370px); max-height: 78vh; overflow-y: auto;
-      background: rgba(9, 24, 36, 0.97); backdrop-filter: blur(10px);
-      border: 2px solid rgba(245, 197, 94, 0.6); border-radius: 18px; padding: 16px; z-index: 15;
-      box-shadow: 0 25px 65px rgba(0,0,0,0.95); pointer-events: auto;
+      width: min(95vw, 680px); max-height: 84vh; overflow-y: auto;
+      background: linear-gradient(160deg, #112535, #08121a); backdrop-filter: blur(12px);
+      border: 2px solid rgba(217, 119, 6, 0.75); border-radius: 16px; padding: 14px; z-index: 15;
+      box-shadow: 0 25px 70px rgba(0,0,0,0.95); pointer-events: auto;
     }
     #market-panel.open { display: block; }
-    .market-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 8px; margin-bottom: 10px; }
-    .market-header strong { color: #ffd783; font-size: 15px; }
-    .market-close { background: rgba(255,255,255,0.1); border: none; color: #cbd5e1; width: 28px; height: 28px; border-radius: 8px; font-weight: 700; cursor: pointer; }
-    .market-tabs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 10px; }
-    .market-tab-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 7px 4px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; }
-    .market-tab-btn.active { background: linear-gradient(135deg, #d97706, #92400e); color: #fff; border-color: #ffd783; }
+    .market-top-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(4, 11, 18, 0.85); padding: 6px 12px; border-radius: 10px;
+      border: 1px solid rgba(245, 197, 94, 0.3); margin-bottom: 10px; font-size: 13px; font-weight: 800;
+    }
+    .market-close { background: rgba(220, 38, 38, 0.85); border: none; color: #fff; width: 30px; height: 30px; border-radius: 8px; font-weight: 900; cursor: pointer; }
+    
+    /* ÜST 9 SEKMELİ KUTU */
+    .market-tabs-grid {
+      display: grid; grid-template-columns: repeat(9, 1fr); gap: 4px; margin-bottom: 12px;
+      background: rgba(0,0,0,0.4); padding: 5px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);
+    }
+    .m-tab {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1;
+      padding: 6px 2px; border-radius: 8px; font-size: 9px; font-weight: 700; cursor: pointer; transition: 0.15s;
+    }
+    .m-tab span { font-size: 15px; }
+    .m-tab.active { background: linear-gradient(135deg, #d97706, #92400e); color: #fff; border-color: #fcd34d; box-shadow: 0 0 10px rgba(245,158,11,0.5); }
+    
     .market-section { display: none; }
     .market-section.active { display: block; }
-    .market-balance { display: flex; justify-content: space-between; font-size: 12px; background: rgba(0,0,0,0.4); padding: 8px 10px; border-radius: 8px; margin-bottom: 10px; color: #e2e8f0; }
-    .market-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(6, 16, 24, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 9px 11px; margin-bottom: 8px; }
+    .market-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(6, 16, 24, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
     .market-item-info { display: flex; flex-direction: column; gap: 2px; }
     .market-item-title { font-size: 13px; font-weight: 700; color: #fff; }
     .market-item-sub { font-size: 11px; color: #94a3b8; }
-    .buy-btn { padding: 6px 11px; border-radius: 8px; border: 1px solid #ffd783; background: linear-gradient(135deg, #d97706, #92400e); color: #fff; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+    .buy-btn { padding: 6px 12px; border-radius: 8px; border: 1px solid #ffd783; background: linear-gradient(135deg, #d97706, #92400e); color: #fff; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap; }
     .buy-btn.star-btn { border-color: #38bdf8; background: linear-gradient(135deg, #0284c7, #1e3a8a); }
     .buy-btn:disabled { opacity: 0.42; background: rgba(30, 41, 59, 0.8); cursor: not-allowed; }
     .buy-btn.equipped { background: #1e40af; border-color: #60a5fa; color: #eff6ff; }
-    #market-feedback { font-size: 12px; min-height: 16px; margin-top: 6px; text-align: center; color: #4ade80; font-weight: 700; }
+    #market-feedback { font-size: 12px; min-height: 18px; margin-top: 8px; text-align: center; color: #4ade80; font-weight: 700; }
 
     #gameover {
       display: none; position: fixed; inset: 0; background: rgba(3, 11, 18, 0.92);
@@ -312,7 +324,7 @@
       <div id="player-ship-hp-fill"></div>
     </div>
     <div class="ship-name-tag" id="tag-username">Test</div>
-    <div class="ship-fleet-tag" id="tag-fleet">[BAF]</div>
+    <div class="ship-fleet-tag" id="tag-fleet">[TST]</div>
   </div>
 
   <div id="top-vital-hud">
@@ -412,86 +424,155 @@
     </div>
   </div>
 
+  <!-- SEAFİGHT TARZI 9 SEKMELİ MARKED PANEL -->
   <div id="market-panel">
-    <div class="market-header">
-      <strong>⚓ Cephane, Star & Tersane</strong>
+    <div class="market-top-bar">
+      <span>🪙 <strong id="market-gold" style="color:#ffd783;">100m</strong> &nbsp;|&nbsp; ⭐ <strong id="market-star" style="color:#38bdf8;">2.500</strong></span>
+      <span style="font-size:15px; color:#fde68a;">MARKET</span>
       <button id="market-close-btn" class="market-close" type="button">✕</button>
     </div>
-    <div class="market-tabs">
-      <button id="tab-market" class="market-tab-btn active" type="button">Cephane</button>
-      <button id="tab-star" class="market-tab-btn" type="button">⭐ Star Menü</button>
-      <button id="tab-shipyard" class="market-tab-btn" type="button">Tersane</button>
-    </div>
-    <div class="market-balance">
-      <span>🪙 <strong id="market-gold" style="color:#ffd783;">100m</strong></span>
-      <span>⭐ <strong id="market-star" style="color:#38bdf8;">2.500</strong></span>
+
+    <!-- Üstteki 9 Sekme Çubuğu -->
+    <div class="market-tabs-grid">
+      <div class="m-tab active" data-tab="shipyard"><span>⚓</span>Tersane</div>
+      <div class="m-tab" data-tab="upgrade"><span>🛡️</span>Genişlet</div>
+      <div class="m-tab" data-tab="gulle"><span>⚫</span>Gülle</div>
+      <div class="m-tab" data-tab="cannon"><span>💣</span>Top</div>
+      <div class="m-tab" data-tab="weapon"><span>⚔️</span>Silah</div>
+      <div class="m-tab" data-tab="fleet"><span>🏴‍☠️</span>Filo</div>
+      <div class="m-tab" data-tab="crew"><span>👥</span>Tayfa</div>
+      <div class="m-tab" data-tab="star"><span>⭐</span>Star Puan</div>
+      <div class="m-tab" data-tab="packages"><span>📦</span>Paketler</div>
     </div>
 
-    <div id="section-market" class="market-section active">
+    <!-- 1. TERSANE SEKMESİ -->
+    <div id="sec-shipyard" class="market-section active">
+      <div id="shipyard-list"></div>
+    </div>
+
+    <!-- 2. GENİŞLET -->
+    <div id="sec-upgrade" class="market-section">
+      <div class="market-item">
+        <div class="market-item-info">
+          <span class="market-item-title">🛡️ Gemi Zırh Plakası</span>
+          <span class="market-item-sub">Maksimum canı kalıcı +500.000 artırır</span>
+        </div>
+        <button class="buy-btn upgrade-buy-btn" data-perk="hull" data-cost="5000000" type="button">5m Altın</button>
+      </div>
+    </div>
+
+    <!-- 3. GÜLLE SEKMESİ -->
+    <div id="sec-gulle" class="market-section">
       <div class="market-item">
         <div class="market-item-info">
           <span class="market-item-title">⚫ 25x Demir Gülle</span>
-          <span class="market-item-sub">180 Hasar · Standart top güllesi</span>
+          <span class="market-item-sub">180 Hasar · Standart gülle</span>
         </div>
         <button class="buy-btn ammo-buy-btn" type="button" data-type="iron" data-amount="25" data-cost="20">20 Altın</button>
       </div>
       <div class="market-item">
         <div class="market-item-info">
           <span class="market-item-title">⛓️ 15x Zincirli Gülle</span>
-          <span class="market-item-sub">140 Hasar · Düşmanı %50 yavaşlatır</span>
+          <span class="market-item-sub">140 Hasar · Yavaşlatma etkili</span>
         </div>
         <button class="buy-btn ammo-buy-btn" type="button" data-type="chain" data-amount="15" data-cost="35">35 Altın</button>
       </div>
       <div class="market-item">
         <div class="market-item-info">
           <span class="market-item-title">🔥 15x Alevli Gülle</span>
-          <span class="market-item-sub">290 Hasar · Yüksek yanma gücü</span>
+          <span class="market-item-sub">290 Hasar · Patlayıcı güç</span>
         </div>
         <button class="buy-btn ammo-buy-btn" type="button" data-type="fire" data-amount="15" data-cost="60">60 Altın</button>
       </div>
       <div class="market-item">
         <div class="market-item-info">
           <span class="market-item-title">🐉 10x Ejderha Nefesi</span>
-          <span class="market-item-sub">450 Hasar · Efsanevi yıkım güllesi</span>
+          <span class="market-item-sub">450 Hasar · Kule avcısı efsane gülle</span>
         </div>
         <button class="buy-btn ammo-buy-btn" type="button" data-type="dragon" data-amount="10" data-cost="120">120 Altın</button>
       </div>
     </div>
 
-    <div id="section-star" class="market-section">
+    <!-- 4. TOP -->
+    <div id="sec-cannon" class="market-section">
+      <div class="market-item">
+        <div class="market-item-info">
+          <span class="market-item-title">💣 Ağır Amiral Topu</span>
+          <span class="market-item-sub">Gülle menzilini ve vuruş gücünü artırır</span>
+        </div>
+        <button class="buy-btn star-btn" type="button" disabled>Kuşanıldı</button>
+      </div>
+    </div>
+
+    <!-- 5. SİLAH -->
+    <div id="sec-weapon" class="market-section">
+      <div class="market-item">
+        <div class="market-item-info">
+          <span class="market-item-title">⚔️ Çelik Borda Kılıcı</span>
+          <span class="market-item-sub">Yakın dövüş gücünü artırır</span>
+        </div>
+        <button class="buy-btn star-btn" type="button" disabled>Aktif</button>
+      </div>
+    </div>
+
+    <!-- 6. FİLO SEKMESİ (Altın karşılığı filo kurma / lider olma) -->
+    <div id="sec-fleet" class="market-section">
+      <div class="market-item">
+        <div class="market-item-info">
+          <span class="market-item-title" id="current-fleet-info">Mevcut Filonuz: [TST] (Lider)</span>
+          <span class="market-item-sub">Kendi filonuzu kurun veya yeni filo tagı tescil edin (Bedel: 10.000.000 Altın)</span>
+        </div>
+        <button class="buy-btn" id="create-fleet-btn" type="button">Filo Kur (10m Altın)</button>
+      </div>
+    </div>
+
+    <!-- 7. TAYFA -->
+    <div id="sec-crew" class="market-section">
+      <div class="market-item">
+        <div class="market-item-info">
+          <span class="market-item-title">👥 Tecrübeli Tayfa Grubu</span>
+          <span class="market-item-sub">Otomatik can yenileme hızını iki katına çıkarır</span>
+        </div>
+        <button class="buy-btn star-btn" type="button">2.500.000 Altın</button>
+      </div>
+    </div>
+
+    <!-- 8. STAR PUAN -->
+    <div id="sec-star" class="market-section">
       <div class="market-item">
         <div class="market-item-info">
           <span class="market-item-title">⭐ Acil Tamir Paketi</span>
           <span class="market-item-sub">Gemi canını anında +250.000 yeniler</span>
         </div>
-        <button class="buy-btn star-btn star-buy-btn" type="button" data-perk="repair" data-cost="250">250 Star</button>
+        <button class="buy-btn star-btn star-buy-btn" data-perk="repair" data-cost="250" type="button">250 Star</button>
       </div>
       <div class="market-item">
         <div class="market-item-info">
           <span class="market-item-title">⚡ Topçu Ustası (+Hasar)</span>
           <span class="market-item-sub">Tüm gülle hasarını kalıcı +50 artırır</span>
         </div>
-        <button class="buy-btn star-btn star-buy-btn" type="button" data-perk="damage" data-cost="500">500 Star</button>
+        <button class="buy-btn star-btn star-buy-btn" data-perk="damage" data-cost="500" type="button">500 Star</button>
       </div>
       <div class="market-item">
         <div class="market-item-info">
           <span class="market-item-title">⛵ Rüzgar Yelkeni (+Hız)</span>
-          <span class="market-item-sub">Gemi maksimum hızını kalıcı artırır</span>
+          <span class="market-item-sub">Gemi maksimum hızını artırır</span>
         </div>
-        <button class="buy-btn star-btn star-buy-btn" type="button" data-perk="speed" data-cost="400">400 Star</button>
-      </div>
-      <div class="market-item">
-        <div class="market-item-info">
-          <span class="market-item-title">🐉 500x Ejderha Cephanesi</span>
-          <span class="market-item-sub">Kule kuşatmaları için özel cephanelik</span>
-        </div>
-        <button class="buy-btn star-btn star-buy-btn" type="button" data-perk="dragon_pack" data-cost="300">300 Star</button>
+        <button class="buy-btn star-btn star-buy-btn" data-perk="speed" data-cost="400" type="button">400 Star</button>
       </div>
     </div>
 
-    <div id="section-shipyard" class="market-section">
-      <div id="shipyard-list"></div>
+    <!-- 9. PAKETLER -->
+    <div id="sec-packages" class="market-section">
+      <div class="market-item">
+        <div class="market-item-info">
+          <span class="market-item-title">📦 Büyük Amiral Başlangıç Paketi</span>
+          <span class="market-item-sub">10m Altın + 5.000 Star + 1.000 Ejderha Gülle</span>
+        </div>
+        <button class="buy-btn star-btn" type="button">Özel Fırsat</button>
+      </div>
     </div>
+
     <div id="market-feedback"></div>
   </div>
 
@@ -505,7 +586,7 @@
     <div class="auth-card">
       <div class="auth-brand">
         <h1>⚓ Korsan Dünyası</h1>
-        <p>Kale Adası Savaşları & Star Sistemi</p>
+        <p>Kale Adası & [TST] Filo Sistemi</p>
       </div>
       <div class="auth-tabs">
         <button id="tab-login" class="auth-tab active" type="button">Giriş Yap</button>
@@ -519,10 +600,6 @@
         <div class="auth-field">
           <label for="auth-password">Şifre</label>
           <input id="auth-password" type="password" autocomplete="current-password" placeholder="Şifre" required>
-        </div>
-        <div class="auth-field">
-          <label for="auth-fleet">Filo Tag (Örn: [BAF])</label>
-          <input id="auth-fleet" type="text" value="[BAF]" required>
         </div>
         <div id="auth-msg" class="auth-msg"></div>
         <button id="auth-submit" class="auth-submit" type="submit">DENİZE AÇIL</button>
@@ -576,13 +653,21 @@ const marketGoldEl = document.querySelector('#market-gold');
 const marketStarEl = document.querySelector('#market-star');
 const marketFeedbackEl = document.querySelector('#market-feedback');
 const shipyardListEl = document.querySelector('#shipyard-list');
+const currentFleetInfoEl = document.querySelector('#current-fleet-info');
+const createFleetBtn = document.querySelector('#create-fleet-btn');
 
-const tabMarket = document.querySelector('#tab-market');
-const tabStar = document.querySelector('#tab-star');
-const tabShipyard = document.querySelector('#tab-shipyard');
-const sectionMarket = document.querySelector('#section-market');
-const sectionStar = document.querySelector('#section-star');
-const sectionShipyard = document.querySelector('#section-shipyard');
+const marketTabs = document.querySelectorAll('.m-tab');
+const marketSections = {
+  shipyard: document.querySelector('#sec-shipyard'),
+  upgrade: document.querySelector('#sec-upgrade'),
+  gulle: document.querySelector('#sec-gulle'),
+  cannon: document.querySelector('#sec-cannon'),
+  weapon: document.querySelector('#sec-weapon'),
+  fleet: document.querySelector('#sec-fleet'),
+  crew: document.querySelector('#sec-crew'),
+  star: document.querySelector('#sec-star'),
+  packages: document.querySelector('#sec-packages')
+};
 
 const authOverlay = document.querySelector('#auth-overlay');
 const tabLogin = document.querySelector('#tab-login');
@@ -590,7 +675,6 @@ const tabRegister = document.querySelector('#tab-register');
 const authForm = document.querySelector('#auth-form');
 const authUsernameInput = document.querySelector('#auth-username');
 const authPasswordInput = document.querySelector('#auth-password');
-const authFleetInput = document.querySelector('#auth-fleet');
 const authMsgEl = document.querySelector('#auth-msg');
 const authSubmitBtn = document.querySelector('#auth-submit');
 const fillTestBtn = document.querySelector('#fill-test-btn');
@@ -636,8 +720,8 @@ const SHIP_MODELS = {
   void_destroyer: { id: 'void_destroyer', name: 'Hiçlik Yokedicisi',   desc: 'Evrenin derinliklerinden gelen mor kozmik enerji yayan son teknoloji', cost: 500000000, tint: 0xd946ef, emissive: 0x86198f, extraCanvasType: 'void' }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v30';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v30';
+const USERS_STORAGE_KEY = 'pirate3d_users_v31';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v31';
 let authMode = 'login';
 let currentUser = null;
 
@@ -645,7 +729,7 @@ function loadUsers() {
   let users = [];
   try { users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]'); } catch { users = []; }
   if (!users.some(u => u.username.toLowerCase() === 'test')) {
-    users.push({ id: 'user_test', username: 'Test', password: 'test', fleet: '[BAF]', ownedShips: ['standard'], equippedShip: 'standard' });
+    users.push({ id: 'user_test', username: 'Test', password: 'test', fleet: '[TST]', ownedShips: ['standard'], equippedShip: 'standard' });
     localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
   }
   return users;
@@ -666,13 +750,13 @@ function setAuthMode(mode) {
 }
 if (tabLogin) tabLogin.addEventListener('click', () => setAuthMode('login'));
 if (tabRegister) tabRegister.addEventListener('click', () => setAuthMode('register'));
-if (fillTestBtn) fillTestBtn.addEventListener('click', () => { authUsernameInput.value = 'Test'; authPasswordInput.value = 'test'; authFleetInput.value = '[BAF]'; });
+if (fillTestBtn) fillTestBtn.addEventListener('click', () => { authUsernameInput.value = 'Test'; authPasswordInput.value = 'test'; });
 
 function completeLogin(user) {
   currentUser = { 
     id: user.id, 
     username: user.username, 
-    fleet: user.fleet || '[BAF]',
+    fleet: user.fleet || '[TST]',
     ownedShips: user.ownedShips || ['standard'], 
     equippedShip: user.equippedShip || 'standard' 
   };
@@ -681,6 +765,7 @@ function completeLogin(user) {
   tagUsernameEl.textContent = currentUser.username;
   tagFleetEl.textContent = currentUser.fleet;
   shipTitleEl.textContent = SHIP_MODELS[currentUser.equippedShip]?.name || '8 Yönlü Efsanevi Gemi';
+  currentFleetInfoEl.textContent = `Mevcut Filonuz: ${currentUser.fleet} (Lider)`;
   authOverlay.style.display = 'none';
   initThreeGame();
 }
@@ -690,11 +775,10 @@ if (authForm) {
     e.preventDefault();
     const uname = authUsernameInput.value.trim(); 
     const pass = authPasswordInput.value;
-    const fleet = authFleetInput.value.trim() || '[BAF]';
     const users = loadUsers();
     if (authMode === 'register') {
       if (users.some(u => u.username.toLowerCase() === uname.toLowerCase())) { authMsgEl.textContent = 'Bu isim zaten kayıtlı.'; return; }
-      const nu = { id: 'u_' + Date.now(), username: uname, password: pass, fleet, ownedShips: ['standard'], equippedShip: 'standard' };
+      const nu = { id: 'u_' + Date.now(), username: uname, password: pass, fleet: '[TST]', ownedShips: ['standard'], equippedShip: 'standard' };
       users.push(nu); saveUsers(users);
       setTimeout(() => completeLogin(nu), 200);
     } else {
@@ -707,7 +791,7 @@ if (authForm) {
 if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeItem(SESSION_STORAGE_KEY); location.reload(); });
 
 // ==========================================================
-// THREE.JS SAHNE & GRAFİKSEL KALE ADASI MOTORU
+// THREE.JS SAHNE & OYUN MOTORU
 // ==========================================================
 let scene, camera, renderer;
 let playerSprite, playerNeonRing, enemies = [], defenseTowers = [], fortressGroup = null, rangeRingMesh, oceanTexture, oceanBumpTexture;
@@ -959,9 +1043,7 @@ function applySpriteByAngle(sprite, angle, baseHeight = BASE_SHIP_HEIGHT, shipId
   }
 }
 
-// ==========================================================
-// FOTOĞRAFTAKİ KALE ADASI & PROFESYONEL KULE GRAFİK OLUŞTURUCU
-// ==========================================================
+// Görseldeki Kaleli Ada Oluşturucu
 function buildGraphicalFortressIsland() {
   if (fortressGroup) {
     scene.remove(fortressGroup);
@@ -969,14 +1051,12 @@ function buildGraphicalFortressIsland() {
   fortressGroup = new THREE.Group();
   towerBraziers = [];
 
-  // Malzemeler (Kum, Kaya, Taş Duvar, Kiremit Çatı, Altın Kubbe)
   const sandMat = new THREE.MeshStandardMaterial({ color: 0x9c8265, roughness: 0.92 });
   const rockMat = new THREE.MeshStandardMaterial({ color: 0x4b463e, roughness: 0.88 });
   const wallMat = new THREE.MeshStandardMaterial({ color: 0x78716c, roughness: 0.75, metalness: 0.1 });
   const roofMat = new THREE.MeshStandardMaterial({ color: 0x3f3f46, roughness: 0.6 });
   const goldMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.25, metalness: 0.8 });
 
-  // 1. MERKEZİ ADA KUM TABANI VE KAYALIK PLATFORM
   const centerSand = new THREE.Mesh(new THREE.CylinderGeometry(82, 108, 12, 24), sandMat);
   centerSand.position.y = 4;
   fortressGroup.add(centerSand);
@@ -985,7 +1065,6 @@ function buildGraphicalFortressIsland() {
   centerRock.position.y = 12;
   fortressGroup.add(centerRock);
 
-  // 2. MERKEZ KALE SARAYI (Fotoğraftaki Ana Yapı & Minareli Kuleler)
   const mainKeep = new THREE.Mesh(new THREE.BoxGeometry(52, 34, 44), wallMat);
   mainKeep.position.set(0, 32, 0);
   fortressGroup.add(mainKeep);
@@ -994,38 +1073,20 @@ function buildGraphicalFortressIsland() {
   sideWing.position.set(34, 28, 4);
   fortressGroup.add(sideWing);
 
-  // Piramit Çatılar
   const mainRoof = new THREE.Mesh(new THREE.ConeGeometry(42, 22, 4), roofMat);
   mainRoof.rotation.y = Math.PI / 4;
   mainRoof.position.set(0, 60, 0);
   fortressGroup.add(mainRoof);
 
-  const wingRoof = new THREE.Mesh(new THREE.ConeGeometry(26, 16, 4), roofMat);
-  wingRoof.rotation.y = Math.PI / 4;
-  wingRoof.position.set(34, 49, 4);
-  fortressGroup.add(wingRoof);
-
-  // Kale Tepesi Altın Alem / Kubbe
   const dome = new THREE.Mesh(new THREE.SphereGeometry(5, 16, 16), goldMat);
   dome.position.set(0, 72, 0);
   fortressGroup.add(dome);
 
-  // Ön İki İnce Kale Kulesi (Minare/Gözetleme Kulesi Görünümü)
-  [[-26, 22], [-10, 28]].forEach(([mx, mz]) => {
-    const spireBody = new THREE.Mesh(new THREE.CylinderGeometry(3.8, 4.8, 48, 12), wallMat);
-    spireBody.position.set(mx, 38, mz);
-    fortressGroup.add(spireBody);
-
-    const spireCap = new THREE.Mesh(new THREE.ConeGeometry(5.5, 14, 12), roofMat);
-    spireCap.position.set(mx, 68, mz);
-    fortressGroup.add(spireCap);
-  });
-
-  // 3. DIŞ HİLAL SUR DUVARLARI (Kuzey ve Güney Yayları - Doğu ve Batı Girişleri Açık)
+  // Surlar (Gemi üstlerinden rahatça geçebilsin diye fiziksel engel kaldırıldı, dekoratif bırakıldı)
   const wallRadius = 215;
   const arcConfigs = [
-    { start: -Math.PI * 0.84, end: -Math.PI * 0.16 }, // Kuzey Sur Yayı
-    { start:  Math.PI * 0.16, end:  Math.PI * 0.84 }  // Güney Sur Yayı
+    { start: -Math.PI * 0.84, end: -Math.PI * 0.16 },
+    { start:  Math.PI * 0.16, end:  Math.PI * 0.84 }
   ];
 
   arcConfigs.forEach(arc => {
@@ -1036,23 +1097,12 @@ function buildGraphicalFortressIsland() {
       const wx = Math.cos(ang) * wallRadius;
       const wz = Math.sin(ang) * wallRadius;
 
-      // Sur Altı Kum/Kaya Şeridi
-      const berm = new THREE.Mesh(new THREE.CylinderGeometry(18, 25, 10, 10), sandMat);
-      berm.position.set(wx, 3, wz);
-      fortressGroup.add(berm);
-
-      // Taş Sur Duvarı Segmenti
       const wallSeg = new THREE.Mesh(new THREE.BoxGeometry(24, 20, 13), wallMat);
       wallSeg.position.set(wx, 14, wz);
       wallSeg.rotation.y = -ang + Math.PI / 2;
       fortressGroup.add(wallSeg);
 
-      // Sur Üstü Ateş Çanakları (Brazier) - Görseldeki Kırmızı Alevli Burçlar
       if (i % 4 === 2) {
-        const bastion = new THREE.Mesh(new THREE.CylinderGeometry(11, 13, 24, 12), rockMat);
-        bastion.position.set(wx, 16, wz);
-        fortressGroup.add(bastion);
-
         const fireBowl = new THREE.Mesh(
           new THREE.CylinderGeometry(8.5, 6, 4, 12),
           new THREE.MeshBasicMaterial({ color: 0xff4500 })
@@ -1067,41 +1117,27 @@ function buildGraphicalFortressIsland() {
   scene.add(fortressGroup);
 }
 
-// Görseldeki "Profesyonel Kule" 3D Modelini Oluşturur
 function createProfessionalTowerMesh() {
   const group = new THREE.Group();
-
   const baseMat = new THREE.MeshStandardMaterial({ color: 0xd6d3d1, roughness: 0.65 });
   const woodMat = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.8 });
   const roofMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.5 });
 
-  // Taş Alt Kaide
   const pedestal = new THREE.Mesh(new THREE.BoxGeometry(16, 12, 16), baseMat);
   pedestal.position.y = 6;
   group.add(pedestal);
 
-  // 4 Köşeli Ahşap/Taş İskelet Gövde
-  const colPositions = [[-5, -5], [5, -5], [-5, 5], [5, 5]];
-  colPositions.forEach(([cx, cz]) => {
-    const pillar = new THREE.Mesh(new THREE.BoxGeometry(2.8, 24, 2.8), baseMat);
-    pillar.position.set(cx, 22, cz);
-    group.add(pillar);
-  });
-
-  // Üst Gözetleme Balkonu
   const platform = new THREE.Mesh(new THREE.BoxGeometry(18, 4, 18), woodMat);
   platform.position.y = 34;
   group.add(platform);
 
-  // Sivri Kule Çatısı
   const roof = new THREE.Mesh(new THREE.ConeGeometry(13, 12, 4), roofMat);
   roof.rotation.y = Math.PI / 4;
   roof.position.y = 42;
   group.add(roof);
 
-  // Görünmez büyük tıklama kutusu (Mobilde/Masaüstünde kolay seçilsin diye)
   const hitBox = new THREE.Mesh(
-    new THREE.CylinderGeometry(16, 16, 52, 8),
+    new THREE.CylinderGeometry(18, 18, 52, 8),
     new THREE.MeshBasicMaterial({ visible: false })
   );
   hitBox.position.y = 26;
@@ -1111,7 +1147,6 @@ function createProfessionalTowerMesh() {
 }
 
 function spawnAllDefenseTowers() {
-  // Eski kuleleri ve HTML etiketlerini temizle
   defenseTowers.forEach(t => {
     scene.remove(t.group);
     if (t.labelEl) t.labelEl.remove();
@@ -1119,12 +1154,9 @@ function spawnAllDefenseTowers() {
   defenseTowers = [];
   towerLabelsLayer.innerHTML = '';
 
-  // Görseldeki gibi: 6 adet dış sur kulesi + 6 adet iç lagün çevresi kulesi = 12 Profesyonel Kule
   const towerCoordinates = [
-    // Dış Sur Kuleleri
     { x: -165, z: -135 }, { x: 0, z: -205 }, { x: 165, z: -135 },
     { x: -165, z:  135 }, { x: 0, z:  205 }, { x: 165, z:  135 },
-    // İç Kale Çevresi Kuleleri
     { x: -82, z: -55 }, { x: 0, z: -85 }, { x: 82, z: -55 },
     { x: -82, z:  55 }, { x: 0, z:  85 }, { x: 82, z:  55 }
   ];
@@ -1136,7 +1168,6 @@ function spawnAllDefenseTowers() {
     hitBox.userData.towerId = id;
     scene.add(group);
 
-    // Kule üstü HTML Can Barı & "Profesyonel Kule" etiketi
     const labelDiv = document.createElement('div');
     labelDiv.className = 'tower-label-tag';
     labelDiv.innerHTML = `
@@ -1248,7 +1279,6 @@ function initThreeGame() {
     mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
 
-    // Kule seçimi
     const towerHitBoxes = defenseTowers.map(t => t.hitBox);
     const towerIntersects = raycaster.intersectObjects(towerHitBoxes);
     if (towerIntersects.length > 0) {
@@ -1262,7 +1292,6 @@ function initThreeGame() {
       }
     }
 
-    // Düşman gemi seçimi
     const enemySprites = enemies.map(en => en.sprite);
     const intersects = raycaster.intersectObjects(enemySprites);
     if (intersects.length > 0) {
@@ -1276,7 +1305,6 @@ function initThreeGame() {
       }
     }
 
-    // Denize tıklayıp hareket etme
     const oceanIntersect = raycaster.intersectObject(ocean);
     if (oceanIntersect.length > 0) {
       targetPos = { x: oceanIntersect[0].point.x, z: oceanIntersect[0].point.z };
@@ -1290,7 +1318,7 @@ function initThreeGame() {
 }
 
 // ==========================================================
-// OYUN MANTIĞI & STAR PUANI / ADA KULE SİSTEMİ
+// OYUN MANTIĞI & RASTGELE DOLAŞAN NPC GEMİLER
 // ==========================================================
 let player;
 let targetPos = null, selectedEnemyId = null, isAttacking = false, isGameOver = false;
@@ -1304,7 +1332,7 @@ function startGameLogic() {
   gameOverEl.style.display = 'none';
 
   player = {
-    x: 310, z: 0, a: Math.PI, speed: 0, maxSpeed: 1.9,
+    x: 350, z: 0, a: Math.PI, speed: 0, maxSpeed: 1.9,
     hp: 1000000, maxHp: 1000000,
     score: 100000000,
     stars: 2500,
@@ -1324,7 +1352,6 @@ function startGameLogic() {
   applySpriteByAngle(playerSprite, player.a, BASE_SHIP_HEIGHT, currentShipId);
   scene.add(playerSprite);
 
-  // Fotoğraftaki Grafiksel Kale Adasını ve Kuleleri Oluştur
   buildGraphicalFortressIsland();
   spawnAllDefenseTowers();
 
@@ -1332,7 +1359,8 @@ function startGameLogic() {
   enemies = [];
   nextNpcIdCounter = 1;
 
-  for (let i = 0; i < 4; i++) {
+  // Haritada rastgele dolaşan NPC gemiler
+  for (let i = 0; i < 6; i++) {
     spawnEnemySprite(nextNpcIdCounter++);
   }
 
@@ -1345,9 +1373,9 @@ function startGameLogic() {
 function spawnEnemySprite(id) {
   let ex, ez;
   do {
-    ex = (Math.random() - 0.5) * 950;
-    ez = (Math.random() - 0.5) * 950;
-  } while (Math.hypot(ex, ez) < 320);
+    ex = (Math.random() - 0.5) * 1000;
+    ez = (Math.random() - 0.5) * 1000;
+  } while (Math.hypot(ex, ez) < 260);
 
   const initialData = shipTextures.top || Object.values(shipTextures)[0];
   const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1 });
@@ -1390,9 +1418,7 @@ window.addEventListener('keydown', e => {
   if (e.key === '2') selectAmmoSlot('chain');
   if (e.key === '3') selectAmmoSlot('fire');
   if (e.key === '4') selectAmmoSlot('dragon');
-  if (e.key.toLowerCase() === 'm') openMarketTab('market');
-  if (e.key.toLowerCase() === 's') openMarketTab('star');
-  if (e.key.toLowerCase() === 't') openMarketTab('shipyard');
+  if (e.key.toLowerCase() === 'm') openMarketTab('shipyard');
 });
 
 function updateTargetCard() {
@@ -1491,7 +1517,7 @@ function animate3D() {
   requestAnimationFrame(animate3D);
 
   if (player && !isGameOver) {
-    if (enemies.length < 4) {
+    if (enemies.length < 6) {
       spawnEnemySprite(nextNpcIdCounter++);
     }
   }
@@ -1503,7 +1529,6 @@ function animate3D() {
 
   const now = Date.now();
 
-  // Ateş çanaklarında titreyen alev efekti
   towerBraziers.forEach((b, i) => {
     const s = 0.92 + Math.sin(now * 0.012 + i) * 0.18;
     b.scale.set(s, s * 1.2, s);
@@ -1531,15 +1556,9 @@ function animate3D() {
     player.speed *= 0.92;
   }
 
-  // Merkez adanın tam ortasına (kale binasına) çarpmayı önle, lagünde yüzebilsin
-  const nextX = player.x + Math.cos(player.a) * player.speed;
-  const nextZ = player.z + Math.sin(player.a) * player.speed;
-  if (Math.hypot(nextX, nextZ) > 95) {
-    player.x = nextX;
-    player.z = nextZ;
-  } else {
-    player.speed = 0;
-  }
+  // Surlardan ve adadan rahatça geçebilmesi için serbest hareket
+  player.x += Math.cos(player.a) * player.speed;
+  player.z += Math.sin(player.a) * player.speed;
 
   coordDisplayEl.textContent = `X: ${Math.round((player.x / (WORLD_SIZE / 2)) * 50)} · Y: ${Math.round((player.z / (WORLD_SIZE / 2)) * 50)}`;
 
@@ -1564,7 +1583,6 @@ function animate3D() {
     playerLabelEl.style.transform = `translate(-50%, 0) translate(${xPx}px, ${yPx}px)`;
   }
 
-  // Her kule üzerindeki "Profesyonel Kule" + Can Barı etiketini 3D sahneye hizala
   defenseTowers.forEach(t => {
     if (!t.labelEl) return;
     const v = new THREE.Vector3(t.x, 52, t.z);
@@ -1583,7 +1601,6 @@ function animate3D() {
   camera.position.z += (player.z + 560 - camera.position.z) * 0.08;
   camera.lookAt(player.x, 0, player.z);
 
-  // Mermi animasyonları
   for (let i = activeProjectiles.length - 1; i >= 0; i--) {
     const p = activeProjectiles[i];
     const dx = p.targetX - p.x;
@@ -1632,9 +1649,7 @@ function animate3D() {
     }
   }
 
-  // ==========================================================
-  // SAVUNMA KULELERİ: YAKLAŞANA ATEŞ AÇAR, SAHİP FİLOYA VURMAZ
-  // ==========================================================
+  // Savunma Kuleleri: Adanın sahibi olan filo oyuncularına ateş açmaz[cite: 2]
   const isPlayerInOwnerFleet = Boolean(islandOwnerFleet && currentUser.fleet === islandOwnerFleet);
 
   for (const tower of defenseTowers) {
@@ -1659,7 +1674,7 @@ function animate3D() {
     }
   }
 
-  // Düşman gemi hareketleri
+  // Düşman gemilerin hareketi ve oyuncuyu takip etmesi
   for (const en of enemies) {
     if (en.slowTimer > 0) en.slowTimer--;
     const activeSpeed = en.slowTimer > 0 ? en.baseSpeed * 0.5 : en.baseSpeed;
@@ -1709,15 +1724,11 @@ function animate3D() {
     }
   }
 
-  // ==========================================================
-  // OYUNCUNUN KULEYE VEYA DÜŞMAN GEMİSİNE SALDIRISI
-  // ==========================================================
   if (isAttacking && selectedEnemyId) {
     const ammoKey = player.selectedAmmo;
     const ammoSpec = AMMO_TYPES[ammoKey];
     const finalDamage = ammoSpec.damage + (player.bonusDamage || 0);
 
-    // HEDEF KULE İSE
     if (String(selectedEnemyId).startsWith('tower_')) {
       const tId = parseInt(selectedEnemyId.replace('tower_', ''));
       const tower = defenseTowers.find(t => t.id === tId);
@@ -1746,18 +1757,17 @@ function animate3D() {
               selectedEnemyId = null;
               isAttacking = false;
 
-              // Kule yıkıldığında Star Puanı + EXP ödülü
               player.stars += 120;
               player.exp += 25;
               showFloatingDamage(tower.x, tower.z, '+120 ⭐ Star', '#38bdf8');
 
-              // SON KULEYİ BATIRAN KULLANICININ FİLOSU ADAYA SAHİP OLUR VE KULELER YENİ FİLO ADINA DİKİLİR
+              // Son kuleyi batıran oyuncunun filosu adanın sahibi olur ve kuleler o filo adına yeniden dikilir[cite: 2]
               if (defenseTowers.length === 0) {
                 islandOwnerFleet = currentUser.fleet;
                 islandOwnerTitleEl.textContent = `Ada: ${islandOwnerFleet}`;
                 player.stars += 1000;
                 showFloatingDamage(player.x, player.z, `ADA FETHEDİLDİ! +1000 ⭐`, '#fbbf24');
-                spawnAllDefenseTowers(); // Tüm kuleler artık bu filoyu koruyacak şekilde yeniden dikilir
+                spawnAllDefenseTowers(); 
               }
 
               updateTargetCard();
@@ -1768,7 +1778,6 @@ function animate3D() {
         }
       }
     } else {
-      // HEDEF DÜŞMAN GEMİSİ İSE
       const target = enemies.find(e => e.id === selectedEnemyId);
       if (target && player.ammo[ammoKey] > 0) {
         const d = Math.hypot(target.x - player.x, target.z - player.z);
@@ -1833,20 +1842,17 @@ function drawMinimap() {
   const scale = w / WORLD_SIZE;
   const cx = w / 2, cy = h / 2;
 
-  // Kale Adası Dış Sur Çemberi
   mctx.strokeStyle = '#57534e';
   mctx.lineWidth = 2;
   mctx.beginPath();
   mctx.arc(cx, cy, 215 * scale, 0, Math.PI * 2);
   mctx.stroke();
 
-  // Merkez Kale
   mctx.fillStyle = '#0f766e';
   mctx.beginPath();
   mctx.arc(cx, cy, 6, 0, Math.PI * 2);
   mctx.fill();
 
-  // Savunma Kuleleri Minimap (Sahip filoya aitse mavi, düşmansa mor/kırmızı)
   const isFriendlyIsland = Boolean(islandOwnerFleet && currentUser.fleet === islandOwnerFleet);
   mctx.fillStyle = isFriendlyIsland ? '#38bdf8' : '#a855f7';
   defenseTowers.forEach(t => {
@@ -1855,7 +1861,6 @@ function drawMinimap() {
     mctx.fill();
   });
 
-  // Düşman Gemiler
   mctx.fillStyle = '#dc2626';
   enemies.forEach(en => {
     mctx.beginPath();
@@ -1863,7 +1868,6 @@ function drawMinimap() {
     mctx.fill();
   });
 
-  // Oyuncu Gemisi
   mctx.fillStyle = '#22c55e';
   mctx.beginPath();
   mctx.arc(cx + player.x * scale, cy + player.z * scale, 3.2, 0, Math.PI * 2);
@@ -1901,34 +1905,49 @@ function updateHUD() {
   });
 }
 
-function openMarketTab(tabName) {
+function openMarketTab(tabKey) {
   marketPanel.classList.add('open');
-  [tabMarket, tabStar, tabShipyard].forEach(b => b.classList.remove('active'));
-  [sectionMarket, sectionStar, sectionShipyard].forEach(s => s.classList.remove('active'));
+  marketTabs.forEach(t => t.classList.remove('active'));
+  Object.values(marketSections).forEach(sec => sec.classList.remove('active'));
 
-  if (tabName === 'market') {
-    tabMarket.classList.add('active');
-    sectionMarket.classList.add('active');
-  } else if (tabName === 'star') {
-    tabStar.classList.add('active');
-    sectionStar.classList.add('active');
-  } else {
-    tabShipyard.classList.add('active');
-    sectionShipyard.classList.add('active');
+  const activeTabEl = document.querySelector(`.m-tab[data-tab="${tabKey}"]`);
+  if (activeTabEl) activeTabEl.classList.add('active');
+  if (marketSections[tabKey]) marketSections[tabKey].classList.add('active');
+
+  if (tabKey === 'shipyard') {
     renderShipyardList();
   }
 }
 
-marketToggleBtn.addEventListener('click', () => openMarketTab('market'));
-starshopToggleBtn.addEventListener('click', () => openMarketTab('star'));
+marketTabs.forEach(tab => {
+  tab.addEventListener('click', () => openMarketTab(tab.dataset.tab));
+});
+
+marketToggleBtn.addEventListener('click', () => openMarketTab('shipyard'));
 shipyardToggleBtn.addEventListener('click', () => openMarketTab('shipyard'));
+starshopToggleBtn.addEventListener('click', () => openMarketTab('star'));
 marketCloseBtn.addEventListener('click', () => marketPanel.classList.remove('open'));
 
-tabMarket.addEventListener('click', () => openMarketTab('market'));
-tabStar.addEventListener('click', () => openMarketTab('star'));
-tabShipyard.addEventListener('click', () => openMarketTab('shipyard'));
+// Filo Kurma Butonu
+createFleetBtn.addEventListener('click', () => {
+  const cost = 10000000;
+  if (player.score < cost) {
+    marketFeedbackEl.style.color = '#f87171';
+    marketFeedbackEl.textContent = 'Yeni filo kurmak için 10m altın lazım!';
+    setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+    return;
+  }
+  player.score -= cost;
+  currentUser.fleet = '[TST-LIDER]';
+  tagFleetEl.textContent = currentUser.fleet;
+  currentFleetInfoEl.textContent = `Mevcut Filonuz: ${currentUser.fleet} (Lider)`;
+  updateHUD();
+  marketFeedbackEl.style.color = '#4ade80';
+  marketFeedbackEl.textContent = 'Yeni filo başarıyla kuruldu ve lider oldunuz!';
+  setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2500);
+});
 
-// Altın ile Cephane Satın Alma
+// Cephane Satın Alma
 document.querySelectorAll('.ammo-buy-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     if (!player) return;
@@ -1954,7 +1973,24 @@ document.querySelectorAll('.ammo-buy-btn').forEach(btn => {
   });
 });
 
-// Star Puanı ile Güçlendirme Satın Alma
+// Zırh Geliştirme
+document.querySelector('.upgrade-buy-btn').addEventListener('click', () => {
+  if (player.score < 5000000) {
+    marketFeedbackEl.style.color = '#f87171';
+    marketFeedbackEl.textContent = 'Yeterli altın yok!';
+    setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+    return;
+  }
+  player.score -= 5000000;
+  player.maxHp += 500000;
+  player.hp = player.maxHp;
+  updateHUD();
+  marketFeedbackEl.style.color = '#4ade80';
+  marketFeedbackEl.textContent = 'Zırh güçlendirildi (+500k Can)!';
+  setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+});
+
+// Star Puanı Güçlendirmeleri
 document.querySelectorAll('.star-buy-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     if (!player) return;
@@ -1979,9 +2015,6 @@ document.querySelectorAll('.star-buy-btn').forEach(btn => {
     } else if (perk === 'speed') {
       player.maxSpeed += 0.35;
       marketFeedbackEl.textContent = 'Gemi hızı kalıcı artırıldı!';
-    } else if (perk === 'dragon_pack') {
-      player.ammo.dragon += 500;
-      marketFeedbackEl.textContent = '+500 Ejderha Nefesi eklendi!';
     }
 
     marketFeedbackEl.style.color = '#38bdf8';
