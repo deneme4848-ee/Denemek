@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - 8 Yönlü Efsanevi Filo</title>
+  <title>Korsan Dünyası - Özgün Tersane Filosu</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -353,7 +353,7 @@
     </div>
     <div class="gold-row">
       <span>🪙</span>
-      <span id="score">100,000,000</span>
+      <span id="score">1,000,000,000</span>
     </div>
     <div class="ship-sub-name" id="ship-title">8 Yönlü Efsanevi Gemi</div>
   </div>
@@ -410,7 +410,7 @@
       <button id="tab-shipyard" class="market-tab-btn" type="button">Tersane</button>
     </div>
     <div class="market-balance">
-      <span>Hazine: <strong id="market-gold" style="color:#ffd783;">100,000,000</strong> Altın</span>
+      <span>Hazine: <strong id="market-gold" style="color:#ffd783;">1,000,000,000</strong> Altın</span>
     </div>
     <div id="section-market" class="market-section active">
       <div class="market-item">
@@ -560,23 +560,23 @@ const AMMO_TYPES = {
   dragon: { id: 'dragon', name: 'Ejderha Nefesi', damage: 450, slow: 0.85, desc: '450 Efsanevi Hasar', color: 0x3b82f6 }
 };
 
-// 10 ADET YEPYENİ TAMAMEN BAĞIMSIZ GÖRSEL TERSANE TASARIMI (BUFF YOK - SADECE STİL)
+// 10 ADET ÖZGÜN TASARIM (NEON SABİT TURKUAZ/MAVİ, FARKLI BAŞLIK VE STİLLER)
 const SHIP_MODELS = {
-  standard: { id: 'standard', name: '8 Yönlü Efsanevi Gemi', desc: 'Standart Şeffaf PNG Sprite Filosu', cost: 0, tint: 0xffffff },
-  nebula:   { id: 'nebula',   name: '🌌 Nebula Gözcüsü',     desc: 'Uzayın derinliklerindeki mor bulutsulardan ilham alan gövde', cost: 2500000, tint: 0x8b5cf6 },
-  sakura:   { id: 'sakura',   name: '🌸 Kiraz Çiçeği (Sakura)', desc: 'Uzak doğunun zarif pembe ve beyaz yapraklarıyla süslenmiş', cost: 6000000, tint: 0xf472b6 },
-  glacier:  { id: 'glacier',  name: '💎 Kutupsal Safir',     desc: 'Kutup buzullarından gelen kristal mavisi donanma', cost: 12000000, tint: 0x38bdf8 },
-  toxic:    { id: 'toxic',    name: '☣️ Radyoaktif Zehir',    desc: 'Karanlıkta parlayan zehirli yeşil asit detayları', cost: 25000000, tint: 0x4ade80 },
-  caramel:  { id: 'caramel',  name: '🍫 Karamel Fırtınası',   desc: 'Sıcak kahverengi ve bronz tonlarının uyumu', cost: 45000000, tint: 0xd97706 },
-  peacock:  { id: 'peacock',  name: '🦚 Kral Tavus Kuşu',    desc: 'Mor, turkuaz ve zümrüt yeşilinin canlı parıltısı', cost: 75000000, tint: 0x06b6d4 },
-  sunset:   { id: 'sunset',   name: '🌅 Gün Batımı Korsanı',  desc: 'Ufuktaki son ışıkların turuncu ve kızıl tonları', cost: 120000000, tint: 0xf97316 },
-  mahogany: { id: 'mahogany', name: '🪵 Antik Maun Ağacı',   desc: 'Asil koyu ahşap kaplamalı usta işi oymalı kalyon', cost: 200000000, tint: 0x78350f },
-  silver:   { id: 'silver',   name: '🌙 Ay Işığı Gümüşü',    desc: 'Gecenin karanlığında gümüş rengi parıltılar saçan', cost: 350000000, tint: 0x94a3b8 },
-  cosmic:   { id: 'cosmic',   name: '🔮 Kozmik Mor',        desc: 'Evrenin ötesinden gelen gizemli mor enerji izleri', cost: 600000000, tint: 0xc084fc }
+  standard: { id: 'standard', name: '8 Yönlü Efsanevi Gemi', desc: 'Standart Donanma Filosu', cost: 0 },
+  skull:    { id: 'skull',    name: '💀 Lanetli Kuru Kafa',   desc: 'Burnunda devasa parlayan kafatası ve kemik oymaları', cost: 100000 },
+  dragon:   { id: 'dragon',   name: '🐉 Ejderha Muhafızı',    desc: 'Kükreyen ejderha başlığı ve pullu zırh hatları', cost: 500000 },
+  eagle:    { id: 'eagle',    name: '🦅 Fırtına Kartalı',     desc: 'Kanat açmış görkemli kartal figürlü keskin hatlar', cost: 1200000 },
+  lion:     { id: 'lion',     name: '🦁 Altın Aslan',         desc: 'Saf altın döküm kükreyen aslan figürlü amiral gemisi', cost: 2500000 },
+  ghost:    { id: 'ghost',    name: '🌙 Gecenin Hayaleti',    desc: 'Ay sfenksi motifleri ve gizemli ruhsal semboller', cost: 5000000 },
+  poseidon: { id: 'poseidon', name: '🔱 Denizlerin Efendisi', desc: 'Devasa üççatal (mızrak) figürlü okyanus hakimi', cost: 10000000 },
+  wolf:     { id: 'wolf',     name: '🐺 Buzul Kurdu',         desc: 'Kuzeyin vahşi kurt başlığı ve buz mavisi yelkenler', cost: 20000000 },
+  titan:    { id: 'titan',    name: '⚓ Demir Yumruk',        desc: 'Çift katmanlı koçbaşı zırhlı yıkılmaz dev', cost: 40000000 },
+  kraken:   { id: 'kraken',   name: '🐙 Kraken\'in Kolu',    desc: 'Gövdesini saran dev dokunaç oymaları ve kabuklar', cost: 75000000 },
+  scales:   { id: 'scales',   name: '⚖️ Adalet Terazisi',     desc: 'Antik korsan lordlarının adalet sembolü kalyon', cost: 150000000 }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v30';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v30';
+const USERS_STORAGE_KEY = 'pirate3d_users_v31';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v31';
 let authMode = 'login';
 let currentUser = null;
 
@@ -584,7 +584,7 @@ function loadUsers() {
   let users = [];
   try { users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]'); } catch { users = []; }
   if (!users.some(u => u.username.toLowerCase() === 'test')) {
-    users.push({ id: 'user_test', username: 'Test', password: 'test', ownedShips: ['standard'], equippedShip: 'standard' });
+    users.push({ id: 'user_test', username: 'Test', password: 'test', ownedShips: Object.keys(SHIP_MODELS), equippedShip: 'standard' });
     localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
   }
   return users;
@@ -611,7 +611,7 @@ function completeLogin(user) {
   currentUser = { 
     id: user.id, 
     username: user.username, 
-    ownedShips: user.ownedShips || ['standard'], 
+    ownedShips: Object.keys(SHIP_MODELS), // Sınırsız test için tüm gemiler açık
     equippedShip: user.equippedShip || 'standard' 
   };
   localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
@@ -629,7 +629,7 @@ if (authForm) {
     const users = loadUsers();
     if (authMode === 'register') {
       if (users.some(u => u.username.toLowerCase() === uname.toLowerCase())) { authMsgEl.textContent = 'Bu isim zaten kayıtlı.'; return; }
-      const nu = { id: 'u_' + Date.now(), username: uname, password: pass, ownedShips: ['standard'], equippedShip: 'standard' };
+      const nu = { id: 'u_' + Date.now(), username: uname, password: pass, ownedShips: Object.keys(SHIP_MODELS), equippedShip: 'standard' };
       users.push(nu); saveUsers(users);
       setTimeout(() => completeLogin(nu), 200);
     } else {
@@ -917,8 +917,9 @@ function initThreeGame() {
   rangeRingMesh.position.y = 0.6;
   scene.add(rangeRingMesh);
 
+  // SABİT TURKUAZ/MAVİ NEON HALKA (Tasarım değiştirende değişmez)
   const neonGeo = new THREE.RingGeometry(32, 38, 48);
-  const neonMat = new THREE.MeshBasicMaterial({ color: 0x0ea5e9, side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
+  const neonMat = new THREE.MeshBasicMaterial({ color: 0x0ea5e9, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
   playerNeonRing = new THREE.Mesh(neonGeo, neonMat);
   playerNeonRing.rotation.x = -Math.PI / 2;
   playerNeonRing.position.y = 0.8;
@@ -1024,22 +1025,15 @@ function showBossBanner(msg) {
   setTimeout(() => bossAlertEl.classList.remove('show'), 4500);
 }
 
-function getEquippedShipModel() {
-  if (!currentUser) return SHIP_MODELS.standard;
-  return SHIP_MODELS[currentUser.equippedShip] || SHIP_MODELS.standard;
-}
-
 function startGameLogic() {
   isGameOver = false; targetPos = null; selectedEnemyId = null; isAttacking = false;
   gameOverEl.style.display = 'none';
   if (clickMarkerGroup) clickMarkerGroup.visible = false;
   if (selectedEnemyRing) selectedEnemyRing.visible = false;
 
-  const model = getEquippedShipModel();
-
   player = {
     x: 0, z: 0, a: -Math.PI / 2, speed: 0, maxSpeed: 1.85,
-    hp: 1000000, maxHp: 1000000, score: 100000000,
+    hp: 1000000, maxHp: 1000000, score: 1000000000, // Sınırsız Test Altını
     level: 1, exp: 0, maxExp: 100,
     selectedAmmo: 'iron',
     ammo: { iron: 1000000, chain: 1000000, fire: 1000000, dragon: 1000000 },
@@ -1052,16 +1046,12 @@ function startGameLogic() {
     map: initialData.texture, 
     transparent: true, 
     alphaTest: 0.1,
-    color: model.tint 
+    color: 0xffffff // Doğal saf renk, renklendirme yok
   });
   playerSprite = new THREE.Sprite(mat);
   playerSprite.center.set(0.5, 0.95);
   applyNormalizedSprite(playerSprite, player.a);
   scene.add(playerSprite);
-
-  if (playerNeonRing) {
-    playerNeonRing.material.color.setHex(model.tint);
-  }
 
   gameIslands.forEach(isl => scene.remove(isl.mesh));
   gameIslands = [];
@@ -1674,11 +1664,10 @@ function renderShipyardList() {
   shipyardListEl.innerHTML = '';
   const users = loadUsers();
   const dbUser = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
-  const owned = dbUser.ownedShips || ['standard'];
   const equipped = dbUser.equippedShip || 'standard';
 
   Object.values(SHIP_MODELS).forEach(model => {
-    const isOwned = owned.includes(model.id);
+    // Sınırsız test için tüm gemiler otomatik olarak sahip olunmuş (owned) kabul edilir
     const isEquipped = equipped === model.id;
 
     const div = document.createElement('div');
@@ -1687,10 +1676,8 @@ function renderShipyardList() {
     let btnHtml = '';
     if (isEquipped) {
       btnHtml = `<button class="buy-btn equipped" type="button" disabled>Kullanımda</button>`;
-    } else if (isOwned) {
-      btnHtml = `<button class="buy-btn ship-equip-btn" type="button" data-id="${model.id}">Kullan</button>`;
     } else {
-      btnHtml = `<button class="buy-btn ship-buy-btn" type="button" data-id="${model.id}" data-cost="${model.cost}">${model.cost.toLocaleString()} Altın</button>`;
+      btnHtml = `<button class="buy-btn ship-equip-btn" type="button" data-id="${model.id}">Kuşan / Dene</button>`;
     }
 
     div.innerHTML = `
@@ -1701,38 +1688,6 @@ function renderShipyardList() {
       ${btnHtml}
     `;
     shipyardListEl.appendChild(div);
-  });
-
-  shipyardListEl.querySelectorAll('.ship-buy-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const shipId = btn.dataset.id;
-      const cost = parseInt(btn.dataset.cost, 10);
-      if (player.score < cost) {
-        marketFeedbackEl.style.color = '#f87171';
-        marketFeedbackEl.textContent = 'Yetersiz hazine (altın)!';
-        return;
-      }
-      player.score -= cost;
-      
-      const users = loadUsers();
-      const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
-      if (uIdx !== -1) {
-        if (!users[uIdx].ownedShips) users[uIdx].ownedShips = ['standard'];
-        users[uIdx].ownedShips.push(shipId);
-        users[uIdx].equippedShip = shipId;
-        saveUsers(users);
-      }
-      currentUser.ownedShips.push(shipId);
-      currentUser.equippedShip = shipId;
-
-      shipTitleEl.textContent = SHIP_MODELS[shipId].name;
-      startGameLogic();
-      renderShipyardList();
-
-      marketFeedbackEl.style.color = '#4ade80';
-      marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} satın alındı ve kuşanıldı!`;
-      setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2500);
-    });
   });
 
   shipyardListEl.querySelectorAll('.ship-equip-btn').forEach(btn => {
@@ -1750,7 +1705,7 @@ function renderShipyardList() {
       renderShipyardList();
 
       marketFeedbackEl.style.color = '#4ade80';
-      marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} kuşanıldı!`;
+      marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} deneme için kuşanıldı!`;
       setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
     });
   });
