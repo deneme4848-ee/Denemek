@@ -69,7 +69,7 @@
       text-transform: uppercase;
     }
     #minimap {
-      width: 82px; height: 82px; border-radius: 6px;
+      width: 90px; height: 90px; border-radius: 6px;
       background: #e6d5b8; border: 1px solid #92400e; display: block;
     }
     .coord-pill {
@@ -313,11 +313,10 @@
   <div id="top-left-hud">
     <div class="radar-card">
       <div class="radar-title">Harita 1</div>
-      <canvas id="minimap" width="82" height="82"></canvas>
+      <canvas id="minimap" width="90" height="90"></canvas>
       <div class="coord-pill" id="coord-display">X: 0 · Y: 0</div>
     </div>
     <div class="side-tool-col">
-      <!-- Market & Tersane Tek Buton -->
       <button id="market-toggle-btn" class="tool-icon-btn" type="button" title="Market & Tersane (M)">
         <span class="ico">⚓</span>
         <span class="lbl">Tersane</span>
@@ -544,8 +543,8 @@ const SHIP_MODELS = {
   dragon:   { id: 'dragon',   name: 'Kızıl Ejder',         desc: 'Ejderha nefesi gücünü artıran efsane', cost: 35000000 }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v30';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v30';
+const USERS_STORAGE_KEY = 'pirate3d_users_v31';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v31';
 let authMode = 'login';
 let currentUser = null;
 
@@ -624,7 +623,7 @@ const WORLD_SIZE = 1000;
 const ATTACK_RANGE = 280;
 const AGGRO_RANGE = 280;
 const BASE_SHIP_HEIGHT = 95;
-const SHIP_Y_POS = 100; // İSTEDİĞİN GİBİ Y: 100 SABİT
+const SHIP_Y_POS = 100; // Y: 100 Sabit
 
 function createStaticOceanTextures() {
   const size = 1024;
@@ -1066,7 +1065,7 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
   });
   const mesh = new THREE.Mesh(pGeo, pMat);
   
-  const GULLE_Y_OFFSET = 50; // İSTEDİĞİN GİBİ Y: 50 SABİT
+  const GULLE_Y_OFFSET = 50; // Y: 50 Sabit
   mesh.position.set(startX, SHIP_Y_POS - GULLE_Y_OFFSET, startZ);
   scene.add(mesh);
 
@@ -1220,11 +1219,9 @@ function animate3D() {
         en.z += Math.sin(en.a) * (activeSpeed * 1.25);
       }
 
-      // 3 Saniyede bir (3000ms) oyuncuya ateş etme ve gülle görseli gönderme
       if (distToPlayer <= ATTACK_RANGE && (now - en.lastAttackTime >= 3000)) {
         en.lastAttackTime = now;
 
-        // Düşmanın namlusundan oyuncuya doğru gülle efekti fırlat
         fireProjectile(en.x, en.z, player.x, player.z, 'fire', () => {
           player.hp = Math.max(0, player.hp - 100);
           player.lastDamagedTime = now;
@@ -1327,7 +1324,8 @@ function drawMinimap() {
   mctx.stroke();
 
   if (!player) return;
-  const scale = (w * 0.46) / (WORLD_SIZE / 2);
+  // Gerçek harita boyutuna (WORLD_SIZE) ve canvas boyutuna tam orantılı harita ölçeği
+  const scale = w / WORLD_SIZE;
   const cx = w / 2, cy = h / 2;
 
   mctx.fillStyle = '#3f6212';
@@ -1344,7 +1342,7 @@ function drawMinimap() {
     mctx.fill();
   });
 
-  // Oyuncunun konumu mini haritada parlak YEŞİL renk ile gösteriliyor
+  // Oyuncunun konumu mini haritada parlak YEŞİL renk
   mctx.fillStyle = '#22c55e';
   mctx.beginPath();
   mctx.arc(cx + player.x * scale, cy + player.z * scale, 3.2, 0, Math.PI * 2);
@@ -1426,7 +1424,7 @@ function renderShipyardList() {
   const users = loadUsers();
   const dbUser = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
   const owned = dbUser.ownedShips || ['standard'];
-  const equipped = dbUser.equippedShip || 'standard';
+  const equipped = currentUser.equippedShip || dbUser.equippedShip || 'standard';
 
   Object.values(SHIP_MODELS).forEach(model => {
     const isOwned = owned.includes(model.id);
@@ -1469,11 +1467,11 @@ function renderShipyardList() {
       const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
       if (uIdx !== -1) {
         if (!users[uIdx].ownedShips) users[uIdx].ownedShips = ['standard'];
-        users[uIdx].ownedShips.push(shipId);
+        if (!users[uIdx].ownedShips.includes(shipId)) users[uIdx].ownedShips.push(shipId);
         users[uIdx].equippedShip = shipId;
         saveUsers(users);
       }
-      currentUser.ownedShips.push(shipId);
+      currentUser.ownedShips = users[uIdx].ownedShips;
       currentUser.equippedShip = shipId;
 
       updateHUD();
