@@ -114,10 +114,10 @@
     }
     .ship-sub-name { font-size: 9px; color: #94a3b8; text-align: right; }
 
-    /* Geminin altında, tasarımın temas etmeyeceği ideal mesafe */
+    /* İlk tercih edilen, geminin hemen altında ideal konum */
     #player-label {
       position: fixed; z-index: 5; pointer-events: none;
-      transform: translate(-50%, 15px);
+      transform: translate(-50%, -10px);
       display: flex; flex-direction: column; align-items: center; gap: 2px;
       will-change: transform;
     }
@@ -140,7 +140,7 @@
 
     .enemy-label {
       position: fixed; z-index: 5; pointer-events: none;
-      transform: translate(-50%, 15px);
+      transform: translate(-50%, -10px);
       display: flex; flex-direction: column; align-items: center; gap: 2px;
       will-change: transform;
     }
@@ -243,7 +243,7 @@
 
     #market-panel {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: min(94vw, 560px); max-height: 85vh; overflow-y: auto;
+      width: min(94vw, 560px); max-height: 88vh; overflow-y: auto;
       background: linear-gradient(160deg, #091c2b, #030a11); backdrop-filter: blur(12px);
       border: 2px solid rgba(245, 197, 94, 0.7); border-radius: 18px; padding: 16px; z-index: 15;
       box-shadow: 0 30px 75px rgba(0,0,0,0.95); pointer-events: auto;
@@ -277,37 +277,38 @@
     }
     
     .shipyard-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
     }
     .ship-card-item {
-      background: rgba(11, 26, 38, 0.95); border: 1.5px solid rgba(245, 197, 94, 0.3); border-radius: 12px;
-      padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.6); transition: transform 0.15s, border-color 0.15s;
+      background: rgba(11, 26, 38, 0.95); border: 1.5px solid rgba(245, 197, 94, 0.4); border-radius: 14px;
+      padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.7); transition: transform 0.15s, border-color 0.15s;
     }
     .ship-card-item:hover { border-color: #fbbf24; transform: translateY(-2px); }
     .ship-card-img-wrap {
-      width: 70px; height: 70px; border-radius: 10px; background: rgba(3, 11, 18, 0.8);
-      border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center;
-      overflow: hidden; box-shadow: inset 0 2px 6px rgba(0,0,0,0.8);
+      width: 100%; height: 115px; border-radius: 10px; 
+      background: radial-gradient(circle at 50% 50%, #083344, #031420);
+      border: 1.5px solid rgba(56, 189, 248, 0.35); display: flex; align-items: center; justify-content: center;
+      overflow: hidden; box-shadow: inset 0 3px 10px rgba(0,0,0,0.9);
     }
     .ship-card-img-wrap img {
-      width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+      width: 75px; height: 75px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.9));
     }
-    .ship-card-title { font-size: 11px; font-weight: 800; color: #fffbeb; }
-    .ship-card-sub { font-size: 9px; color: #94a3b8; line-height: 1.2; }
+    .ship-card-title { font-size: 12px; font-weight: 800; color: #fffbeb; margin-top: 2px; }
+    .ship-card-sub { font-size: 10px; color: #94a3b8; line-height: 1.2; margin-bottom: 2px; }
 
     .market-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(6, 16, 24, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 9px; padding: 8px 10px; margin-bottom: 7px; }
     .market-item-info { display: flex; flex-direction: column; gap: 2px; }
     .market-item-title { font-size: 12px; font-weight: 700; color: #fff; }
     .market-item-sub { font-size: 10px; color: #94a3b8; }
     
-    .buy-btn { padding: 5px 10px; border-radius: 7px; border: 1px solid #ffd783; background: linear-gradient(135deg, #d97706, #92400e); color: #fff; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap; }
-    .buy-btn:disabled { opacity: 0.42; background: rgba(30, 41, 59, 0.8); cursor: not-allowed; }
+    .buy-btn { width: 100%; padding: 7px 12px; border-radius: 8px; border: 1px solid #ffd783; background: linear-gradient(135deg, #d97706, #92400e); color: #fff; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap; margin-top: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    .buy-btn:disabled { opacity: 0.42; background: rgba(30, 41, 59, 0.8); cursor: not-allowed; box-shadow: none; }
     .buy-btn.equipped { background: #1e40af; border-color: #60a5fa; color: #eff6ff; }
     #market-feedback { font-size: 11px; min-height: 14px; margin-top: 5px; text-align: center; color: #4ade80; font-weight: 700; }
 
     .generic-tab-content {
-      text-align: center; padding: 30px 10px; color: #94a3b8; font-size: 13px; font-weight: 700;
+      text-align: center; padding: 40px 10px; color: #94a3b8; font-size: 13px; font-weight: 700;
     }
 
     #gameover {
@@ -438,7 +439,7 @@
     </div>
   </div>
 
-  <!-- Güncellenmiş Liman Paneli -->
+  <!-- Modern Liman Paneli -->
   <div id="market-panel">
     <div class="market-header">
       <strong id="port-panel-title">⚓ LİMAN - Gülle & Cephane</strong>
@@ -461,31 +462,31 @@
           <span class="market-item-title">⚫ 25x Demir Gülle</span>
           <span class="market-item-sub">180 Hasar · Standart top güllesi</span>
         </div>
-        <button class="buy-btn ammo-buy-btn" type="button" data-type="iron" data-amount="25" data-cost="20">20 Altın</button>
+        <button class="buy-btn ammo-buy-btn" type="button" data-type="iron" data-amount="25" data-cost="20" style="width:auto;">20 Altın</button>
       </div>
       <div class="market-item">
         <div class="market-item-info">
           <span class="market-item-title">⛓️ 15x Zincirli Gülle</span>
           <span class="market-item-sub">140 Hasar · Düşmanı %50 yavaşlatır</span>
         </div>
-        <button class="buy-btn ammo-buy-btn" type="button" data-type="chain" data-amount="15" data-cost="35">35 Altın</button>
+        <button class="buy-btn ammo-buy-btn" type="button" data-type="chain" data-amount="15" data-cost="35" style="width:auto;">35 Altın</button>
       </div>
       <div class="market-item">
         <div class="market-item-info">
           <span class="market-item-title">🔥 15x Alevli Gülle</span>
           <span class="market-item-sub">290 Hasar · Yüksek yanma gücü</span>
         </div>
-        <button class="buy-btn ammo-buy-btn" type="button" data-type="fire" data-amount="15" data-cost="60">60 Altın</button>
+        <button class="buy-btn ammo-buy-btn" type="button" data-type="fire" data-amount="15" data-cost="60" style="width:auto;">60 Altın</button>
       </div>
       <div class="market-item">
         <div class="market-item-info">
           <span class="market-item-title">🐉 10x Ejderha Nefesi</span>
           <span class="market-item-sub">450 Hasar · Efsanevi yıkım güllesi</span>
         </div>
-        <button class="buy-btn ammo-buy-btn" type="button" data-type="dragon" data-amount="10" data-cost="120">120 Altın</button>
+        <button class="buy-btn ammo-buy-btn" type="button" data-type="dragon" data-amount="10" data-cost="120" style="width:auto;">120 Altın</button>
       </div>
     </div>
-    <!-- Tersane Bölümü (gemi18.png önizlemeli) -->
+    <!-- Tersane Bölümü (büyük önizlemeli) -->
     <div id="section-shipyard" class="market-section">
       <div class="shipyard-grid" id="shipyard-list"></div>
     </div>
@@ -623,8 +624,8 @@ const SHIP_MODELS = {
   dragon:   { id: 'dragon',   name: 'Kızıl Ejder', desc: 'Ejderha Gücü', cost: 35000000, img: 'gemi18.png' }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v34';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v34';
+const USERS_STORAGE_KEY = 'pirate3d_users_v36';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v36';
 let authMode = 'login';
 let currentUser = null;
 
@@ -998,7 +999,7 @@ function startGameLogic() {
   const initialData = shipTextures.top || Object.values(shipTextures)[0];
   const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1 });
   playerSprite = new THREE.Sprite(mat);
-  playerSprite.center.set(0.5, 0.5); // Merkez ayarı tam oturması için
+  playerSprite.center.set(0.5, 0.85); // Orijinal kusursuz merkez ayarı
   applyNormalizedSprite(playerSprite, player.a);
   scene.add(playerSprite);
 
@@ -1027,7 +1028,7 @@ function spawnEnemySprite(id) {
   const initialData = shipTextures.top || Object.values(shipTextures)[0];
   const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1, color: 0xd1fae5 });
   const sprite = new THREE.Sprite(mat);
-  sprite.center.set(0.5, 0.5);
+  sprite.center.set(0.5, 0.85);
   applyNormalizedSprite(sprite, 0);
   sprite.position.set(ex, SHIP_Y_POS, ez);
   sprite.userData.enemyId = id;
@@ -1213,7 +1214,7 @@ function animate3D() {
     const tempVector = new THREE.Vector3(player.x, SHIP_Y_POS, player.z);
     tempVector.project(camera);
     const xPx = (tempVector.x *  .5 + .5) * window.innerWidth;
-    const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 50; // Geminin altında hatasız konum
+    const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 38; // Orijinal kusursuz dikey konum (+38)
     playerLabelEl.style.transform = `translate(-50%, 0) translate(${xPx}px, ${yPx}px)`;
   }
 
@@ -1329,7 +1330,7 @@ function animate3D() {
       const tempVector = new THREE.Vector3(en.x, SHIP_Y_POS, en.z);
       tempVector.project(camera);
       const xPx = (tempVector.x *  .5 + .5) * window.innerWidth;
-      const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 50;
+      const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 38;
       en.labelEl.style.transform = `translate(-50%, 0) translate(${xPx}px, ${yPx}px)`;
 
       const hpP = Math.max(0, (en.hp / en.maxHp) * 100);
@@ -1530,7 +1531,7 @@ function renderShipyardList() {
 
     div.innerHTML = `
       <div class="ship-card-img-wrap">
-        <img src="${model.img}" alt="${model.name}">
+        <img src="gemi18.png" alt="${model.name}">
       </div>
       <div class="ship-card-title">${model.name}</div>
       <div class="ship-card-sub">${model.desc}</div>
