@@ -537,14 +537,14 @@ const AMMO_TYPES = {
 };
 
 const SHIP_MODELS = {
-  standard: { id: 'standard', name: '8 Yönlü Efsanevi Gemi', desc: 'Şeffaf PNG Sprite Filosu', cost: 0 },
-  ghost:    { id: 'ghost',    name: 'Hayalet Fırkateyn',    desc: 'Karanlık sisli sulara özel gizli gövde', cost: 5000000 },
-  gold:     { id: 'gold',     name: 'Altın Korsan',        desc: 'Servet ve ihtişam saçan yaldızlı kalyon', cost: 15000000 },
-  dragon:   { id: 'dragon',   name: 'Kızıl Ejder',         desc: 'Ejderha nefesi gücünü artıran efsane', cost: 35000000 }
+  standard: { id: 'standard', name: '8 Yönlü Efsanevi Gemi', desc: 'Şeffaf PNG Sprite Filosu', cost: 0, tint: 0xffffff, emissive: 0x000000 },
+  ghost:    { id: 'ghost',    name: 'Hayalet Fırkateyn',    desc: 'Karanlık sisli sulara özel gizli gövde', cost: 5000000, tint: 0x38bdf8, emissive: 0x0369a1 },
+  gold:     { id: 'gold',     name: 'Altın Korsan',        desc: 'Servet ve ihtişam saçan yaldızlı kalyon', cost: 15000000, tint: 0xfbbf24, emissive: 0xd97706 },
+  dragon:   { id: 'dragon',   name: 'Kızıl Ejder',         desc: 'Ejderha nefesi gücünü artıran efsane', cost: 35000000, tint: 0xef4444, emissive: 0x991b1b }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v31';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v31';
+const USERS_STORAGE_KEY = 'pirate3d_users_v32';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v32';
 let authMode = 'login';
 let currentUser = null;
 
@@ -784,6 +784,15 @@ function applyNormalizedSprite(sprite, angle, baseHeight = BASE_SHIP_HEIGHT) {
   if (!data) return;
   sprite.material.map = data.texture;
   sprite.scale.set(baseHeight * data.aspect, baseHeight, 1);
+  
+  // Seçili gemi modeline göre renk ve parıltı ayarı (Tasarım Sistemi)
+  const currentShipId = currentUser?.equippedShip || 'standard';
+  const modelSpec = SHIP_MODELS[currentShipId] || SHIP_MODELS.standard;
+  sprite.material.color.setHex(modelSpec.tint);
+  if (modelSpec.emissive) {
+    sprite.material.emissive = new THREE.Color(modelSpec.emissive);
+    sprite.material.emissiveIntensity = 0.4;
+  }
 }
 
 function initThreeGame() {
@@ -1324,7 +1333,6 @@ function drawMinimap() {
   mctx.stroke();
 
   if (!player) return;
-  // Gerçek harita boyutuna (WORLD_SIZE) ve canvas boyutuna tam orantılı harita ölçeği
   const scale = w / WORLD_SIZE;
   const cx = w / 2, cy = h / 2;
 
@@ -1476,6 +1484,7 @@ function renderShipyardList() {
 
       updateHUD();
       shipTitleEl.textContent = SHIP_MODELS[shipId].name;
+      if (playerSprite) applyNormalizedSprite(playerSprite, player.a);
       renderShipyardList();
 
       marketFeedbackEl.style.color = '#4ade80';
@@ -1495,6 +1504,7 @@ function renderShipyardList() {
       }
       currentUser.equippedShip = shipId;
       shipTitleEl.textContent = SHIP_MODELS[shipId].name;
+      if (playerSprite) applyNormalizedSprite(playerSprite, player.a);
       renderShipyardList();
 
       marketFeedbackEl.style.color = '#4ade80';
