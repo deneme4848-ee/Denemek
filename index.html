@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Kişiye Özel Tersane</title>
+  <title>Korsan Dünyası - Klasik Liman & Tersane</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -81,18 +81,22 @@
     .side-tool-col {
       pointer-events: auto; display: flex; flex-direction: column; gap: 6px;
     }
-    .tool-icon-btn {
-      width: 40px; height: 40px; border-radius: 10px;
-      background: linear-gradient(155deg, #172a3a, #091520);
-      border: 1.5px solid rgba(245, 197, 94, 0.55); color: #fef3c7;
+    .port-btn {
+      width: 54px; height: 54px; border-radius: 14px;
+      background: radial-gradient(circle at 35% 30%, #452710, #1f1106 85%);
+      border: 2.5px solid #d4a359; color: #fef3c7;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,0.75);
-      transition: transform 0.12s, border-color 0.15s;
+      cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,0.85), inset 0 1px 3px rgba(255,230,170,0.4);
+      transition: transform 0.12s, border-color 0.15s, box-shadow 0.15s;
     }
-    .tool-icon-btn:hover { border-color: #fbbf24; transform: translateY(-1px); }
-    .tool-icon-btn:active { transform: scale(0.94); }
-    .tool-icon-btn span.ico { font-size: 15px; line-height: 1.1; }
-    .tool-icon-btn span.lbl { font-size: 8px; font-weight: 800; color: #fde68a; }
+    .port-btn:hover {
+      border-color: #fde047;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.6);
+      transform: translateY(-1px);
+    }
+    .port-btn:active { transform: scale(0.94); }
+    .port-btn span.ico { font-size: 21px; line-height: 1.1; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.8)); }
+    .port-btn span.lbl { font-size: 10px; font-weight: 900; color: #fde68a; letter-spacing: 0.4px; margin-top: 2px; }
 
     #top-right-hud {
       position: fixed; top: 66px; right: 10px; z-index: 6;
@@ -238,35 +242,208 @@
       to { box-shadow: 0 0 24px rgba(239, 68, 68, 0.95); }
     }
 
-    #market-panel {
-      display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: min(94vw, 400px); max-height: 80vh; overflow-y: auto;
-      background: rgba(9, 24, 36, 0.97); backdrop-filter: blur(10px);
-      border: 2px solid rgba(245, 197, 94, 0.6); border-radius: 18px; padding: 16px; z-index: 15;
-      box-shadow: 0 25px 65px rgba(0,0,0,0.95); pointer-events: auto;
+    /* ==============================================================
+       KLASİK KORSAN LİMAN & MARKET PENCERESİ (REFERANS GÖRSEL TARZI)
+       ============================================================== */
+    #port-modal-backdrop {
+      display: none; position: fixed; inset: 0; z-index: 25;
+      background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(2px);
+      align-items: center; justify-content: center; padding: 10px;
     }
-    #market-panel.open { display: block; }
-    .market-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 8px; margin-bottom: 10px; }
-    .market-header strong { color: #ffd783; font-size: 15px; }
-    .market-close { background: rgba(255,255,255,0.1); border: none; color: #cbd5e1; width: 28px; height: 28px; border-radius: 8px; font-weight: 700; cursor: pointer; }
-    .market-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
-    .market-tab-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 7px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
-    .market-tab-btn.active { background: linear-gradient(135deg, #d97706, #92400e); color: #fff; border-color: #ffd783; }
-    .market-section { display: none; }
-    .market-section.active { display: block; }
-    .market-balance { display: flex; justify-content: space-between; font-size: 12px; background: rgba(0,0,0,0.35); padding: 8px 10px; border-radius: 8px; margin-bottom: 10px; color: #e2e8f0; }
-    .market-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(6, 16, 24, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 9px 11px; margin-bottom: 8px; }
-    .market-item-info { display: flex; flex-direction: column; gap: 2px; }
-    .market-item-title { font-size: 13px; font-weight: 700; color: #fff; }
-    .market-item-sub { font-size: 11px; color: #94a3b8; }
-    .buy-btn { padding: 6px 12px; border-radius: 8px; border: 1px solid #ffd783; background: linear-gradient(135deg, #d97706, #92400e); color: #fff; font-size: 12px; font-weight: 800; cursor: pointer; white-space: nowrap; }
-    .buy-btn:disabled { opacity: 0.42; background: rgba(30, 41, 59, 0.8); cursor: not-allowed; }
-    .buy-btn.equipped { background: #1e40af; border-color: #60a5fa; color: #eff6ff; }
-    #market-feedback { font-size: 12px; min-height: 16px; margin-top: 6px; text-align: center; color: #4ade80; font-weight: 700; }
+    #port-modal-backdrop.open { display: flex; }
+
+    .port-window {
+      position: relative; width: min(96vw, 760px); max-height: 92vh;
+      display: flex; flex-direction: column;
+      background: linear-gradient(180deg, #2b1d12 0%, #1c120b 100%);
+      border: 2.5px solid #c59b52;
+      border-radius: 10px;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95), inset 0 0 25px rgba(0, 0, 0, 0.8);
+      color: #f3e5c8;
+    }
+
+    /* Üst Altın & Elmas Barı */
+    .port-top-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      background: linear-gradient(180deg, #3c2817, #24170c);
+      border-bottom: 2px solid #9e7634;
+      padding: 8px 16px; border-radius: 7px 7px 0 0;
+    }
+    .port-currency {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 14px; font-weight: 900; color: #ffd768;
+      text-shadow: 0 1px 2px #000;
+    }
+    .port-currency.diamond { color: #67e8f9; margin-right: 28px; }
+    .port-main-title {
+      font-size: 16px; font-weight: 900; letter-spacing: 1.5px;
+      color: #f5d08a; text-shadow: 0 2px 4px #000;
+    }
+
+    /* Sağ Üst Yuvarlak Kırmızı/Altın Kapatma Butonu */
+    .port-close-btn {
+      position: absolute; top: -12px; right: -12px;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #d94e28, #8a230b);
+      border: 2.5px solid #e2b464;
+      color: #fff3d6; font-size: 18px; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.85);
+      z-index: 5; transition: transform 0.12s;
+    }
+    .port-close-btn:hover { transform: scale(1.08); filter: brightness(1.1); }
+
+    /* Sekme Çubuğu (Tersane, Gülle, Top, Tayfa, Paketler) */
+    .port-tabs-bar {
+      display: flex; align-items: stretch; justify-content: space-around;
+      background: linear-gradient(180deg, #24170d 0%, #160d07 100%);
+      border-bottom: 2px solid #8a6429;
+      padding: 6px 8px 0; overflow-x: auto; gap: 4px;
+    }
+    .port-tab {
+      flex: 1; min-width: 68px; max-width: 110px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 3px; padding: 6px 4px 8px;
+      background: transparent; border: none; border-bottom: 3px solid transparent;
+      color: #b89f7d; cursor: pointer; transition: all 0.15s;
+    }
+    .port-tab:hover { color: #fde68a; }
+    .port-tab.active {
+      background: linear-gradient(180deg, rgba(212, 163, 89, 0.18), rgba(212, 163, 89, 0.04));
+      border-bottom: 3px solid #f59e0b;
+      color: #ffd768;
+    }
+    .port-tab-icon {
+      font-size: 24px; line-height: 1;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.85));
+    }
+    .port-tab-text { font-size: 11px; font-weight: 800; white-space: nowrap; }
+
+    /* İçerik Alanı */
+    .port-body {
+      padding: 12px 16px 16px; overflow-y: auto; flex: 1;
+    }
+    .port-section { display: none; }
+    .port-section.active { display: block; }
+
+    /* Stat ve Açıklama Alanı */
+    .port-stats-strip {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
+      margin-bottom: 8px;
+    }
+    .port-stat-box {
+      display: flex; align-items: center; gap: 8px;
+      background: #140c06; border: 1.5px solid #7c5823;
+      border-radius: 6px; padding: 4px 12px;
+      font-size: 13px; font-weight: 800; color: #f6e3ba;
+    }
+    .port-stat-q {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #3a2716; border: 1px solid #b58943;
+      color: #ffd768; font-size: 11px; display: inline-flex;
+      align-items: center; justify-content: center;
+    }
+    .port-info-desc {
+      text-align: center; font-size: 11px; color: #d6c3a3;
+      line-height: 1.4; margin-bottom: 12px;
+    }
+
+    /* Filtre ve Sayfalama Barı */
+    .port-controls-row {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+      gap: 8px; margin-bottom: 12px;
+    }
+    .port-filter-select {
+      background: linear-gradient(180deg, #382515, #22150b);
+      border: 1.5px solid #9e7634; border-radius: 6px;
+      color: #f5d08a; font-size: 12px; font-weight: 800;
+      padding: 6px 12px; outline: none; cursor: pointer;
+    }
+    .port-pagination { display: flex; gap: 5px; }
+    .page-num-btn {
+      width: 28px; height: 28px; border-radius: 5px;
+      background: #24160c; border: 1px solid #7c5823;
+      color: #d6c3a3; font-size: 12px; font-weight: 800; cursor: pointer;
+    }
+    .page-num-btn.active {
+      background: linear-gradient(180deg, #b47b2b, #784e14);
+      border-color: #ffd768; color: #fff;
+    }
+
+    /* 3 Sütunlu Deniz Üzeri Gemi Önizleme Kartları */
+    .ship-cards-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    }
+    @media (max-width: 600px) {
+      .ship-cards-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .ship-preview-card {
+      background: linear-gradient(180deg, #332214 0%, #1d130b 100%);
+      border: 2px solid #8a6429; border-radius: 8px;
+      padding: 8px; display: flex; flex-direction: column; align-items: center;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.65);
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .ship-preview-card:hover {
+      border-color: #f59e0b; transform: translateY(-2px);
+    }
+    .ship-preview-card.equipped-card {
+      border-color: #38bdf8;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.35);
+    }
+    .ship-card-title {
+      font-size: 13px; font-weight: 900; color: #f6d388;
+      margin-bottom: 6px; text-align: center;
+      text-shadow: 0 1px 2px #000;
+    }
+    .ship-canvas-frame {
+      width: 100%; aspect-ratio: 4 / 3;
+      border: 1.5px solid #6e4e1e; border-radius: 5px;
+      overflow: hidden; background: #0c4a6e;
+      margin-bottom: 8px; position: relative;
+    }
+    .ship-canvas-frame canvas {
+      width: 100%; height: 100%; display: block;
+    }
+    .ship-card-sub {
+      font-size: 10px; color: #cbb694; text-align: center;
+      margin-bottom: 8px; min-height: 26px; line-height: 1.3;
+    }
+    .port-action-btn {
+      width: 100%; padding: 7px 10px; border-radius: 6px;
+      border: 1.5px solid #e2b464;
+      background: linear-gradient(180deg, #b87a28 0%, #7c4d12 100%);
+      color: #fff8e7; font-size: 12px; font-weight: 900;
+      cursor: pointer; text-shadow: 0 1px 2px #000;
+      transition: filter 0.15s;
+    }
+    .port-action-btn:hover { filter: brightness(1.15); }
+    .port-action-btn.equipped {
+      background: linear-gradient(180deg, #1d4ed8 0%, #1e3a8a 100%);
+      border-color: #93c5fd; cursor: default;
+    }
+
+    /* Market (Gülle / Top / Tayfa) Öğeleri */
+    .market-grid-list {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px;
+    }
+    .port-market-item {
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      background: linear-gradient(180deg, #2c1d11, #191009);
+      border: 1.5px solid #7c5823; border-radius: 8px; padding: 10px 12px;
+    }
+    .port-market-info { display: flex; flex-direction: column; gap: 3px; }
+    .port-market-title { font-size: 13px; font-weight: 900; color: #ffd768; }
+    .port-market-sub { font-size: 11px; color: #cbb694; }
+
+    #market-feedback {
+      font-size: 12px; min-height: 18px; margin-top: 8px; text-align: center;
+      color: #4ade80; font-weight: 800;
+    }
 
     #gameover {
       display: none; position: fixed; inset: 0; background: rgba(3, 11, 18, 0.92);
-      flex-direction: column; align-items: center; justify-content: center; z-index: 20; text-align: center; padding: 20px;
+      flex-direction: column; align-items: center; justify-content: center; z-index: 30; text-align: center; padding: 20px;
     }
     #gameover h1 { color: #ffd783; margin: 0 0 10px; font-size: 32px; }
     #gameover p { font-size: 16px; margin: 0 0 24px; color: #cbd5e1; }
@@ -333,13 +510,9 @@
       <div class="coord-pill" id="coord-display">X: 0 · Y: 0</div>
     </div>
     <div class="side-tool-col">
-      <button id="market-toggle-btn" class="tool-icon-btn" type="button" title="Market (M)">
-        <span class="ico">⚖️</span>
-        <span class="lbl">Market</span>
-      </button>
-      <button id="shipyard-toggle-btn" class="tool-icon-btn" type="button" title="Tersane (T)">
+      <button id="port-toggle-btn" class="port-btn" type="button" title="Liman (L)">
         <span class="ico">⚓</span>
-        <span class="lbl">Tersane</span>
+        <span class="lbl">Liman</span>
       </button>
     </div>
   </div>
@@ -353,7 +526,7 @@
       <span>🪙</span>
       <span id="score">1,000,000,000</span>
     </div>
-    <div class="ship-sub-name" id="ship-title">8 Yönlü Efsanevi Gemi</div>
+    <div class="ship-sub-name" id="ship-title">Asarı Nusret</div>
   </div>
 
   <div id="bottom-dock">
@@ -398,52 +571,163 @@
     </div>
   </div>
 
-  <div id="market-panel">
-    <div class="market-header">
-      <strong>⚓ Cephane Marketi & Tersane</strong>
-      <button id="market-close-btn" class="market-close" type="button">✕</button>
-    </div>
-    <div class="market-tabs">
-      <button id="tab-market" class="market-tab-btn active" type="button">Gülle & Cephane</button>
-      <button id="tab-shipyard" class="market-tab-btn" type="button">Tersane</button>
-    </div>
-    <div class="market-balance">
-      <span>Hazine: <strong id="market-gold" style="color:#ffd783;">1,000,000,000</strong> Altın</span>
-    </div>
-    <div id="section-market" class="market-section active">
-      <div class="market-item">
-        <div class="market-item-info">
-          <span class="market-item-title">⚫ 25x Demir Gülle</span>
-          <span class="market-item-sub">180 Hasar · Standart top güllesi</span>
+  <!-- KLASİK KORSAN LİMAN & MARKET PENCERESİ -->
+  <div id="port-modal-backdrop">
+    <div class="port-window">
+      <button id="port-close-btn" class="port-close-btn" type="button">✕</button>
+
+      <!-- Üst Altın & Elmas Göstergesi -->
+      <div class="port-top-bar">
+        <div class="port-currency">
+          <span>🪙</span>
+          <span id="port-gold-display">1.000.000.000</span>
         </div>
-        <button class="buy-btn ammo-buy-btn" type="button" data-type="iron" data-amount="25" data-cost="20">20 Altın</button>
-      </div>
-      <div class="market-item">
-        <div class="market-item-info">
-          <span class="market-item-title">⛓️ 15x Zincirli Gülle</span>
-          <span class="market-item-sub">140 Hasar · Düşmanı %50 yavaşlatır</span>
+        <div class="port-main-title">LİMAN &amp; MARKET</div>
+        <div class="port-currency diamond">
+          <span id="port-diamond-display">1.103</span>
+          <span>💎</span>
         </div>
-        <button class="buy-btn ammo-buy-btn" type="button" data-type="chain" data-amount="15" data-cost="35">35 Altın</button>
       </div>
-      <div class="market-item">
-        <div class="market-item-info">
-          <span class="market-item-title">🔥 15x Alevli Gülle</span>
-          <span class="market-item-sub">290 Hasar · Yüksek yanma gücü</span>
-        </div>
-        <button class="buy-btn ammo-buy-btn" type="button" data-type="fire" data-amount="15" data-cost="60">60 Altın</button>
+
+      <!-- İkonlu Sekmeler -->
+      <div class="port-tabs-bar">
+        <button class="port-tab active" data-tab="shipyard" type="button">
+          <span class="port-tab-icon">⛵</span>
+          <span class="port-tab-text">Tersane</span>
+        </button>
+        <button class="port-tab" data-tab="ammo" type="button">
+          <span class="port-tab-icon">💣</span>
+          <span class="port-tab-text">Gülle</span>
+        </button>
+        <button class="port-tab" data-tab="cannons" type="button">
+          <span class="port-tab-icon">💥</span>
+          <span class="port-tab-text">Top &amp; Silah</span>
+        </button>
+        <button class="port-tab" data-tab="crew" type="button">
+          <span class="port-tab-icon">🏴‍☠️</span>
+          <span class="port-tab-text">Tayfa</span>
+        </button>
+        <button class="port-tab" data-tab="packs" type="button">
+          <span class="port-tab-icon">🧰</span>
+          <span class="port-tab-text">Paketler</span>
+        </button>
       </div>
-      <div class="market-item">
-        <div class="market-item-info">
-          <span class="market-item-title">🐉 10x Ejderha Nefesi</span>
-          <span class="market-item-sub">450 Hasar · Efsanevi yıkım güllesi</span>
+
+      <!-- İçerik Bölümü -->
+      <div class="port-body">
+        <!-- 1. TERSANE SEKMESİ -->
+        <div id="port-sec-shipyard" class="port-section active">
+          <div class="port-stats-strip">
+            <div class="port-stat-box"><span>⭐ 53.157.535.283</span><span class="port-stat-q">?</span></div>
+            <div class="port-stat-box"><span>🛡️ 201.636.000</span><span class="port-stat-q">?</span></div>
+            <div class="port-stat-box"><span>⛵ 120</span><span class="port-stat-q">?</span></div>
+          </div>
+          <div class="port-info-desc">
+            Pro Puan pro gülle atılarak kazanılır. Her 10m Pro puanda %1 ekstra hasar. Her 50.000 defans puanı gemi canını %1 arttırır.
+          </div>
+
+          <div class="port-controls-row">
+            <select id="ship-category-filter" class="port-filter-select">
+              <option value="all">Pro Tasarımlar (Tümü)</option>
+              <option value="mythic">Efsanevi &amp; Mistik</option>
+              <option value="war">Savaş Kalyonları</option>
+            </select>
+            <div class="port-pagination" id="ship-pagination"></div>
+          </div>
+
+          <div class="ship-cards-grid" id="shipyard-grid"></div>
         </div>
-        <button class="buy-btn ammo-buy-btn" type="button" data-type="dragon" data-amount="10" data-cost="120">120 Altın</button>
+
+        <!-- 2. GÜLLE SEKMESİ -->
+        <div id="port-sec-ammo" class="port-section">
+          <div class="market-grid-list">
+            <div class="port-market-item">
+              <div class="port-market-info">
+                <span class="port-market-title">⚫ 25x Demir Gülle</span>
+                <span class="port-market-sub">180 Hasar · Standart top güllesi</span>
+              </div>
+              <button class="port-action-btn ammo-buy-btn" style="width:auto;" type="button" data-type="iron" data-amount="25" data-cost="20">20 Altın</button>
+            </div>
+            <div class="port-market-item">
+              <div class="port-market-info">
+                <span class="port-market-title">⛓️ 15x Zincirli Gülle</span>
+                <span class="port-market-sub">140 Hasar · Düşmanı %50 yavaşlatır</span>
+              </div>
+              <button class="port-action-btn ammo-buy-btn" style="width:auto;" type="button" data-type="chain" data-amount="15" data-cost="35">35 Altın</button>
+            </div>
+            <div class="port-market-item">
+              <div class="port-market-info">
+                <span class="port-market-title">🔥 15x Alevli Gülle</span>
+                <span class="port-market-sub">290 Hasar · Yüksek yanma gücü</span>
+              </div>
+              <button class="port-action-btn ammo-buy-btn" style="width:auto;" type="button" data-type="fire" data-amount="15" data-cost="60">60 Altın</button>
+            </div>
+            <div class="port-market-item">
+              <div class="port-market-info">
+                <span class="port-market-title">🐉 10x Ejderha Nefesi</span>
+                <span class="port-market-sub">450 Hasar · Efsanevi yıkım güllesi</span>
+              </div>
+              <button class="port-action-btn ammo-buy-btn" style="width:auto;" type="button" data-type="dragon" data-amount="10" data-cost="120">120 Altın</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. TOP & SİLAH SEKMESİ -->
+        <div id="port-sec-cannons" class="port-section">
+          <div class="market-grid-list">
+            <div class="port-market-item">
+              <div class="port-market-info">
+                <span class="port-market-title">💥 60 Librelik Kraliyet Topu</span>
+                <span class="port-market-sub">Tüm gülle hasarını kalıcı olarak +25 arttırır</span>
+              </div>
+              <button class="port-action-btn upgrade-buy-btn" style="width:auto;" type="button" data-cost="50000" data-bonus="damage">50.000 Altın</button>
+            </div>
+            <div class="port-market-item">
+              <div class="port-market-info">
+                <span class="port-market-title">🛡️ Güçlendirilmiş Meşe Gövde</span>
+                <span class="port-market-sub">Maksimum gemi canını +250.000 arttırır</span>
+              </div>
+              <button class="port-action-btn upgrade-buy-btn" style="width:auto;" type="button" data-cost="75000" data-bonus="hp">75.000 Altın</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. TAYFA SEKMESİ -->
+        <div id="port-sec-crew" class="port-section">
+          <div class="market-grid-list">
+            <div class="port-market-item">
+              <div class="port-market-info">
+                <span class="port-market-title">🧭 Usta Dümenci</span>
+                <span class="port-market-sub">Gemi seyir hızını arttırır</span>
+              </div>
+              <button class="port-action-btn upgrade-buy-btn" style="width:auto;" type="button" data-cost="40000" data-bonus="speed">40.000 Altın</button>
+            </div>
+            <div class="port-market-item">
+              <div class="port-market-info">
+                <span class="port-market-title">🔨 Marangoz Tayfası</span>
+                <span class="port-market-sub">Gemi canını anında tamamen onarır</span>
+              </div>
+              <button class="port-action-btn upgrade-buy-btn" style="width:auto;" type="button" data-cost="5000" data-bonus="repair">5.000 Altın</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. PAKETLER SEKMESİ -->
+        <div id="port-sec-packs" class="port-section">
+          <div class="market-grid-list">
+            <div class="port-market-item">
+              <div class="port-market-info">
+                <span class="port-market-title">🧰 Korsan Lordu Cephane Sandığı</span>
+                <span class="port-market-sub">+500 Alevli Gülle &amp; +250 Ejderha Nefesi</span>
+              </div>
+              <button class="port-action-btn upgrade-buy-btn" style="width:auto;" type="button" data-cost="25000" data-bonus="pack">25.000 Altın</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="market-feedback"></div>
       </div>
     </div>
-    <div id="section-shipyard" class="market-section">
-      <div id="shipyard-list"></div>
-    </div>
-    <div id="market-feedback"></div>
   </div>
 
   <div id="gameover">
@@ -514,18 +798,15 @@ const captainNameEl = document.querySelector('#captain-name');
 const shipTitleEl = document.querySelector('#ship-title');
 const logoutBtn = document.querySelector('#logout-btn');
 
-const marketToggleBtn = document.querySelector('#market-toggle-btn');
-const shipyardToggleBtn = document.querySelector('#shipyard-toggle-btn');
-const marketPanel = document.querySelector('#market-panel');
-const marketCloseBtn = document.querySelector('#market-close-btn');
-const marketGoldEl = document.querySelector('#market-gold');
+// Liman Modal Referansları
+const portToggleBtn = document.querySelector('#port-toggle-btn');
+const portModalBackdrop = document.querySelector('#port-modal-backdrop');
+const portCloseBtn = document.querySelector('#port-close-btn');
+const portGoldDisplayEl = document.querySelector('#port-gold-display');
 const marketFeedbackEl = document.querySelector('#market-feedback');
-const shipyardListEl = document.querySelector('#shipyard-list');
-
-const tabMarket = document.querySelector('#tab-market');
-const tabShipyard = document.querySelector('#tab-shipyard');
-const sectionMarket = document.querySelector('#section-market');
-const sectionShipyard = document.querySelector('#section-shipyard');
+const shipyardGridEl = document.querySelector('#shipyard-grid');
+const shipPaginationEl = document.querySelector('#ship-pagination');
+const shipCategoryFilter = document.querySelector('#ship-category-filter');
 
 const authOverlay = document.querySelector('#auth-overlay');
 const tabLogin = document.querySelector('#tab-login');
@@ -559,21 +840,21 @@ const AMMO_TYPES = {
 };
 
 const SHIP_MODELS = {
-  standard: { id: 'standard', name: '8 Yönlü Efsanevi Gemi', desc: 'Standart Donanma Filosu', cost: 0 },
-  skull:    { id: 'skull',    name: '💀 Lanetli Kuru Kafa',   desc: 'Burnunda devasa parlayan kafatası ve kemik oymaları', cost: 100000 },
-  dragon:   { id: 'dragon',   name: '🐉 Ejderha Muhafızı',    desc: 'Kükreyen ejderha başlığı ve pullu zırh hatları', cost: 500000 },
-  eagle:    { id: 'eagle',    name: '🦅 Fırtına Kartalı',     desc: 'Kanat açmış görkemli kartal figürlü keskin hatlar', cost: 1200000 },
-  lion:     { id: 'lion',     name: '🦁 Altın Aslan',         desc: 'Saf altın döküm kükreyen aslan figürlü amiral gemisi', cost: 2500000 },
-  ghost:    { id: 'ghost',    name: '🌙 Gecenin Hayaleti',    desc: 'Ay sfenksi motifleri ve gizemli ruhsal semboller', cost: 5000000 },
-  poseidon: { id: 'poseidon', name: '🔱 Denizlerin Efendisi', desc: 'Devasa üççatal (mızrak) figürlü okyanus hakimi', cost: 10000000 },
-  wolf:     { id: 'wolf',     name: '🐺 Buzul Kurdu',         desc: 'Kuzeyin vahşi kurt başlığı ve buz mavisi yelkenler', cost: 20000000 },
-  titan:    { id: 'titan',    name: '⚓ Demir Yumruk',        desc: 'Çift katmanlı koçbaşı zırhlı yıkılmaz dev', cost: 40000000 },
-  kraken:   { id: 'kraken',   name: '🐙 Kraken\'in Kolu',    desc: 'Gövdesini saran dev dokunaç oymaları ve kabuklar', cost: 75000000 },
-  scales:   { id: 'scales',   name: '⚖️ Adalet Terazisi',     desc: 'Antik korsan lordlarının adalet sembolü kalyon', cost: 150000000 }
+  standard: { id: 'standard', name: 'Asarı Nusret',       category: 'war',    desc: 'Standart Donanma Savaş Kalyonu', cost: 0 },
+  skull:    { id: 'skull',    name: 'Cenk-Aver',          category: 'mythic', desc: 'Burnunda parlayan kafatası figürü ve kemik oymaları', cost: 100000 },
+  dragon:   { id: 'dragon',   name: 'Bahri-Zafer',        category: 'mythic', desc: 'Kükreyen ejderha başlığı ve kızıl pullu zırh', cost: 500000 },
+  eagle:    { id: 'eagle',    name: 'Fırtına Kartalı',    category: 'war',    desc: 'Kanat açmış görkemli kartal figürlü amiral gemisi', cost: 1200000 },
+  lion:     { id: 'lion',     name: 'Altın Aslan',        category: 'war',    desc: 'Saf altın döküm kükreyen aslan başlığı', cost: 2500000 },
+  ghost:    { id: 'ghost',    name: 'Gecenin Hayaleti',   category: 'mythic', desc: 'Ay sfenksi motifleri ve gizemli mor aura', cost: 5000000 },
+  poseidon: { id: 'poseidon', name: 'Denizlerin Efendisi',category: 'mythic', desc: 'Devasa üççatal mızraklı okyanus hakimi', cost: 10000000 },
+  wolf:     { id: 'wolf',     name: 'Buzul Kurdu',        category: 'war',    desc: 'Kuzeyin vahşi kurt başlığı ve buz mavisi yelkenler', cost: 20000000 },
+  titan:    { id: 'titan',    name: 'Demir Yumruk',       category: 'war',    desc: 'Çift katmanlı koçbaşı zırhlı yıkılmaz dev', cost: 40000000 },
+  kraken:   { id: 'kraken',   name: 'Kraken\'in Kolu',    category: 'mythic', desc: 'Gövdesini saran zümrüt dokunaç oymaları', cost: 75000000 },
+  scales:   { id: 'scales',   name: 'Adalet Terazisi',    category: 'war',    desc: 'Antik korsan lordlarının altın terazi sembolü', cost: 150000000 }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v34';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v34';
+const USERS_STORAGE_KEY = 'pirate3d_users_v35';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v35';
 let authMode = 'login';
 let currentUser = null;
 
@@ -614,7 +895,7 @@ function completeLogin(user) {
   localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
   captainNameEl.textContent = currentUser.username;
   tagUsernameEl.textContent = currentUser.username;
-  shipTitleEl.textContent = SHIP_MODELS[currentUser.equippedShip]?.name || '8 Yönlü Efsanevi Gemi';
+  shipTitleEl.textContent = SHIP_MODELS[currentUser.equippedShip]?.name || 'Asarı Nusret';
   authOverlay.style.display = 'none';
   initThreeGame();
 }
@@ -722,6 +1003,111 @@ function createStaticOceanTextures() {
   return { mapTex, bumpTex };
 }
 
+function drawCustomFigureOnCanvas(ctx, w, h, shipId) {
+  if (shipId === 'standard') return;
+  const cx = w / 2;
+  const cy = h / 2;
+
+  ctx.save();
+  ctx.translate(cx, cy);
+
+  if (shipId === 'skull') {
+    ctx.fillStyle = '#f8fafc';
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(0, -h * 0.28, 16, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#000';
+    ctx.fillRect(-6, -h * 0.32, 4, 6);
+    ctx.fillRect(2, -h * 0.32, 4, 6);
+  } else if (shipId === 'dragon') {
+    ctx.fillStyle = '#ef4444';
+    ctx.strokeStyle = '#b91c1c';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(0, -h * 0.38);
+    ctx.lineTo(-12, -h * 0.22);
+    ctx.lineTo(12, -h * 0.22);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#fbbf24';
+    ctx.fillRect(-16, -h * 0.34, 6, 12);
+    ctx.fillRect(10, -h * 0.34, 6, 12);
+  } else if (shipId === 'eagle') {
+    ctx.fillStyle = '#e2e8f0';
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(0, -h * 0.38);
+    ctx.lineTo(-18, -h * 0.26);
+    ctx.lineTo(18, -h * 0.26);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#f59e0b';
+    ctx.beginPath();
+    ctx.moveTo(0, -h * 0.22);
+    ctx.lineTo(-5, -h * 0.28);
+    ctx.lineTo(5, -h * 0.28);
+    ctx.closePath();
+    ctx.fill();
+  } else if (shipId === 'lion') {
+    ctx.fillStyle = '#d97706';
+    ctx.beginPath();
+    ctx.arc(0, -h * 0.28, 18, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#fbbf24';
+    ctx.beginPath();
+    ctx.arc(0, -h * 0.28, 11, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (shipId === 'ghost') {
+    ctx.fillStyle = '#a855f7';
+    ctx.shadowColor = '#c084fc';
+    ctx.shadowBlur = 12;
+    ctx.beginPath();
+    ctx.arc(0, -h * 0.28, 14, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (shipId === 'poseidon') {
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.moveTo(0, -h * 0.38);
+    ctx.lineTo(0, -h * 0.18);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-10, -h * 0.38); ctx.lineTo(-10, -h * 0.30);
+    ctx.moveTo(10, -h * 0.38); ctx.lineTo(10, -h * 0.30);
+    ctx.stroke();
+  } else if (shipId === 'wolf') {
+    ctx.fillStyle = '#38bdf8';
+    ctx.beginPath();
+    ctx.moveTo(0, -h * 0.36);
+    ctx.lineTo(-14, -h * 0.22);
+    ctx.lineTo(14, -h * 0.22);
+    ctx.closePath();
+    ctx.fill();
+  } else if (shipId === 'titan') {
+    ctx.fillStyle = '#64748b';
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 4;
+    ctx.fillRect(-12, -h * 0.32, 24, 16);
+    ctx.strokeRect(-12, -h * 0.32, 24, 16);
+  } else if (shipId === 'kraken') {
+    ctx.strokeStyle = '#10b981';
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(-12, -h * 0.25);
+    ctx.quadraticCurveTo(0, -h * 0.38, 12, -h * 0.25);
+    ctx.stroke();
+  } else if (shipId === 'scales') {
+    ctx.fillStyle = '#fbbf24';
+    ctx.fillRect(-2, -h * 0.36, 4, 18);
+    ctx.fillRect(-12, -h * 0.30, 24, 4);
+  }
+
+  ctx.restore();
+}
+
 function normalizeSpriteTexture(rawTexture) {
   const img = rawTexture.image;
   if (!img || !img.width) return { texture: rawTexture, aspect: 1 };
@@ -782,107 +1168,7 @@ function generateCustomShipTexture(baseRawTexture, shipId) {
   const ctx = canvas.getContext('2d');
   ctx.drawImage(img, 0, 0);
 
-  const cx = canvas.width / 2;
-  const cy = canvas.height / 2;
-
-  ctx.save();
-  ctx.translate(cx, cy);
-  
-  if (shipId === 'skull') {
-    ctx.fillStyle = '#f8fafc';
-    ctx.strokeStyle = '#0f172a';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.arc(0, -canvas.height * 0.28, 16, 0, Math.PI * 2);
-    ctx.fill(); ctx.stroke();
-    ctx.fillStyle = '#000';
-    ctx.fillRect(-6, -canvas.height * 0.32, 4, 6);
-    ctx.fillRect(2, -canvas.height * 0.32, 4, 6);
-  } else if (shipId === 'dragon') {
-    ctx.fillStyle = '#ef4444';
-    ctx.strokeStyle = '#b91c1c';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(0, -canvas.height * 0.38);
-    ctx.lineTo(-12, -canvas.height * 0.22);
-    ctx.lineTo(12, -canvas.height * 0.22);
-    ctx.closePath();
-    ctx.fill(); ctx.stroke();
-    ctx.fillStyle = '#fbbf24';
-    ctx.fillRect(-16, -canvas.height * 0.34, 6, 12);
-    ctx.fillRect(10, -canvas.height * 0.34, 6, 12);
-  } else if (shipId === 'eagle') {
-    ctx.fillStyle = '#e2e8f0';
-    ctx.strokeStyle = '#475569';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(0, -canvas.height * 0.38);
-    ctx.lineTo(-18, -canvas.height * 0.26);
-    ctx.lineTo(18, -canvas.height * 0.26);
-    ctx.closePath();
-    ctx.fill(); ctx.stroke();
-    ctx.fillStyle = '#f59e0b';
-    ctx.beginPath();
-    ctx.moveTo(0, -canvas.height * 0.22);
-    ctx.lineTo(-5, -canvas.height * 0.28);
-    ctx.lineTo(5, -canvas.height * 0.28);
-    ctx.closePath();
-    ctx.fill();
-  } else if (shipId === 'lion') {
-    ctx.fillStyle = '#d97706';
-    ctx.beginPath();
-    ctx.arc(0, -canvas.height * 0.28, 18, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#fbbf24';
-    ctx.beginPath();
-    ctx.arc(0, -canvas.height * 0.28, 11, 0, Math.PI * 2);
-    ctx.fill();
-  } else if (shipId === 'ghost') {
-    ctx.fillStyle = '#a855f7';
-    ctx.shadowColor = '#c084fc';
-    ctx.shadowBlur = 12;
-    ctx.beginPath();
-    ctx.arc(0, -canvas.height * 0.28, 14, 0, Math.PI * 2);
-    ctx.fill();
-  } else if (shipId === 'poseidon') {
-    ctx.strokeStyle = '#38bdf8';
-    ctx.lineWidth = 6;
-    ctx.beginPath();
-    ctx.moveTo(0, -canvas.height * 0.38);
-    ctx.lineTo(0, -canvas.height * 0.18);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(-10, -canvas.height * 0.38); ctx.lineTo(-10, -canvas.height * 0.30);
-    ctx.moveTo(10, -canvas.height * 0.38); ctx.lineTo(10, -canvas.height * 0.30);
-    ctx.stroke();
-  } else if (shipId === 'wolf') {
-    ctx.fillStyle = '#38bdf8';
-    ctx.beginPath();
-    ctx.moveTo(0, -canvas.height * 0.36);
-    ctx.lineTo(-14, -canvas.height * 0.22);
-    ctx.lineTo(14, -canvas.height * 0.22);
-    ctx.closePath();
-    ctx.fill();
-  } else if (shipId === 'titan') {
-    ctx.fillStyle = '#64748b';
-    ctx.strokeStyle = '#334155';
-    ctx.lineWidth = 4;
-    ctx.fillRect(-12, -canvas.height * 0.32, 24, 16);
-    ctx.strokeRect(-12, -canvas.height * 0.32, 24, 16);
-  } else if (shipId === 'kraken') {
-    ctx.strokeStyle = '#10b981';
-    ctx.lineWidth = 5;
-    ctx.beginPath();
-    ctx.moveTo(-12, -canvas.height * 0.25);
-    ctx.quadraticCurveTo(0, -canvas.height * 0.38, 12, -canvas.height * 0.25);
-    ctx.stroke();
-  } else if (shipId === 'scales') {
-    ctx.fillStyle = '#fbbf24';
-    ctx.fillRect(-2, -canvas.height * 0.36, 4, 18);
-    ctx.fillRect(-12, -canvas.height * 0.30, 24, 4);
-  }
-
-  ctx.restore();
+  drawCustomFigureOnCanvas(ctx, canvas.width, canvas.height, shipId);
 
   let minX = canvas.width, minY = canvas.height, maxX = 0, maxY = 0;
   let foundOpaque = false;
@@ -1122,7 +1408,7 @@ function initThreeGame() {
       e.target.closest('#top-left-hud') ||
       e.target.closest('#top-right-hud') ||
       e.target.closest('#bottom-dock') ||
-      e.target.closest('#market-panel') ||
+      e.target.closest('#port-modal-backdrop') ||
       e.target.closest('#auth-overlay')
     ) return;
 
@@ -1176,6 +1462,7 @@ function initThreeGame() {
 let player, gameIslands = [];
 let targetPos = null, selectedEnemyId = null, isAttacking = false, isGameOver = false;
 let lastPlayerAttackTime = 0;
+let bonusDamage = 0;
 
 function showBossBanner(msg) {
   bossAlertEl.textContent = msg;
@@ -1190,6 +1477,7 @@ function startGameLogic(isFullReset = false) {
   if (selectedEnemyRing) selectedEnemyRing.visible = false;
 
   if (isFullReset || !player) {
+    bonusDamage = 0;
     player = {
       x: 0, z: 0, a: -Math.PI / 2, speed: 0, maxSpeed: 1.85,
       hp: 1000000, maxHp: 1000000, score: 1000000000,
@@ -1256,7 +1544,6 @@ function spawnEnemySprite(id, isBoss = false) {
   } while ((Math.hypot(ex, ez) < (isBoss ? 360 : 280) || isPositionInsideIsland(ex, ez, isBoss ? 110 : 85)) && tries < 60);
 
   const shipHeight = isBoss ? BASE_SHIP_HEIGHT * 1.65 : BASE_SHIP_HEIGHT;
-  // NPC ve Boss'lar her zaman kendi 'standard' korsan gemisi tasarımını kullanır
   const data = getDirectionSpriteData(0, 'standard');
   const mat = new THREE.SpriteMaterial({
     map: data.texture,
@@ -1319,7 +1606,7 @@ function selectAmmoSlot(type) {
     slot.classList.toggle('selected', slot.dataset.type === type);
   });
   const info = AMMO_TYPES[type];
-  activeAmmoInfoEl.textContent = `Seçili: ${info.name} (${info.desc})`;
+  activeAmmoInfoEl.textContent = `Seçili: ${info.name} (${info.damage + bonusDamage} Hasar)`;
   syncAttackButton();
 }
 
@@ -1332,12 +1619,11 @@ window.addEventListener('keydown', e => {
   if (e.key === '2') selectAmmoSlot('chain');
   if (e.key === '3') selectAmmoSlot('fire');
   if (e.key === '4') selectAmmoSlot('dragon');
-  if (e.key.toLowerCase() === 'm') marketPanel.classList.toggle('open');
-  if (e.key.toLowerCase() === 't') {
-    marketPanel.classList.add('open');
-    tabShipyard.classList.add('active'); tabMarket.classList.remove('active');
-    sectionShipyard.classList.add('active'); sectionMarket.classList.remove('active');
-    renderShipyardList();
+  if (e.key.toLowerCase() === 'l' || e.key.toLowerCase() === 'm') {
+    togglePortModal();
+  }
+  if (e.key === 'Escape') {
+    portModalBackdrop.classList.remove('open');
   }
 });
 
@@ -1439,7 +1725,7 @@ function animate3D() {
     const dist = Math.hypot(dx, dz);
     if (dist > 8) {
       player.a = Math.atan2(dz, dx);
-      player.speed = Math.min(1.85, player.speed + 0.12);
+      player.speed = Math.min(player.maxSpeed, player.speed + 0.12);
     } else {
       targetPos = null;
       player.speed *= 0.9;
@@ -1630,7 +1916,6 @@ function animate3D() {
 
     if (en.sprite) {
       en.sprite.position.set(en.x, SHIP_Y_POS, en.z);
-      // NPC gemileri daima kendi standart tasarımını kullanır
       applyNormalizedSprite(en.sprite, en.a, en.shipHeight, en.shipId || 'standard');
     }
     if (en.auraMesh) {
@@ -1653,12 +1938,13 @@ function animate3D() {
         player.ammo[ammoKey]--;
 
         target.isAggressive = true;
+        const totalDmg = ammoSpec.damage + bonusDamage;
 
         fireProjectile(player.x, player.z, target.x, target.z, ammoKey, () => {
-          target.hp -= ammoSpec.damage;
+          target.hp -= totalDmg;
           if (ammoSpec.slow < 1.0) target.slowTimer = 240;
 
-          showFloatingDamage(target.x, target.z, '-' + ammoSpec.damage, '#f97316');
+          showFloatingDamage(target.x, target.z, '-' + totalDmg, '#f97316');
 
           updateTargetCard();
           updateHUD();
@@ -1755,6 +2041,7 @@ function drawMinimap() {
 
 function updateHUD() {
   scoreEl.textContent = player.score.toLocaleString();
+  portGoldDisplayEl.textContent = player.score.toLocaleString('tr-TR');
   levelEl.textContent = player.level;
   
   hpTextEl.textContent = `Can ${Math.ceil(player.hp).toLocaleString()} / ${player.maxHp.toLocaleString()}`;
@@ -1762,7 +2049,6 @@ function updateHUD() {
   
   hpBarEl.style.width = ((player.hp / player.maxHp) * 100) + '%';
   expBarEl.style.width = ((player.exp / player.maxExp) * 100) + '%';
-  marketGoldEl.textContent = player.score.toLocaleString();
 
   const hpPercent = Math.max(0, Math.min(100, (player.hp / player.maxHp) * 100));
   playerShipHpFillEl.style.width = hpPercent + '%';
@@ -1782,30 +2068,175 @@ function updateHUD() {
   });
 }
 
-marketToggleBtn.addEventListener('click', () => {
-  marketPanel.classList.toggle('open');
-  tabMarket.classList.add('active'); tabShipyard.classList.remove('active');
-  sectionMarket.classList.add('active'); sectionShipyard.classList.remove('active');
-});
-marketCloseBtn.addEventListener('click', () => marketPanel.classList.remove('open'));
+// ==========================================================
+// LİMAN & TERSANE ARAYÜZ MANTIĞI
+// ==========================================================
+let currentShipPage = 1;
+const SHIPS_PER_PAGE = 3;
 
-tabMarket.addEventListener('click', () => {
-  tabMarket.classList.add('active'); tabShipyard.classList.remove('active');
-  sectionMarket.classList.add('active'); sectionShipyard.classList.remove('active');
-});
-tabShipyard.addEventListener('click', () => {
-  tabShipyard.classList.add('active'); tabMarket.classList.remove('active');
-  sectionShipyard.classList.add('active'); sectionMarket.classList.remove('active');
-  renderShipyardList();
-});
+function togglePortModal(forceOpen = null) {
+  const shouldOpen = forceOpen !== null ? forceOpen : !portModalBackdrop.classList.contains('open');
+  if (shouldOpen) {
+    portModalBackdrop.classList.add('open');
+    renderShipyardCards();
+  } else {
+    portModalBackdrop.classList.remove('open');
+  }
+}
 
-shipyardToggleBtn.addEventListener('click', () => {
-  marketPanel.classList.add('open');
-  tabShipyard.classList.add('active'); tabMarket.classList.remove('active');
-  sectionShipyard.classList.add('active'); sectionMarket.classList.remove('active');
-  renderShipyardList();
+portToggleBtn.addEventListener('click', () => togglePortModal(true));
+portCloseBtn.addEventListener('click', () => togglePortModal(false));
+portModalBackdrop.addEventListener('click', e => {
+  if (e.target === portModalBackdrop) togglePortModal(false);
 });
 
+// Üst Sekme Geçişleri
+document.querySelectorAll('.port-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.port-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.port-section').forEach(s => s.classList.remove('active'));
+
+    tab.classList.add('active');
+    const secId = 'port-sec-' + tab.dataset.tab;
+    const secEl = document.getElementById(secId);
+    if (secEl) secEl.classList.add('active');
+
+    if (tab.dataset.tab === 'shipyard') {
+      renderShipyardCards();
+    }
+  });
+});
+
+shipCategoryFilter.addEventListener('change', () => {
+  currentShipPage = 1;
+  renderShipyardCards();
+});
+
+// Kart İçindeki Deniz Üzeri Canlı Gemi Önizleme Canvas'ı Çizimi
+function drawShipCardPreview(canvas, shipId) {
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width;
+  const h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+
+  // 1. Okyanus Arka Planı & Dalga Dokusu (Referans görseldeki mavi deniz tonu)
+  const oceanGrad = ctx.createLinearGradient(0, 0, 0, h);
+  oceanGrad.addColorStop(0, '#135e87');
+  oceanGrad.addColorStop(0.5, '#0d4a6e');
+  oceanGrad.addColorStop(1, '#08334e');
+  ctx.fillStyle = oceanGrad;
+  ctx.fillRect(0, 0, w, h);
+
+  // Hafif dalga çizgileri
+  ctx.strokeStyle = 'rgba(125, 211, 252, 0.14)';
+  ctx.lineWidth = 1.5;
+  for (let i = 0; i < 18; i++) {
+    const wy = (i * 11) % h;
+    const wx = ((i * 37) % (w - 30));
+    ctx.beginPath();
+    ctx.moveTo(wx, wy);
+    ctx.quadraticCurveTo(wx + 15, wy - 3, wx + 30, wy);
+    ctx.stroke();
+  }
+
+  // 2. Geminin Sağ-Üst (İzometrik) Görselini Çiz
+  const rawTex = baseShipTextures.topRight || baseShipTextures.top || Object.values(baseShipTextures)[0];
+  if (rawTex && rawTex.image) {
+    const img = rawTex.image;
+    const tempC = document.createElement('canvas');
+    tempC.width = img.width;
+    tempC.height = img.height;
+    const tCtx = tempC.getContext('2d');
+    tCtx.drawImage(img, 0, 0);
+    drawCustomFigureOnCanvas(tCtx, tempC.width, tempC.height, shipId);
+
+    const scale = Math.min((w * 0.72) / img.width, (h * 0.78) / img.height);
+    const drawW = img.width * scale;
+    const drawH = img.height * scale;
+    const dx = (w - drawW) / 2;
+    const dy = (h - drawH) / 2 + 4;
+
+    ctx.drawImage(tempC, dx, dy, drawW, drawH);
+  }
+}
+
+function renderShipyardCards() {
+  const filterVal = shipCategoryFilter.value;
+  const allShips = Object.values(SHIP_MODELS).filter(m => filterVal === 'all' || m.category === filterVal);
+
+  const totalPages = Math.max(1, Math.ceil(allShips.length / SHIPS_PER_PAGE));
+  if (currentShipPage > totalPages) currentShipPage = totalPages;
+
+  // Sayfa Numaraları (1, 2, 3, 4...)
+  shipPaginationEl.innerHTML = '';
+  for (let p = 1; p <= totalPages; p++) {
+    const pBtn = document.createElement('button');
+    pBtn.type = 'button';
+    pBtn.className = 'page-num-btn' + (p === currentShipPage ? ' active' : '');
+    pBtn.textContent = p;
+    pBtn.addEventListener('click', () => {
+      currentShipPage = p;
+      renderShipyardCards();
+    });
+    shipPaginationEl.appendChild(pBtn);
+  }
+
+  // Kartları Render Et
+  shipyardGridEl.innerHTML = '';
+  const users = loadUsers();
+  const dbUser = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
+  const equipped = dbUser.equippedShip || 'standard';
+
+  const startIdx = (currentShipPage - 1) * SHIPS_PER_PAGE;
+  const pageItems = allShips.slice(startIdx, startIdx + SHIPS_PER_PAGE);
+
+  pageItems.forEach(model => {
+    const isEquipped = equipped === model.id;
+    const card = document.createElement('div');
+    card.className = 'ship-preview-card' + (isEquipped ? ' equipped-card' : '');
+
+    card.innerHTML = `
+      <div class="ship-card-title">${model.name}</div>
+      <div class="ship-canvas-frame">
+        <canvas width="200" height="150"></canvas>
+      </div>
+      <div class="ship-card-sub">${model.desc}</div>
+      <button class="port-action-btn ${isEquipped ? 'equipped' : ''}" type="button" data-id="${model.id}" ${isEquipped ? 'disabled' : ''}>
+        ${isEquipped ? 'Kullanımda' : 'Kuşan / Seç'}
+      </button>
+    `;
+
+    shipyardGridEl.appendChild(card);
+
+    // Önizleme canvas'ına gemiyi çiz
+    const previewCanvas = card.querySelector('canvas');
+    drawShipCardPreview(previewCanvas, model.id);
+
+    const btn = card.querySelector('.port-action-btn');
+    if (!isEquipped) {
+      btn.addEventListener('click', () => {
+        const shipId = btn.dataset.id;
+        const uList = loadUsers();
+        const uIdx = uList.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
+        if (uIdx !== -1) {
+          uList[uIdx].equippedShip = shipId;
+          saveUsers(uList);
+        }
+        currentUser.equippedShip = shipId;
+        shipTitleEl.textContent = SHIP_MODELS[shipId].name;
+
+        startGameLogic(false);
+        renderShipyardCards();
+
+        marketFeedbackEl.style.color = '#4ade80';
+        marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} tasarımı kuşanıldı!`;
+        setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+      });
+    }
+  });
+}
+
+// Gülle Satın Alma
 document.querySelectorAll('.ammo-buy-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     if (!player) return;
@@ -1825,61 +2256,52 @@ document.querySelectorAll('.ammo-buy-btn').forEach(btn => {
     syncAttackButton();
 
     marketFeedbackEl.style.color = '#4ade80';
-    marketFeedbackEl.textContent = `${amount} adet ${AMMO_TYPES[type].name} satın alındı!`;
+    marketFeedbackEl.textContent = `${amount} adet ${AMMO_TYPES[type].name} cephaneliğe eklendi!`;
     setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
   });
 });
 
-function renderShipyardList() {
-  shipyardListEl.innerHTML = '';
-  const users = loadUsers();
-  const dbUser = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
-  const equipped = dbUser.equippedShip || 'standard';
+// Top, Gövde, Tayfa & Paket Satın Alma
+document.querySelectorAll('.upgrade-buy-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (!player) return;
+    const cost = parseInt(btn.dataset.cost, 10);
+    const bonus = btn.dataset.bonus;
 
-  Object.values(SHIP_MODELS).forEach(model => {
-    const isEquipped = equipped === model.id;
-
-    const div = document.createElement('div');
-    div.className = 'market-item';
-    
-    let btnHtml = '';
-    if (isEquipped) {
-      btnHtml = `<button class="buy-btn equipped" type="button" disabled>Kullanımda</button>`;
-    } else {
-      btnHtml = `<button class="buy-btn ship-equip-btn" type="button" data-id="${model.id}">Kuşan / Dene</button>`;
+    if (player.score < cost) {
+      marketFeedbackEl.style.color = '#f87171';
+      marketFeedbackEl.textContent = 'Yetersiz altın!';
+      return;
     }
 
-    div.innerHTML = `
-      <div class="market-item-info">
-        <span class="market-item-title">${model.name}</span>
-        <span class="market-item-sub">${model.desc}</span>
-      </div>
-      ${btnHtml}
-    `;
-    shipyardListEl.appendChild(div);
-  });
+    player.score -= cost;
+    let msg = '';
+    if (bonus === 'damage') {
+      bonusDamage += 25;
+      selectAmmoSlot(player.selectedAmmo);
+      msg = 'Top gücü kalıcı olarak +25 arttırıldı!';
+    } else if (bonus === 'hp') {
+      player.maxHp += 250000;
+      player.hp = player.maxHp;
+      msg = 'Gemi gövdesi güçlendirildi (+250.000 Can)!';
+    } else if (bonus === 'speed') {
+      player.maxSpeed += 0.25;
+      msg = 'Usta dümenci katıldı, gemi hızı arttı!';
+    } else if (bonus === 'repair') {
+      player.hp = player.maxHp;
+      msg = 'Marangoz tayfası gemiyi tamamen onardı!';
+    } else if (bonus === 'pack') {
+      player.ammo.fire += 500;
+      player.ammo.dragon += 250;
+      msg = 'Korsan Lordu Cephane Sandığı açıldı!';
+    }
 
-  shipyardListEl.querySelectorAll('.ship-equip-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const shipId = btn.dataset.id;
-      const users = loadUsers();
-      const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
-      if (uIdx !== -1) {
-        users[uIdx].equippedShip = shipId;
-        saveUsers(users);
-      }
-      currentUser.equippedShip = shipId;
-      shipTitleEl.textContent = SHIP_MODELS[shipId].name;
-      
-      startGameLogic(false); 
-      renderShipyardList();
-
-      marketFeedbackEl.style.color = '#4ade80';
-      marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} kuşanıldı! (Sadece senin gemin değişti)`;
-      setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
-    });
+    updateHUD();
+    marketFeedbackEl.style.color = '#4ade80';
+    marketFeedbackEl.textContent = msg;
+    setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2500);
   });
-}
+});
 
 loadUsers();
 const session = JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY) || 'null');
