@@ -115,7 +115,7 @@
     }
     .ship-sub-name { font-size: 10px; color: #94a3b8; text-align: right; }
 
-    /* Oyuncu Gemi Etiketi */
+    /* Oyuncu Gemi Etiketi (Y: 100 Sabit) */
     #player-label {
       position: fixed; z-index: 5; pointer-events: none;
       transform: translate(-50%, 0);
@@ -136,6 +136,25 @@
     }
     .ship-fleet-tag {
       font-size: 10px; font-weight: 800; color: #fde68a;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap;
+    }
+
+    /* NPC Gemi Etiketleri ve Can Barları (Y: 100 Sabit) */
+    .npc-label {
+      position: fixed; z-index: 5; pointer-events: none;
+      transform: translate(-50%, 0);
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      will-change: transform;
+    }
+    .npc-hp-track {
+      width: 50px; height: 5px; background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 3px; overflow: hidden;
+    }
+    .npc-hp-fill {
+      width: 100%; height: 100%; background: #ef4444; transition: width 0.15s;
+    }
+    .npc-name-tag {
+      font-size: 10px; font-weight: 800; color: #fca5a5;
       text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap;
     }
 
@@ -284,7 +303,7 @@
 
   <div id="game"></div>
 
-  <!-- Oyuncu Gemi Etiketi -->
+  <!-- Oyuncu Gemi Etiketi (Y: 100 Sabit) -->
   <div id="player-label">
     <div class="ship-hp-track">
       <div id="player-ship-hp-fill"></div>
@@ -292,6 +311,9 @@
     <div class="ship-name-tag" id="tag-username">Test</div>
     <div class="ship-fleet-tag">[TST]</div>
   </div>
+
+  <!-- Dinamik NPC Etiketleri Konteyneri (Y: 100 Sabit) -->
+  <div id="npc-labels-container"></div>
 
   <div id="top-vital-hud">
     <div class="level-crest">
@@ -499,6 +521,7 @@ const marketCloseBtn = document.querySelector('#market-close-btn');
 const marketGoldEl = document.querySelector('#market-gold');
 const marketFeedbackEl = document.querySelector('#market-feedback');
 const shipyardListEl = document.querySelector('#shipyard-list');
+const npcLabelsContainer = document.querySelector('#npc-labels-container');
 
 const tabMarket = document.querySelector('#tab-market');
 const tabShipyard = document.querySelector('#tab-shipyard');
@@ -555,8 +578,8 @@ const SHIP_MODELS = {
   void_destroyer: { id: 'void_destroyer', name: 'Hiçlik Yokedicisi', desc: 'Evrenin derinliklerinden gelen mor kozmik enerji yayan son teknoloji', cost: 0, tint: 0xd946ef, emissive: 0x86198f, extraCanvasType: 'void' }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v39';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v39';
+const USERS_STORAGE_KEY = 'pirate3d_users_v38';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v38';
 let authMode = 'login';
 let currentUser = null;
 
@@ -638,7 +661,7 @@ const WORLD_SIZE = 1000;
 const ATTACK_RANGE = 280;
 const AGGRO_RANGE = 280;
 const BASE_SHIP_HEIGHT = 95;
-const SHIP_Y_POS = 100; // Y: 100 Sabit (Oyuncu etiketi için)
+const SHIP_Y_POS = 100; // Y: 100 Sabit (Can barı ve isimler için)
 
 function createStaticOceanTextures() {
   const size = 1024;
@@ -1046,9 +1069,11 @@ function startGameLogic() {
   }
 
   enemies.forEach(en => {
+    if (en.labelEl) en.labelEl.remove();
     scene.remove(en.sprite);
   });
   enemies = [];
+  npcLabelsContainer.innerHTML = '';
   nextNpcIdCounter = 1;
 
   for (let i = 0; i < 6; i++) {
@@ -1073,12 +1098,22 @@ function spawnEnemySprite(id) {
   const sprite = new THREE.Sprite(mat);
   sprite.center.set(0.5, 0.95);
   applyNpcSprite(sprite, 0);
-  sprite.position.set(ex, 0, ez);
+  sprite.position.set(ex, SHIP_Y_POS, ez);
   sprite.userData.enemyId = id;
   scene.add(sprite);
 
+  // Orijinal / Sorunsuz HTML Can Barı ve İsim Yapısı
+  const labelDiv = document.createElement('div');
+  labelDiv.className = 'npc-label';
+  labelDiv.id = `npc-label-${id}`;
+  labelDiv.innerHTML = `
+    <div class="npc-hp-track"><div class="npc-hp-fill" id="npc-hp-fill-${id}"></div></div>
+    <div class="npc-name-tag">Korsan</div>
+  `;
+  npcLabelsContainer.appendChild(labelDiv);
+
   enemies.push({
-    id, name: `Korsan Gemisi #${id}`, sprite,
+    id, name: `Korsan Gemisi #${id}`, sprite, labelEl: labelDiv,
     hp: 520, maxHp: 520, baseSpeed: 1.15, slowTimer: 0,
     a: 0, wanderAngle: Math.random() * Math.PI * 2, wanderTimer: 0,
     lastAttackTime: 0
@@ -1161,7 +1196,7 @@ function showFloatingDamage(wx, wz, text, colorHex) {
   div.style.color = colorHex;
   document.body.appendChild(div);
 
-  const tempV = new THREE.Vector3(wx, 0, wz);
+  const tempV = new THREE.Vector3(wx, SHIP_Y_POS, wz);
   tempV.project(camera);
   const x = (tempV.x * 0.5 + 0.5) * window.innerWidth;
   const y = (tempV.y * -0.5 + 0.5) * window.innerHeight;
@@ -1182,7 +1217,7 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
   });
   const mesh = new THREE.Mesh(pGeo, pMat);
   
-  const GULLE_Y_OFFSET = 50; // Gülle yüksekliği 50
+  const GULLE_Y_OFFSET = 50; // Gülle yüksekliği tekrar 50 yapıldı
   mesh.position.set(startX, SHIP_Y_POS - GULLE_Y_OFFSET, startZ);
   scene.add(mesh);
 
@@ -1238,7 +1273,7 @@ function animate3D() {
   coordDisplayEl.textContent = `X: ${Math.round((player.x / (WORLD_SIZE / 2)) * 50)} · Y: ${Math.round((player.z / (WORLD_SIZE / 2)) * 50)}`;
 
   if (playerSprite) {
-    playerSprite.position.set(player.x, 0, player.z);
+    playerSprite.position.set(player.x, SHIP_Y_POS, player.z);
     applyPlayerSprite(playerSprite, player.a);
   }
 
@@ -1258,7 +1293,7 @@ function animate3D() {
   }
 
   if (playerSprite) {
-    const tempVector = new THREE.Vector3(player.x, 0, player.z);
+    const tempVector = new THREE.Vector3(player.x, SHIP_Y_POS, player.z);
     tempVector.project(camera);
     const xPx = (tempVector.x *  .5 + .5) * window.innerWidth;
     const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 55;
@@ -1372,8 +1407,22 @@ function animate3D() {
     en.z = Math.max(-WORLD_SIZE/2, Math.min(WORLD_SIZE/2, en.z));
 
     if (en.sprite) {
-      en.sprite.position.set(en.x, 0, en.z);
+      en.sprite.position.set(en.x, SHIP_Y_POS, en.z);
       applyNpcSprite(en.sprite, en.a);
+    }
+
+    // NPC HTML Can Barı ve İsim Etiketi Konumlandırma Güncellemesi (Y: 100 Sabit)
+    if (en.labelEl) {
+      const v = new THREE.Vector3(en.x, SHIP_Y_POS, en.z);
+      v.project(camera);
+      const nx = (v.x * 0.5 + 0.5) * window.innerWidth;
+      const ny = (v.y * -0.5 + 0.5) * window.innerHeight + 55;
+      en.labelEl.style.transform = `translate(-50%, 0) translate(${nx}px, ${ny}px)`;
+
+      const fillEl = document.getElementById(`npc-hp-fill-${en.id}`);
+      if (fillEl) {
+        fillEl.style.width = Math.max(0, (en.hp / en.maxHp) * 100) + '%';
+      }
     }
   }
 
@@ -1398,6 +1447,7 @@ function animate3D() {
           syncAttackButton();
 
           if (target.hp <= 0) {
+            if (target.labelEl) target.labelEl.remove();
             scene.remove(target.sprite);
             enemies = enemies.filter(e => e.id !== target.id);
             selectedEnemyId = null;
