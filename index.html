@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Klasik Liman & Tersane</title>
+  <title>Korsan Dünyası - Ada Savaşları & Kule Savunması</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -81,22 +81,18 @@
     .side-tool-col {
       pointer-events: auto; display: flex; flex-direction: column; gap: 6px;
     }
-    .port-btn {
-      width: 54px; height: 54px; border-radius: 14px;
-      background: radial-gradient(circle at 35% 30%, #452710, #1f1106 85%);
-      border: 2.5px solid #d4a359; color: #fef3c7;
+    .tool-icon-btn {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: linear-gradient(155deg, #172a3a, #091520);
+      border: 1.5px solid rgba(245, 197, 94, 0.55); color: #fef3c7;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,0.85), inset 0 1px 3px rgba(255,230,170,0.4);
-      transition: transform 0.12s, border-color 0.15s, box-shadow 0.15s;
+      cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,0.75);
+      transition: transform 0.12s, border-color 0.15s;
     }
-    .port-btn:hover {
-      border-color: #fde047;
-      box-shadow: 0 0 16px rgba(245, 158, 11, 0.6);
-      transform: translateY(-1px);
-    }
-    .port-btn:active { transform: scale(0.94); }
-    .port-btn span.ico { font-size: 21px; line-height: 1.1; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.8)); }
-    .port-btn span.lbl { font-size: 10px; font-weight: 900; color: #fde68a; letter-spacing: 0.4px; margin-top: 2px; }
+    .tool-icon-btn:hover { border-color: #fbbf24; transform: translateY(-1px); }
+    .tool-icon-btn:active { transform: scale(0.94); }
+    .tool-icon-btn span.ico { font-size: 15px; line-height: 1.1; }
+    .tool-icon-btn span.lbl { font-size: 8px; font-weight: 800; color: #fde68a; }
 
     #top-right-hud {
       position: fixed; top: 66px; right: 10px; z-index: 6;
@@ -140,17 +136,6 @@
       font-size: 10px; font-weight: 800; color: #fde68a;
       text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap;
     }
-
-    #boss-alert {
-      position: fixed; top: 68px; left: 50%; transform: translateX(-50%);
-      background: linear-gradient(90deg, rgba(127, 29, 29, 0.95), rgba(185, 28, 28, 0.95));
-      border: 1.5px solid #fbbf24; color: #fef08a;
-      padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 900;
-      box-shadow: 0 8px 25px rgba(220, 38, 38, 0.6); z-index: 8;
-      pointer-events: none; opacity: 0; transition: opacity 0.4s ease;
-      white-space: nowrap;
-    }
-    #boss-alert.show { opacity: 1; }
 
     .floating-dmg {
       position: fixed; z-index: 10; pointer-events: none;
@@ -208,16 +193,10 @@
     #target-card {
       display: none; background: rgba(15, 23, 42, 0.92);
       border: 1.5px solid #ef4444; border-radius: 10px;
-      padding: 6px 10px; min-width: 155px; box-shadow: 0 8px 20px rgba(0,0,0,0.85);
+      padding: 6px 10px; min-width: 145px; box-shadow: 0 8px 20px rgba(0,0,0,0.85);
     }
     #target-card.visible { display: block; }
-    #target-card.boss-target {
-      border-color: #fbbf24;
-      background: linear-gradient(145deg, rgba(69, 10, 10, 0.95), rgba(15, 23, 42, 0.95));
-      box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
-    }
-    .target-header { display: flex; justify-content: space-between; gap: 8px; font-size: 11px; font-weight: 800; color: #fca5a5; margin-bottom: 4px; }
-    .boss-target .target-header { color: #fde047; }
+    .target-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: #fca5a5; margin-bottom: 4px; }
     .target-hp-bg { width: 100%; height: 7px; background: rgba(255,255,255,0.15); border-radius: 4px; overflow: hidden; }
     #target-hp-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #dc2626, #f97316); transition: width 0.15s; }
 
@@ -242,200 +221,35 @@
       to { box-shadow: 0 0 24px rgba(239, 68, 68, 0.95); }
     }
 
-    /* ==============================================================
-       KLASİK KORSAN LİMAN & MARKET PENCERESİ
-       ============================================================== */
-    #port-modal-backdrop {
-      display: none; position: fixed; inset: 0; z-index: 25;
-      background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(2px);
-      align-items: center; justify-content: center; padding: 10px;
+    #market-panel {
+      display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: min(92vw, 350px); max-height: 76vh; overflow-y: auto;
+      background: rgba(9, 24, 36, 0.97); backdrop-filter: blur(10px);
+      border: 2px solid rgba(245, 197, 94, 0.6); border-radius: 18px; padding: 16px; z-index: 15;
+      box-shadow: 0 25px 65px rgba(0,0,0,0.95); pointer-events: auto;
     }
-    #port-modal-backdrop.open { display: flex; }
-
-    .port-window {
-      position: relative; width: min(96vw, 760px); max-height: 92vh;
-      display: flex; flex-direction: column;
-      background: linear-gradient(180deg, #2b1d12 0%, #1c120b 100%);
-      border: 2.5px solid #c59b52;
-      border-radius: 10px;
-      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95), inset 0 0 25px rgba(0, 0, 0, 0.8);
-      color: #f3e5c8;
-    }
-
-    .port-top-bar {
-      display: flex; align-items: center; justify-content: space-between;
-      background: linear-gradient(180deg, #3c2817, #24170c);
-      border-bottom: 2px solid #9e7634;
-      padding: 8px 16px; border-radius: 7px 7px 0 0;
-    }
-    .port-currency {
-      display: flex; align-items: center; gap: 8px;
-      font-size: 14px; font-weight: 900; color: #ffd768;
-      text-shadow: 0 1px 2px #000;
-    }
-    .port-currency.diamond { color: #67e8f9; margin-right: 28px; }
-    .port-main-title {
-      font-size: 16px; font-weight: 900; letter-spacing: 1.5px;
-      color: #f5d08a; text-shadow: 0 2px 4px #000;
-    }
-
-    .port-close-btn {
-      position: absolute; top: -12px; right: -12px;
-      width: 40px; height: 40px; border-radius: 50%;
-      background: radial-gradient(circle at 35% 30%, #d94e28, #8a230b);
-      border: 2.5px solid #e2b464;
-      color: #fff3d6; font-size: 18px; font-weight: 900;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.85);
-      z-index: 5; transition: transform 0.12s;
-    }
-    .port-close-btn:hover { transform: scale(1.08); filter: brightness(1.1); }
-
-    .port-tabs-bar {
-      display: flex; align-items: stretch; justify-content: space-around;
-      background: linear-gradient(180deg, #24170d 0%, #160d07 100%);
-      border-bottom: 2px solid #8a6429;
-      padding: 6px 8px 0; overflow-x: auto; gap: 4px;
-    }
-    .port-tab {
-      flex: 1; min-width: 68px; max-width: 110px;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 3px; padding: 6px 4px 8px;
-      background: transparent; border: none; border-bottom: 3px solid transparent;
-      color: #b89f7d; cursor: pointer; transition: all 0.15s;
-    }
-    .port-tab:hover { color: #fde68a; }
-    .port-tab.active {
-      background: linear-gradient(180deg, rgba(212, 163, 89, 0.18), rgba(212, 163, 89, 0.04));
-      border-bottom: 3px solid #f59e0b;
-      color: #ffd768;
-    }
-    .port-tab-icon {
-      font-size: 24px; line-height: 1;
-      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.85));
-    }
-    .port-tab-text { font-size: 11px; font-weight: 800; white-space: nowrap; }
-
-    .port-body {
-      padding: 12px 16px 16px; overflow-y: auto; flex: 1;
-    }
-    .port-section { display: none; }
-    .port-section.active { display: block; }
-
-    .port-stats-strip {
-      display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
-      margin-bottom: 8px;
-    }
-    .port-stat-box {
-      display: flex; align-items: center; gap: 8px;
-      background: #140c06; border: 1.5px solid #7c5823;
-      border-radius: 6px; padding: 4px 12px;
-      font-size: 13px; font-weight: 800; color: #f6e3ba;
-    }
-    .port-stat-q {
-      width: 18px; height: 18px; border-radius: 50%;
-      background: #3a2716; border: 1px solid #b58943;
-      color: #ffd768; font-size: 11px; display: inline-flex;
-      align-items: center; justify-content: center;
-    }
-    .port-info-desc {
-      text-align: center; font-size: 11px; color: #d6c3a3;
-      line-height: 1.4; margin-bottom: 12px;
-    }
-
-    .port-controls-row {
-      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
-      gap: 8px; margin-bottom: 12px;
-    }
-    .port-filter-select {
-      background: linear-gradient(180deg, #382515, #22150b);
-      border: 1.5px solid #9e7634; border-radius: 6px;
-      color: #f5d08a; font-size: 12px; font-weight: 800;
-      padding: 6px 12px; outline: none; cursor: pointer;
-    }
-    .port-pagination { display: flex; gap: 5px; }
-    .page-num-btn {
-      width: 28px; height: 28px; border-radius: 5px;
-      background: #24160c; border: 1px solid #7c5823;
-      color: #d6c3a3; font-size: 12px; font-weight: 800; cursor: pointer;
-    }
-    .page-num-btn.active {
-      background: linear-gradient(180deg, #b47b2b, #784e14);
-      border-color: #ffd768; color: #fff;
-    }
-
-    .ship-cards-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
-    }
-    @media (max-width: 600px) {
-      .ship-cards-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    .ship-preview-card {
-      background: linear-gradient(180deg, #332214 0%, #1d130b 100%);
-      border: 2px solid #8a6429; border-radius: 8px;
-      padding: 8px; display: flex; flex-direction: column; align-items: center;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.65);
-      transition: transform 0.15s, border-color 0.15s;
-    }
-    .ship-preview-card:hover {
-      border-color: #f59e0b; transform: translateY(-2px);
-    }
-    .ship-preview-card.equipped-card {
-      border-color: #38bdf8;
-      box-shadow: 0 0 15px rgba(56, 189, 248, 0.35);
-    }
-    .ship-card-title {
-      font-size: 13px; font-weight: 900; color: #f6d388;
-      margin-bottom: 6px; text-align: center;
-      text-shadow: 0 1px 2px #000;
-    }
-    .ship-canvas-frame {
-      width: 100%; aspect-ratio: 4 / 3;
-      border: 1.5px solid #6e4e1e; border-radius: 5px;
-      overflow: hidden; background: #0c4a6e;
-      margin-bottom: 8px; position: relative;
-    }
-    .ship-canvas-frame canvas {
-      width: 100%; height: 100%; display: block;
-    }
-    .ship-card-sub {
-      font-size: 10px; color: #cbb694; text-align: center;
-      margin-bottom: 8px; min-height: 26px; line-height: 1.3;
-    }
-    .port-action-btn {
-      width: 100%; padding: 7px 10px; border-radius: 6px;
-      border: 1.5px solid #e2b464;
-      background: linear-gradient(180deg, #b87a28 0%, #7c4d12 100%);
-      color: #fff8e7; font-size: 12px; font-weight: 900;
-      cursor: pointer; text-shadow: 0 1px 2px #000;
-      transition: filter 0.15s;
-    }
-    .port-action-btn:hover { filter: brightness(1.15); }
-    .port-action-btn.equipped {
-      background: linear-gradient(180deg, #1d4ed8 0%, #1e3a8a 100%);
-      border-color: #93c5fd; cursor: default;
-    }
-
-    .market-grid-list {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px;
-    }
-    .port-market-item {
-      display: flex; justify-content: space-between; align-items: center; gap: 10px;
-      background: linear-gradient(180deg, #2c1d11, #191009);
-      border: 1.5px solid #7c5823; border-radius: 8px; padding: 10px 12px;
-    }
-    .port-market-info { display: flex; flex-direction: column; gap: 3px; }
-    .port-market-title { font-size: 13px; font-weight: 900; color: #ffd768; }
-    .port-market-sub { font-size: 11px; color: #cbb694; }
-
-    #market-feedback {
-      font-size: 12px; min-height: 18px; margin-top: 8px; text-align: center;
-      color: #4ade80; font-weight: 800;
-    }
+    #market-panel.open { display: block; }
+    .market-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 8px; margin-bottom: 10px; }
+    .market-header strong { color: #ffd783; font-size: 15px; }
+    .market-close { background: rgba(255,255,255,0.1); border: none; color: #cbd5e1; width: 28px; height: 28px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+    .market-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+    .market-tab-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 7px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .market-tab-btn.active { background: linear-gradient(135deg, #d97706, #92400e); color: #fff; border-color: #ffd783; }
+    .market-section { display: none; }
+    .market-section.active { display: block; }
+    .market-balance { display: flex; justify-content: space-between; font-size: 12px; background: rgba(0,0,0,0.35); padding: 8px 10px; border-radius: 8px; margin-bottom: 10px; color: #e2e8f0; }
+    .market-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(6, 16, 24, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 9px 11px; margin-bottom: 8px; }
+    .market-item-info { display: flex; flex-direction: column; gap: 2px; }
+    .market-item-title { font-size: 13px; font-weight: 700; color: #fff; }
+    .market-item-sub { font-size: 11px; color: #94a3b8; }
+    .buy-btn { padding: 6px 12px; border-radius: 8px; border: 1px solid #ffd783; background: linear-gradient(135deg, #d97706, #92400e); color: #fff; font-size: 12px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+    .buy-btn:disabled { opacity: 0.42; background: rgba(30, 41, 59, 0.8); cursor: not-allowed; }
+    .buy-btn.equipped { background: #1e40af; border-color: #60a5fa; color: #eff6ff; }
+    #market-feedback { font-size: 12px; min-height: 16px; margin-top: 6px; text-align: center; color: #4ade80; font-weight: 700; }
 
     #gameover {
       display: none; position: fixed; inset: 0; background: rgba(3, 11, 18, 0.92);
-      flex-direction: column; align-items: center; justify-content: center; z-index: 30; text-align: center; padding: 20px;
+      flex-direction: column; align-items: center; justify-content: center; z-index: 20; text-align: center; padding: 20px;
     }
     #gameover h1 { color: #ffd783; margin: 0 0 10px; font-size: 32px; }
     #gameover p { font-size: 16px; margin: 0 0 24px; color: #cbd5e1; }
@@ -468,14 +282,12 @@
 
   <div id="game"></div>
 
-  <div id="boss-alert">☠️ KIZIL SAKAL'IN KALYONU (BOSS) DENİZDE BELİRDİ!</div>
-
   <div id="player-label">
     <div class="ship-hp-track">
       <div id="player-ship-hp-fill"></div>
     </div>
     <div class="ship-name-tag" id="tag-username">Test</div>
-    <div class="ship-fleet-tag">[TST]</div>
+    <div class="ship-fleet-tag" id="tag-fleet">[TST]</div>
   </div>
 
   <div id="top-vital-hud">
@@ -497,14 +309,18 @@
 
   <div id="top-left-hud">
     <div class="radar-card">
-      <div class="radar-title">Harita 1</div>
+      <div class="radar-title" id="island-owner-title">Ada: Tarafsız</div>
       <canvas id="minimap" width="82" height="82"></canvas>
       <div class="coord-pill" id="coord-display">X: 0 · Y: 0</div>
     </div>
     <div class="side-tool-col">
-      <button id="port-toggle-btn" class="port-btn" type="button" title="Liman (L)">
+      <button id="market-toggle-btn" class="tool-icon-btn" type="button" title="Market (M)">
+        <span class="ico">⚖️</span>
+        <span class="lbl">Market</span>
+      </button>
+      <button id="shipyard-toggle-btn" class="tool-icon-btn" type="button" title="Tersane (T)">
         <span class="ico">⚓</span>
-        <span class="lbl">Liman</span>
+        <span class="lbl">Tersane</span>
       </button>
     </div>
   </div>
@@ -516,9 +332,9 @@
     </div>
     <div class="gold-row">
       <span>🪙</span>
-      <span id="score">1,000,000,000</span>
+      <span id="score">100,000,000</span>
     </div>
-    <div class="ship-sub-name" id="ship-title">Kızıl Kalyon</div>
+    <div class="ship-sub-name" id="ship-title">8 Yönlü Efsanevi Gemi</div>
   </div>
 
   <div id="bottom-dock">
@@ -563,163 +379,52 @@
     </div>
   </div>
 
-  <!-- KLASİK KORSAN LİMAN & MARKET PENCERESİ -->
-  <div id="port-modal-backdrop">
-    <div class="port-window">
-      <button id="port-close-btn" class="port-close-btn" type="button">✕</button>
-
-      <!-- Üst Altın & Elmas Göstergesi -->
-      <div class="port-top-bar">
-        <div class="port-currency">
-          <span>🪙</span>
-          <span id="port-gold-display">1.000.000.000</span>
+  <div id="market-panel">
+    <div class="market-header">
+      <strong>⚓ Cephane Marketi & Tersane</strong>
+      <button id="market-close-btn" class="market-close" type="button">✕</button>
+    </div>
+    <div class="market-tabs">
+      <button id="tab-market" class="market-tab-btn active" type="button">Gülle & Cephane</button>
+      <button id="tab-shipyard" class="market-tab-btn" type="button">Tersane</button>
+    </div>
+    <div class="market-balance">
+      <span>Hazine: <strong id="market-gold" style="color:#ffd783;">100,000,000</strong> Altın</span>
+    </div>
+    <div id="section-market" class="market-section active">
+      <div class="market-item">
+        <div class="market-item-info">
+          <span class="market-item-title">⚫ 25x Demir Gülle</span>
+          <span class="market-item-sub">180 Hasar · Standart top güllesi</span>
         </div>
-        <div class="port-main-title">LİMAN &amp; MARKET</div>
-        <div class="port-currency diamond">
-          <span id="port-diamond-display">1.103</span>
-          <span>💎</span>
-        </div>
+        <button class="buy-btn ammo-buy-btn" type="button" data-type="iron" data-amount="25" data-cost="20">20 Altın</button>
       </div>
-
-      <!-- İkonlu Sekmeler -->
-      <div class="port-tabs-bar">
-        <button class="port-tab active" data-tab="shipyard" type="button">
-          <span class="port-tab-icon">⛵</span>
-          <span class="port-tab-text">Tersane</span>
-        </button>
-        <button class="port-tab" data-tab="ammo" type="button">
-          <span class="port-tab-icon">💣</span>
-          <span class="port-tab-text">Gülle</span>
-        </button>
-        <button class="port-tab" data-tab="cannons" type="button">
-          <span class="port-tab-icon">💥</span>
-          <span class="port-tab-text">Top &amp; Silah</span>
-        </button>
-        <button class="port-tab" data-tab="crew" type="button">
-          <span class="port-tab-icon">🏴‍☠️</span>
-          <span class="port-tab-text">Tayfa</span>
-        </button>
-        <button class="port-tab" data-tab="packs" type="button">
-          <span class="port-tab-icon">🧰</span>
-          <span class="port-tab-text">Paketler</span>
-        </button>
+      <div class="market-item">
+        <div class="market-item-info">
+          <span class="market-item-title">⛓️ 15x Zincirli Gülle</span>
+          <span class="market-item-sub">140 Hasar · Düşmanı %50 yavaşlatır</span>
+        </div>
+        <button class="buy-btn ammo-buy-btn" type="button" data-type="chain" data-amount="15" data-cost="35">35 Altın</button>
       </div>
-
-      <!-- İçerik Bölümü -->
-      <div class="port-body">
-        <!-- 1. TERSANE SEKMESİ -->
-        <div id="port-sec-shipyard" class="port-section active">
-          <div class="port-stats-strip">
-            <div class="port-stat-box"><span>⭐ 53.157.535.283</span><span class="port-stat-q">?</span></div>
-            <div class="port-stat-box"><span>🛡️ 201.636.000</span><span class="port-stat-q">?</span></div>
-            <div class="port-stat-box"><span>⛵ 120</span><span class="port-stat-q">?</span></div>
-          </div>
-          <div class="port-info-desc">
-            Star Puan özel gülle atılarak kazanılır. Her 10m Star puanda %1 ekstra hasar. Her 50.000 defans puanı gemi canını %1 arttırır.
-          </div>
-
-          <div class="port-controls-row">
-            <select id="ship-category-filter" class="port-filter-select">
-              <option value="all">Star Tasarımlar (Tümü)</option>
-              <option value="mythic">Efsanevi &amp; Mistik</option>
-              <option value="war">Savaş Kalyonları</option>
-            </select>
-            <div class="port-pagination" id="ship-pagination"></div>
-          </div>
-
-          <div class="ship-cards-grid" id="shipyard-grid"></div>
+      <div class="market-item">
+        <div class="market-item-info">
+          <span class="market-item-title">🔥 15x Alevli Gülle</span>
+          <span class="market-item-sub">290 Hasar · Yüksek yanma gücü</span>
         </div>
-
-        <!-- 2. GÜLLE SEKMESİ -->
-        <div id="port-sec-ammo" class="port-section">
-          <div class="market-grid-list">
-            <div class="port-market-item">
-              <div class="port-market-info">
-                <span class="port-market-title">⚫ 25x Demir Gülle</span>
-                <span class="port-market-sub">180 Hasar · Standart top güllesi</span>
-              </div>
-              <button class="port-action-btn ammo-buy-btn" style="width:auto;" type="button" data-type="iron" data-amount="25" data-cost="20">20 Altın</button>
-            </div>
-            <div class="port-market-item">
-              <div class="port-market-info">
-                <span class="port-market-title">⛓️ 15x Zincirli Gülle</span>
-                <span class="port-market-sub">140 Hasar · Düşmanı %50 yavaşlatır</span>
-              </div>
-              <button class="port-action-btn ammo-buy-btn" style="width:auto;" type="button" data-type="chain" data-amount="15" data-cost="35">35 Altın</button>
-            </div>
-            <div class="port-market-item">
-              <div class="port-market-info">
-                <span class="port-market-title">🔥 15x Alevli Gülle</span>
-                <span class="port-market-sub">290 Hasar · Yüksek yanma gücü</span>
-              </div>
-              <button class="port-action-btn ammo-buy-btn" style="width:auto;" type="button" data-type="fire" data-amount="15" data-cost="60">60 Altın</button>
-            </div>
-            <div class="port-market-item">
-              <div class="port-market-info">
-                <span class="port-market-title">🐉 10x Ejderha Nefesi</span>
-                <span class="port-market-sub">450 Hasar · Efsanevi yıkım güllesi</span>
-              </div>
-              <button class="port-action-btn ammo-buy-btn" style="width:auto;" type="button" data-type="dragon" data-amount="10" data-cost="120">120 Altın</button>
-            </div>
-          </div>
+        <button class="buy-btn ammo-buy-btn" type="button" data-type="fire" data-amount="15" data-cost="60">60 Altın</button>
+      </div>
+      <div class="market-item">
+        <div class="market-item-info">
+          <span class="market-item-title">🐉 10x Ejderha Nefesi</span>
+          <span class="market-item-sub">450 Hasar · Efsanevi yıkım güllesi</span>
         </div>
-
-        <!-- 3. TOP & SİLAH SEKMESİ -->
-        <div id="port-sec-cannons" class="port-section">
-          <div class="market-grid-list">
-            <div class="port-market-item">
-              <div class="port-market-info">
-                <span class="port-market-title">💥 60 Librelik Kraliyet Topu</span>
-                <span class="port-market-sub">Tüm gülle hasarını kalıcı olarak +25 arttırır</span>
-              </div>
-              <button class="port-action-btn upgrade-buy-btn" style="width:auto;" type="button" data-cost="50000" data-bonus="damage">50.000 Altın</button>
-            </div>
-            <div class="port-market-item">
-              <div class="port-market-info">
-                <span class="port-market-title">🛡️ Güçlendirilmiş Meşe Gövde</span>
-                <span class="port-market-sub">Maksimum gemi canını +250.000 arttırır</span>
-              </div>
-              <button class="port-action-btn upgrade-buy-btn" style="width:auto;" type="button" data-cost="75000" data-bonus="hp">75.000 Altın</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- 4. TAYFA SEKMESİ -->
-        <div id="port-sec-crew" class="port-section">
-          <div class="market-grid-list">
-            <div class="port-market-item">
-              <div class="port-market-info">
-                <span class="port-market-title">🧭 Usta Dümenci</span>
-                <span class="port-market-sub">Gemi seyir hızını arttırır</span>
-              </div>
-              <button class="port-action-btn upgrade-buy-btn" style="width:auto;" type="button" data-cost="40000" data-bonus="speed">40.000 Altın</button>
-            </div>
-            <div class="port-market-item">
-              <div class="port-market-info">
-                <span class="port-market-title">🔨 Marangoz Tayfası</span>
-                <span class="port-market-sub">Gemi canını anında tamamen onarır</span>
-              </div>
-              <button class="port-action-btn upgrade-buy-btn" style="width:auto;" type="button" data-cost="5000" data-bonus="repair">5.000 Altın</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- 5. PAKETLER SEKMESİ -->
-        <div id="port-sec-packs" class="port-section">
-          <div class="market-grid-list">
-            <div class="port-market-item">
-              <div class="port-market-info">
-                <span class="port-market-title">🧰 Korsan Lordu Cephane Sandığı</span>
-                <span class="port-market-sub">+500 Alevli Gülle &amp; +250 Ejderha Nefesi</span>
-              </div>
-              <button class="port-action-btn upgrade-buy-btn" style="width:auto;" type="button" data-cost="25000" data-bonus="pack">25.000 Altın</button>
-            </div>
-          </div>
-        </div>
-
-        <div id="market-feedback"></div>
+        <button class="buy-btn ammo-buy-btn" type="button" data-type="dragon" data-amount="10" data-cost="120">120 Altın</button>
       </div>
     </div>
+    <div id="section-shipyard" class="market-section">
+      <div id="shipyard-list"></div>
+    </div>
+    <div id="market-feedback"></div>
   </div>
 
   <div id="gameover">
@@ -732,7 +437,7 @@
     <div class="auth-card">
       <div class="auth-brand">
         <h1>⚓ Korsan Dünyası</h1>
-        <p>8 Yönlü Şeffaf PNG Sprite Denizleri</p>
+        <p>Ada Savaşları & Savunma Kuleleri</p>
       </div>
       <div class="auth-tabs">
         <button id="tab-login" class="auth-tab active" type="button">Giriş Yap</button>
@@ -746,6 +451,10 @@
         <div class="auth-field">
           <label for="auth-password">Şifre</label>
           <input id="auth-password" type="password" autocomplete="current-password" placeholder="Şifre" required>
+        </div>
+        <div class="auth-field">
+          <label for="auth-fleet">Filo Tag (Örn: [BAF])</label>
+          <input id="auth-fleet" type="text" value="[BAF]" required>
         </div>
         <div id="auth-msg" class="auth-msg"></div>
         <button id="auth-submit" class="auth-submit" type="submit">DENİZE AÇIL</button>
@@ -765,7 +474,6 @@ const expTextEl = document.querySelector('#exp-text');
 const hpBarEl = document.querySelector('#hp-bar');
 const expBarEl = document.querySelector('#exp-bar');
 const coordDisplayEl = document.querySelector('#coord-display');
-const bossAlertEl = document.querySelector('#boss-alert');
 
 const attackBtn = document.querySelector('#attack-btn');
 const attackBtnText = document.querySelector('#attack-btn-text');
@@ -790,15 +498,18 @@ const captainNameEl = document.querySelector('#captain-name');
 const shipTitleEl = document.querySelector('#ship-title');
 const logoutBtn = document.querySelector('#logout-btn');
 
-// Liman Modal Referansları
-const portToggleBtn = document.querySelector('#port-toggle-btn');
-const portModalBackdrop = document.querySelector('#port-modal-backdrop');
-const portCloseBtn = document.querySelector('#port-close-btn');
-const portGoldDisplayEl = document.querySelector('#port-gold-display');
+const marketToggleBtn = document.querySelector('#market-toggle-btn');
+const shipyardToggleBtn = document.querySelector('#shipyard-toggle-btn');
+const marketPanel = document.querySelector('#market-panel');
+const marketCloseBtn = document.querySelector('#market-close-btn');
+const marketGoldEl = document.querySelector('#market-gold');
 const marketFeedbackEl = document.querySelector('#market-feedback');
-const shipyardGridEl = document.querySelector('#shipyard-grid');
-const shipPaginationEl = document.querySelector('#ship-pagination');
-const shipCategoryFilter = document.querySelector('#ship-category-filter');
+const shipyardListEl = document.querySelector('#shipyard-list');
+
+const tabMarket = document.querySelector('#tab-market');
+const tabShipyard = document.querySelector('#tab-shipyard');
+const sectionMarket = document.querySelector('#section-market');
+const sectionShipyard = document.querySelector('#section-shipyard');
 
 const authOverlay = document.querySelector('#auth-overlay');
 const tabLogin = document.querySelector('#tab-login');
@@ -806,6 +517,7 @@ const tabRegister = document.querySelector('#tab-register');
 const authForm = document.querySelector('#auth-form');
 const authUsernameInput = document.querySelector('#auth-username');
 const authPasswordInput = document.querySelector('#auth-password');
+const authFleetInput = document.querySelector('#auth-fleet');
 const authMsgEl = document.querySelector('#auth-msg');
 const authSubmitBtn = document.querySelector('#auth-submit');
 const fillTestBtn = document.querySelector('#fill-test-btn');
@@ -816,6 +528,8 @@ const mctx = miniCanvas.getContext('2d');
 const playerLabelEl = document.querySelector('#player-label');
 const playerShipHpFillEl = document.querySelector('#player-ship-hp-fill');
 const tagUsernameEl = document.querySelector('#tag-username');
+const tagFleetEl = document.querySelector('#tag-fleet');
+const islandOwnerTitleEl = document.querySelector('#island-owner-title');
 
 function formatShortNumber(num) {
   if (num >= 1000000000) return (num / 1000000000).toFixed(num % 1000000000 !== 0 ? 1 : 0) + 't';
@@ -831,23 +545,25 @@ const AMMO_TYPES = {
   dragon: { id: 'dragon', name: 'Ejderha Nefesi', damage: 450, slow: 0.85, desc: '450 Efsanevi Hasar', color: 0x3b82f6 }
 };
 
-// TAMAMEN ÖZGÜN & TELİFSİZ GEMİ TASARIMLARI
 const SHIP_MODELS = {
-  standard: { id: 'standard', name: 'Kızıl Kalyon',       category: 'war',    desc: 'Standart Donanma Savaş Kalyonu', cost: 0 },
-  skull:    { id: 'skull',    name: 'Kafatası Baronu',    category: 'mythic', desc: 'Burnunda parlayan kafatası figürü ve kemik oymaları', cost: 100000 },
-  dragon:   { id: 'dragon',   name: 'Alev Ejderi',        category: 'mythic', desc: 'Kükreyen ejderha başlığı ve kızıl pullu zırh', cost: 500000 },
-  eagle:    { id: 'eagle',    name: 'Gök Şahini',         category: 'war',    desc: 'Kanat açmış görkemli şahin figürlü amiral gemisi', cost: 1200000 },
-  lion:     { id: 'lion',     name: 'Altın Yele',         category: 'war',    desc: 'Saf altın döküm kükreyen aslan başlığı', cost: 2500000 },
-  ghost:    { id: 'ghost',    name: 'Ay Sfenksi',         category: 'mythic', desc: 'Ay sfenksi motifleri ve gizemli mor aura', cost: 5000000 },
-  poseidon: { id: 'poseidon', name: 'Üççatal Muhafızı',   category: 'mythic', desc: 'Devasa üççatal mızraklı okyanus hakimi', cost: 10000000 },
-  wolf:     { id: 'wolf',     name: 'Kuzey Kurdu',        category: 'war',    desc: 'Kuzeyin vahşi kurt başlığı ve buz mavisi yelkenler', cost: 20000000 },
-  titan:    { id: 'titan',    name: 'Zırhlı Koçbaşı',     category: 'war',    desc: 'Çift katmanlı koçbaşı zırhlı yıkılmaz dev', cost: 40000000 },
-  kraken:   { id: 'kraken',   name: 'Derinlik Vantuzu',   category: 'mythic', desc: 'Gövdesini saran zümrüt dokunaç oymaları', cost: 75000000 },
-  scales:   { id: 'scales',   name: 'Korsan Mührü',       category: 'war',    desc: 'Antik korsan lordlarının altın terazi sembolü', cost: 150000000 }
+  standard:       { id: 'standard',       name: '8 Yönlü Efsanevi Gemi', desc: 'Şeffaf PNG Sprite Filosu', cost: 0, tint: 0xffffff, emissive: 0x000000, extraCanvasType: 'none' },
+  ghost:          { id: 'ghost',          name: 'Hayalet Fırkateyn',    desc: 'Karanlık sisli sulara özel gizli gövde', cost: 5000000, tint: 0x38bdf8, emissive: 0x0369a1, extraCanvasType: 'ghost' },
+  gold:           { id: 'gold',           name: 'Altın Korsan',        desc: 'Servet ve ihtişam saçan yaldızlı kalyon', cost: 15000000, tint: 0xfbbf24, emissive: 0xd97706, extraCanvasType: 'gold' },
+  dragon:         { id: 'dragon',         name: 'Kızıl Ejder',         desc: 'Ejderha nefesi gücünü artıran efsane', cost: 35000000, tint: 0xef4444, emissive: 0x991b1b, extraCanvasType: 'dragon' },
+  skull_lord:     { id: 'skull_lord',     name: 'Kuru Kafa Lordu',     desc: 'Devasa tüylü korsan bayrağı ve pruvada parlayan dev kuru kafa', cost: 50000000, tint: 0xf1f5f9, emissive: 0x475569, extraCanvasType: 'skull' },
+  kraken_beast:   { id: 'kraken_beast',   name: 'Kraken Dehşeti',      desc: 'Denizlerin kabusu, dev yeşil dokunaçlarla sarılı gövde', cost: 75000000, tint: 0x065f46, emissive: 0x047857, extraCanvasType: 'kraken' },
+  phoenix_wing:   { id: 'phoenix_wing',   name: 'Zümrüdüanka',         desc: 'Küllerinden doğan, alev renkli devasa dev yelken donanımı', cost: 100000000, tint: 0xf97316, emissive: 0xc2410c, extraCanvasType: 'phoenix' },
+  shadow_phantom: { id: 'shadow_phantom', name: 'Gölge Hayaleti',      desc: 'Gecenin karanlığına bürünmüş, kalın zırh çizgili gizli fırkateyn', cost: 130000000, tint: 0x1e1b4b, emissive: 0x4338ca, extraCanvasType: 'shadow' },
+  titan_iron:     { id: 'titan_iron',     name: 'Demir Titan',         desc: 'Kalın çelik zırh plakalarıyla kaplanmış devasa savaş gemisi', cost: 160000000, tint: 0x64748b, emissive: 0x334155, extraCanvasType: 'titan' },
+  frost_wyrm:     { id: 'frost_wyrm',     name: 'Buz Ejderi',          desc: 'Kuzeyin buzlu denizlerinden gelen dev buz kristali pruva', cost: 200000000, tint: 0x93c5fd, emissive: 0x2563eb, extraCanvasType: 'frost' },
+  blood_reaper:   { id: 'blood_reaper',   name: 'Kızıl Azrail',        desc: 'Düşman kanıyla boyanmış kana susamış korkunç savaş kalyonu', cost: 250000000, tint: 0x991b1b, emissive: 0x7f1d1d, extraCanvasType: 'blood' },
+  thunder_storm:  { id: 'thunder_storm',  name: 'Fırtına Koparan',     desc: 'Yıldırım çakan direkler ve elektrik enerjisi saçan yelkenler', cost: 300000000, tint: 0xfde047, emissive: 0xca8a04, extraCanvasType: 'thunder' },
+  royal_emperor:  { id: 'royal_emperor',  name: 'İmparatorun Tacı',    desc: 'Kraliyet armaları ve parlayan saf elmas işlemeli amiral gemisi', cost: 400000000, tint: 0xe0e7ff, emissive: 0x6366f1, extraCanvasType: 'royal' },
+  void_destroyer: { id: 'void_destroyer', name: 'Hiçlik Yokedicisi',   desc: 'Evrenin derinliklerinden gelen mor kozmik enerji yayan son teknoloji', cost: 500000000, tint: 0xd946ef, emissive: 0x86198f, extraCanvasType: 'void' }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v36';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v36';
+const USERS_STORAGE_KEY = 'pirate3d_users_v29';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v29';
 let authMode = 'login';
 let currentUser = null;
 
@@ -855,7 +571,7 @@ function loadUsers() {
   let users = [];
   try { users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]'); } catch { users = []; }
   if (!users.some(u => u.username.toLowerCase() === 'test')) {
-    users.push({ id: 'user_test', username: 'Test', password: 'test', ownedShips: Object.keys(SHIP_MODELS), equippedShip: 'standard' });
+    users.push({ id: 'user_test', username: 'Test', password: 'test', fleet: '[BAF]', ownedShips: ['standard'], equippedShip: 'standard' });
     localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
   }
   return users;
@@ -876,19 +592,21 @@ function setAuthMode(mode) {
 }
 if (tabLogin) tabLogin.addEventListener('click', () => setAuthMode('login'));
 if (tabRegister) tabRegister.addEventListener('click', () => setAuthMode('register'));
-if (fillTestBtn) fillTestBtn.addEventListener('click', () => { authUsernameInput.value = 'Test'; authPasswordInput.value = 'test'; });
+if (fillTestBtn) fillTestBtn.addEventListener('click', () => { authUsernameInput.value = 'Test'; authPasswordInput.value = 'test'; authFleetInput.value = '[BAF]'; });
 
 function completeLogin(user) {
   currentUser = { 
     id: user.id, 
     username: user.username, 
-    ownedShips: Object.keys(SHIP_MODELS),
+    fleet: user.fleet || '[BAF]',
+    ownedShips: user.ownedShips || ['standard'], 
     equippedShip: user.equippedShip || 'standard' 
   };
   localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
   captainNameEl.textContent = currentUser.username;
   tagUsernameEl.textContent = currentUser.username;
-  shipTitleEl.textContent = SHIP_MODELS[currentUser.equippedShip]?.name || 'Kızıl Kalyon';
+  tagFleetEl.textContent = currentUser.fleet;
+  shipTitleEl.textContent = SHIP_MODELS[currentUser.equippedShip]?.name || '8 Yönlü Efsanevi Gemi';
   authOverlay.style.display = 'none';
   initThreeGame();
 }
@@ -896,11 +614,13 @@ function completeLogin(user) {
 if (authForm) {
   authForm.addEventListener('submit', e => {
     e.preventDefault();
-    const uname = authUsernameInput.value.trim(); const pass = authPasswordInput.value;
+    const uname = authUsernameInput.value.trim(); 
+    const pass = authPasswordInput.value;
+    const fleet = authFleetInput.value.trim() || '[BAF]';
     const users = loadUsers();
     if (authMode === 'register') {
       if (users.some(u => u.username.toLowerCase() === uname.toLowerCase())) { authMsgEl.textContent = 'Bu isim zaten kayıtlı.'; return; }
-      const nu = { id: 'u_' + Date.now(), username: uname, password: pass, ownedShips: Object.keys(SHIP_MODELS), equippedShip: 'standard' };
+      const nu = { id: 'u_' + Date.now(), username: uname, password: pass, fleet, ownedShips: ['standard'], equippedShip: 'standard' };
       users.push(nu); saveUsers(users);
       setTimeout(() => completeLogin(nu), 200);
     } else {
@@ -916,20 +636,18 @@ if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeIt
 // THREE.JS SAHNE & OYUN MOTORU
 // ==========================================================
 let scene, camera, renderer;
-let playerSprite, playerNeonRing, enemies = [], rangeRingMesh, oceanTexture, oceanBumpTexture;
-let clickMarkerGroup, clickOuterRing, clickInnerRing, clickRipples = [];
-let selectedEnemyRing = null;
+let playerSprite, playerNeonRing, enemies = [], defenseTowers = [], fortressIsland = null, rangeRingMesh, oceanTexture, oceanBumpTexture;
 let activeProjectiles = [], particleSystems = [];
 let raycaster, planeGeo, mouse;
-let baseShipTextures = {};
-let customShipTextures = {};
+let shipTextures = {};
 let textureLoader;
 const WORLD_SIZE = 1000;
 const ATTACK_RANGE = 280;
 const AGGRO_RANGE = 280;
 const BASE_SHIP_HEIGHT = 95;
 const SHIP_Y_POS = 110;
-const SHIP_COLLISION_RADIUS = 24;
+
+let islandOwnerFleet = null; // Adanın sahibi olan filo
 
 function createStaticOceanTextures() {
   const size = 1024;
@@ -996,112 +714,7 @@ function createStaticOceanTextures() {
   return { mapTex, bumpTex };
 }
 
-function drawCustomFigureOnCanvas(ctx, w, h, shipId) {
-  if (shipId === 'standard') return;
-  const cx = w / 2;
-  const cy = h / 2;
-
-  ctx.save();
-  ctx.translate(cx, cy);
-
-  if (shipId === 'skull') {
-    ctx.fillStyle = '#f8fafc';
-    ctx.strokeStyle = '#0f172a';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.arc(0, -h * 0.28, 16, 0, Math.PI * 2);
-    ctx.fill(); ctx.stroke();
-    ctx.fillStyle = '#000';
-    ctx.fillRect(-6, -h * 0.32, 4, 6);
-    ctx.fillRect(2, -h * 0.32, 4, 6);
-  } else if (shipId === 'dragon') {
-    ctx.fillStyle = '#ef4444';
-    ctx.strokeStyle = '#b91c1c';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(0, -h * 0.38);
-    ctx.lineTo(-12, -h * 0.22);
-    ctx.lineTo(12, -h * 0.22);
-    ctx.closePath();
-    ctx.fill(); ctx.stroke();
-    ctx.fillStyle = '#fbbf24';
-    ctx.fillRect(-16, -h * 0.34, 6, 12);
-    ctx.fillRect(10, -h * 0.34, 6, 12);
-  } else if (shipId === 'eagle') {
-    ctx.fillStyle = '#e2e8f0';
-    ctx.strokeStyle = '#475569';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(0, -h * 0.38);
-    ctx.lineTo(-18, -h * 0.26);
-    ctx.lineTo(18, -h * 0.26);
-    ctx.closePath();
-    ctx.fill(); ctx.stroke();
-    ctx.fillStyle = '#f59e0b';
-    ctx.beginPath();
-    ctx.moveTo(0, -h * 0.22);
-    ctx.lineTo(-5, -h * 0.28);
-    ctx.lineTo(5, -h * 0.28);
-    ctx.closePath();
-    ctx.fill();
-  } else if (shipId === 'lion') {
-    ctx.fillStyle = '#d97706';
-    ctx.beginPath();
-    ctx.arc(0, -h * 0.28, 18, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#fbbf24';
-    ctx.beginPath();
-    ctx.arc(0, -h * 0.28, 11, 0, Math.PI * 2);
-    ctx.fill();
-  } else if (shipId === 'ghost') {
-    ctx.fillStyle = '#a855f7';
-    ctx.shadowColor = '#c084fc';
-    ctx.shadowBlur = 12;
-    ctx.beginPath();
-    ctx.arc(0, -h * 0.28, 14, 0, Math.PI * 2);
-    ctx.fill();
-  } else if (shipId === 'poseidon') {
-    ctx.strokeStyle = '#38bdf8';
-    ctx.lineWidth = 6;
-    ctx.beginPath();
-    ctx.moveTo(0, -h * 0.38);
-    ctx.lineTo(0, -h * 0.18);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(-10, -h * 0.38); ctx.lineTo(-10, -h * 0.30);
-    ctx.moveTo(10, -h * 0.38); ctx.lineTo(10, -h * 0.30);
-    ctx.stroke();
-  } else if (shipId === 'wolf') {
-    ctx.fillStyle = '#38bdf8';
-    ctx.beginPath();
-    ctx.moveTo(0, -h * 0.36);
-    ctx.lineTo(-14, -h * 0.22);
-    ctx.lineTo(14, -h * 0.22);
-    ctx.closePath();
-    ctx.fill();
-  } else if (shipId === 'titan') {
-    ctx.fillStyle = '#64748b';
-    ctx.strokeStyle = '#334155';
-    ctx.lineWidth = 4;
-    ctx.fillRect(-12, -h * 0.32, 24, 16);
-    ctx.strokeRect(-12, -h * 0.32, 24, 16);
-  } else if (shipId === 'kraken') {
-    ctx.strokeStyle = '#10b981';
-    ctx.lineWidth = 5;
-    ctx.beginPath();
-    ctx.moveTo(-12, -h * 0.25);
-    ctx.quadraticCurveTo(0, -h * 0.38, 12, -h * 0.25);
-    ctx.stroke();
-  } else if (shipId === 'scales') {
-    ctx.fillStyle = '#fbbf24';
-    ctx.fillRect(-2, -h * 0.36, 4, 18);
-    ctx.fillRect(-12, -h * 0.30, 24, 4);
-  }
-
-  ctx.restore();
-}
-
-function normalizeSpriteTexture(rawTexture) {
+function normalizeSpriteTexture(rawTexture, extraType = 'none') {
   const img = rawTexture.image;
   if (!img || !img.width) return { texture: rawTexture, aspect: 1 };
 
@@ -1144,58 +757,59 @@ function normalizeSpriteTexture(rawTexture) {
   const tCtx = trimCanvas.getContext('2d');
   tCtx.drawImage(img, minX, minY, trimW, trimH, 0, 0, trimW, trimH);
 
+  if (extraType && extraType !== 'none') {
+    tCtx.save();
+    const cx = trimW / 2;
+    const cy = trimH / 2;
+
+    if (extraType === 'skull') {
+      tCtx.fillStyle = '#ffffff';
+      tCtx.strokeStyle = '#ff0000';
+      tCtx.lineWidth = 4;
+      tCtx.beginPath(); tCtx.arc(cx, cy - 18, 18, 0, Math.PI * 2); tCtx.fill(); tCtx.stroke();
+      tCtx.fillRect(cx - 10, cy - 8, 20, 18);
+      tCtx.strokeRect(cx - 10, cy - 8, 20, 18);
+      tCtx.strokeStyle = '#f8fafc'; tCtx.lineWidth = 6;
+      tCtx.beginPath(); tCtx.moveTo(cx - 28, cy - 30); tCtx.lineTo(cx + 28, cy + 20); tCtx.stroke();
+      tCtx.beginPath(); tCtx.moveTo(cx + 28, cy - 30); tCtx.lineTo(cx - 28, cy + 20); tCtx.stroke();
+    } else if (extraType === 'kraken') {
+      tCtx.strokeStyle = '#34d399'; tCtx.fillStyle = '#059669'; tCtx.lineWidth = 8;
+      tCtx.beginPath(); tCtx.moveTo(cx - 22, cy - 10); tCtx.quadraticCurveTo(cx - 55, cy + 15, cx - 30, cy + 50); tCtx.stroke();
+      tCtx.beginPath(); tCtx.moveTo(cx + 22, cy - 10); tCtx.quadraticCurveTo(cx + 55, cy + 15, cx + 30, cy + 50); tCtx.stroke();
+    } else if (extraType === 'phoenix') {
+      tCtx.fillStyle = 'rgba(255, 100, 0, 0.95)';
+      tCtx.strokeStyle = '#ffff00'; tCtx.lineWidth = 3;
+      tCtx.beginPath(); tCtx.ellipse(cx - 22, cy, 18, 38, -0.4, 0, Math.PI * 2); tCtx.fill(); tCtx.stroke();
+      tCtx.beginPath(); tCtx.ellipse(cx + 22, cy, 18, 38, 0.4, 0, Math.PI * 2); tCtx.fill(); tCtx.stroke();
+    } else if (extraType === 'shadow' || extraType === 'titan') {
+      tCtx.fillStyle = extraType === 'titan' ? '#94a3b8' : '#4338ca';
+      tCtx.strokeStyle = '#ffffff'; tCtx.lineWidth = 4;
+      tCtx.fillRect(cx - 22, cy - 35, 44, 18);
+      tCtx.strokeRect(cx - 22, cy - 35, 44, 18);
+      tCtx.fillRect(cx - 26, cy - 10, 52, 20);
+      tCtx.strokeRect(cx - 26, cy - 10, 52, 20);
+    } else if (extraType === 'frost' || extraType === 'dragon') {
+      tCtx.fillStyle = extraType === 'frost' ? '#38bdf8' : '#ef4444';
+      tCtx.strokeStyle = '#ffffff'; tCtx.lineWidth = 4;
+      tCtx.beginPath(); tCtx.moveTo(cx, cy - 55); tCtx.lineTo(cx - 18, cy - 22); tCtx.lineTo(cx + 18, cy - 22); tCtx.closePath(); tCtx.fill(); tCtx.stroke();
+    } else if (extraType === 'blood' || extraType === 'royal') {
+      tCtx.fillStyle = extraType === 'blood' ? '#dc2626' : '#fbbf24';
+      tCtx.strokeStyle = '#ffffff'; tCtx.lineWidth = 4;
+      tCtx.fillRect(cx - 16, cy - 40, 32, 32);
+      tCtx.strokeRect(cx - 16, cy - 40, 32, 32);
+    } else if (extraType === 'thunder') {
+      tCtx.strokeStyle = '#fde047'; tCtx.lineWidth = 6;
+      tCtx.beginPath(); tCtx.moveTo(cx, cy - 45); tCtx.lineTo(cx - 16, cy - 10); tCtx.lineTo(cx + 10, cy - 5); tCtx.lineTo(cx - 6, cy + 35); tCtx.stroke();
+    } else if (extraType === 'void') {
+      tCtx.strokeStyle = '#e879f9'; tCtx.lineWidth = 6;
+      tCtx.beginPath(); tCtx.arc(cx, cy, 36, 0, Math.PI * 2); tCtx.stroke();
+    }
+    tCtx.restore();
+  }
+
   const normalizedTex = new THREE.CanvasTexture(trimCanvas);
   normalizedTex.generateMipmaps = true;
   return { texture: normalizedTex, aspect: trimW / trimH };
-}
-
-function generateCustomShipTexture(baseRawTexture, shipId) {
-  if (shipId === 'standard') return normalizeSpriteTexture(baseRawTexture);
-
-  const img = baseRawTexture.image;
-  if (!img || !img.width) return normalizeSpriteTexture(baseRawTexture);
-
-  const canvas = document.createElement('canvas');
-  canvas.width = img.width;
-  canvas.height = img.height;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(img, 0, 0);
-
-  drawCustomFigureOnCanvas(ctx, canvas.width, canvas.height, shipId);
-
-  let minX = canvas.width, minY = canvas.height, maxX = 0, maxY = 0;
-  let foundOpaque = false;
-  try {
-    const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-    for (let y = 0; y < canvas.height; y++) {
-      for (let x = 0; x < canvas.width; x++) {
-        if (data[(y * canvas.width + x) * 4 + 3] > 20) {
-          if (x < minX) minX = x; if (x > maxX) maxX = x;
-          if (y < minY) minY = y; if (y > maxY) maxY = y;
-          foundOpaque = true;
-        }
-      }
-    }
-  } catch (e) {
-    const fallbackTex = new THREE.CanvasTexture(canvas);
-    return { texture: fallbackTex, aspect: canvas.width / canvas.height };
-  }
-
-  if (!foundOpaque || maxX <= minX || maxY <= minY) {
-    const fallbackTex = new THREE.CanvasTexture(canvas);
-    return { texture: fallbackTex, aspect: canvas.width / canvas.height };
-  }
-
-  const trimW = maxX - minX + 1;
-  const trimH = maxY - minY + 1;
-  const trimCanvas = document.createElement('canvas');
-  trimCanvas.width = trimW; trimCanvas.height = trimH;
-  const tCtx = trimCanvas.getContext('2d');
-  tCtx.drawImage(canvas, minX, minY, trimW, trimH, 0, 0, trimW, trimH);
-
-  const finalTex = new THREE.CanvasTexture(trimCanvas);
-  finalTex.generateMipmaps = true;
-  return { texture: finalTex, aspect: trimW / trimH };
 }
 
 function loadShipTextures(onAllLoaded) {
@@ -1215,7 +829,7 @@ function loadShipTextures(onAllLoaded) {
 
   for (const [key, src] of Object.entries(textureFiles)) {
     textureLoader.load(src, (tex) => {
-      baseShipTextures[key] = tex;
+      shipTextures[key] = normalizeSpriteTexture(tex, 'none');
       loadedCount++;
       if (loadedCount === total && onAllLoaded) onAllLoaded();
     }, undefined, () => {
@@ -1225,88 +839,50 @@ function loadShipTextures(onAllLoaded) {
   }
 }
 
-function getShipTexturesById(shipId = 'standard') {
-  if (customShipTextures[shipId]) return customShipTextures[shipId];
-
-  const generated = {};
-  for (const [key, rawTex] of Object.entries(baseShipTextures)) {
-    generated[key] = generateCustomShipTexture(rawTex, shipId);
-  }
-  customShipTextures[shipId] = generated;
-  return generated;
-}
-
 function getDirectionSpriteData(angle, shipId = 'standard') {
-  const textures = getShipTexturesById(shipId);
   let deg = (angle * (180 / Math.PI)) % 360;
   if (deg < 0) deg += 360;
 
-  if (deg >= 337.5 || deg < 22.5) return textures.right || textures.top;
-  if (deg >= 22.5 && deg < 67.5) return textures.bottomRight || textures.top;
-  if (deg >= 67.5 && deg < 112.5) return textures.bottom || textures.right;
-  if (deg >= 112.5 && deg < 157.5) return textures.bottomLeft || textures.top;
-  if (deg >= 157.5 && deg < 202.5) return textures.left || textures.top;
-  if (deg >= 202.5 && deg < 247.5) return textures.topLeft || textures.top;
-  if (deg >= 247.5 && deg < 292.5) return textures.top || textures.right;
-  return textures.topRight || textures.top;
+  let rawKey = 'top';
+  if (deg >= 337.5 || deg < 22.5) rawKey = 'right';
+  else if (deg >= 22.5 && deg < 67.5) rawKey = 'bottomRight';
+  else if (deg >= 67.5 && deg < 112.5) rawKey = 'bottom';
+  else if (deg >= 112.5 && deg < 157.5) rawKey = 'bottomLeft';
+  else if (deg >= 157.5 && deg < 202.5) rawKey = 'left';
+  else if (deg >= 202.5 && deg < 247.5) rawKey = 'topLeft';
+  else if (deg >= 247.5 && deg < 292.5) rawKey = 'top';
+  else rawKey = 'topRight';
+
+  const rawTex = shipTextures[rawKey] || shipTextures.top;
+  if (!rawTex) return null;
+
+  const modelSpec = SHIP_MODELS[shipId] || SHIP_MODELS.standard;
+  if (modelSpec.extraCanvasType && modelSpec.extraCanvasType !== 'none') {
+    const origImg = shipTextures[rawKey]?.texture?.image;
+    if (origImg) {
+      const dummyTex = new THREE.Texture(origImg);
+      dummyTex.needsUpdate = true;
+      return normalizeSpriteTexture(dummyTex, modelSpec.extraCanvasType);
+    }
+  }
+
+  return rawTex;
 }
 
-function applyNormalizedSprite(sprite, angle, baseHeight = BASE_SHIP_HEIGHT, shipId = 'standard') {
+function applySpriteByAngle(sprite, angle, baseHeight = BASE_SHIP_HEIGHT, shipId = 'standard') {
   const data = getDirectionSpriteData(angle, shipId);
   if (!data) return;
   sprite.material.map = data.texture;
   sprite.scale.set(baseHeight * data.aspect, baseHeight, 1);
-}
 
-function spawnClickRipple(x, z) {
-  if (clickMarkerGroup) {
-    clickMarkerGroup.position.set(x, 1.0, z);
-    clickMarkerGroup.visible = true;
+  const modelSpec = SHIP_MODELS[shipId] || SHIP_MODELS.standard;
+  if (modelSpec.tint) {
+    sprite.material.color.setHex(modelSpec.tint);
   }
-
-  const rGeo = new THREE.RingGeometry(4, 7, 36);
-  const rMat = new THREE.MeshBasicMaterial({
-    color: 0x38bdf8,
-    side: THREE.DoubleSide,
-    transparent: true,
-    opacity: 0.9
-  });
-  const rMesh = new THREE.Mesh(rGeo, rMat);
-  rMesh.rotation.x = -Math.PI / 2;
-  rMesh.position.set(x, 1.1, z);
-  scene.add(rMesh);
-
-  clickRipples.push({ mesh: rMesh, scale: 1, opacity: 0.9 });
-}
-
-function resolveIslandCollisions(entity, radius = SHIP_COLLISION_RADIUS) {
-  let collided = false;
-  for (const isl of gameIslands) {
-    const ix = isl.mesh.position.x;
-    const iz = isl.mesh.position.z;
-    const dx = entity.x - ix;
-    const dz = entity.z - iz;
-    const dist = Math.hypot(dx, dz);
-    const minDist = isl.r + radius;
-
-    if (dist < minDist) {
-      collided = true;
-      const pushDist = minDist - dist;
-      const nx = dist > 0.001 ? dx / dist : 1;
-      const nz = dist > 0.001 ? dz / dist : 0;
-      entity.x += nx * pushDist;
-      entity.z += nz * pushDist;
-    }
+  if (modelSpec.emissive) {
+    sprite.material.emissive = new THREE.Color(modelSpec.emissive);
+    sprite.material.emissiveIntensity = 0.6;
   }
-  return collided;
-}
-
-function isPositionInsideIsland(x, z, buffer = 80) {
-  for (const isl of gameIslands) {
-    const dist = Math.hypot(x - isl.mesh.position.x, z - isl.mesh.position.z);
-    if (dist < isl.r + buffer) return true;
-  }
-  return false;
 }
 
 function initThreeGame() {
@@ -1356,35 +932,11 @@ function initThreeGame() {
   scene.add(rangeRingMesh);
 
   const neonGeo = new THREE.RingGeometry(32, 38, 48);
-  const neonMat = new THREE.MeshBasicMaterial({ color: 0x0ea5e9, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
+  const neonMat = new THREE.MeshBasicMaterial({ color: 0x0ea5e9, side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
   playerNeonRing = new THREE.Mesh(neonGeo, neonMat);
   playerNeonRing.rotation.x = -Math.PI / 2;
   playerNeonRing.position.y = 0.8;
   scene.add(playerNeonRing);
-
-  const selRingGeo = new THREE.RingGeometry(26, 32, 48);
-  const selRingMat = new THREE.MeshBasicMaterial({ color: 0xef4444, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
-  selectedEnemyRing = new THREE.Mesh(selRingGeo, selRingMat);
-  selectedEnemyRing.rotation.x = -Math.PI / 2;
-  selectedEnemyRing.position.y = 0.85;
-  selectedEnemyRing.visible = false;
-  scene.add(selectedEnemyRing);
-
-  clickMarkerGroup = new THREE.Group();
-  const outerGeo = new THREE.RingGeometry(14, 18, 36);
-  const outerMat = new THREE.MeshBasicMaterial({ color: 0xfbbf24, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
-  clickOuterRing = new THREE.Mesh(outerGeo, outerMat);
-  clickOuterRing.rotation.x = -Math.PI / 2;
-
-  const innerGeo = new THREE.RingGeometry(4, 7, 36);
-  const innerMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.95 });
-  clickInnerRing = new THREE.Mesh(innerGeo, innerMat);
-  clickInnerRing.rotation.x = -Math.PI / 2;
-
-  clickMarkerGroup.add(clickOuterRing);
-  clickMarkerGroup.add(clickInnerRing);
-  clickMarkerGroup.visible = false;
-  scene.add(clickMarkerGroup);
 
   raycaster = new THREE.Raycaster();
   mouse = new THREE.Vector2();
@@ -1398,16 +950,41 @@ function initThreeGame() {
   window.addEventListener('pointerdown', e => {
     if (
       e.target.closest('#top-vital-hud') ||
-      e.target.closest('#top-left-hud') ||
       e.target.closest('#top-right-hud') ||
       e.target.closest('#bottom-dock') ||
-      e.target.closest('#port-modal-backdrop') ||
-      e.target.closest('#auth-overlay')
+      e.target.closest('#market-panel') ||
+      e.target.closest('#auth-overlay') ||
+      e.target.closest('.side-tool-col')
     ) return;
+
+    if (e.target.closest('#minimap')) {
+      const rect = miniCanvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+      const w = miniCanvas.width, h = miniCanvas.height;
+      const mapWorldX = ((clickX - w / 2) / (w / 2)) * (WORLD_SIZE / 2);
+      const mapWorldZ = ((clickY - h / 2) / (h / 2)) * (WORLD_SIZE / 2);
+      targetPos = { x: mapWorldX, z: mapWorldZ };
+      return;
+    }
 
     mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
+
+    // Kulelere tıklanıp seçilebilmesi
+    const towerMeshes = defenseTowers.map(t => t.mesh);
+    const towerIntersects = raycaster.intersectObjects(towerMeshes);
+    if (towerIntersects.length > 0) {
+      let obj = towerIntersects.object || towerIntersects[0].object;
+      if (obj.userData.towerId) {
+        selectedEnemyId = 'tower_' + obj.userData.towerId;
+        isAttacking = false;
+        updateTargetCard();
+        syncAttackButton();
+        return;
+      }
+    }
 
     const enemySprites = enemies.map(en => en.sprite);
     const intersects = raycaster.intersectObjects(enemySprites);
@@ -1415,6 +992,7 @@ function initThreeGame() {
       let obj = intersects[0].object;
       if (obj.userData.enemyId) {
         selectedEnemyId = obj.userData.enemyId;
+        isAttacking = false;
         updateTargetCard();
         syncAttackButton();
         return;
@@ -1423,104 +1001,107 @@ function initThreeGame() {
 
     const oceanIntersect = raycaster.intersectObject(ocean);
     if (oceanIntersect.length > 0) {
-      let tx = oceanIntersect[0].point.x;
-      let tz = oceanIntersect[0].point.z;
-
-      for (const isl of gameIslands) {
-        const dx = tx - isl.mesh.position.x;
-        const dz = tz - isl.mesh.position.z;
-        const dist = Math.hypot(dx, dz);
-        const safeR = isl.r + SHIP_COLLISION_RADIUS + 6;
-        if (dist < safeR) {
-          const ang = dist > 0.001 ? Math.atan2(dz, dx) : 0;
-          tx = isl.mesh.position.x + Math.cos(ang) * safeR;
-          tz = isl.mesh.position.z + Math.sin(ang) * safeR;
-        }
-      }
-
-      targetPos = { x: tx, z: tz };
-      spawnClickRipple(tx, tz);
+      targetPos = { x: oceanIntersect[0].point.x, z: oceanIntersect[0].point.z };
     }
   });
 
   loadShipTextures(() => {
-    startGameLogic(true);
+    startGameLogic();
     animate3D();
   });
 }
 
 // ==========================================================
-// OYUN MANTIĞI
+// OYUN MANTIĞI & ADA / KULE SİSTEMİ
 // ==========================================================
 let player, gameIslands = [];
 let targetPos = null, selectedEnemyId = null, isAttacking = false, isGameOver = false;
 let lastPlayerAttackTime = 0;
-let bonusDamage = 0;
+let nextNpcIdCounter = 1;
 
-function showBossBanner(msg) {
-  bossAlertEl.textContent = msg;
-  bossAlertEl.classList.add('show');
-  setTimeout(() => bossAlertEl.classList.remove('show'), 4500);
-}
-
-function startGameLogic(isFullReset = false) {
+function startGameLogic() {
   isGameOver = false; targetPos = null; selectedEnemyId = null; isAttacking = false;
+  islandOwnerFleet = null;
+  islandOwnerTitleEl.textContent = 'Ada: Tarafsız';
   gameOverEl.style.display = 'none';
-  if (clickMarkerGroup) clickMarkerGroup.visible = false;
-  if (selectedEnemyRing) selectedEnemyRing.visible = false;
 
-  if (isFullReset || !player) {
-    bonusDamage = 0;
-    player = {
-      x: 0, z: 0, a: -Math.PI / 2, speed: 0, maxSpeed: 1.85,
-      hp: 1000000, maxHp: 1000000, score: 1000000000,
-      level: 1, exp: 0, maxExp: 100,
-      selectedAmmo: 'iron',
-      ammo: { iron: 1000000, chain: 1000000, fire: 1000000, dragon: 1000000 },
-      lastDamagedTime: 0
-    };
-
-    gameIslands.forEach(isl => scene.remove(isl.mesh));
-    gameIslands = [];
-    const islGeo = new THREE.CylinderGeometry(42, 68, 35, 7);
-    const islMat = new THREE.MeshStandardMaterial({ color: 0x0f382b, roughness: 0.9 });
-    for (let i = 0; i < 8; i++) {
-      let ix, iz, tries = 0;
-      do {
-        ix = (Math.random() - 0.5) * 820;
-        iz = (Math.random() - 0.5) * 820;
-        tries++;
-      } while ((Math.hypot(ix, iz) < 170 || isPositionInsideIsland(ix, iz, 95)) && tries < 40);
-
-      const mesh = new THREE.Mesh(islGeo, islMat);
-      mesh.position.set(ix, 10, iz);
-      mesh.rotation.y = Math.random() * Math.PI;
-      scene.add(mesh);
-      gameIslands.push({ mesh, r: 58 });
-    }
-
-    enemies.forEach(en => {
-      scene.remove(en.sprite);
-      if (en.auraMesh) scene.remove(en.auraMesh);
-    });
-    enemies = [];
-
-    for (let i = 0; i < 6; i++) spawnEnemySprite(i + 1, false);
-    spawnEnemySprite(99, true);
-  }
+  player = {
+    x: 250, z: 250, a: -Math.PI / 2, speed: 0, maxSpeed: 1.85,
+    hp: 1000000, maxHp: 1000000, score: 100000000,
+    level: 1, exp: 0, maxExp: 100,
+    selectedAmmo: 'iron',
+    ammo: { iron: 1000000, chain: 1000000, fire: 1000000, dragon: 1000000 },
+    lastDamagedTime: 0
+  };
 
   if (playerSprite) scene.remove(playerSprite);
-  const playerShipId = currentUser ? currentUser.equippedShip : 'standard';
-  const data = getDirectionSpriteData(player.a, playerShipId);
-  const mat = new THREE.SpriteMaterial({ 
-    map: data.texture, 
-    transparent: true, 
-    alphaTest: 0.1 
-  });
+  const initialData = shipTextures.top || Object.values(shipTextures)[0];
+  const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1 });
   playerSprite = new THREE.Sprite(mat);
   playerSprite.center.set(0.5, 0.95);
-  applyNormalizedSprite(playerSprite, player.a, BASE_SHIP_HEIGHT, playerShipId);
+  const currentShipId = currentUser?.equippedShip || 'standard';
+  applySpriteByAngle(playerSprite, player.a, BASE_SHIP_HEIGHT, currentShipId);
   scene.add(playerSprite);
+
+  gameIslands.forEach(isl => scene.remove(isl.mesh));
+  gameIslands = [];
+  
+  // Normal Rastgele Adalar
+  const islGeo = new THREE.CylinderGeometry(40, 70, 35, 6);
+  const islMat = new THREE.MeshStandardMaterial({ color: 0x0f382b, roughness: 0.9 });
+  for (let i = 0; i < 5; i++) {
+    const mesh = new THREE.Mesh(islGeo, islMat);
+    mesh.position.set((Math.random() - 0.5) * 800, 10, (Math.random() - 0.5) * 800);
+    scene.add(mesh);
+    gameIslands.push({ mesh, r: 60 });
+  }
+
+  // ---- GÖNDERDİĞİN RESİMDEKİ MERKEZİ KALE ADASI (KULELER İLE ÇEVRİLİ) ----
+  if (fortressIsland) scene.remove(fortressIsland.mesh);
+  const fortGeo = new THREE.CylinderGeometry(140, 180, 45, 12);
+  const fortMat = new THREE.MeshStandardMaterial({ color: 0x1e3a2f, roughness: 0.8 });
+  const fortMesh = new THREE.Mesh(fortGeo, fortMat);
+  fortMesh.position.set(0, 15, 0);
+  scene.add(fortMesh);
+  fortressIsland = { mesh: fortMesh, x: 0, z: 0, r: 150 };
+
+  // Savunma Kulelerini Oluştur (Resimdeki dairesel çember konumu)
+  defenseTowers.forEach(t => scene.remove(t.mesh));
+  defenseTowers = [];
+
+  const towerGeo = new THREE.CylinderGeometry(12, 16, 30, 8);
+  const towerMat = new THREE.MeshStandardMaterial({ color: 0x8b5cf6, metalness: 0.3, roughness: 0.4 });
+  const towerCount = 8;
+  const towerRadius = 180;
+
+  for (let i = 0; i < towerCount; i++) {
+    const angle = (i / towerCount) * Math.PI * 2;
+    const tx = Math.cos(angle) * towerRadius;
+    const tz = Math.sin(angle) * towerRadius;
+    const tMesh = new THREE.Mesh(towerGeo, towerMat);
+    tMesh.position.set(tx, 25, tz);
+    tMesh.userData.towerId = i + 1;
+    scene.add(tMesh);
+
+    defenseTowers.push({
+      id: i + 1,
+      name: `Profesyonel Kule #${i + 1}`,
+      mesh: tMesh,
+      x: tx,
+      z: tz,
+      hp: 1200,
+      maxHp: 1200,
+      lastAttackTime: 0
+    });
+  }
+
+  enemies.forEach(en => scene.remove(en.sprite));
+  enemies = [];
+  nextNpcIdCounter = 1;
+
+  for (let i = 0; i < 4; i++) {
+    spawnEnemySprite(nextNpcIdCounter++);
+  }
 
   selectAmmoSlot('iron');
   updateTargetCard();
@@ -1528,67 +1109,31 @@ function startGameLogic(isFullReset = false) {
   syncAttackButton();
 }
 
-function spawnEnemySprite(id, isBoss = false) {
-  let ex, ez, tries = 0;
+function spawnEnemySprite(id) {
+  let ex, ez;
   do {
-    ex = (Math.random() - 0.5) * 860;
-    ez = (Math.random() - 0.5) * 860;
-    tries++;
-  } while ((Math.hypot(ex, ez) < (isBoss ? 360 : 280) || isPositionInsideIsland(ex, ez, isBoss ? 110 : 85)) && tries < 60);
+    ex = (Math.random() - 0.5) * 700;
+    ez = (Math.random() - 0.5) * 700;
+  } while (Math.hypot(ex, ez) < 350);
 
-  const shipHeight = isBoss ? BASE_SHIP_HEIGHT * 1.65 : BASE_SHIP_HEIGHT;
-  const data = getDirectionSpriteData(0, 'standard');
-  const mat = new THREE.SpriteMaterial({
-    map: data.texture,
-    transparent: true,
-    alphaTest: 0.1,
-    color: isBoss ? 0xff9999 : 0xd1fae5
-  });
+  const initialData = shipTextures.top || Object.values(shipTextures)[0];
+  const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1 });
   const sprite = new THREE.Sprite(mat);
   sprite.center.set(0.5, 0.95);
-  applyNormalizedSprite(sprite, 0, shipHeight, 'standard');
+  applySpriteByAngle(sprite, 0, BASE_SHIP_HEIGHT, 'standard');
   sprite.position.set(ex, SHIP_Y_POS, ez);
   sprite.userData.enemyId = id;
   scene.add(sprite);
 
-  let auraMesh = null;
-  if (isBoss) {
-    const auraGeo = new THREE.RingGeometry(48, 58, 48);
-    const auraMat = new THREE.MeshBasicMaterial({
-      color: 0xef4444,
-      side: THREE.DoubleSide,
-      transparent: true,
-      opacity: 0.85
-    });
-    auraMesh = new THREE.Mesh(auraGeo, auraMat);
-    auraMesh.rotation.x = -Math.PI / 2;
-    auraMesh.position.set(ex, 0.9, ez);
-    scene.add(auraMesh);
-    showBossBanner("☠️ KIZIL SAKAL'IN KALYONU (BOSS) DENİZDE BELİRDİ!");
-  }
+  // Rastgele düşman filoları atayalım
+  const enemyFleets = ['[RED]', '[SKULL]', '[KRAKEN]', '[BLACK]'];
+  const assignedFleet = enemyFleets[Math.floor(Math.random() * enemyFleets.length)];
 
   enemies.push({
-    id,
-    isBoss,
-    shipId: 'standard',
-    name: isBoss ? "☠️ Kızıl Sakal (BOSS)" : `Korsan Gemisi #${id}`,
-    sprite,
-    auraMesh,
-    shipHeight,
-    x: ex,
-    z: ez,
-    hp: isBoss ? 8500 : 520,
-    maxHp: isBoss ? 8500 : 520,
-    damage: isBoss ? 450 : 100,
-    rewardGold: isBoss ? 5000 : 150,
-    rewardExp: isBoss ? 300 : 35,
-    baseSpeed: isBoss ? 0.95 : 1.15,
-    slowTimer: 0,
-    a: 0,
-    wanderAngle: Math.random() * Math.PI * 2,
-    wanderTimer: 0,
-    lastAttackTime: 0,
-    isAggressive: false
+    id, name: `Korsan Gemisi #${id}`, fleet: assignedFleet, sprite,
+    hp: 520, maxHp: 520, baseSpeed: 1.15, slowTimer: 0,
+    a: 0, wanderAngle: Math.random() * Math.PI * 2, wanderTimer: 0,
+    lastAttackTime: 0
   });
 }
 
@@ -1599,7 +1144,7 @@ function selectAmmoSlot(type) {
     slot.classList.toggle('selected', slot.dataset.type === type);
   });
   const info = AMMO_TYPES[type];
-  activeAmmoInfoEl.textContent = `Seçili: ${info.name} (${info.damage + bonusDamage} Hasar)`;
+  activeAmmoInfoEl.textContent = `Seçili: ${info.name} (${info.desc})`;
   syncAttackButton();
 }
 
@@ -1612,30 +1157,49 @@ window.addEventListener('keydown', e => {
   if (e.key === '2') selectAmmoSlot('chain');
   if (e.key === '3') selectAmmoSlot('fire');
   if (e.key === '4') selectAmmoSlot('dragon');
-  if (e.key.toLowerCase() === 'l' || e.key.toLowerCase() === 'm') {
-    togglePortModal();
+  if (e.key.toLowerCase() === 'm') {
+    marketPanel.classList.toggle('open');
+    tabMarket.classList.add('active'); tabShipyard.classList.remove('active');
+    sectionMarket.classList.add('active'); sectionShipyard.classList.remove('active');
   }
-  if (e.key === 'Escape') {
-    portModalBackdrop.classList.remove('open');
+  if (e.key.toLowerCase() === 't') {
+    marketPanel.classList.toggle('open');
+    tabShipyard.classList.add('active'); tabMarket.classList.remove('active');
+    sectionShipyard.classList.add('active'); sectionMarket.classList.remove('active');
+    renderShipyardList();
   }
 });
 
 function updateTargetCard() {
   if (!selectedEnemyId) {
-    targetCardEl.classList.remove('visible', 'boss-target');
-    if (selectedEnemyRing) selectedEnemyRing.visible = false;
+    targetCardEl.classList.remove('visible');
     return;
   }
+  
+  if (String(selectedEnemyId).startsWith('tower_')) {
+    const tId = parseInt(selectedEnemyId.replace('tower_', ''));
+    const tower = defenseTowers.find(t => t.id === tId);
+    if (!tower) {
+      targetCardEl.classList.remove('visible');
+      selectedEnemyId = null;
+      return;
+    }
+    targetCardEl.classList.add('visible');
+    targetNameEl.textContent = tower.name;
+    targetHpTextEl.textContent = `${Math.ceil(tower.hp)}/${tower.maxHp}`;
+    targetHpBarEl.style.width = Math.max(0, (tower.hp / tower.maxHp) * 100) + '%';
+    return;
+  }
+
   const target = enemies.find(e => e.id === selectedEnemyId);
   if (!target) {
-    targetCardEl.classList.remove('visible', 'boss-target');
-    if (selectedEnemyRing) selectedEnemyRing.visible = false;
+    targetCardEl.classList.remove('visible');
+    selectedEnemyId = null;
     return;
   }
   targetCardEl.classList.add('visible');
-  targetCardEl.classList.toggle('boss-target', !!target.isBoss);
-  targetNameEl.textContent = target.name;
-  targetHpTextEl.textContent = `${Math.ceil(target.hp).toLocaleString()}/${target.maxHp.toLocaleString()}`;
+  targetNameEl.textContent = `${target.name} ${target.fleet}`;
+  targetHpTextEl.textContent = `${Math.ceil(target.hp)}/${target.maxHp}`;
   targetHpBarEl.style.width = Math.max(0, (target.hp / target.maxHp) * 100) + '%';
 }
 
@@ -1655,7 +1219,7 @@ attackBtn.addEventListener('click', () => {
   syncAttackButton();
 });
 
-restartBtn.addEventListener('click', () => startGameLogic(true));
+restartBtn.addEventListener('click', () => startGameLogic());
 
 function showFloatingDamage(wx, wz, text, colorHex) {
   const div = document.createElement('div');
@@ -1675,13 +1239,12 @@ function showFloatingDamage(wx, wz, text, colorHex) {
 }
 
 function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit, isEnemy = false) {
-  const ammoSpec = isEnemy ? { color: 0xef4444 } : AMMO_TYPES[ammoKey];
-  const pGeo = new THREE.SphereGeometry(isEnemy ? 5.5 : 6.5, 16, 16);
+  const pGeo = new THREE.SphereGeometry(7.5, 16, 16);
   const pMat = new THREE.MeshStandardMaterial({ 
-    color: ammoSpec.color, 
-    emissive: ammoSpec.color,
-    emissiveIntensity: 1.0,
-    roughness: 0.15 
+    color: isEnemy ? 0xff2200 : AMMO_TYPES[ammoKey].color, 
+    emissive: isEnemy ? 0xff0000 : AMMO_TYPES[ammoKey].color,
+    emissiveIntensity: 2.0,
+    roughness: 0.1 
   });
   const mesh = new THREE.Mesh(pGeo, pMat);
   
@@ -1691,15 +1254,21 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit, isEnem
 
   activeProjectiles.push({
     mesh, x: startX, z: startZ, targetX, targetZ,
-    speed: isEnemy ? 4.5 : 5, 
-    ammoKey: isEnemy ? 'enemy_ball' : ammoKey,
-    onHit, sparkTimer: 0,
-    yOffset: GULLE_Y_OFFSET
+    speed: 6, 
+    ammoKey, onHit, sparkTimer: 0,
+    yOffset: GULLE_Y_OFFSET,
+    isEnemy
   });
 }
 
 function animate3D() {
   requestAnimationFrame(animate3D);
+
+  if (player && !isGameOver) {
+    if (enemies.length < 4) {
+      spawnEnemySprite(nextNpcIdCounter++);
+    }
+  }
 
   if (!player || isGameOver) {
     if (scene && camera && renderer) renderer.render(scene, camera);
@@ -1708,7 +1277,9 @@ function animate3D() {
 
   const now = Date.now();
   if (player.hp < player.maxHp && (now - player.lastDamagedTime > 5000)) {
-    player.hp = Math.min(player.maxHp, player.hp + 5000);
+    const healAmount = 5000;
+    player.hp = Math.min(player.maxHp, player.hp + healAmount);
+    showFloatingDamage(player.x, player.z, '+' + healAmount.toLocaleString(), '#22c55e');
     updateHUD();
   }
 
@@ -1722,7 +1293,6 @@ function animate3D() {
     } else {
       targetPos = null;
       player.speed *= 0.9;
-      if (clickMarkerGroup) clickMarkerGroup.visible = false;
     }
   } else {
     player.speed *= 0.92;
@@ -1731,33 +1301,12 @@ function animate3D() {
   player.x += Math.cos(player.a) * player.speed;
   player.z += Math.sin(player.a) * player.speed;
 
-  resolveIslandCollisions(player, SHIP_COLLISION_RADIUS);
-
-  if (clickMarkerGroup && clickMarkerGroup.visible) {
-    const pulse = 1 + Math.sin(now * 0.008) * 0.18;
-    clickOuterRing.scale.set(pulse, pulse, 1);
-    clickInnerRing.rotation.z += 0.05;
-  }
-  for (let i = clickRipples.length - 1; i >= 0; i--) {
-    const rp = clickRipples[i];
-    rp.scale += 0.08;
-    rp.opacity -= 0.025;
-    rp.mesh.scale.set(rp.scale, rp.scale, 1);
-    rp.mesh.material.opacity = Math.max(0, rp.opacity);
-    if (rp.opacity <= 0) {
-      scene.remove(rp.mesh);
-      rp.mesh.geometry.dispose();
-      rp.mesh.material.dispose();
-      clickRipples.splice(i, 1);
-    }
-  }
-
   coordDisplayEl.textContent = `X: ${Math.round((player.x / (WORLD_SIZE / 2)) * 50)} · Y: ${Math.round((player.z / (WORLD_SIZE / 2)) * 50)}`;
 
   if (playerSprite) {
-    const playerShipId = currentUser ? currentUser.equippedShip : 'standard';
     playerSprite.position.set(player.x, SHIP_Y_POS, player.z);
-    applyNormalizedSprite(playerSprite, player.a, BASE_SHIP_HEIGHT, playerShipId);
+    const currentShipId = currentUser?.equippedShip || 'standard';
+    applySpriteByAngle(playerSprite, player.a, BASE_SHIP_HEIGHT, currentShipId);
   }
 
   if (playerNeonRing) {
@@ -1767,24 +1316,11 @@ function animate3D() {
 
   rangeRingMesh.position.set(player.x, 0.6, player.z);
 
-  if (selectedEnemyId && selectedEnemyRing) {
-    const selTarget = enemies.find(e => e.id === selectedEnemyId);
-    if (selTarget) {
-      selectedEnemyRing.position.set(selTarget.x, 0.85, selTarget.z);
-      selectedEnemyRing.rotation.z -= 0.03;
-      selectedEnemyRing.visible = true;
-    } else {
-      selectedEnemyRing.visible = false;
-    }
-  } else if (selectedEnemyRing) {
-    selectedEnemyRing.visible = false;
-  }
-
   if (playerSprite) {
     const tempVector = new THREE.Vector3(player.x, SHIP_Y_POS, player.z);
     tempVector.project(camera);
     const xPx = (tempVector.x *  .5 + .5) * window.innerWidth;
-    const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 100;
+    const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 55;
     playerLabelEl.style.transform = `translate(-50%, 0) translate(${xPx}px, ${yPx}px)`;
   }
 
@@ -1792,6 +1328,7 @@ function animate3D() {
   camera.position.z += (player.z + 540 - camera.position.z) * 0.08;
   camera.lookAt(player.x, 0, player.z);
 
+  // Mermi animasyonları
   for (let i = activeProjectiles.length - 1; i >= 0; i--) {
     const p = activeProjectiles[i];
     const dx = p.targetX - p.x;
@@ -1808,35 +1345,22 @@ function animate3D() {
       p.x += (dx / dist) * p.speed;
       p.z += (dz / dist) * p.speed;
       p.mesh.position.set(p.x, SHIP_Y_POS - p.yOffset, p.z);
-      p.mesh.rotation.x += 0.15;
-      p.mesh.rotation.y += 0.15;
+      p.mesh.rotation.x += 0.2;
+      p.mesh.rotation.y += 0.2;
 
       p.sparkTimer++;
       if (p.sparkTimer % 1 === 0) {
-        let sparkColor = 0xffa500;
-        if (p.ammoKey === 'fire') {
-          sparkColor = Math.random() > 0.5 ? 0xff0000 : 0xff7700;
-        } else if (p.ammoKey === 'dragon') {
-          const colors = [0x3b82f6, 0xa855f7, 0x10b981];
-          sparkColor = colors[Math.floor(Math.random() * colors.length)];
-        } else if (p.ammoKey === 'chain') {
-          sparkColor = 0xaaaaaa;
-        } else if (p.ammoKey === 'enemy_ball') {
-          sparkColor = 0xdc2626;
-        } else {
-          sparkColor = 0x666666;
-        }
-
-        const sparkGeo = new THREE.SphereGeometry(2.4, 8, 8);
-        const sparkMat = new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 0.95 });
+        let sparkColor = p.isEnemy ? 0xff3300 : 0xffa500;
+        const sparkGeo = new THREE.SphereGeometry(p.isEnemy ? 4.5 : 3.2, 8, 8);
+        const sparkMat = new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 0.98 });
         const sparkMesh = new THREE.Mesh(sparkGeo, sparkMat);
         sparkMesh.position.set(
-          p.x + (Math.random() - 0.5) * 8, 
-          SHIP_Y_POS - p.yOffset + (Math.random() - 0.5) * 8, 
-          p.z + (Math.random() - 0.5) * 8
+          p.x + (Math.random() - 0.5) * 10, 
+          SHIP_Y_POS - p.yOffset + (Math.random() - 0.5) * 10, 
+          p.z + (Math.random() - 0.5) * 10
         );
         scene.add(sparkMesh);
-        particleSystems.push({ mesh: sparkMesh, life: 22 });
+        particleSystems.push({ mesh: sparkMesh, life: 28 });
       }
     }
   }
@@ -1844,7 +1368,7 @@ function animate3D() {
   for (let i = particleSystems.length - 1; i >= 0; i--) {
     const pt = particleSystems[i];
     pt.life--;
-    pt.mesh.scale.multiplyScalar(0.90);
+    pt.mesh.scale.multiplyScalar(0.88);
     if (pt.life <= 0) {
       scene.remove(pt.mesh);
       pt.mesh.geometry.dispose();
@@ -1853,40 +1377,63 @@ function animate3D() {
     }
   }
 
+  // ==========================================================
+  // SAVUNMA KULELERİ YAPAY ZEKA VE ATEŞ SİSTEMİ
+  // ==========================================================
+  for (const tower of defenseTowers) {
+    const distToPlayer = Math.hypot(player.x - tower.x, player.z - tower.z);
+    const towerRange = 240;
+
+    // EĞER KULLANICI ADANIN SAHİBİ OLAN FİLOADan DEĞİLSE VE MENZİL İÇİNDEYSE ATEŞ AÇ
+    const isPlayerInOwnerFleet = (islandOwnerFleet && currentUser.fleet === islandOwnerFleet);
+
+    if (distToPlayer <= towerRange && !isPlayerInOwnerFleet && (now - tower.lastAttackTime >= 2500)) {
+      tower.lastAttackTime = now;
+
+      fireProjectile(tower.x, tower.z, player.x, player.z, 'fire', () => {
+        player.hp = Math.max(0, player.hp - 80);
+        player.lastDamagedTime = now;
+        showFloatingDamage(player.x, player.z, '-80 (Kule)', '#ef4444');
+        updateHUD();
+        if (player.hp <= 0) {
+          isGameOver = true;
+          isAttacking = false;
+          gameOverEl.style.display = 'flex';
+          finalScoreEl.textContent = 'Toplanan Altın: ' + formatShortNumber(player.score);
+        }
+      }, true);
+    }
+  }
+
+  // Düşman gemi hareketleri
   for (const en of enemies) {
     if (en.slowTimer > 0) en.slowTimer--;
     const activeSpeed = en.slowTimer > 0 ? en.baseSpeed * 0.5 : en.baseSpeed;
     const distToPlayer = Math.hypot(player.x - en.x, player.z - en.z);
 
-    if (en.isAggressive) {
-      if (distToPlayer > AGGRO_RANGE * 1.5) {
-        en.isAggressive = false;
-      } else {
-        en.a = Math.atan2(player.z - en.z, player.x - en.x);
-        
-        if (distToPlayer > ATTACK_RANGE - 20) {
-          en.x += Math.cos(en.a) * (activeSpeed * 1.25);
-          en.z += Math.sin(en.a) * (activeSpeed * 1.25);
-        }
+    if (distToPlayer <= AGGRO_RANGE) {
+      en.a = Math.atan2(player.z - en.z, player.x - en.x);
+      
+      if (distToPlayer > ATTACK_RANGE - 20) {
+        en.x += Math.cos(en.a) * (activeSpeed * 1.25);
+        en.z += Math.sin(en.a) * (activeSpeed * 1.25);
+      }
 
-        if (distToPlayer <= ATTACK_RANGE && (now - en.lastAttackTime >= (en.isBoss ? 1400 : 1000))) {
-          en.lastAttackTime = now;
+      if (distToPlayer <= ATTACK_RANGE && (now - en.lastAttackTime >= 3000)) {
+        en.lastAttackTime = now;
 
-          fireProjectile(en.x, en.z, player.x, player.z, 'enemy_ball', () => {
-            player.hp = Math.max(0, player.hp - en.damage);
-            player.lastDamagedTime = now;
-            
-            showFloatingDamage(player.x, player.z, `-${en.damage}`, en.isBoss ? '#dc2626' : '#ef4444');
-
-            updateHUD();
-            if (player.hp <= 0) {
-              isGameOver = true;
-              isAttacking = false;
-              gameOverEl.style.display = 'flex';
-              finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString();
-            }
-          }, true);
-        }
+        fireProjectile(en.x, en.z, player.x, player.z, 'fire', () => {
+          player.hp = Math.max(0, player.hp - 100);
+          player.lastDamagedTime = now;
+          showFloatingDamage(player.x, player.z, '-100', '#ef4444');
+          updateHUD();
+          if (player.hp <= 0) {
+            isGameOver = true;
+            isAttacking = false;
+            gameOverEl.style.display = 'flex';
+            finalScoreEl.textContent = 'Toplanan Altın: ' + formatShortNumber(player.score);
+          }
+        }, true);
       }
     } else {
       en.wanderTimer--;
@@ -1899,84 +1446,104 @@ function animate3D() {
       en.z += Math.sin(en.a) * (activeSpeed * 0.75);
     }
 
-    const hitIsland = resolveIslandCollisions(en, en.isBoss ? 36 : SHIP_COLLISION_RADIUS);
-    if (hitIsland) {
-      en.wanderAngle += Math.PI * 0.5;
-    }
-
     en.x = Math.max(-WORLD_SIZE/2, Math.min(WORLD_SIZE/2, en.x));
     en.z = Math.max(-WORLD_SIZE/2, Math.min(WORLD_SIZE/2, en.z));
 
     if (en.sprite) {
       en.sprite.position.set(en.x, SHIP_Y_POS, en.z);
-      applyNormalizedSprite(en.sprite, en.a, en.shipHeight, en.shipId || 'standard');
-    }
-    if (en.auraMesh) {
-      en.auraMesh.position.set(en.x, 0.9, en.z);
-      en.auraMesh.rotation.z -= 0.03;
-      const bossPulse = 1 + Math.sin(now * 0.006) * 0.1;
-      en.auraMesh.scale.set(bossPulse, bossPulse, 1);
+      applySpriteByAngle(en.sprite, en.a, BASE_SHIP_HEIGHT, 'standard');
     }
   }
 
+  // ==========================================================
+  // OYUNCUNUN KULEYE VEYA DÜŞMANA SALDIRISI
+  // ==========================================================
   if (isAttacking && selectedEnemyId) {
-    const target = enemies.find(e => e.id === selectedEnemyId);
     const ammoKey = player.selectedAmmo;
     const ammoSpec = AMMO_TYPES[ammoKey];
 
-    if (target && player.ammo[ammoKey] > 0) {
-      const d = Math.hypot(target.x - player.x, target.z - player.z);
-      if (d <= ATTACK_RANGE && (now - lastPlayerAttackTime >= 1000)) {
-        lastPlayerAttackTime = now;
-        player.ammo[ammoKey]--;
+    // EĞER SEÇİLEN HEDEF BİR KULE İSE
+    if (String(selectedEnemyId).startsWith('tower_')) {
+      const tId = parseInt(selectedEnemyId.replace('tower_', ''));
+      const tower = defenseTowers.find(t => t.id === tId);
 
-        target.isAggressive = true;
-        const totalDmg = ammoSpec.damage + bonusDamage;
+      if (tower && player.ammo[ammoKey] > 0) {
+        const d = Math.hypot(tower.x - player.x, tower.z - player.z);
+        if (d <= ATTACK_RANGE && (now - lastPlayerAttackTime >= 1000)) {
+          lastPlayerAttackTime = now;
 
-        fireProjectile(player.x, player.z, target.x, target.z, ammoKey, () => {
-          target.hp -= totalDmg;
-          if (ammoSpec.slow < 1.0) target.slowTimer = 240;
+          fireProjectile(player.x, player.z, tower.x, tower.z, ammoKey, () => {
+            tower.hp -= ammoSpec.damage;
+            showFloatingDamage(tower.x, tower.z, '-' + ammoSpec.damage, '#f97316');
 
-          showFloatingDamage(target.x, target.z, '-' + totalDmg, '#f97316');
-
-          updateTargetCard();
-          updateHUD();
-          syncAttackButton();
-
-          if (target.hp <= 0) {
-            scene.remove(target.sprite);
-            if (target.auraMesh) scene.remove(target.auraMesh);
-            enemies = enemies.filter(e => e.id !== target.id);
-            selectedEnemyId = null;
-            isAttacking = false;
-            if (selectedEnemyRing) selectedEnemyRing.visible = false;
-
-            player.score += target.rewardGold;
-            player.exp += target.rewardExp;
-
-            if (target.isBoss) {
-              showFloatingDamage(player.x, player.z, `+${target.rewardGold.toLocaleString()} ALTIN!`, '#fbbf24');
-              showBossBanner(`🏆 KIZIL SAKAL BATIRILDI! +${target.rewardGold.toLocaleString()} ALTIN KAZANDIN!`);
-            }
-
-            while (player.exp >= player.maxExp) {
-              player.level++;
-              player.exp -= player.maxExp;
-              player.maxExp = Math.round(player.maxExp * 1.4);
-              player.maxHp += 200000;
-              player.hp = player.maxHp;
-            }
             updateTargetCard();
             updateHUD();
             syncAttackButton();
-            setTimeout(() => spawnEnemySprite(target.id, target.isBoss), target.isBoss ? 15000 : 3000);
-          }
-        }, false);
 
+            if (tower.hp <= 0) {
+              scene.remove(tower.mesh);
+              tower.mesh.geometry.dispose();
+              tower.mesh.material.dispose();
+
+              defenseTowers = defenseTowers.filter(t => t.id !== tower.id);
+              selectedEnemyId = null;
+              isAttacking = false;
+
+              // ---- İSTEDİĞİN ÖZELLİK: SON KULEYİ BATIRAN KULLANICININ FİLOSU ADAYA SAHİP OLUR ----
+              if (defenseTowers.length === 0) {
+                islandOwnerFleet = currentUser.fleet;
+                islandOwnerTitleEl.textContent = `Ada Sahibi: ${islandOwnerFleet} (${currentUser.username})`;
+                alert(`Tebrikler Kaptan! Son kuleyi batırdınız. ${islandOwnerFleet} filosu adanın mülkiyetini ele geçirdi! Artık kuleler filonuza ateş etmeyecek.`);
+              } else {
+                alert(`Kule yıkıldı! Kalan kule: ${defenseTowers.length}`);
+              }
+
+              updateTargetCard();
+              updateHUD();
+              syncAttackButton();
+            }
+          }, false);
+        }
       }
-    } else if (player.ammo[ammoKey] <= 0) {
-      isAttacking = false;
-      syncAttackButton();
+    } else {
+      // Normal düşman gemisine saldırı
+      const target = enemies.find(e => e.id === selectedEnemyId);
+      if (target && player.ammo[ammoKey] > 0) {
+        const d = Math.hypot(target.x - player.x, target.z - player.z);
+        if (d <= ATTACK_RANGE && (now - lastPlayerAttackTime >= 1000)) {
+          lastPlayerAttackTime = now;
+
+          fireProjectile(player.x, player.z, target.x, target.z, ammoKey, () => {
+            target.hp -= ammoSpec.damage;
+            if (ammoSpec.slow < 1.0) target.slowTimer = 240;
+
+            showFloatingDamage(target.x, target.z, '-' + ammoSpec.damage, '#f97316');
+
+            updateTargetCard();
+            updateHUD();
+            syncAttackButton();
+
+            if (target.hp <= 0) {
+              scene.remove(target.sprite);
+              enemies = enemies.filter(e => e.id !== target.id);
+              selectedEnemyId = null;
+              isAttacking = false;
+              player.exp += 35;
+              player.score += 5000;
+              if (player.exp >= player.maxExp) {
+                player.level++;
+                player.exp -= player.maxExp;
+                player.maxExp = Math.round(player.maxExp * 1.4);
+                player.maxHp += 200000;
+                player.hp = player.maxHp;
+              }
+              updateTargetCard();
+              updateHUD();
+              syncAttackButton();
+            }
+          }, false);
+        }
+      }
     }
   }
 
@@ -1999,42 +1566,48 @@ function drawMinimap() {
   mctx.stroke();
 
   if (!player) return;
-  const scale = (w * 0.46) / (WORLD_SIZE / 2);
+  const scale = w / WORLD_SIZE;
   const cx = w / 2, cy = h / 2;
 
+  // Adalar minimap
   mctx.fillStyle = '#3f6212';
   gameIslands.forEach(isl => {
     mctx.beginPath();
-    mctx.arc(cx + isl.mesh.position.x * scale, cy + isl.mesh.position.z * scale, 2.8, 0, Math.PI * 2);
+    mctx.arc(cx + isl.mesh.position.x * scale, cy + isl.mesh.position.z * scale, 2.5, 0, Math.PI * 2);
     mctx.fill();
   });
 
-  enemies.forEach(en => {
-    if (en.isBoss) {
-      mctx.fillStyle = '#991b1b';
-      mctx.beginPath();
-      mctx.arc(cx + en.x * scale, cy + en.z * scale, 4.2, 0, Math.PI * 2);
-      mctx.fill();
-      mctx.strokeStyle = '#fbbf24';
-      mctx.lineWidth = 1;
-      mctx.stroke();
-    } else {
-      mctx.fillStyle = '#dc2626';
-      mctx.beginPath();
-      mctx.arc(cx + en.x * scale, cy + en.z * scale, 2.2, 0, Math.PI * 2);
-      mctx.fill();
-    }
+  // Merkez Kale Adası
+  if (fortressIsland) {
+    mctx.fillStyle = '#0f766e';
+    mctx.beginPath();
+    mctx.arc(cx, cy, 6, 0, Math.PI * 2);
+    mctx.fill();
+  }
+
+  // Savunma Kuleleri Minimap (Mor renkli)
+  mctx.fillStyle = '#8b5cf6';
+  defenseTowers.forEach(t => {
+    mctx.beginPath();
+    mctx.arc(cx + t.x * scale, cy + t.z * scale, 2, 0, Math.PI * 2);
+    mctx.fill();
   });
 
-  mctx.fillStyle = '#1d4ed8';
+  mctx.fillStyle = '#dc2626';
+  enemies.forEach(en => {
+    mctx.beginPath();
+    mctx.arc(cx + en.x * scale, cy + en.z * scale, 2.2, 0, Math.PI * 2);
+    mctx.fill();
+  });
+
+  mctx.fillStyle = '#22c55e';
   mctx.beginPath();
-  mctx.arc(cx + player.x * scale, cy + player.z * scale, 2.8, 0, Math.PI * 2);
+  mctx.arc(cx + player.x * scale, cy + player.z * scale, 3.2, 0, Math.PI * 2);
   mctx.fill();
 }
 
 function updateHUD() {
-  scoreEl.textContent = player.score.toLocaleString();
-  portGoldDisplayEl.textContent = player.score.toLocaleString('tr-TR');
+  scoreEl.textContent = formatShortNumber(player.score);
   levelEl.textContent = player.level;
   
   hpTextEl.textContent = `Can ${Math.ceil(player.hp).toLocaleString()} / ${player.maxHp.toLocaleString()}`;
@@ -2042,6 +1615,7 @@ function updateHUD() {
   
   hpBarEl.style.width = ((player.hp / player.maxHp) * 100) + '%';
   expBarEl.style.width = ((player.exp / player.maxExp) * 100) + '%';
+  marketGoldEl.textContent = formatShortNumber(player.score);
 
   const hpPercent = Math.max(0, Math.min(100, (player.hp / player.maxHp) * 100));
   playerShipHpFillEl.style.width = hpPercent + '%';
@@ -2054,183 +1628,47 @@ function updateHUD() {
   }
 
   Object.keys(qtyEls).forEach(type => {
-    const count = player.ammo[type] || 0;
-    qtyEls[type].textContent = formatShortNumber(count);
+    const qty = player.ammo[type] || 0;
+    qtyEls[type].textContent = formatShortNumber(qty);
     const slotEl = document.querySelector(`.ammo-slot[data-type="${type}"]`);
-    if (slotEl) slotEl.classList.toggle('empty', count <= 0);
+    if (slotEl) slotEl.classList.toggle('empty', qty <= 0);
   });
 }
 
-// ==========================================================
-// LİMAN & TERSANE ARAYÜZ MANTIĞI
-// ==========================================================
-let currentShipPage = 1;
-const SHIPS_PER_PAGE = 3;
-
-function togglePortModal(forceOpen = null) {
-  const shouldOpen = forceOpen !== null ? forceOpen : !portModalBackdrop.classList.contains('open');
-  if (shouldOpen) {
-    portModalBackdrop.classList.add('open');
-    renderShipyardCards();
-  } else {
-    portModalBackdrop.classList.remove('open');
-  }
-}
-
-portToggleBtn.addEventListener('click', () => togglePortModal(true));
-portCloseBtn.addEventListener('click', () => togglePortModal(false));
-portModalBackdrop.addEventListener('click', e => {
-  if (e.target === portModalBackdrop) togglePortModal(false);
+marketToggleBtn.addEventListener('click', () => {
+  marketPanel.classList.toggle('open');
+  tabMarket.classList.add('active'); tabShipyard.classList.remove('active');
+  sectionMarket.classList.add('active'); sectionShipyard.classList.remove('active');
 });
-
-document.querySelectorAll('.port-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.port-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.port-section').forEach(s => s.classList.remove('active'));
-
-    tab.classList.add('active');
-    const secId = 'port-sec-' + tab.dataset.tab;
-    const secEl = document.getElementById(secId);
-    if (secEl) secEl.classList.add('active');
-
-    if (tab.dataset.tab === 'shipyard') {
-      renderShipyardCards();
-    }
-  });
+shipyardToggleBtn.addEventListener('click', () => {
+  marketPanel.classList.toggle('open');
+  tabShipyard.classList.add('active'); tabMarket.classList.remove('active');
+  sectionShipyard.classList.add('active'); sectionMarket.classList.remove('active');
+  renderShipyardList();
 });
+marketCloseBtn.addEventListener('click', () => marketPanel.classList.remove('open'));
 
-shipCategoryFilter.addEventListener('change', () => {
-  currentShipPage = 1;
-  renderShipyardCards();
+tabMarket.addEventListener('click', () => {
+  tabMarket.classList.add('active'); tabShipyard.classList.remove('active');
+  sectionMarket.classList.add('active'); sectionShipyard.classList.remove('active');
 });
-
-function drawShipCardPreview(canvas, shipId) {
-  const ctx = canvas.getContext('2d');
-  const w = canvas.width;
-  const h = canvas.height;
-  ctx.clearRect(0, 0, w, h);
-
-  const oceanGrad = ctx.createLinearGradient(0, 0, 0, h);
-  oceanGrad.addColorStop(0, '#135e87');
-  oceanGrad.addColorStop(0.5, '#0d4a6e');
-  oceanGrad.addColorStop(1, '#08334e');
-  ctx.fillStyle = oceanGrad;
-  ctx.fillRect(0, 0, w, h);
-
-  ctx.strokeStyle = 'rgba(125, 211, 252, 0.14)';
-  ctx.lineWidth = 1.5;
-  for (let i = 0; i < 18; i++) {
-    const wy = (i * 11) % h;
-    const wx = ((i * 37) % (w - 30));
-    ctx.beginPath();
-    ctx.moveTo(wx, wy);
-    ctx.quadraticCurveTo(wx + 15, wy - 3, wx + 30, wy);
-    ctx.stroke();
-  }
-
-  const rawTex = baseShipTextures.topRight || baseShipTextures.top || Object.values(baseShipTextures)[0];
-  if (rawTex && rawTex.image) {
-    const img = rawTex.image;
-    const tempC = document.createElement('canvas');
-    tempC.width = img.width;
-    tempC.height = img.height;
-    const tCtx = tempC.getContext('2d');
-    tCtx.drawImage(img, 0, 0);
-    drawCustomFigureOnCanvas(tCtx, tempC.width, tempC.height, shipId);
-
-    const scale = Math.min((w * 0.72) / img.width, (h * 0.78) / img.height);
-    const drawW = img.width * scale;
-    const drawH = img.height * scale;
-    const dx = (w - drawW) / 2;
-    const dy = (h - drawH) / 2 + 4;
-
-    ctx.drawImage(tempC, dx, dy, drawW, drawH);
-  }
-}
-
-function renderShipyardCards() {
-  const filterVal = shipCategoryFilter.value;
-  const allShips = Object.values(SHIP_MODELS).filter(m => filterVal === 'all' || m.category === filterVal);
-
-  const totalPages = Math.max(1, Math.ceil(allShips.length / SHIPS_PER_PAGE));
-  if (currentShipPage > totalPages) currentShipPage = totalPages;
-
-  shipPaginationEl.innerHTML = '';
-  for (let p = 1; p <= totalPages; p++) {
-    const pBtn = document.createElement('button');
-    pBtn.type = 'button';
-    pBtn.className = 'page-num-btn' + (p === currentShipPage ? ' active' : '');
-    pBtn.textContent = p;
-    pBtn.addEventListener('click', () => {
-      currentShipPage = p;
-      renderShipyardCards();
-    });
-    shipPaginationEl.appendChild(pBtn);
-  }
-
-  shipyardGridEl.innerHTML = '';
-  const users = loadUsers();
-  const dbUser = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
-  const equipped = dbUser.equippedShip || 'standard';
-
-  const startIdx = (currentShipPage - 1) * SHIPS_PER_PAGE;
-  const pageItems = allShips.slice(startIdx, startIdx + SHIPS_PER_PAGE);
-
-  pageItems.forEach(model => {
-    const isEquipped = equipped === model.id;
-    const card = document.createElement('div');
-    card.className = 'ship-preview-card' + (isEquipped ? ' equipped-card' : '');
-
-    card.innerHTML = `
-      <div class="ship-card-title">${model.name}</div>
-      <div class="ship-canvas-frame">
-        <canvas width="200" height="150"></canvas>
-      </div>
-      <div class="ship-card-sub">${model.desc}</div>
-      <button class="port-action-btn ${isEquipped ? 'equipped' : ''}" type="button" data-id="${model.id}" ${isEquipped ? 'disabled' : ''}>
-        ${isEquipped ? 'Kullanımda' : 'Kuşan / Seç'}
-      </button>
-    `;
-
-    shipyardGridEl.appendChild(card);
-
-    const previewCanvas = card.querySelector('canvas');
-    drawShipCardPreview(previewCanvas, model.id);
-
-    const btn = card.querySelector('.port-action-btn');
-    if (!isEquipped) {
-      btn.addEventListener('click', () => {
-        const shipId = btn.dataset.id;
-        const uList = loadUsers();
-        const uIdx = uList.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
-        if (uIdx !== -1) {
-          uList[uIdx].equippedShip = shipId;
-          saveUsers(uList);
-        }
-        currentUser.equippedShip = shipId;
-        shipTitleEl.textContent = SHIP_MODELS[shipId].name;
-
-        startGameLogic(false);
-        renderShipyardCards();
-
-        marketFeedbackEl.style.color = '#4ade80';
-        marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} tasarımı kuşanıldı!`;
-        setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
-      });
-    }
-  });
-}
+tabShipyard.addEventListener('click', () => {
+  tabShipyard.classList.add('active'); tabMarket.classList.remove('active');
+  sectionShipyard.classList.add('active'); sectionMarket.classList.remove('active');
+  renderShipyardList();
+});
 
 document.querySelectorAll('.ammo-buy-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     if (!player) return;
     const type = btn.dataset.type;
-    const amount = parseInt(btn.dataset.amount, 10);
-    const cost = parseInt(btn.dataset.cost, 10);
+    const amount = parseInt(btn.dataset.amount);
+    const cost = parseInt(btn.dataset.cost);
 
     if (player.score < cost) {
       marketFeedbackEl.style.color = '#f87171';
-      marketFeedbackEl.textContent = 'Yetersiz altın!';
+      marketFeedbackEl.textContent = 'Yeterli altın yok!';
+      setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
       return;
     }
 
@@ -2240,51 +1678,97 @@ document.querySelectorAll('.ammo-buy-btn').forEach(btn => {
     syncAttackButton();
 
     marketFeedbackEl.style.color = '#4ade80';
-    marketFeedbackEl.textContent = `${amount} adet ${AMMO_TYPES[type].name} cephaneliğe eklendi!`;
+    marketFeedbackEl.textContent = `Başarıyla satın alındı!`;
     setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
   });
 });
 
-document.querySelectorAll('.upgrade-buy-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if (!player) return;
-    const cost = parseInt(btn.dataset.cost, 10);
-    const bonus = btn.dataset.bonus;
+function renderShipyardList() {
+  shipyardListEl.innerHTML = '';
+  const owned = currentUser.ownedShips || ['standard'];
+  const equipped = currentUser.equippedShip || 'standard';
 
-    if (player.score < cost) {
-      marketFeedbackEl.style.color = '#f87171';
-      marketFeedbackEl.textContent = 'Yetersiz altın!';
-      return;
+  Object.values(SHIP_MODELS).forEach(model => {
+    const isOwned = owned.includes(model.id);
+    const isEquipped = equipped === model.id;
+
+    const div = document.createElement('div');
+    div.className = 'market-item';
+    
+    let btnHtml = '';
+    if (isEquipped) {
+      btnHtml = `<button class="buy-btn equipped" type="button" disabled>Kullanımda</button>`;
+    } else if (isOwned) {
+      btnHtml = `<button class="buy-btn ship-equip-btn" type="button" data-id="${model.id}">Kullan</button>`;
+    } else {
+      btnHtml = `<button class="buy-btn ship-buy-btn" type="button" data-id="${model.id}" data-cost="${model.cost}">Satın Al (${formatShortNumber(model.cost)})</button>`;
     }
 
-    player.score -= cost;
-    let msg = '';
-    if (bonus === 'damage') {
-      bonusDamage += 25;
-      selectAmmoSlot(player.selectedAmmo);
-      msg = 'Top gücü kalıcı olarak +25 arttırıldı!';
-    } else if (bonus === 'hp') {
-      player.maxHp += 250000;
-      player.hp = player.maxHp;
-      msg = 'Gemi gövdesi güçlendirildi (+250.000 Can)!';
-    } else if (bonus === 'speed') {
-      player.maxSpeed += 0.25;
-      msg = 'Usta dümenci katıldı, gemi hızı arttı!';
-    } else if (bonus === 'repair') {
-      player.hp = player.maxHp;
-      msg = 'Marangoz tayfası gemiyi tamamen onardı!';
-    } else if (bonus === 'pack') {
-      player.ammo.fire += 500;
-      player.ammo.dragon += 250;
-      msg = 'Korsan Lordu Cephane Sandığı açıldı!';
-    }
-
-    updateHUD();
-    marketFeedbackEl.style.color = '#4ade80';
-    marketFeedbackEl.textContent = msg;
-    setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2500);
+    div.innerHTML = `
+      <div class="market-item-info">
+        <span class="market-item-title">${model.name}</span>
+        <span class="market-item-sub">${model.desc}</span>
+      </div>
+      ${btnHtml}
+    `;
+    shipyardListEl.appendChild(div);
   });
-});
+
+  shipyardListEl.querySelectorAll('.ship-buy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const shipId = btn.dataset.id;
+      const cost = parseInt(btn.dataset.cost);
+      if (player.score < cost) {
+        marketFeedbackEl.style.color = '#f87171';
+        marketFeedbackEl.textContent = 'Yeterli altın yok!';
+        setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+        return;
+      }
+      player.score -= cost;
+      if (!currentUser.ownedShips.includes(shipId)) currentUser.ownedShips.push(shipId);
+      currentUser.equippedShip = shipId;
+
+      const users = loadUsers();
+      const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
+      if (uIdx !== -1) {
+        users[uIdx].ownedShips = currentUser.ownedShips;
+        users[uIdx].equippedShip = shipId;
+        saveUsers(users);
+      }
+      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
+
+      shipTitleEl.textContent = SHIP_MODELS[shipId].name;
+      updateHUD();
+      renderShipyardList();
+
+      marketFeedbackEl.style.color = '#4ade80';
+      marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} satın alındı ve kuşanıldı!`;
+      setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+    });
+  });
+
+  shipyardListEl.querySelectorAll('.ship-equip-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const shipId = btn.dataset.id;
+      currentUser.equippedShip = shipId;
+
+      const users = loadUsers();
+      const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
+      if (uIdx !== -1) {
+        users[uIdx].equippedShip = shipId;
+        saveUsers(users);
+      }
+      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
+
+      shipTitleEl.textContent = SHIP_MODELS[shipId].name;
+      renderShipyardList();
+
+      marketFeedbackEl.style.color = '#4ade80';
+      marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} kuşanıldı!`;
+      setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+    });
+  });
+}
 
 loadUsers();
 const session = JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY) || 'null');
