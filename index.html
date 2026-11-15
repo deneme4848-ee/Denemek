@@ -138,6 +138,18 @@
       text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap;
     }
 
+    /* Boss Uyarı Bannerı */
+    #boss-alert {
+      position: fixed; top: 68px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(90deg, rgba(127, 29, 29, 0.95), rgba(185, 28, 28, 0.95));
+      border: 1.5px solid #fbbf24; color: #fef08a;
+      padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 900;
+      box-shadow: 0 8px 25px rgba(220, 38, 38, 0.6); z-index: 8;
+      pointer-events: none; opacity: 0; transition: opacity 0.4s ease;
+      white-space: nowrap;
+    }
+    #boss-alert.show { opacity: 1; }
+
     /* Yüzen Hasar Yazıları Animasyonu */
     .floating-dmg {
       position: fixed; z-index: 10; pointer-events: none;
@@ -195,10 +207,16 @@
     #target-card {
       display: none; background: rgba(15, 23, 42, 0.92);
       border: 1.5px solid #ef4444; border-radius: 10px;
-      padding: 6px 10px; min-width: 145px; box-shadow: 0 8px 20px rgba(0,0,0,0.85);
+      padding: 6px 10px; min-width: 155px; box-shadow: 0 8px 20px rgba(0,0,0,0.85);
     }
     #target-card.visible { display: block; }
-    .target-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: #fca5a5; margin-bottom: 4px; }
+    #target-card.boss-target {
+      border-color: #fbbf24;
+      background: linear-gradient(145deg, rgba(69, 10, 10, 0.95), rgba(15, 23, 42, 0.95));
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+    }
+    .target-header { display: flex; justify-content: space-between; gap: 8px; font-size: 11px; font-weight: 800; color: #fca5a5; margin-bottom: 4px; }
+    .boss-target .target-header { color: #fde047; }
     .target-hp-bg { width: 100%; height: 7px; background: rgba(255,255,255,0.15); border-radius: 4px; overflow: hidden; }
     #target-hp-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #dc2626, #f97316); transition: width 0.15s; }
 
@@ -283,6 +301,8 @@
 <body>
 
   <div id="game"></div>
+
+  <div id="boss-alert">☠️ KIZIL SAKAL'IN KALYONU (BOSS) DENİZDE BELİRDİ!</div>
 
   <!-- Geminin Altındaki Can Barı & İsim / Filo Etiketi -->
   <div id="player-label">
@@ -473,6 +493,7 @@ const expTextEl = document.querySelector('#exp-text');
 const hpBarEl = document.querySelector('#hp-bar');
 const expBarEl = document.querySelector('#exp-bar');
 const coordDisplayEl = document.querySelector('#coord-display');
+const bossAlertEl = document.querySelector('#boss-alert');
 
 const attackBtn = document.querySelector('#attack-btn');
 const attackBtnText = document.querySelector('#attack-btn-text');
@@ -619,6 +640,7 @@ if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeIt
 // ==========================================================
 let scene, camera, renderer;
 let playerSprite, playerNeonRing, enemies = [], rangeRingMesh, oceanTexture, oceanBumpTexture;
+let clickMarkerGroup, clickOuterRing, clickInnerRing, clickRipples = [];
 let activeProjectiles = [], particleSystems = [];
 let raycaster, planeGeo, mouse;
 let shipTextures = {};
@@ -627,7 +649,8 @@ const WORLD_SIZE = 1000;
 const ATTACK_RANGE = 280;
 const AGGRO_RANGE = 280;
 const BASE_SHIP_HEIGHT = 95;
-const SHIP_Y_POS = 110; // ASLA DEĞİŞMEYECEK SABİT DEĞER
+const SHIP_Y_POS = 110;
+const SHIP_COLLISION_RADIUS = 24;
 
 function createStaticOceanTextures() {
   const size = 1024;
@@ -790,6 +813,59 @@ function applyNormalizedSprite(sprite, angle, baseHeight = BASE_SHIP_HEIGHT) {
   sprite.scale.set(baseHeight * data.aspect, baseHeight, 1);
 }
 
+// Tıklama Noktası Su Halkası (Ripple) Oluşturma
+function spawnClickRipple(x, z) {
+  if (clickMarkerGroup) {
+    clickMarkerGroup.position.set(x, 1.0, z);
+    clickMarkerGroup.visible = true;
+  }
+
+  const rGeo = new THREE.RingGeometry(4, 7, 36);
+  const rMat = new THREE.MeshBasicMaterial({
+    color: 0x38bdf8,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.9
+  });
+  const rMesh = new THREE.Mesh(rGeo, rMat);
+  rMesh.rotation.x = -Math.PI / 2;
+  rMesh.position.set(x, 1.1, z);
+  scene.add(rMesh);
+
+  clickRipples.push({ mesh: rMesh, scale: 1, opacity: 0.9 });
+}
+
+// Ada Çarpışma Fiziği (Yumuşak İtme / Etrafından Dolaşma)
+function resolveIslandCollisions(entity, radius = SHIP_COLLISION_RADIUS) {
+  let collided = false;
+  for (const isl of gameIslands) {
+    const ix = isl.mesh.position.x;
+    const iz = isl.mesh.position.z;
+    const dx = entity.x - ix;
+    const dz = entity.z - iz;
+    const dist = Math.hypot(dx, dz);
+    const minDist = isl.r + radius;
+
+    if (dist < minDist) {
+      collided = true;
+      const pushDist = minDist - dist;
+      const nx = dist > 0.001 ? dx / dist : 1;
+      const nz = dist > 0.001 ? dz / dist : 0;
+      entity.x += nx * pushDist;
+      entity.z += nz * pushDist;
+    }
+  }
+  return collided;
+}
+
+function isPositionInsideIsland(x, z, buffer = 80) {
+  for (const isl of gameIslands) {
+    const dist = Math.hypot(x - isl.mesh.position.x, z - isl.mesh.position.z);
+    if (dist < isl.r + buffer) return true;
+  }
+  return false;
+}
+
 function initThreeGame() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x052236);
@@ -843,6 +919,23 @@ function initThreeGame() {
   playerNeonRing.position.y = 0.8;
   scene.add(playerNeonRing);
 
+  // Tıklama Hedef İşaretçisi (Altın & Turkuaz Çift Halka)
+  clickMarkerGroup = new THREE.Group();
+  const outerGeo = new THREE.RingGeometry(14, 18, 36);
+  const outerMat = new THREE.MeshBasicMaterial({ color: 0xfbbf24, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
+  clickOuterRing = new THREE.Mesh(outerGeo, outerMat);
+  clickOuterRing.rotation.x = -Math.PI / 2;
+
+  const innerGeo = new THREE.RingGeometry(4, 7, 36);
+  const innerMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.95 });
+  clickInnerRing = new THREE.Mesh(innerGeo, innerMat);
+  clickInnerRing.rotation.x = -Math.PI / 2;
+
+  clickMarkerGroup.add(clickOuterRing);
+  clickMarkerGroup.add(clickInnerRing);
+  clickMarkerGroup.visible = false;
+  scene.add(clickMarkerGroup);
+
   raycaster = new THREE.Raycaster();
   mouse = new THREE.Vector2();
 
@@ -880,7 +973,24 @@ function initThreeGame() {
 
     const oceanIntersect = raycaster.intersectObject(ocean);
     if (oceanIntersect.length > 0) {
-      targetPos = { x: oceanIntersect[0].point.x, z: oceanIntersect[0].point.z };
+      let tx = oceanIntersect[0].point.x;
+      let tz = oceanIntersect[0].point.z;
+
+      // Eğer doğrudan bir adanın içine tıklandıysa hedefi adanın kıyısına kaydır
+      for (const isl of gameIslands) {
+        const dx = tx - isl.mesh.position.x;
+        const dz = tz - isl.mesh.position.z;
+        const dist = Math.hypot(dx, dz);
+        const safeR = isl.r + SHIP_COLLISION_RADIUS + 6;
+        if (dist < safeR) {
+          const ang = dist > 0.001 ? Math.atan2(dz, dx) : 0;
+          tx = isl.mesh.position.x + Math.cos(ang) * safeR;
+          tz = isl.mesh.position.z + Math.sin(ang) * safeR;
+        }
+      }
+
+      targetPos = { x: tx, z: tz };
+      spawnClickRipple(tx, tz);
     }
   });
 
@@ -897,9 +1007,16 @@ let player, gameIslands = [];
 let targetPos = null, selectedEnemyId = null, isAttacking = false, isGameOver = false;
 let lastPlayerAttackTime = 0;
 
+function showBossBanner(msg) {
+  bossAlertEl.textContent = msg;
+  bossAlertEl.classList.add('show');
+  setTimeout(() => bossAlertEl.classList.remove('show'), 4500);
+}
+
 function startGameLogic() {
   isGameOver = false; targetPos = null; selectedEnemyId = null; isAttacking = false;
   gameOverEl.style.display = 'none';
+  if (clickMarkerGroup) clickMarkerGroup.visible = false;
 
   player = {
     x: 0, z: 0, a: -Math.PI / 2, speed: 0, maxSpeed: 1.85,
@@ -920,18 +1037,31 @@ function startGameLogic() {
 
   gameIslands.forEach(isl => scene.remove(isl.mesh));
   gameIslands = [];
-  const islGeo = new THREE.CylinderGeometry(40, 70, 35, 6);
+  const islGeo = new THREE.CylinderGeometry(42, 68, 35, 7);
   const islMat = new THREE.MeshStandardMaterial({ color: 0x0f382b, roughness: 0.9 });
   for (let i = 0; i < 8; i++) {
+    let ix, iz, tries = 0;
+    do {
+      ix = (Math.random() - 0.5) * 820;
+      iz = (Math.random() - 0.5) * 820;
+      tries++;
+    } while ((Math.hypot(ix, iz) < 170 || isPositionInsideIsland(ix, iz, 95)) && tries < 40);
+
     const mesh = new THREE.Mesh(islGeo, islMat);
-    mesh.position.set((Math.random() - 0.5) * 800, 10, (Math.random() - 0.5) * 800);
+    mesh.position.set(ix, 10, iz);
+    mesh.rotation.y = Math.random() * Math.PI;
     scene.add(mesh);
-    gameIslands.push({ mesh, r: 60 });
+    gameIslands.push({ mesh, r: 58 });
   }
 
-  enemies.forEach(en => scene.remove(en.sprite));
+  enemies.forEach(en => {
+    scene.remove(en.sprite);
+    if (en.auraMesh) scene.remove(en.auraMesh);
+  });
   enemies = [];
-  for (let i = 0; i < 6; i++) spawnEnemySprite(i + 1);
+
+  for (let i = 0; i < 6; i++) spawnEnemySprite(i + 1, false);
+  spawnEnemySprite(99, true); // Patron Gemi (Boss)
 
   selectAmmoSlot('iron');
   updateTargetCard();
@@ -939,26 +1069,64 @@ function startGameLogic() {
   syncAttackButton();
 }
 
-function spawnEnemySprite(id) {
-  let ex, ez;
+function spawnEnemySprite(id, isBoss = false) {
+  let ex, ez, tries = 0;
   do {
-    ex = (Math.random() - 0.5) * 800;
-    ez = (Math.random() - 0.5) * 800;
-  } while (Math.hypot(ex, ez) < 300);
+    ex = (Math.random() - 0.5) * 860;
+    ez = (Math.random() - 0.5) * 860;
+    tries++;
+  } while ((Math.hypot(ex, ez) < (isBoss ? 360 : 280) || isPositionInsideIsland(ex, ez, isBoss ? 110 : 85)) && tries < 60);
 
   const initialData = shipTextures.top || Object.values(shipTextures)[0];
-  const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1, color: 0xd1fae5 });
+  const shipHeight = isBoss ? BASE_SHIP_HEIGHT * 1.65 : BASE_SHIP_HEIGHT;
+  const mat = new THREE.SpriteMaterial({
+    map: initialData.texture,
+    transparent: true,
+    alphaTest: 0.1,
+    color: isBoss ? 0xff9999 : 0xd1fae5
+  });
   const sprite = new THREE.Sprite(mat);
   sprite.center.set(0.5, 0.95);
-  applyNormalizedSprite(sprite, 0);
+  applyNormalizedSprite(sprite, 0, shipHeight);
   sprite.position.set(ex, SHIP_Y_POS, ez);
   sprite.userData.enemyId = id;
   scene.add(sprite);
 
+  let auraMesh = null;
+  if (isBoss) {
+    const auraGeo = new THREE.RingGeometry(48, 58, 48);
+    const auraMat = new THREE.MeshBasicMaterial({
+      color: 0xef4444,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.85
+    });
+    auraMesh = new THREE.Mesh(auraGeo, auraMat);
+    auraMesh.rotation.x = -Math.PI / 2;
+    auraMesh.position.set(ex, 0.9, ez);
+    scene.add(auraMesh);
+    showBossBanner("☠️ KIZIL SAKAL'IN KALYONU (BOSS) DENİZDE BELİRDİ!");
+  }
+
   enemies.push({
-    id, name: `Korsan Gemisi #${id}`, sprite, x: ex, z: ez,
-    hp: 520, maxHp: 520, baseSpeed: 1.15, slowTimer: 0,
-    a: 0, wanderAngle: Math.random() * Math.PI * 2, wanderTimer: 0,
+    id,
+    isBoss,
+    name: isBoss ? "☠️ Kızıl Sakal (BOSS)" : `Korsan Gemisi #${id}`,
+    sprite,
+    auraMesh,
+    shipHeight,
+    x: ex,
+    z: ez,
+    hp: isBoss ? 8500 : 520,
+    maxHp: isBoss ? 8500 : 520,
+    damage: isBoss ? 450 : 100,
+    rewardGold: isBoss ? 5000 : 150,
+    rewardExp: isBoss ? 300 : 35,
+    baseSpeed: isBoss ? 0.95 : 1.15,
+    slowTimer: 0,
+    a: 0,
+    wanderAngle: Math.random() * Math.PI * 2,
+    wanderTimer: 0,
     lastAttackTime: 0
   });
 }
@@ -994,17 +1162,18 @@ window.addEventListener('keydown', e => {
 
 function updateTargetCard() {
   if (!selectedEnemyId) {
-    targetCardEl.classList.remove('visible');
+    targetCardEl.classList.remove('visible', 'boss-target');
     return;
   }
   const target = enemies.find(e => e.id === selectedEnemyId);
   if (!target) {
-    targetCardEl.classList.remove('visible');
+    targetCardEl.classList.remove('visible', 'boss-target');
     return;
   }
   targetCardEl.classList.add('visible');
+  targetCardEl.classList.toggle('boss-target', !!target.isBoss);
   targetNameEl.textContent = target.name;
-  targetHpTextEl.textContent = `${Math.ceil(target.hp)}/${target.maxHp}`;
+  targetHpTextEl.textContent = `${Math.ceil(target.hp).toLocaleString()}/${target.maxHp.toLocaleString()}`;
   targetHpBarEl.style.width = Math.max(0, (target.hp / target.maxHp) * 100) + '%';
 }
 
@@ -1026,7 +1195,6 @@ attackBtn.addEventListener('click', () => {
 
 restartBtn.addEventListener('click', () => startGameLogic());
 
-// Yüzen Hasar Yazısı Gösterme Fonksiyonu (Floating Damage Text)
 function showFloatingDamage(wx, wz, text, colorHex) {
   const div = document.createElement('div');
   div.className = 'floating-dmg';
@@ -1044,10 +1212,9 @@ function showFloatingDamage(wx, wz, text, colorHex) {
   setTimeout(() => div.remove(), 900);
 }
 
-// Gülle Ateşleme Fonksiyonu (Daha büyük ve görkemli gülleler)
 function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
   const ammoSpec = AMMO_TYPES[ammoKey];
-  const pGeo = new THREE.SphereGeometry(6.5, 16, 16); // Daha büyük gülle boyutu
+  const pGeo = new THREE.SphereGeometry(6.5, 16, 16);
   const pMat = new THREE.MeshStandardMaterial({ 
     color: ammoSpec.color, 
     emissive: ammoSpec.color,
@@ -1056,7 +1223,7 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
   });
   const mesh = new THREE.Mesh(pGeo, pMat);
   
-  const GULLE_Y_OFFSET = 50; // Eski orijinal yükseklik ayarı
+  const GULLE_Y_OFFSET = 50;
   mesh.position.set(startX, SHIP_Y_POS - GULLE_Y_OFFSET, startZ);
   scene.add(mesh);
 
@@ -1092,6 +1259,7 @@ function animate3D() {
     } else {
       targetPos = null;
       player.speed *= 0.9;
+      if (clickMarkerGroup) clickMarkerGroup.visible = false;
     }
   } else {
     player.speed *= 0.92;
@@ -1099,6 +1267,29 @@ function animate3D() {
 
   player.x += Math.cos(player.a) * player.speed;
   player.z += Math.sin(player.a) * player.speed;
+
+  // Oyuncu Ada Çarpışma Kontrolü
+  resolveIslandCollisions(player, SHIP_COLLISION_RADIUS);
+
+  // Tıklama İmleci & Su Halkası Animasyonları
+  if (clickMarkerGroup && clickMarkerGroup.visible) {
+    const pulse = 1 + Math.sin(now * 0.008) * 0.18;
+    clickOuterRing.scale.set(pulse, pulse, 1);
+    clickInnerRing.rotation.z += 0.05;
+  }
+  for (let i = clickRipples.length - 1; i >= 0; i--) {
+    const rp = clickRipples[i];
+    rp.scale += 0.08;
+    rp.opacity -= 0.025;
+    rp.mesh.scale.set(rp.scale, rp.scale, 1);
+    rp.mesh.material.opacity = Math.max(0, rp.opacity);
+    if (rp.opacity <= 0) {
+      scene.remove(rp.mesh);
+      rp.mesh.geometry.dispose();
+      rp.mesh.material.dispose();
+      clickRipples.splice(i, 1);
+    }
+  }
 
   coordDisplayEl.textContent = `X: ${Math.round((player.x / (WORLD_SIZE / 2)) * 50)} · Y: ${Math.round((player.z / (WORLD_SIZE / 2)) * 50)}`;
 
@@ -1126,7 +1317,6 @@ function animate3D() {
   camera.position.z += (player.z + 540 - camera.position.z) * 0.08;
   camera.lookAt(player.x, 0, player.z);
 
-  // Gülle ve Büyütülmüş Parçacık Efektleri
   for (let i = activeProjectiles.length - 1; i >= 0; i--) {
     const p = activeProjectiles[i];
     const dx = p.targetX - p.x;
@@ -1160,7 +1350,7 @@ function animate3D() {
           sparkColor = 0x666666;
         }
 
-        const sparkGeo = new THREE.SphereGeometry(2.4, 8, 8); // Daha büyük kıvılcım tanecikleri
+        const sparkGeo = new THREE.SphereGeometry(2.4, 8, 8);
         const sparkMat = new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 0.95 });
         const sparkMesh = new THREE.Mesh(sparkGeo, sparkMat);
         sparkMesh.position.set(
@@ -1190,8 +1380,9 @@ function animate3D() {
     if (en.slowTimer > 0) en.slowTimer--;
     const activeSpeed = en.slowTimer > 0 ? en.baseSpeed * 0.5 : en.baseSpeed;
     const distToPlayer = Math.hypot(player.x - en.x, player.z - en.z);
+    const aggroRange = en.isBoss ? 340 : AGGRO_RANGE;
 
-    if (distToPlayer <= AGGRO_RANGE) {
+    if (distToPlayer <= aggroRange) {
       en.a = Math.atan2(player.z - en.z, player.x - en.x);
       
       if (distToPlayer > ATTACK_RANGE - 20) {
@@ -1199,13 +1390,12 @@ function animate3D() {
         en.z += Math.sin(en.a) * (activeSpeed * 1.25);
       }
 
-      if (distToPlayer <= ATTACK_RANGE && (now - en.lastAttackTime >= 1000)) {
+      if (distToPlayer <= ATTACK_RANGE && (now - en.lastAttackTime >= (en.isBoss ? 1400 : 1000))) {
         en.lastAttackTime = now;
-        player.hp = Math.max(0, player.hp - 100);
+        player.hp = Math.max(0, player.hp - en.damage);
         player.lastDamagedTime = now;
         
-        // Oyuncu Hasar Aldığında Üstünde Hasar Yazısı Göster
-        showFloatingDamage(player.x, player.z, '-100', '#ef4444');
+        showFloatingDamage(player.x, player.z, `-${en.damage}`, en.isBoss ? '#dc2626' : '#ef4444');
 
         updateHUD();
         if (player.hp <= 0) {
@@ -1226,12 +1416,24 @@ function animate3D() {
       en.z += Math.sin(en.a) * (activeSpeed * 0.75);
     }
 
+    // Düşman & Boss Ada Çarpışma Kontrolü
+    const hitIsland = resolveIslandCollisions(en, en.isBoss ? 36 : SHIP_COLLISION_RADIUS);
+    if (hitIsland) {
+      en.wanderAngle += Math.PI * 0.5;
+    }
+
     en.x = Math.max(-WORLD_SIZE/2, Math.min(WORLD_SIZE/2, en.x));
     en.z = Math.max(-WORLD_SIZE/2, Math.min(WORLD_SIZE/2, en.z));
 
     if (en.sprite) {
       en.sprite.position.set(en.x, SHIP_Y_POS, en.z);
-      applyNormalizedSprite(en.sprite, en.a);
+      applyNormalizedSprite(en.sprite, en.a, en.shipHeight);
+    }
+    if (en.auraMesh) {
+      en.auraMesh.position.set(en.x, 0.9, en.z);
+      en.auraMesh.rotation.z -= 0.03;
+      const bossPulse = 1 + Math.sin(now * 0.006) * 0.1;
+      en.auraMesh.scale.set(bossPulse, bossPulse, 1);
     }
   }
 
@@ -1250,7 +1452,6 @@ function animate3D() {
           target.hp -= ammoSpec.damage;
           if (ammoSpec.slow < 1.0) target.slowTimer = 240;
 
-          // Düşmana Hasar Verildiğinde Üstünde Hasar Yazısı Göster
           showFloatingDamage(target.x, target.z, '-' + ammoSpec.damage, '#f97316');
 
           updateTargetCard();
@@ -1259,12 +1460,20 @@ function animate3D() {
 
           if (target.hp <= 0) {
             scene.remove(target.sprite);
+            if (target.auraMesh) scene.remove(target.auraMesh);
             enemies = enemies.filter(e => e.id !== target.id);
             selectedEnemyId = null;
             isAttacking = false;
-            player.score += 150;
-            player.exp += 35;
-            if (player.exp >= player.maxExp) {
+
+            player.score += target.rewardGold;
+            player.exp += target.rewardExp;
+
+            if (target.isBoss) {
+              showFloatingDamage(player.x, player.z, `+${target.rewardGold.toLocaleString()} ALTIN!`, '#fbbf24');
+              showBossBanner("🏆 KIZIL SAKAL BATIRILDI! +5.000 ALTIN KAZANDIN!");
+            }
+
+            while (player.exp >= player.maxExp) {
               player.level++;
               player.exp -= player.maxExp;
               player.maxExp = Math.round(player.maxExp * 1.4);
@@ -1274,7 +1483,7 @@ function animate3D() {
             updateTargetCard();
             updateHUD();
             syncAttackButton();
-            setTimeout(() => spawnEnemySprite(target.id), 3000);
+            setTimeout(() => spawnEnemySprite(target.id, target.isBoss), target.isBoss ? 15000 : 3000);
           }
         });
 
@@ -1310,15 +1519,25 @@ function drawMinimap() {
   mctx.fillStyle = '#3f6212';
   gameIslands.forEach(isl => {
     mctx.beginPath();
-    mctx.arc(cx + isl.mesh.position.x * scale, cy + isl.mesh.position.z * scale, 2.5, 0, Math.PI * 2);
+    mctx.arc(cx + isl.mesh.position.x * scale, cy + isl.mesh.position.z * scale, 2.8, 0, Math.PI * 2);
     mctx.fill();
   });
 
-  mctx.fillStyle = '#dc2626';
   enemies.forEach(en => {
-    mctx.beginPath();
-    mctx.arc(cx + en.x * scale, cy + en.z * scale, 2.2, 0, Math.PI * 2);
-    mctx.fill();
+    if (en.isBoss) {
+      mctx.fillStyle = '#991b1b';
+      mctx.beginPath();
+      mctx.arc(cx + en.x * scale, cy + en.z * scale, 4.2, 0, Math.PI * 2);
+      mctx.fill();
+      mctx.strokeStyle = '#fbbf24';
+      mctx.lineWidth = 1;
+      mctx.stroke();
+    } else {
+      mctx.fillStyle = '#dc2626';
+      mctx.beginPath();
+      mctx.arc(cx + en.x * scale, cy + en.z * scale, 2.2, 0, Math.PI * 2);
+      mctx.fill();
+    }
   });
 
   mctx.fillStyle = '#1d4ed8';
@@ -1341,11 +1560,11 @@ function updateHUD() {
   const hpPercent = Math.max(0, Math.min(100, (player.hp / player.maxHp) * 100));
   playerShipHpFillEl.style.width = hpPercent + '%';
   if (hpPercent > 50) {
-    playerShipHpFillEl.style.backgroundColor = '#22c55e'; // Yeşil
+    playerShipHpFillEl.style.backgroundColor = '#22c55e';
   } else if (hpPercent > 20) {
-    playerShipHpFillEl.style.backgroundColor = '#eab308'; // Sarı
+    playerShipHpFillEl.style.backgroundColor = '#eab308';
   } else {
-    playerShipHpFillEl.style.backgroundColor = '#ef4444'; // Kırmızı
+    playerShipHpFillEl.style.backgroundColor = '#ef4444';
   }
 
   Object.keys(qtyEls).forEach(type => {
