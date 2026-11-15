@@ -137,6 +137,26 @@
       text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap;
     }
 
+    /* NPC Gemilerinin Altındaki Can Barı & İsim Etiketi */
+    .enemy-label {
+      position: fixed; z-index: 5; pointer-events: none;
+      transform: translate(-50%, 0);
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      will-change: transform;
+    }
+    .enemy-hp-track {
+      width: 50px; height: 5px; background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 3px; overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.8);
+    }
+    .enemy-hp-fill {
+      width: 100%; height: 100%; background: #ef4444; transition: width 0.15s;
+    }
+    .enemy-name-tag {
+      font-size: 10px; font-weight: 800; color: #fca5a5;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap;
+    }
+
     .floating-dmg {
       position: fixed; z-index: 10; pointer-events: none;
       font-weight: 900; font-size: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.9);
@@ -545,8 +565,8 @@ const SHIP_MODELS = {
   dragon:   { id: 'dragon',   name: 'Kızıl Ejder',         desc: 'Ejderha nefesi gücünü artıran efsane', cost: 35000000 }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v29';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v29';
+const USERS_STORAGE_KEY = 'pirate3d_users_v30';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v30';
 let authMode = 'login';
 let currentUser = null;
 
@@ -899,7 +919,7 @@ function initThreeGame() {
 // ==========================================================
 // OYUN MANTIĞI
 // ==========================================================
-let player, gameIslands = [];
+let player;
 let targetPos = null, selectedEnemyId = null, isAttacking = false, isGameOver = false;
 let lastPlayerAttackTime = 0;
 
@@ -924,18 +944,15 @@ function startGameLogic() {
   applyNormalizedSprite(playerSprite, player.a);
   scene.add(playerSprite);
 
-  gameIslands.forEach(isl => scene.remove(isl.mesh));
-  gameIslands = [];
-  const islGeo = new THREE.CylinderGeometry(40, 70, 35, 6);
-  const islMat = new THREE.MeshStandardMaterial({ color: 0x0f382b, roughness: 0.9 });
-  for (let i = 0; i < 8; i++) {
-    const mesh = new THREE.Mesh(islGeo, islMat);
-    mesh.position.set((Math.random() - 0.5) * 800, 10, (Math.random() - 0.5) * 800);
-    scene.add(mesh);
-    gameIslands.push({ mesh, r: 60 });
-  }
+  // Adalar tamamen kaldırıldı
 
-  enemies.forEach(en => scene.remove(en.sprite));
+  // Eski düşman HTML etiketlerini temizle
+  document.querySelectorAll('.enemy-label').forEach(el => el.remove());
+
+  enemies.forEach(en => {
+    if (en.sprite) scene.remove(en.sprite);
+    if (en.labelEl) en.labelEl.remove();
+  });
   enemies = [];
   for (let i = 0; i < 6; i++) spawnEnemySprite(i + 1);
 
@@ -961,8 +978,19 @@ function spawnEnemySprite(id) {
   sprite.userData.enemyId = id;
   scene.add(sprite);
 
+  // NPC Altı Can Barı & İsim Etiketi DOM Elementi
+  const labelEl = document.createElement('div');
+  labelEl.className = 'enemy-label';
+  labelEl.innerHTML = `
+    <div class="enemy-hp-track"><div class="enemy-hp-fill" id="enemy-hp-${id}"></div></div>
+    <div class="enemy-name-tag">Korsan #${id}</div>
+  `;
+  document.body.appendChild(labelEl);
+
   enemies.push({
-    id, name: `Korsan Gemisi #${id}`, sprite, x: ex, z: ez,
+    id, name: `Korsan Gemisi #${id}`, sprite, labelEl,
+    hpFillEl: labelEl.querySelector('.enemy-hp-fill'),
+    x: ex, z: ez,
     hp: 520, maxHp: 520, baseSpeed: 1.15, slowTimer: 0,
     a: 0, wanderAngle: Math.random() * Math.PI * 2, wanderTimer: 0,
     lastAttackTime: 0, isAggro: false
@@ -1249,6 +1277,16 @@ function animate3D() {
     if (en.sprite) {
       en.sprite.position.set(en.x, SHIP_Y_POS, en.z);
       applyNormalizedSprite(en.sprite, en.a);
+
+      // NPC Altı Can Barı ve İsim Konumlandırma (Ekran koordinatlarına göre geminin hemen altında)
+      const tempVector = new THREE.Vector3(en.x, SHIP_Y_POS, en.z);
+      tempVector.project(camera);
+      const xPx = (tempVector.x *  .5 + .5) * window.innerWidth;
+      const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 100;
+      en.labelEl.style.transform = `translate(-50%, 0) translate(${xPx}px, ${yPx}px)`;
+
+      const hpP = Math.max(0, (en.hp / en.maxHp) * 100);
+      en.hpFillEl.style.width = hpP + '%';
     }
   }
 
@@ -1277,6 +1315,7 @@ function animate3D() {
 
           if (target.hp <= 0) {
             scene.remove(target.sprite);
+            target.labelEl.remove();
             enemies = enemies.filter(e => e.id !== target.id);
             selectedEnemyId = null;
             isAttacking = false;
@@ -1326,12 +1365,7 @@ function drawMinimap() {
   const scale = (w * 0.46) / (WORLD_SIZE / 2);
   const cx = w / 2, cy = h / 2;
 
-  mctx.fillStyle = '#3f6212';
-  gameIslands.forEach(isl => {
-    mctx.beginPath();
-    mctx.arc(cx + isl.mesh.position.x * scale, cy + isl.mesh.position.z * scale, 2.5, 0, Math.PI * 2);
-    mctx.fill();
-  });
+  // Adalar minimaptan de kaldırıldı
 
   mctx.fillStyle = '#dc2626';
   enemies.forEach(en => {
