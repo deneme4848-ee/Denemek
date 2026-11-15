@@ -114,7 +114,6 @@
     }
     .ship-sub-name { font-size: 10px; color: #94a3b8; text-align: right; }
 
-    /* Geminin Altındaki Can Barı & İsim / Filo Etiketi */
     #player-label {
       position: fixed; z-index: 5; pointer-events: none;
       transform: translate(-50%, 0);
@@ -138,7 +137,6 @@
       text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap;
     }
 
-    /* Yüzen Hasar Yazıları Animasyonu */
     .floating-dmg {
       position: fixed; z-index: 10; pointer-events: none;
       font-weight: 900; font-size: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.9);
@@ -284,7 +282,6 @@
 
   <div id="game"></div>
 
-  <!-- Geminin Altındaki Can Barı & İsim / Filo Etiketi -->
   <div id="player-label">
     <div class="ship-hp-track">
       <div id="player-ship-hp-fill"></div>
@@ -293,179 +290,7 @@
     <div class="ship-fleet-tag">[TST]</div>
   </div>
 
-  <div id="top-vital-hud">
-    <div class="level-crest">
-      <span>SEVİYE</span>
-      <strong id="level">1</strong>
-    </div>
-    <div class="vital-bars-wrap">
-      <div class="vital-track">
-        <div id="hp-bar"></div>
-        <div class="vital-label" id="hp-text">Can 1.000.000 / 1.000.000</div>
-      </div>
-      <div class="vital-track">
-        <div id="exp-bar"></div>
-        <div class="vital-label" id="exp-text">Deneyim 0 / 100</div>
-      </div>
-    </div>
-  </div>
-
-  <div id="top-left-hud">
-    <div class="radar-card">
-      <div class="radar-title">Harita 1</div>
-      <canvas id="minimap" width="82" height="82"></canvas>
-      <div class="coord-pill" id="coord-display">X: 0 · Y: 0</div>
-    </div>
-    <div class="side-tool-col">
-      <button id="market-toggle-btn" class="tool-icon-btn" type="button" title="Market (M)">
-        <span class="ico">⚖️</span>
-        <span class="lbl">Market</span>
-      </button>
-      <button id="shipyard-toggle-btn" class="tool-icon-btn" type="button" title="Tersane (T)">
-        <span class="ico">⚓</span>
-        <span class="lbl">Tersane</span>
-      </button>
-    </div>
-  </div>
-
-  <div id="top-right-hud">
-    <div class="captain-row">
-      <strong id="captain-name">Test</strong>
-      <button id="logout-btn" class="logout-chip" type="button">Çıkış</button>
-    </div>
-    <div class="gold-row">
-      <span>🪙</span>
-      <span id="score">100,000,000</span>
-    </div>
-    <div class="ship-sub-name" id="ship-title">8 Yönlü Efsanevi Gemi</div>
-  </div>
-
-  <div id="bottom-dock">
-    <div class="ammo-dock-container">
-      <div class="active-ammo-banner" id="active-ammo-info">Seçili: Demir Gülle (180 Hasar)</div>
-      <div class="ammo-slots-row" id="ammo-slots-row">
-        <div class="ammo-slot selected" data-type="iron">
-          <span class="key-hint">1</span>
-          <span class="ammo-ico">⚫</span>
-          <span class="ammo-qty" id="qty-iron">1m</span>
-        </div>
-        <div class="ammo-slot" data-type="chain">
-          <span class="key-hint">2</span>
-          <span class="ammo-ico">⛓️</span>
-          <span class="ammo-qty" id="qty-chain">1m</span>
-        </div>
-        <div class="ammo-slot" data-type="fire">
-          <span class="key-hint">3</span>
-          <span class="ammo-ico">🔥</span>
-          <span class="ammo-qty" id="qty-fire">1m</span>
-        </div>
-        <div class="ammo-slot" data-type="dragon">
-          <span class="key-hint">4</span>
-          <span class="ammo-ico">🐉</span>
-          <span class="ammo-qty" id="qty-dragon">1m</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="right-combat-cluster">
-      <div id="target-card">
-        <div class="target-header">
-          <span id="target-name">Korsan Fırkateyni</span>
-          <span id="target-hp-text">520/520</span>
-        </div>
-        <div class="target-hp-bg"><div id="target-hp-bar"></div></div>
-      </div>
-      <button id="attack-btn" disabled>
-        <span class="crosshair">🎯</span>
-        <span id="attack-btn-text">ATEŞ ET</span>
-      </button>
-    </div>
-  </div>
-
-  <div id="market-panel">
-    <div class="market-header">
-      <strong>⚓ Cephane Marketi & Tersane</strong>
-      <button id="market-close-btn" class="market-close" type="button">✕</button>
-    </div>
-    <div class="market-tabs">
-      <button id="tab-market" class="market-tab-btn active" type="button">Gülle & Cephane</button>
-      <button id="tab-shipyard" class="market-tab-btn" type="button">Tersane</button>
-    </div>
-    <div class="market-balance">
-      <span>Hazine: <strong id="market-gold" style="color:#ffd783;">100,000,000</strong> Altın</span>
-    </div>
-    <div id="section-market" class="market-section active">
-      <div class="market-item">
-        <div class="market-item-info">
-          <span class="market-item-title">⚫ 25x Demir Gülle</span>
-          <span class="market-item-sub">180 Hasar · Standart top güllesi</span>
-        </div>
-        <button class="buy-btn ammo-buy-btn" type="button" data-type="iron" data-amount="25" data-cost="20">20 Altın</button>
-      </div>
-      <div class="market-item">
-        <div class="market-item-info">
-          <span class="market-item-title">⛓️ 15x Zincirli Gülle</span>
-          <span class="market-item-sub">140 Hasar · Düşmanı %50 yavaşlatır</span>
-        </div>
-        <button class="buy-btn ammo-buy-btn" type="button" data-type="chain" data-amount="15" data-cost="35">35 Altın</button>
-      </div>
-      <div class="market-item">
-        <div class="market-item-info">
-          <span class="market-item-title">🔥 15x Alevli Gülle</span>
-          <span class="market-item-sub">290 Hasar · Yüksek yanma gücü</span>
-        </div>
-        <button class="buy-btn ammo-buy-btn" type="button" data-type="fire" data-amount="15" data-cost="60">60 Altın</button>
-      </div>
-      <div class="market-item">
-        <div class="market-item-info">
-          <span class="market-item-title">🐉 10x Ejderha Nefesi</span>
-          <span class="market-item-sub">450 Hasar · Efsanevi yıkım güllesi</span>
-        </div>
-        <button class="buy-btn ammo-buy-btn" type="button" data-type="dragon" data-amount="10" data-cost="120">120 Altın</button>
-      </div>
-    </div>
-    <div id="section-shipyard" class="market-section">
-      <div id="shipyard-list"></div>
-    </div>
-    <div id="market-feedback"></div>
-  </div>
-
-  <div id="gameover">
-    <h1>GEMİN BATTI!</h1>
-    <p id="final-score">Toplanan Altın: 0</p>
-    <button id="restart-btn">YENİDEN YELKEN AÇ</button>
-  </div>
-
-  <div id="auth-overlay">
-    <div class="auth-card">
-      <div class="auth-brand">
-        <h1>⚓ Korsan Dünyası</h1>
-        <p>8 Yönlü Şeffaf PNG Sprite Denizleri</p>
-      </div>
-      <div class="auth-tabs">
-        <button id="tab-login" class="auth-tab active" type="button">Giriş Yap</button>
-        <button id="tab-register" class="auth-tab" type="button">Kayıt Ol</button>
-      </div>
-      <form id="auth-form">
-        <div class="auth-field">
-          <label for="auth-username">Kaptan Adı</label>
-          <input id="auth-username" type="text" autocomplete="username" placeholder="Örn: Test" required>
-        </div>
-        <div class="auth-field">
-          <label for="auth-password">Şifre</label>
-          <input id="auth-password" type="password" autocomplete="current-password" placeholder="Şifre" required>
-        </div>
-        <div id="auth-msg" class="auth-msg"></div>
-        <button id="auth-submit" class="auth-submit" type="submit">DENİZE AÇIL</button>
-      </form>
-      <div class="quick-test-box">
-        <span>Test: <strong>Test</strong> / <strong>test</strong></span>
-        <button id="fill-test-btn" class="quick-test-btn" type="button">Hızlı Doldur</button>
-      </div>
-    </div>
-  </div>
-
-<script>
+  <script>
 const scoreEl = document.querySelector('#score');
 const levelEl = document.querySelector('#level');
 const hpTextEl = document.querySelector('#hp-text');
@@ -637,7 +462,7 @@ const WORLD_SIZE = 1000;
 const ATTACK_RANGE = 280;
 const AGGRO_RANGE = 280;
 const BASE_SHIP_HEIGHT = 95;
-const SHIP_Y_POS = 110; // ASLA DEĞİŞMEYECEK SABİT DEĞER
+const SHIP_Y_POS = 110;
 
 function createStaticOceanTextures() {
   const size = 1024;
@@ -1152,7 +977,7 @@ function showFloatingDamage(wx, wz, text, colorHex) {
 }
 
 function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit, isEnemy = false) {
-  const ammoSpec = isEnemy ? { color: 0xff2200, speed: 6 } : AMMO_TYPES[ammoKey];
+  const ammoSpec = isEnemy ? { color: 0xff2200 } : AMMO_TYPES[ammoKey];
   const pGeo = new THREE.SphereGeometry(7.5, 16, 16);
   const pMat = new THREE.MeshStandardMaterial({ 
     color: isEnemy ? 0xff2200 : ammoSpec.color, 
@@ -1611,3 +1436,176 @@ if (session) { completeLogin(session); }
 </script>
 </body>
 </html>
+
+  
+  <div id="top-vital-hud">
+    <div class="level-crest">
+      <span>SEVİYE</span>
+      <strong id="level">1</strong>
+    </div>
+    <div class="vital-bars-wrap">
+      <div class="vital-track">
+        <div id="hp-bar"></div>
+        <div class="vital-label" id="hp-text">Can 1.000.000 / 1.000.000</div>
+      </div>
+      <div class="vital-track">
+        <div id="exp-bar"></div>
+        <div class="vital-label" id="exp-text">Deneyim 0 / 100</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="top-left-hud">
+    <div class="radar-card">
+      <div class="radar-title">Harita 1</div>
+      <canvas id="minimap" width="82" height="82"></canvas>
+      <div class="coord-pill" id="coord-display">X: 0 · Y: 0</div>
+    </div>
+    <div class="side-tool-col">
+      <button id="market-toggle-btn" class="tool-icon-btn" type="button" title="Market (M)">
+        <span class="ico">⚖️</span>
+        <span class="lbl">Market</span>
+      </button>
+      <button id="shipyard-toggle-btn" class="tool-icon-btn" type="button" title="Tersane (T)">
+        <span class="ico">⚓</span>
+        <span class="lbl">Tersane</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="top-right-hud">
+    <div class="captain-row">
+      <strong id="captain-name">Test</strong>
+      <button id="logout-btn" class="logout-chip" type="button">Çıkış</button>
+    </div>
+    <div class="gold-row">
+      <span>🪙</span>
+      <span id="score">100,000,000</span>
+    </div>
+    <div class="ship-sub-name" id="ship-title">8 Yönlü Efsanevi Gemi</div>
+  </div>
+
+  <div id="bottom-dock">
+    <div class="ammo-dock-container">
+      <div class="active-ammo-banner" id="active-ammo-info">Seçili: Demir Gülle (180 Hasar)</div>
+      <div class="ammo-slots-row" id="ammo-slots-row">
+        <div class="ammo-slot selected" data-type="iron">
+          <span class="key-hint">1</span>
+          <span class="ammo-ico">⚫</span>
+          <span class="ammo-qty" id="qty-iron">1m</span>
+        </div>
+        <div class="ammo-slot" data-type="chain">
+          <span class="key-hint">2</span>
+          <span class="ammo-ico">⛓️</span>
+          <span class="ammo-qty" id="qty-chain">1m</span>
+        </div>
+        <div class="ammo-slot" data-type="fire">
+          <span class="key-hint">3</span>
+          <span class="ammo-ico">🔥</span>
+          <span class="ammo-qty" id="qty-fire">1m</span>
+        </div>
+        <div class="ammo-slot" data-type="dragon">
+          <span class="key-hint">4</span>
+          <span class="ammo-ico">🐉</span>
+          <span class="ammo-qty" id="qty-dragon">1m</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-combat-cluster">
+      <div id="target-card">
+        <div class="target-header">
+          <span id="target-name">Korsan Fırkateyni</span>
+          <span id="target-hp-text">520/520</span>
+        </div>
+        <div class="target-hp-bg"><div id="target-hp-bar"></div></div>
+      </div>
+      <button id="attack-btn" disabled>
+        <span class="crosshair">🎯</span>
+        <span id="attack-btn-text">ATEŞ ET</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="market-panel">
+    <div class="market-header">
+      <strong>⚓ Cephane Marketi & Tersane</strong>
+      <button id="market-close-btn" class="market-close" type="button">✕</button>
+    </div>
+    <div class="market-tabs">
+      <button id="tab-market" class="market-tab-btn active" type="button">Gülle & Cephane</button>
+      <button id="tab-shipyard" class="market-tab-btn" type="button">Tersane</button>
+    </div>
+    <div class="market-balance">
+      <span>Hazine: <strong id="market-gold" style="color:#ffd783;">100,000,000</strong> Altın</span>
+    </div>
+    <div id="section-market" class="market-section active">
+      <div class="market-item">
+        <div class="market-item-info">
+          <span class="market-item-title">⚫ 25x Demir Gülle</span>
+          <span class="market-item-sub">180 Hasar · Standart top güllesi</span>
+        </div>
+        <button class="buy-btn ammo-buy-btn" type="button" data-type="iron" data-amount="25" data-cost="20">20 Altın</button>
+      </div>
+      <div class="market-item">
+        <div class="market-item-info">
+          <span class="market-item-title">⛓️ 15x Zincirli Gülle</span>
+          <span class="market-item-sub">140 Hasar · Düşmanı %50 yavaşlatır</span>
+        </div>
+        <button class="buy-btn ammo-buy-btn" type="button" data-type="chain" data-amount="15" data-cost="35">35 Altın</button>
+      </div>
+      <div class="market-item">
+        <div class="market-item-info">
+          <span class="market-item-title">🔥 15x Alevli Gülle</span>
+          <span class="market-item-sub">290 Hasar · Yüksek yanma gücü</span>
+        </div>
+        <button class="buy-btn ammo-buy-btn" type="button" data-type="fire" data-amount="15" data-cost="60">60 Altın</button>
+      </div>
+      <div class="market-item">
+        <div class="market-item-info">
+          <span class="market-item-title">🐉 10x Ejderha Nefesi</span>
+          <span class="market-item-sub">450 Hasar · Efsanevi yıkım güllesi</span>
+        </div>
+        <button class="buy-btn ammo-buy-btn" type="button" data-type="dragon" data-amount="10" data-cost="120">120 Altın</button>
+      </div>
+    </div>
+    <div id="section-shipyard" class="market-section">
+      <div id="shipyard-list"></div>
+    </div>
+    <div id="market-feedback"></div>
+  </div>
+
+  <div id="gameover">
+    <h1>GEMİN BATTI!</h1>
+    <p id="final-score">Toplanan Altın: 0</p>
+    <button id="restart-btn">YENİDEN YELKEN AÇ</button>
+  </div>
+
+  <div id="auth-overlay">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <h1>⚓ Korsan Dünyası</h1>
+        <p>8 Yönlü Şeffaf PNG Sprite Denizleri</p>
+      </div>
+      <div class="auth-tabs">
+        <button id="tab-login" class="auth-tab active" type="button">Giriş Yap</button>
+        <button id="tab-register" class="auth-tab" type="button">Kayıt Ol</button>
+      </div>
+      <form id="auth-form">
+        <div class="auth-field">
+          <label for="auth-username">Kaptan Adı</label>
+          <input id="auth-username" type="text" autocomplete="username" placeholder="Örn: Test" required>
+        </div>
+        <div class="auth-field">
+          <label for="auth-password">Şifre</label>
+          <input id="auth-password" type="password" autocomplete="current-password" placeholder="Şifre" required>
+        </div>
+        <div id="auth-msg" class="auth-msg"></div>
+        <button id="auth-submit" class="auth-submit" type="submit">DENİZE AÇIL</button>
+      </form>
+      <div class="quick-test-box">
+        <span>Test: <strong>Test</strong> / <strong>test</strong></span>
+        <button id="fill-test-btn" class="quick-test-btn" type="button">Hızlı Doldur</button>
+      </div>
+    </div>
+  </div>
