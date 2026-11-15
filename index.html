@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - 8 Yönlü Efsanevi Filo</title>
+  <title>Korsan Dünyası - Hilal Kale Kuşatması</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -114,7 +114,6 @@
     }
     .ship-sub-name { font-size: 9px; color: #94a3b8; text-align: right; }
 
-    /* İlk tercih edilen, geminin hemen altında ideal konum */
     #player-label {
       position: fixed; z-index: 5; pointer-events: none;
       transform: translate(-50%, -10px);
@@ -340,7 +339,9 @@
     .quick-test-btn { border: 1px solid rgba(186, 230, 253, 0.35); background: rgba(14, 116, 144, 0.35); color: #e0f2fe; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; }
   </style>
 
+  <!-- Three.js ve GLTF Yükleyicisi -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
 
@@ -486,7 +487,7 @@
         <button class="buy-btn ammo-buy-btn" type="button" data-type="dragon" data-amount="10" data-cost="120" style="width:auto;">120 Altın</button>
       </div>
     </div>
-    <!-- Tersane Bölümü (büyük önizlemeli) -->
+    <!-- Tersane Bölümü -->
     <div id="section-shipyard" class="market-section">
       <div class="shipyard-grid" id="shipyard-list"></div>
     </div>
@@ -511,7 +512,7 @@
     <div class="auth-card">
       <div class="auth-brand">
         <h1>⚓ Korsan Dünyası</h1>
-        <p>8 Yönlü Şeffaf PNG Sprite Denizleri</p>
+        <p>8 Yönlü Şeffaf PNG Sprite & GLB Model Desteği</p>
       </div>
       <div class="auth-tabs">
         <button id="tab-login" class="auth-tab active" type="button">Giriş Yap</button>
@@ -617,15 +618,16 @@ const AMMO_TYPES = {
   dragon: { id: 'dragon', name: 'Ejderha Nefesi', damage: 450, slow: 0.85, desc: '450 Efsanevi Hasar', color: 0x3b82f6 }
 };
 
+// Tersane Modelleri (GLB destekli yeni gemi eklendi)
 const SHIP_MODELS = {
-  standard: { id: 'standard', name: '8 Yönlü Gemi', desc: 'Standart Savaş Gemisi', cost: 0, img: 'gemi18.png' },
-  ghost:    { id: 'ghost',    name: 'Hayalet Fırkateyn', desc: 'Gizli Sis Gövdesi', cost: 5000000, img: 'gemi18.png' },
-  gold:     { id: 'gold',     name: 'Altın Korsan', desc: 'İhtişamlı Altın Kalyon', cost: 15000000, img: 'gemi18.png' },
-  dragon:   { id: 'dragon',   name: 'Kızıl Ejder', desc: 'Ejderha Gücü', cost: 35000000, img: 'gemi18.png' }
+  standard: { id: 'standard', name: '8 Yönlü Gemi', desc: 'Standart Savaş Gemisi', cost: 0, type: 'sprite', img: 'gemi18.png' },
+  ghost:    { id: 'ghost',    name: 'Hayalet Fırkateyn', desc: 'Gizli Sis Gövdesi', cost: 5000000, type: 'sprite', img: 'gemi18.png' },
+  gold:     { id: 'gold',     name: 'Altın Korsan', desc: 'İhtişamlı Altın Kalyon', cost: 15000000, type: 'sprite', img: 'gemi18.png' },
+  customGlb:{ id: 'customGlb', name: 'Özel 3D Kalyon', desc: 'GLB Formatlı Savaş Gemisi', cost: 25000000, type: 'glb', modelPath: 'ejder_kalyon.glb', img: 'gemi18.png' }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v36';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v36';
+const USERS_STORAGE_KEY = 'pirate3d_users_v41';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v41';
 let authMode = 'login';
 let currentUser = null;
 
@@ -694,17 +696,20 @@ if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeIt
 // THREE.JS SAHNE & OYUN MOTORU
 // ==========================================================
 let scene, camera, renderer;
-let playerSprite, playerNeonRing, enemies = [], rangeRingMesh, oceanTexture, oceanBumpTexture;
+let playerSprite, activeGlbShip = null, playerNeonRing, enemies = [], rangeRingMesh, oceanTexture, oceanBumpTexture;
+let castleGroup = null, castleTowers = [];
+let castleProjectiles = [];
 let activeProjectiles = [], particleSystems = [];
 let raycaster, planeGeo, mouse;
 let shipTextures = {};
-let textureLoader;
+let textureLoader, gltfLoader;
 let selectedRingMesh = null;
 const WORLD_SIZE = 1000;
 const ATTACK_RANGE = 280;
-const AGGRO_RANGE = 280;
+const CASTLE_AGGRO_RANGE = 330;
 const BASE_SHIP_HEIGHT = 85;
-const SHIP_Y_POS = 110;
+const SHIP_Y_POS = 0;
+let castleTowerMeshes = [];
 
 function createStaticOceanTextures() {
   const size = 1024;
@@ -867,6 +872,87 @@ function applyNormalizedSprite(sprite, angle, baseHeight = BASE_SHIP_HEIGHT) {
   sprite.scale.set(baseHeight * data.aspect, baseHeight, 1);
 }
 
+// ==========================================================
+// HİLAL ŞEKLİNDE GİRİLEBİLİR ADA VE 15 KULE MODELLEMESİ
+// ==========================================================
+function buildCastleIsland() {
+  castleGroup = new THREE.Group();
+  castleGroup.position.set(0, 0, -350);
+
+  const islandGeo = new THREE.CylinderGeometry(150, 170, 32, 36);
+  const islandMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.85, metalness: 0.1 });
+  const islandMesh = new THREE.Mesh(islandGeo, islandMat);
+  islandMesh.position.y = 14;
+  castleGroup.add(islandMesh);
+
+  const wallRadius = 120;
+  const wallCount = 20;
+  const wallMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.8, metalness: 0.2 });
+
+  for (let i = 0; i < wallCount; i++) {
+    const angle = (i / wallCount) * Math.PI * 1.6 - (Math.PI * 0.8);
+    const wx = Math.cos(angle) * wallRadius;
+    const wz = Math.sin(angle) * wallRadius;
+
+    const wGeo = new THREE.BoxGeometry(18, 30, 10);
+    const wMesh = new THREE.Mesh(wGeo, wallMat);
+    wMesh.position.set(wx, 30, wz);
+    wMesh.rotation.y = -angle;
+    castleGroup.add(wMesh);
+  }
+
+  const keepGeo = new THREE.BoxGeometry(45, 60, 45);
+  const keepMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6, metalness: 0.3 });
+  const keepMesh = new THREE.Mesh(keepGeo, keepMat);
+  keepMesh.position.set(0, 52, 20);
+  castleGroup.add(keepMesh);
+
+  const roofGeo = new THREE.ConeGeometry(34, 32, 4);
+  const roofMat = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.5 });
+  const roofMesh = new THREE.Mesh(roofGeo, roofMat);
+  roofMesh.position.set(0, 95, 20);
+  castleGroup.add(roofMesh);
+
+  castleTowers = [];
+  castleTowerMeshes = [];
+  const towerCount = 15;
+
+  for (let i = 0; i < towerCount; i++) {
+    const angle = (i / towerCount) * Math.PI * 1.5 - (Math.PI * 0.75);
+    const tx = Math.cos(angle) * wallRadius;
+    const tz = Math.sin(angle) * wallRadius;
+
+    const tGeo = new THREE.CylinderGeometry(8, 10, 42, 16);
+    const tMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.7 });
+    const towerMesh = new THREE.Mesh(tGeo, tMat);
+    towerMesh.position.set(tx, 45, tz);
+    
+    const towerId = 100 + i;
+    towerMesh.userData = { towerId: towerId, name: `Kale Kulesi #${i+1}` };
+    castleGroup.add(towerMesh);
+    castleTowerMeshes.push(towerMesh);
+
+    const tRoofGeo = new THREE.ConeGeometry(11, 15, 12);
+    const tRoofMat = new THREE.MeshStandardMaterial({ color: 0x7f1d1d, roughness: 0.5 });
+    const tRoofMesh = new THREE.Mesh(tRoofGeo, tRoofMat);
+    tRoofMesh.position.set(tx, 71, tz);
+    castleGroup.add(tRoofMesh);
+
+    castleTowers.push({
+      id: towerId,
+      name: `Kale Kulesi #${i+1}`,
+      mesh: towerMesh,
+      localX: tx,
+      localZ: tz,
+      hp: 350,
+      maxHp: 350,
+      lastShotTime: 0
+    });
+  }
+
+  scene.add(castleGroup);
+}
+
 function initThreeGame() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x052236);
@@ -882,6 +968,7 @@ function initThreeGame() {
   document.getElementById('game').appendChild(renderer.domElement);
 
   textureLoader = new THREE.TextureLoader();
+  gltfLoader = new THREE.GLTFLoader();
 
   const ambientLight = new THREE.AmbientLight(0xe0f2fe, 0.95);
   scene.add(ambientLight);
@@ -905,6 +992,8 @@ function initThreeGame() {
   const ocean = new THREE.Mesh(planeGeo, oceanMat);
   ocean.rotation.x = -Math.PI / 2;
   scene.add(ocean);
+
+  buildCastleIsland();
 
   const ringGeo = new THREE.RingGeometry(ATTACK_RANGE - 3, ATTACK_RANGE, 64);
   const ringMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.6 });
@@ -952,11 +1041,24 @@ function initThreeGame() {
     raycaster.setFromCamera(mouse, camera);
 
     const enemySprites = enemies.map(en => en.sprite);
-    const intersects = raycaster.intersectObjects(enemySprites);
-    if (intersects.length > 0) {
-      let obj = intersects[0].object;
+    const intersectsEnemies = raycaster.intersectObjects(enemySprites);
+    if (intersectsEnemies.length > 0) {
+      let obj = intersectsEnemies[0].object;
       if (obj.userData.enemyId) {
         selectedEnemyId = obj.userData.enemyId;
+        selectedTowerId = null;
+        updateTargetCard();
+        syncAttackButton();
+        return;
+      }
+    }
+
+    const intersectsTowers = raycaster.intersectObjects(castleTowerMeshes);
+    if (intersectsTowers.length > 0) {
+      let obj = intersectsTowers[0].object;
+      if (obj.userData.towerId) {
+        selectedTowerId = obj.userData.towerId;
+        selectedEnemyId = null;
         updateTargetCard();
         syncAttackButton();
         return;
@@ -976,18 +1078,56 @@ function initThreeGame() {
 }
 
 // ==========================================================
-// OYUN MANTIĞI
+// OYUN MANTIĞI & GLB YÜKLEME
 // ==========================================================
 let player;
-let targetPos = null, selectedEnemyId = null, isAttacking = false, isGameOver = false;
+let targetPos = null, selectedEnemyId = null, selectedTowerId = null, isAttacking = false, isGameOver = false;
 let lastPlayerAttackTime = 0;
 
+function setupPlayerShipVisual() {
+  const users = loadUsers();
+  const dbUser = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
+  const equippedId = dbUser.equippedShip || 'standard';
+  const modelSpec = SHIP_MODELS[equippedId] || SHIP_MODELS.standard;
+
+  shipTitleEl.textContent = modelSpec.name;
+
+  // Mevcut görselleri temizle
+  if (playerSprite) { playerSprite.visible = false; }
+  if (activeGlbShip) { scene.remove(activeGlbShip); activeGlbShip = null; }
+
+  if (modelSpec.type === 'glb' && modelSpec.modelPath) {
+    gltfLoader.load(modelSpec.modelPath, (gltf) => {
+      activeGlbShip = gtf.scene || gltf.scenes[0];
+      activeGlbShip.scale.set(12, 12, 12); // Boyut ayarı
+      scene.add(activeGlbShip);
+    }, undefined, (err) => {
+      console.warn("GLB yüklenemedi, yedek sprite'a dönülüyor:", err);
+      createDefaultSprite();
+    });
+  } else {
+    createDefaultSprite();
+  }
+}
+
+function createDefaultSprite() {
+  if (!playerSprite) {
+    const initialData = shipTextures.top || Object.values(shipTextures)[0];
+    const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1 });
+    playerSprite = new THREE.Sprite(mat);
+    playerSprite.center.set(0.5, 0.85);
+    scene.add(playerSprite);
+  }
+  playerSprite.visible = true;
+  applyNormalizedSprite(playerSprite, player ? player.a : 0);
+}
+
 function startGameLogic() {
-  isGameOver = false; targetPos = null; selectedEnemyId = null; isAttacking = false;
+  isGameOver = false; targetPos = null; selectedEnemyId = null; selectedTowerId = null; isAttacking = false;
   gameOverEl.style.display = 'none';
 
   player = {
-    x: 0, z: 0, a: -Math.PI / 2, speed: 0, maxSpeed: 1.85,
+    x: 0, z: 220, a: -Math.PI / 2, speed: 0, maxSpeed: 1.85,
     hp: 1000000, maxHp: 1000000, score: 100000000,
     level: 1, exp: 0, maxExp: 100,
     selectedAmmo: 'iron',
@@ -995,13 +1135,7 @@ function startGameLogic() {
     lastDamagedTime: 0
   };
 
-  if (playerSprite) scene.remove(playerSprite);
-  const initialData = shipTextures.top || Object.values(shipTextures)[0];
-  const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1 });
-  playerSprite = new THREE.Sprite(mat);
-  playerSprite.center.set(0.5, 0.85); // Orijinal kusursuz merkez ayarı
-  applyNormalizedSprite(playerSprite, player.a);
-  scene.add(playerSprite);
+  setupPlayerShipVisual();
 
   document.querySelectorAll('.enemy-label').forEach(el => el.remove());
 
@@ -1022,8 +1156,8 @@ function spawnEnemySprite(id) {
   let ex, ez;
   do {
     ex = (Math.random() - 0.5) * 800;
-    ez = (Math.random() - 0.5) * 800;
-  } while (Math.hypot(ex, ez) < 300);
+    ez = (Math.random() - 0.5) * 600 + 100;
+  } while (Math.hypot(ex, ez) < 250);
 
   const initialData = shipTextures.top || Object.values(shipTextures)[0];
   const mat = new THREE.SpriteMaterial({ map: initialData.texture, transparent: true, alphaTest: 0.1, color: 0xd1fae5 });
@@ -1076,38 +1210,59 @@ window.addEventListener('keydown', e => {
 });
 
 function updateTargetCard() {
-  if (!selectedEnemyId) {
+  if (!selectedEnemyId && !selectedTowerId) {
     targetCardEl.classList.remove('visible');
     if (selectedRingMesh) selectedRingMesh.visible = false;
     return;
   }
-  const target = enemies.find(e => e.id === selectedEnemyId);
-  if (!target) {
-    targetCardEl.classList.remove('visible');
-    if (selectedRingMesh) selectedRingMesh.visible = false;
-    return;
-  }
+
   targetCardEl.classList.add('visible');
-  targetNameEl.textContent = target.name;
-  targetHpTextEl.textContent = `${Math.ceil(target.hp)}/${target.maxHp}`;
-  targetHpBarEl.style.width = Math.max(0, (target.hp / target.maxHp) * 100) + '%';
-  
-  if (selectedRingMesh) {
-    selectedRingMesh.visible = true;
-    selectedRingMesh.position.set(target.x, 0.9, target.z);
+
+  if (selectedEnemyId) {
+    const target = enemies.find(e => e.id === selectedEnemyId);
+    if (!target) {
+      targetCardEl.classList.remove('visible');
+      if (selectedRingMesh) selectedRingMesh.visible = false;
+      return;
+    }
+    targetNameEl.textContent = target.name;
+    targetHpTextEl.textContent = `${Math.ceil(target.hp)}/${target.maxHp}`;
+    targetHpBarEl.style.width = Math.max(0, (target.hp / target.maxHp) * 100) + '%';
+    
+    if (selectedRingMesh) {
+      selectedRingMesh.visible = true;
+      selectedRingMesh.position.set(target.x, 0.9, target.z);
+    }
+  } else if (selectedTowerId) {
+    const tower = castleTowers.find(t => t.id === selectedTowerId);
+    if (!tower) {
+      targetCardEl.classList.remove('visible');
+      if (selectedRingMesh) selectedRingMesh.visible = false;
+      return;
+    }
+    targetNameEl.textContent = tower.name;
+    targetHpTextEl.textContent = `${Math.ceil(tower.hp)}/${tower.maxHp}`;
+    targetHpBarEl.style.width = Math.max(0, (tower.hp / tower.maxHp) * 100) + '%';
+    
+    if (selectedRingMesh) {
+      selectedRingMesh.visible = true;
+      const twX = castleGroup.position.x + tower.localX;
+      const twZ = castleGroup.position.z + tower.localZ;
+      selectedRingMesh.position.set(twX, 0.9, twZ);
+    }
   }
 }
 
 function syncAttackButton() {
   if (isGameOver || !player) return;
   const currentAmmoQty = player.ammo[player.selectedAmmo] || 0;
-  attackBtn.disabled = !selectedEnemyId || currentAmmoQty <= 0;
+  attackBtn.disabled = (!selectedEnemyId && !selectedTowerId) || currentAmmoQty <= 0;
   attackBtn.classList.toggle('firing', isAttacking);
   attackBtnText.textContent = isAttacking ? 'DURDUR' : 'ATEŞ ET';
 }
 
 attackBtn.addEventListener('click', () => {
-  if (!selectedEnemyId) return;
+  if (!selectedEnemyId && !selectedTowerId) return;
   const currentAmmoQty = player.ammo[player.selectedAmmo] || 0;
   if (currentAmmoQty <= 0) return;
   isAttacking = !isAttacking;
@@ -1156,6 +1311,23 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
   });
 }
 
+function fireCastleProjectile(startX, startZ, targetX, targetZ, onHit) {
+  const pGeo = new THREE.SphereGeometry(5, 16, 16);
+  const pMat = new THREE.MeshStandardMaterial({ 
+    color: 0xff4500, 
+    emissive: 0xff0000,
+    emissiveIntensity: 1.2 
+  });
+  const mesh = new THREE.Mesh(pGeo, pMat);
+  mesh.position.set(startX, 50, startZ);
+  scene.add(mesh);
+
+  castleProjectiles.push({
+    mesh, x: startX, z: startZ, targetX, targetZ,
+    speed: 4.5, onHit
+  });
+}
+
 function animate3D() {
   requestAnimationFrame(animate3D);
 
@@ -1190,9 +1362,14 @@ function animate3D() {
 
   coordDisplayEl.textContent = `X: ${Math.round((player.x / (WORLD_SIZE / 2)) * 50)} · Y: ${Math.round((player.z / (WORLD_SIZE / 2)) * 50)}`;
 
-  if (playerSprite) {
+  // Oyuncu görselini güncelle (Sprite veya GLB Model)
+  if (playerSprite && playerSprite.visible) {
     playerSprite.position.set(player.x, SHIP_Y_POS, player.z);
     applyNormalizedSprite(playerSprite, player.a);
+  }
+  if (activeGlbShip) {
+    activeGlbShip.position.set(player.x, SHIP_Y_POS, player.z);
+    activeGlbShip.rotation.y = -player.a + Math.PI / 2;
   }
 
   if (playerNeonRing) {
@@ -1202,25 +1379,84 @@ function animate3D() {
 
   rangeRingMesh.position.set(player.x, 0.6, player.z);
 
-  if (selectedEnemyId && selectedRingMesh) {
-    const target = enemies.find(e => e.id === selectedEnemyId);
-    if (target) {
-      selectedRingMesh.position.set(target.x, 0.9, target.z);
-      selectedRingMesh.rotation.z += 0.02;
+  if (selectedRingMesh) {
+    if (selectedEnemyId) {
+      const target = enemies.find(e => e.id === selectedEnemyId);
+      if (target) {
+        selectedRingMesh.visible = true;
+        selectedRingMesh.position.set(target.x, 0.9, target.z);
+        selectedRingMesh.rotation.z += 0.02;
+      }
+    } else if (selectedTowerId) {
+      const tower = castleTowers.find(t => t.id === selectedTowerId);
+      if (tower) {
+        selectedRingMesh.visible = true;
+        const twX = castleGroup.position.x + tower.localX;
+        const twZ = castleGroup.position.z + tower.localZ;
+        selectedRingMesh.position.set(twX, 0.9, twZ);
+        selectedRingMesh.rotation.z += 0.02;
+      }
     }
   }
 
-  if (playerSprite) {
+  if (player) {
     const tempVector = new THREE.Vector3(player.x, SHIP_Y_POS, player.z);
     tempVector.project(camera);
     const xPx = (tempVector.x *  .5 + .5) * window.innerWidth;
-    const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 65; // Orijinal kusursuz dikey konum (+38)
+    const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 38;
     playerLabelEl.style.transform = `translate(-50%, 0) translate(${xPx}px, ${yPx}px)`;
   }
 
   camera.position.x += (player.x - camera.position.x) * 0.08;
   camera.position.z += (player.z + 680 - camera.position.z) * 0.08;
   camera.lookAt(player.x, 0, player.z);
+
+  if (castleGroup) {
+    const castleWorldX = castleGroup.position.x;
+    const castleWorldZ = castleGroup.position.z;
+
+    castleTowers.forEach(tower => {
+      if (tower.hp <= 0) return;
+      const towerWorldX = castleWorldX + tower.localX;
+      const towerWorldZ = castleWorldZ + tower.localZ;
+      const distToPlayer = Math.hypot(player.x - towerWorldX, player.z - towerWorldZ);
+
+      if (distToPlayer <= CASTLE_AGGRO_RANGE && (now - tower.lastShotTime >= 2200)) {
+        tower.lastShotTime = now;
+        fireCastleProjectile(towerWorldX, towerWorldZ, player.x, player.z, () => {
+          player.hp = Math.max(0, player.hp - 80);
+          player.lastDamagedTime = now;
+          showFloatingDamage(player.x, player.z, '-80 (Kule)', '#dc2626');
+          updateHUD();
+          if (player.hp <= 0) {
+            isGameOver = true;
+            isAttacking = false;
+            gameOverEl.style.display = 'flex';
+            finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString();
+          }
+        });
+      }
+    });
+  }
+
+  for (let i = castleProjectiles.length - 1; i >= 0; i--) {
+    const cp = castleProjectiles[i];
+    const dx = player.x - cp.x;
+    const dz = player.z - cp.z;
+    const dist = Math.hypot(dx, dz);
+
+    if (dist < cp.speed) {
+      scene.remove(cp.mesh);
+      cp.mesh.geometry.dispose();
+      cp.mesh.material.dispose();
+      castleProjectiles.splice(i, 1);
+      if (cp.onHit) cp.onHit();
+    } else {
+      cp.x += (dx / dist) * cp.speed;
+      cp.z += (dz / dist) * cp.speed;
+      cp.mesh.position.set(cp.x, 50, cp.z);
+    }
+  }
 
   for (let i = activeProjectiles.length - 1; i >= 0; i--) {
     const p = activeProjectiles[i];
@@ -1338,56 +1574,78 @@ function animate3D() {
     }
   }
 
-  if (isAttacking && selectedEnemyId) {
-    const target = enemies.find(e => e.id === selectedEnemyId);
+  if (isAttacking && (selectedEnemyId || selectedTowerId)) {
     const ammoKey = player.selectedAmmo;
     const ammoSpec = AMMO_TYPES[ammoKey];
 
-    if (target && player.ammo[ammoKey] > 0) {
-      const d = Math.hypot(target.x - player.x, target.z - player.z);
-      if (d <= ATTACK_RANGE && (now - lastPlayerAttackTime >= 1000)) {
-        lastPlayerAttackTime = now;
-        player.ammo[ammoKey]--;
+    if (selectedEnemyId) {
+      const target = enemies.find(e => e.id === selectedEnemyId);
+      if (target && player.ammo[ammoKey] > 0) {
+        const d = Math.hypot(target.x - player.x, target.z - player.z);
+        if (d <= ATTACK_RANGE && (now - lastPlayerAttackTime >= 1000)) {
+          lastPlayerAttackTime = now;
+          player.ammo[ammoKey]--;
+          target.isAggro = true;
 
-        target.isAggro = true;
-
-        fireProjectile(player.x, player.z, target.x, target.z, ammoKey, () => {
-          target.hp -= ammoSpec.damage;
-          if (ammoSpec.slow < 1.0) target.slowTimer = 240;
-
-          showFloatingDamage(target.x, target.z, '-' + ammoSpec.damage, '#f97316');
-
-          updateTargetCard();
-          updateHUD();
-          syncAttackButton();
-
-          if (target.hp <= 0) {
-            scene.remove(target.sprite);
-            target.labelEl.remove();
-            enemies = enemies.filter(e => e.id !== target.id);
-            selectedEnemyId = null;
-            isAttacking = false;
-            if (selectedRingMesh) selectedRingMesh.visible = false;
-            player.score += 150;
-            player.exp += 35;
-            if (player.exp >= player.maxExp) {
-              player.level++;
-              player.exp -= player.maxExp;
-              player.maxExp = Math.round(player.maxExp * 1.4);
-              player.maxHp += 200000;
-              player.hp = player.maxHp;
-            }
+          fireProjectile(player.x, player.z, target.x, target.z, ammoKey, () => {
+            target.hp -= ammoSpec.damage;
+            if (ammoSpec.slow < 1.0) target.slowTimer = 240;
+            showFloatingDamage(target.x, target.z, '-' + ammoSpec.damage, '#f97316');
             updateTargetCard();
             updateHUD();
             syncAttackButton();
-            setTimeout(() => spawnEnemySprite(target.id), 3000);
-          }
-        });
 
+            if (target.hp <= 0) {
+              scene.remove(target.sprite);
+              target.labelEl.remove();
+              enemies = enemies.filter(e => e.id !== target.id);
+              selectedEnemyId = null;
+              isAttacking = false;
+              if (selectedRingMesh) selectedRingMesh.visible = false;
+              player.score += 150;
+              player.exp += 35;
+              updateTargetCard();
+              updateHUD();
+              syncAttackButton();
+              setTimeout(() => spawnEnemySprite(target.id), 3000);
+            }
+          });
+        }
       }
-    } else if (player.ammo[ammoKey] <= 0) {
-      isAttacking = false;
-      syncAttackButton();
+    } else if (selectedTowerId) {
+      const tower = castleTowers.find(t => t.id === selectedTowerId);
+      if (tower && tower.hp > 0 && player.ammo[ammoKey] > 0) {
+        const twWorldX = castleGroup.position.x + tower.localX;
+        const twWorldZ = castleGroup.position.z + tower.localZ;
+        const d = Math.hypot(twWorldX - player.x, twWorldZ - player.z);
+
+        if (d <= ATTACK_RANGE && (now - lastPlayerAttackTime >= 1000)) {
+          lastPlayerAttackTime = now;
+          player.ammo[ammoKey]--;
+
+          fireProjectile(player.x, player.z, twWorldX, twWorldZ, ammoKey, () => {
+            tower.hp -= ammoSpec.damage;
+            showFloatingDamage(twWorldX, twWorldZ, '-' + ammoSpec.damage, '#f97316');
+            updateTargetCard();
+            updateHUD();
+            syncAttackButton();
+
+            if (tower.hp <= 0) {
+              castleGroup.remove(tower.mesh);
+              tower.mesh.geometry.dispose();
+              tower.mesh.material.dispose();
+              castleTowerMeshes = castleTowerMeshes.filter(m => m !== tower.mesh);
+              selectedTowerId = null;
+              isAttacking = false;
+              if (selectedRingMesh) selectedRingMesh.visible = false;
+              player.score += 300;
+              updateTargetCard();
+              updateHUD();
+              syncAttackButton();
+            }
+          });
+        }
+      }
     }
   }
 
@@ -1413,6 +1671,11 @@ function drawMinimap() {
 
   const scale = w / WORLD_SIZE;
   const cx = w / 2, cy = h / 2;
+
+  mctx.fillStyle = '#475569';
+  mctx.beginPath();
+  mctx.arc(cx + 0, cy + (-350 * scale), 22 * scale, 0, Math.PI * 2);
+  mctx.fill();
 
   mctx.fillStyle = '#dc2626';
   enemies.forEach(en => {
@@ -1531,7 +1794,7 @@ function renderShipyardList() {
 
     div.innerHTML = `
       <div class="ship-card-img-wrap">
-        <img src="gemi18.png" alt="${model.name}">
+        <img src="${model.img}" alt="${model.name}">
       </div>
       <div class="ship-card-title">${model.name}</div>
       <div class="ship-card-sub">${model.desc}</div>
@@ -1563,7 +1826,7 @@ function renderShipyardList() {
       currentUser.equippedShip = shipId;
 
       updateHUD();
-      shipTitleEl.textContent = SHIP_MODELS[shipId].name;
+      setupPlayerShipVisual();
       renderShipyardList();
 
       marketFeedbackEl.style.color = '#4ade80';
@@ -1582,7 +1845,7 @@ function renderShipyardList() {
         saveUsers(users);
       }
       currentUser.equippedShip = shipId;
-      shipTitleEl.textContent = SHIP_MODELS[shipId].name;
+      setupPlayerShipVisual();
       renderShipyardList();
 
       marketFeedbackEl.style.color = '#4ade80';
