@@ -618,7 +618,6 @@ const AMMO_TYPES = {
   dragon: { id: 'dragon', name: 'Ejderha Nefesi', damage: 450, slow: 0.85, desc: '450 Efsanevi Hasar', color: 0x3b82f6 }
 };
 
-// Tersane Modelleri (GLB destekli yeni gemi eklendi)
 const SHIP_MODELS = {
   standard: { id: 'standard', name: '8 Yönlü Gemi', desc: 'Standart Savaş Gemisi', cost: 0, type: 'sprite', img: 'gemi18.png' },
   ghost:    { id: 'ghost',    name: 'Hayalet Fırkateyn', desc: 'Gizli Sis Gövdesi', cost: 5000000, type: 'sprite', img: 'gemi18.png' },
@@ -708,7 +707,7 @@ const WORLD_SIZE = 1000;
 const ATTACK_RANGE = 280;
 const CASTLE_AGGRO_RANGE = 330;
 const BASE_SHIP_HEIGHT = 85;
-const SHIP_Y_POS = 100;
+const SHIP_Y_POS = 0;
 let castleTowerMeshes = [];
 
 function createStaticOceanTextures() {
@@ -1092,14 +1091,13 @@ function setupPlayerShipVisual() {
 
   shipTitleEl.textContent = modelSpec.name;
 
-  // Mevcut görselleri temizle
   if (playerSprite) { playerSprite.visible = false; }
   if (activeGlbShip) { scene.remove(activeGlbShip); activeGlbShip = null; }
 
   if (modelSpec.type === 'glb' && modelSpec.modelPath) {
     gltfLoader.load(modelSpec.modelPath, (gltf) => {
-      activeGlbShip = gtf.scene || gltf.scenes[0];
-      activeGlbShip.scale.set(50, 100, 200); // Boyut ayarı
+      activeGlbShip = gltf.scene || gltf.scenes[0];
+      activeGlbShip.scale.set(12, 12, 12);
       scene.add(activeGlbShip);
     }, undefined, (err) => {
       console.warn("GLB yüklenemedi, yedek sprite'a dönülüyor:", err);
@@ -1362,7 +1360,6 @@ function animate3D() {
 
   coordDisplayEl.textContent = `X: ${Math.round((player.x / (WORLD_SIZE / 2)) * 50)} · Y: ${Math.round((player.z / (WORLD_SIZE / 2)) * 50)}`;
 
-  // Oyuncu görselini güncelle (Sprite veya GLB Model)
   if (playerSprite && playerSprite.visible) {
     playerSprite.position.set(player.x, SHIP_Y_POS, player.z);
     applyNormalizedSprite(playerSprite, player.a);
