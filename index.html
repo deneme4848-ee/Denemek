@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Sade Market & Gemi Görselleri</title>
+  <title>Korsan Dünyası - Yarım Ay Sinematik Kuleler</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -652,8 +652,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v65';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v65';
+const USERS_STORAGE_KEY = 'pirate3d_users_v66';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v66';
 let authMode = 'login';
 let currentUser = null;
 
@@ -856,6 +856,81 @@ function createBorderFrame() {
   scene.add(borderFrameMesh);
 }
 
+function buildCinematicCrescentTowerMesh() {
+  const towerGroup = new THREE.Group();
+
+  const stoneMat = new THREE.MeshStandardMaterial({
+    color: 0x273444,
+    roughness: 0.85,
+    metalness: 0.15,
+    bumpScale: 0.05
+  });
+  const ironMat = new THREE.MeshStandardMaterial({
+    color: 0x0f172a,
+    roughness: 0.4,
+    metalness: 0.85
+  });
+  const brassMat = new THREE.MeshStandardMaterial({
+    color: 0xd97706,
+    roughness: 0.3,
+    metalness: 0.9
+  });
+
+  const baseGeo = new THREE.CylinderGeometry(28, 36, 45, 18);
+  const baseMesh = new THREE.Mesh(baseGeo, stoneMat);
+  baseMesh.position.y = 22.5;
+  baseMesh.castShadow = true;
+  baseMesh.receiveShadow = true;
+  towerGroup.add(baseMesh);
+
+  const midGeo = new THREE.CylinderGeometry(22, 28, 60, 16);
+  const midMesh = new THREE.Mesh(midGeo, stoneMat);
+  midMesh.position.y = 67.5;
+  midMesh.castShadow = true;
+  midMesh.receiveShadow = true;
+  towerGroup.add(midMesh);
+
+  const shieldShape = new THREE.Shape();
+  shieldShape.absarc(0, 0, 24, 0, Math.PI, false);
+  shieldShape.lineTo(-20, -12);
+  shieldShape.absarc(0, 0, 20, Math.PI, 0, true);
+  shieldShape.closePath();
+
+  const extrudeSettings = { depth: 35, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 1, bevelThickness: 1 };
+  const crescentGeo = new THREE.ExtrudeGeometry(shieldShape, extrudeSettings);
+  crescentGeo.rotateX(Math.PI / 2);
+  const crescentMesh = new THREE.Mesh(crescentGeo, stoneMat);
+  crescentMesh.position.set(0, 80, -4);
+  crescentMesh.castShadow = true;
+  towerGroup.add(crescentMesh);
+
+  const topGeo = new THREE.CylinderGeometry(24, 22, 14, 16);
+  const topMesh = new THREE.Mesh(topGeo, ironMat);
+  topMesh.position.y = 104;
+  towerGroup.add(topMesh);
+
+  const roofGeo = new THREE.ConeGeometry(26, 32, 16);
+  const roofMesh = new THREE.Mesh(roofGeo, ironMat);
+  roofMesh.position.y = 127;
+  roofMesh.castShadow = true;
+  towerGroup.add(roofMesh);
+
+  const spireGeo = new THREE.CylinderGeometry(1.5, 3, 22, 8);
+  const spireMesh = new THREE.Mesh(spireGeo, brassMat);
+  spireMesh.position.y = 150;
+  towerGroup.add(spireMesh);
+
+  for (let i = 0; i < 4; i++) {
+    const bandGeo = new THREE.TorusGeometry(23.5 + (i * 0.5), 1.2, 8, 24);
+    const bandMesh = new THREE.Mesh(bandGeo, brassMat);
+    bandMesh.rotation.x = Math.PI / 2;
+    bandMesh.position.y = 50 + (i * 18);
+    towerGroup.add(bandMesh);
+  }
+
+  return towerGroup;
+}
+
 function buildCastleIsland() {
   castleGroup = new THREE.Group();
   castleGroup.position.set(0, 0, -2200);
@@ -863,47 +938,40 @@ function buildCastleIsland() {
   castleTowers = [];
   castleTowerMeshes = [];
   const towerCount = 15;
-  const radius = 370;
+  const radius = 420;
 
   for (let i = 0; i < towerCount; i++) {
-    const angle = (i / towerCount) * Math.PI * 1.62 - (Math.PI * 0.81);
+    const angle = (i / (towerCount - 1)) * Math.PI - Math.PI;
     const tx = Math.cos(angle) * radius;
-    const tz = Math.sin(angle) * radius;
+    const tz = Math.sin(angle) * (radius * 0.75);
     const towerId = 100 + i;
 
-    gltfLoader.load('kule.glb', (gltf) => {
-      const towerModel = gltf.scene || gltf.scenes[0];
-      const box = new THREE.Box3().setFromObject(towerModel);
-      const size = new THREE.Vector3();
-      box.getSize(size);
-      let scaleFactor = (65 / Math.max(size.x, size.y, size.z)) * 10; 
-      towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
+    const towerModel = buildCinematicCrescentTowerMesh();
+    let scaleFactor = 1.35;
+    towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      towerModel.position.set(tx, SHIP_Y_POS - 40, tz);
-      towerModel.rotation.y = -angle + Math.PI / 2;
+    towerModel.position.set(tx, SHIP_Y_POS - 40, tz);
+    towerModel.rotation.y = -angle - Math.PI / 2;
 
-      towerModel.userData = { towerId: towerId, name: `Korsan Kulesi #${i+1}` };
-      towerModel.traverse(child => { 
-        child.userData = { towerId: towerId };
-        if (child.material) {
-          if (Array.isArray(child.material)) {
-            child.material.forEach(m => { m.depthWrite = true; m.depthTest = true; });
-          } else {
-            child.material.depthWrite = true;
-            child.material.depthTest = true;
-          }
+    towerModel.userData = { towerId: towerId, name: `Sinematik Kule #${i+1}` };
+    towerModel.traverse(child => { 
+      child.userData = { towerId: towerId };
+      if (child.material) {
+        if (Array.isArray(child.material)) {
+          child.material.forEach(m => { m.depthWrite = true; m.depthTest = true; });
+        } else {
+          child.material.depthWrite = true;
+          child.material.depthTest = true;
         }
-      });
-
-      castleGroup.add(towerModel);
-      castleTowerMeshes.push(towerModel);
-    }, undefined, (err) => {
-      console.error(`[HATA] kule.glb yüklenemedi:`, err);
+      }
     });
+
+    castleGroup.add(towerModel);
+    castleTowerMeshes.push(towerModel);
 
     castleTowers.push({
       id: towerId,
-      name: `Korsan Kulesi #${i+1}`,
+      name: `Sinematik Kule #${i+1}`,
       localX: tx,
       localZ: tz,
       hp: 500000,
