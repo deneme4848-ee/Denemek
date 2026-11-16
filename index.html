@@ -28,13 +28,6 @@
         z-index: 6; pointer-events: none;
       }
       .side-tool-col { flex-direction: column; gap: 8px; }
-      #top-right-hud {
-        position: fixed; top: 16px; right: 20px; z-index: 6;
-        background: rgba(7, 20, 31, 0.94); backdrop-filter: blur(8px);
-        border: 1.5px solid rgba(245, 197, 94, 0.5); border-radius: 14px;
-        padding: 10px 18px; min-width: 210px; box-shadow: 0 8px 24px rgba(0,0,0,0.85);
-        display: flex; flex-direction: column; gap: 6px;
-      }
       #bottom-dock {
         position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
         width: auto; display: flex; flex-direction: row; align-items: flex-end; gap: 20px;
@@ -63,13 +56,6 @@
       }
       #top-left-hud {
         position: fixed; top: 56px; left: 8px; display: flex; align-items: flex-start; gap: 6px; z-index: 6; pointer-events: none;
-      }
-      #top-right-hud {
-        position: fixed; top: 56px; right: 8px; z-index: 6;
-        background: rgba(7, 20, 31, 0.9); backdrop-filter: blur(6px);
-        border: 1px solid rgba(245, 197, 94, 0.45); border-radius: 10px;
-        padding: 6px 10px; min-width: 140px; box-shadow: 0 6px 20px rgba(0,0,0,0.8);
-        display: flex; flex-direction: column; gap: 4px;
       }
       #bottom-dock {
         position: fixed; bottom: 10px; left: 8px; right: 8px;
@@ -144,29 +130,14 @@
     .tool-icon-btn:active { transform: scale(0.94); }
     .tool-icon-btn span.ico { line-height: 1.1; }
     .tool-icon-btn span.lbl { font-weight: 800; color: #cbd5e1; }
-
-    .captain-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
-    .captain-name-group { display: flex; align-items: center; gap: 8px; }
-    .captain-row strong { font-size: 12px; color: #fffbeb; }
     
     .ship-level-badge {
       background: linear-gradient(135deg, #b45309, #78350f);
       border: 1px solid #f59e0b; color: #fef3c7;
-      font-size: 10px; font-weight: 900; padding: 2px 7px; border-radius: 6px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.6); display: inline-flex; align-items: center; gap: 2px;
-      letter-spacing: 0.3px;
+      font-size: 8px; font-weight: 900; padding: 1px 4px; border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.6); display: inline-flex; align-items: center; gap: 2px;
+      letter-spacing: 0.3px; white-space: nowrap;
     }
-
-    .logout-chip {
-      border: 1px solid rgba(252, 165, 165, 0.45); background: rgba(153, 27, 27, 0.85);
-      color: #fee2e2; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 5px; cursor: pointer;
-    }
-    .gold-row {
-      display: flex; align-items: center; justify-content: space-between;
-      font-size: 12px; font-weight: 800; color: #fbbf24;
-      background: rgba(0,0,0,0.35); padding: 4px 8px; border-radius: 6px;
-    }
-    .ship-sub-name { font-size: 10px; color: #94a3b8; text-align: right; }
 
     #player-label {
       position: fixed; z-index: 5; pointer-events: none;
@@ -396,7 +367,10 @@
 
   <div id="player-label">
     <div class="ship-hp-track"><div id="player-ship-hp-fill"></div></div>
-    <div class="ship-name-tag" id="tag-username">Test</div>
+    <div style="display: flex; align-items: center; gap: 4px;">
+      <span class="ship-name-tag" id="tag-username">Test</span>
+      <span class="ship-level-badge" id="player-label-level-badge">Lv. 1</span>
+    </div>
     <div class="ship-fleet-tag">[TST]</div>
   </div>
 
@@ -423,19 +397,11 @@
         <span class="ico">⚓</span>
         <span class="lbl">Liman</span>
       </button>
+      <button id="logout-btn" class="tool-icon-btn" type="button" title="Çıkış Yap" style="background: linear-gradient(155deg, #7f1d1d, #450a0a); border-color: rgba(248, 113, 113, 0.4);">
+        <span class="ico">🚪</span>
+        <span class="lbl">Çıkış</span>
+      </button>
     </div>
-  </div>
-
-  <div id="top-right-hud">
-    <div class="captain-row">
-      <div class="captain-name-group">
-        <strong id="captain-name">Test</strong>
-        <span class="ship-level-badge" id="hud-level-badge">Lv. 1</span>
-      </div>
-      <button id="logout-btn" class="logout-chip" type="button">Çıkış</button>
-    </div>
-    <div class="gold-row"><span>🪙</span><span id="score">100,000,000</span></div>
-    <div class="ship-sub-name" id="ship-title">Ejderha Kalyonu</div>
   </div>
 
   <div id="bottom-dock">
@@ -543,7 +509,6 @@
 <script>
 const scoreEl = document.querySelector('#score');
 const levelEl = document.querySelector('#level');
-const hudLevelBadgeEl = document.querySelector('#hud-level-badge');
 const hpTextEl = document.querySelector('#hp-text');
 const expTextEl = document.querySelector('#exp-text');
 const hpBarEl = document.querySelector('#hp-bar');
@@ -570,8 +535,6 @@ const qtyEls = {
 const gameOverEl = document.querySelector('#gameover');
 const finalScoreEl = document.querySelector('#final-score');
 const restartBtn = document.querySelector('#restart-btn');
-const captainNameEl = document.querySelector('#captain-name');
-const shipTitleEl = document.querySelector('#ship-title');
 const logoutBtn = document.querySelector('#logout-btn');
 
 const mapsToggleBtn = document.querySelector('#maps-toggle-btn');
@@ -615,6 +578,7 @@ const mctx = miniCanvas.getContext('2d');
 const playerLabelEl = document.querySelector('#player-label');
 const playerShipHpFillEl = document.querySelector('#player-ship-hp-fill');
 const tagUsernameEl = document.querySelector('#tag-username');
+const playerLabelLevelBadgeEl = document.querySelector('#player-label-level-badge');
 
 function formatShortNumber(num) {
   if (num >= 1000000000) return (num / 1000000000).toFixed(num % 1000000000 !== 0 ? 1 : 0) + 't';
@@ -688,9 +652,7 @@ function completeLogin(user) {
     equippedShip: user.equippedShip || 'standard' 
   };
   localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
-  captainNameEl.textContent = currentUser.username;
   tagUsernameEl.textContent = currentUser.username;
-  shipTitleEl.textContent = SHIP_MODELS[currentUser.equippedShip]?.name || 'Ejderha Kalyonu';
   authOverlay.style.display = 'none';
   initThreeGame();
 }
@@ -716,7 +678,6 @@ if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeIt
 
 let scene, camera, renderer;
 let oceanTexture = null;
-let oceanFlowTime = 0;
 let activeGlbShip = null, playerNeonRing, enemies = [], rangeRingMesh;
 let castleGroup = null, castleTowers = [], castleTowerMeshes = [];
 let castleProjectiles = [];
@@ -871,12 +832,11 @@ function buildCastleIsland() {
     const towerId = 100 + i;
 
     gltfLoader.load('kule.glb', (gltf) => {
-      console.log(`[BAŞARILI] kule.glb yüklendi (Kule #${i+1})`);
       const towerModel = gltf.scene || gltf.scenes[0];
       const box = new THREE.Box3().setFromObject(towerModel);
       const size = new THREE.Vector3();
       box.getSize(size);
-      let scaleFactor = (120 / Math.max(size.x, size.y, size.z)) ; 
+      let scaleFactor = (65 / Math.max(size.x, size.y, size.z)) * 10; 
       towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
       towerModel.position.set(tx, SHIP_Y_POS - 40, tz);
@@ -898,7 +858,7 @@ function buildCastleIsland() {
       castleGroup.add(towerModel);
       castleTowerMeshes.push(towerModel);
     }, undefined, (err) => {
-      console.error(`[HATA] kule.glb yüklenemedi! Dosya adını veya yerini kontrol edin:`, err);
+      console.error(`[HATA] kule.glb yüklenemedi:`, err);
     });
 
     castleTowers.push({
@@ -993,7 +953,6 @@ function initThreeGame() {
     if (
       e.target.closest('#top-vital-hud') ||
       e.target.closest('#top-left-hud') ||
-      e.target.closest('#top-right-hud') ||
       e.target.closest('#bottom-dock') ||
       e.target.closest('#market-panel') ||
       e.target.closest('#maps-panel') ||
@@ -1062,8 +1021,6 @@ function setupPlayerShipVisual() {
   const dbUser = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
   const equippedId = dbUser.equippedShip || 'standard';
   const modelSpec = SHIP_MODELS[equippedId] || SHIP_MODELS.standard;
-
-  shipTitleEl.textContent = modelSpec.name;
 
   if (activeGlbShip) { scene.remove(activeGlbShip); activeGlbShip = null; }
 
@@ -1734,7 +1691,7 @@ function drawMinimap() {
 function updateHUD() {
   scoreEl.textContent = player.score.toLocaleString();
   levelEl.textContent = player.level;
-  if (hudLevelBadgeEl) hudLevelBadgeEl.textContent = `Lv. ${player.level}`;
+  if (playerLabelLevelBadgeEl) playerLabelLevelBadgeEl.textContent = `Lv. ${player.level}`;
   hpTextEl.textContent = `Can ${Math.ceil(player.hp).toLocaleString()} / ${player.maxHp.toLocaleString()}`;
   expTextEl.textContent = `Deneyim ${player.exp.toLocaleString()} / ${player.maxExp.toLocaleString()}`;
   hpBarEl.style.width = ((player.hp / player.maxHp) * 100) + '%';
