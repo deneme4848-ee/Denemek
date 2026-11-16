@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Genişletme Düzeltildi</title>
+  <title>Korsan Dünyası - Kesin Çözüm</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -535,7 +535,6 @@
   </div>
 
 <script>
-const scoreEl = document.querySelector('#score');
 const levelEl = document.querySelector('#level');
 const hpTextEl = document.querySelector('#hp-text');
 const expTextEl = document.querySelector('#exp-text');
@@ -649,8 +648,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v62';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v62';
+const USERS_STORAGE_KEY = 'pirate3d_users_v63';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v63';
 let authMode = 'login';
 let currentUser = null;
 
@@ -1733,7 +1732,6 @@ function drawMinimap() {
 
 function updateHUD() {
   if (!player) return;
-  scoreEl.textContent = player.score.toLocaleString();
   levelEl.textContent = player.level;
   if (playerLabelLevelBadgeEl) playerLabelLevelBadgeEl.textContent = `Lv. ${player.level}`;
   hpTextEl.textContent = `Can ${Math.ceil(player.hp).toLocaleString()} / ${player.maxHp.toLocaleString()}`;
@@ -1928,7 +1926,7 @@ function renderShipyardList() {
       
       const users = loadUsers();
       const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
-      if (uIdx !== e-1 && uIdx !== -1) {
+      if (uIdx !== -1) {
         if (!users[uIdx].ownedShips) users[uIdx].ownedShips = ['standard'];
         users[uIdx].ownedShips.push(shipId);
         users[uIdx].equippedShip = shipId;
