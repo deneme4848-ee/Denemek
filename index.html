@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - 15 Harita Sistemi</title>
+  <title>Korsan Dünyası - 99x99 Devasa 15 Harita Sistemi</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -67,16 +67,16 @@
     /* HARİTA GEÇİŞ BUTONU */
     #map-transit-banner {
       display: none; position: fixed; top: 85px; left: 50%; transform: translateX(-50%);
-      z-index: 12; background: linear-gradient(135deg, #b45309, #d97706);
-      border: 2px solid #fef08a; border-radius: 14px; padding: 10px 22px;
-      color: #fff; font-size: 13px; font-weight: 900; cursor: pointer;
+      z-index: 12; background: linear-gradient(135deg, #1e293b, #0f172a);
+      border: 2px solid #94a3b8; border-radius: 14px; padding: 10px 22px;
+      color: #f8fafc; font-size: 13px; font-weight: 900; cursor: pointer;
       box-shadow: 0 10px 25px rgba(0,0,0,0.85); animation: pulseTransit 1.2s infinite alternate;
       pointer-events: auto; letter-spacing: 0.5px;
     }
     #map-transit-banner.visible { display: block; }
     @keyframes pulseTransit {
-      from { transform: translateX(-50%) scale(1.0); box-shadow: 0 0 15px rgba(245, 158, 11, 0.6); }
-      to { transform: translateX(-50%) scale(1.06); box-shadow: 0 0 25px rgba(254, 240, 138, 0.9); }
+      from { transform: translateX(-50%) scale(1.0); box-shadow: 0 0 15px rgba(148, 163, 184, 0.4); }
+      to { transform: translateX(-50%) scale(1.06); box-shadow: 0 0 25px rgba(241, 245, 249, 0.7); }
     }
 
     .level-crest {
@@ -103,31 +103,31 @@
 
     .radar-card {
       pointer-events: auto; background: rgba(7, 20, 31, 0.92);
-      border: 2px solid rgba(217, 119, 6, 0.65); border-radius: 10px;
+      border: 2px solid rgba(148, 163, 184, 0.45); border-radius: 10px;
       padding: 4px; box-shadow: 0 8px 24px rgba(0,0,0,0.85);
       display: flex; flex-direction: column; align-items: center; gap: 2px;
     }
-    .radar-title { font-size: 8px; font-weight: 800; color: #fcd34d; letter-spacing: 0.5px; text-transform: uppercase; }
-    #minimap { width: 72px; height: 72px; border-radius: 5px; background: #e6d5b8; border: 1px solid #92400e; display: block; }
+    .radar-title { font-size: 8px; font-weight: 800; color: #94a3b8; letter-spacing: 0.5px; text-transform: uppercase; }
+    #minimap { width: 72px; height: 72px; border-radius: 5px; background: #e6d5b8; border: 1px solid #475569; display: block; }
     .coord-pill {
       width: 100%; text-align: center; font-size: 9px; font-weight: 800;
-      background: rgba(2, 8, 14, 0.85); color: #fef08a; padding: 2px 3px;
-      border-radius: 4px; border: 1px solid rgba(245, 158, 11, 0.3);
+      background: rgba(2, 8, 14, 0.85); color: #f8fafc; padding: 2px 3px;
+      border-radius: 4px; border: 1px solid rgba(148, 163, 184, 0.3);
     }
 
     .side-tool-col { pointer-events: auto; display: flex; flex-direction: column; gap: 5px; }
     .tool-icon-btn {
       width: 38px; height: 38px; border-radius: 9px;
       background: linear-gradient(155deg, #172a3a, #091520);
-      border: 1.5px solid rgba(245, 197, 94, 0.55); color: #fef3c7;
+      border: 1.5px solid rgba(148, 163, 184, 0.4); color: #f8fafc;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       cursor: pointer; box-shadow: 0 5px 14px rgba(0,0,0,0.75);
       transition: transform 0.12s, border-color 0.15s;
     }
-    .tool-icon-btn:hover { border-color: #fbbf24; transform: translateY(-1px); }
+    .tool-icon-btn:hover { border-color: #cbd5e1; transform: translateY(-1px); }
     .tool-icon-btn:active { transform: scale(0.94); }
     .tool-icon-btn span.ico { font-size: 14px; line-height: 1.1; }
-    .tool-icon-btn span.lbl { font-size: 6px; font-weight: 800; color: #fde68a; }
+    .tool-icon-btn span.lbl { font-size: 6px; font-weight: 800; color: #cbd5e1; }
 
     .captain-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
     .captain-row strong { font-size: 11px; color: #fffbeb; }
@@ -155,7 +155,7 @@
     }
     #player-ship-hp-fill { width: 100%; height: 100%; background: #22c55e; transition: width 0.15s, background-color 0.2s; }
     .ship-name-tag { font-size: 10px; font-weight: 900; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap; }
-    .ship-fleet-tag { font-size: 9px; font-weight: 800; color: #fde68a; text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap; }
+    .ship-fleet-tag { font-size: 9px; font-weight: 800; color: #cbd5e1; text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap; }
 
     .enemy-label {
       position: fixed; z-index: 5; pointer-events: none;
@@ -185,8 +185,8 @@
     .ammo-dock-container { pointer-events: auto; display: flex; flex-direction: column; gap: 5px; }
     .active-ammo-banner {
       background: rgba(6, 17, 27, 0.88);
-      border: 1px solid rgba(245, 197, 94, 0.4); border-radius: 7px;
-      padding: 3px 8px; font-size: 10px; color: #fde68a; font-weight: 700;
+      border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 7px;
+      padding: 3px 8px; font-size: 10px; color: #cbd5e1; font-weight: 700;
     }
     .ammo-slots-row { display: flex; gap: 6px; padding-bottom: 2px; }
     .ammo-slot {
@@ -197,8 +197,8 @@
       cursor: pointer; transition: all 0.15s ease; box-shadow: 0 5px 12px rgba(0,0,0,0.8);
     }
     .ammo-slot.selected {
-      border-color: #fbbf24; background: linear-gradient(165deg, #451a03, #1c0a00);
-      box-shadow: 0 0 14px rgba(245, 158, 11, 0.55); transform: translateY(-2px);
+      border-color: #cbd5e1; background: linear-gradient(165deg, #1e293b, #0f172a);
+      box-shadow: 0 0 14px rgba(148, 163, 184, 0.4); transform: translateY(-2px);
     }
     .ammo-slot .key-hint { position: absolute; top: 2px; left: 4px; font-size: 8px; font-weight: 800; color: #94a3b8; }
     .ammo-slot .ammo-ico { font-size: 18px; line-height: 1.1; }
@@ -221,10 +221,10 @@
 
     #attack-btn {
       width: 72px; height: 72px; border-radius: 50%;
-      border: 2.5px solid #fbbf24;
-      background: radial-gradient(circle at 35% 30%, #ea580c, #7c2d12 75%, #431407);
-      color: #fffbeb; font-size: 11px; font-weight: 900; letter-spacing: 0.4px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.85), inset 0 2px 5px rgba(255,255,255,0.3);
+      border: 2.5px solid #64748b;
+      background: radial-gradient(circle at 35% 30%, #334155, #0f172a 75%, #020617);
+      color: #f8fafc; font-size: 11px; font-weight: 900; letter-spacing: 0.4px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.85), inset 0 2px 5px rgba(255,255,255,0.2);
       cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
       transition: all 0.16s ease;
     }
@@ -244,16 +244,16 @@
     #maps-panel {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
       width: min(94vw, 520px); background: linear-gradient(160deg, #092238, #030c14);
-      border: 2.5px solid rgba(245, 197, 94, 0.75); border-radius: 16px; padding: 18px; z-index: 25;
+      border: 2px solid rgba(148, 163, 184, 0.4); border-radius: 16px; padding: 18px; z-index: 25;
       box-shadow: 0 30px 80px rgba(0,0,0,0.95); pointer-events: auto;
     }
     #maps-panel.open { display: block; }
     .maps-header {
       display: flex; justify-content: space-between; align-items: center;
-      background: linear-gradient(90deg, #1e293b, #0f172a); border: 1px solid rgba(245, 197, 94, 0.4);
+      background: linear-gradient(90deg, #1e293b, #0f172a); border: 1px solid rgba(148, 163, 184, 0.3);
       padding: 8px 14px; border-radius: 10px; margin-bottom: 12px;
     }
-    .maps-header strong { color: #ffd783; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .maps-header strong { color: #f8fafc; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
     .maps-close { background: rgba(255,255,255,0.1); border: none; color: #cbd5e1; width: 28px; height: 28px; border-radius: 8px; font-weight: 700; cursor: pointer; }
     
     .maps-grid {
@@ -265,29 +265,29 @@
       cursor: default; text-align: center; box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
     }
     .map-box.current {
-      background: linear-gradient(135deg, #7f1d1d, #991b1b);
-      border: 2.5px solid #ef4444;
-      box-shadow: 0 0 12px rgba(239, 68, 68, 0.7);
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border: 2.5px solid #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
     }
     .map-box .m-num { font-size: 11px; font-weight: 900; color: #fff; line-height: 1; }
-    .map-box .m-name { font-size: 8px; font-weight: 800; color: #ffd783; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
-    .map-box .m-lvl { font-size: 7px; color: #cbd5e1; margin-top: 1px; }
+    .map-box .m-name { font-size: 8px; font-weight: 800; color: #cbd5e1; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+    .map-box .m-lvl { font-size: 7px; color: #94a3b8; margin-top: 1px; }
 
     /* LİMAN PANELİ */
     #market-panel {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
       width: min(94vw, 560px); max-height: 88vh; overflow-y: auto;
       background: linear-gradient(160deg, #091c2b, #030a11); backdrop-filter: blur(12px);
-      border: 2px solid rgba(245, 197, 94, 0.7); border-radius: 18px; padding: 16px; z-index: 15;
+      border: 2px solid rgba(148, 163, 184, 0.4); border-radius: 18px; padding: 16px; z-index: 15;
       box-shadow: 0 30px 75px rgba(0,0,0,0.95); pointer-events: auto;
     }
     #market-panel.open { display: block; }
     .market-header { 
       display: flex; justify-content: space-between; align-items: center; 
-      background: linear-gradient(90deg, #1e293b, #0f172a); border: 1px solid rgba(245, 197, 94, 0.4);
+      background: linear-gradient(90deg, #1e293b, #0f172a); border: 1px solid rgba(148, 163, 184, 0.3);
       padding: 8px 14px; border-radius: 10px; margin-bottom: 12px;
     }
-    .market-header strong { color: #ffd783; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .market-header strong { color: #f8fafc; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
     .market-close { background: rgba(255,255,255,0.1); border: none; color: #cbd5e1; width: 28px; height: 28px; border-radius: 8px; font-weight: 700; cursor: pointer; }
     
     .port-tabs-scroll { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 12px; }
@@ -296,24 +296,24 @@
       padding: 7px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0;
       transition: all 0.2s;
     }
-    .market-tab-btn.active { background: linear-gradient(135deg, #d97706, #92400e); color: #fff; border-color: #ffd783; box-shadow: 0 4px 12px rgba(217,119,6,0.4); }
+    .market-tab-btn.active { background: linear-gradient(135deg, #334155, #1e293b); color: #fff; border-color: #94a3b8; box-shadow: 0 4px 12px rgba(15,23,42,0.4); }
     
     .market-section { display: none; }
     .market-section.active { display: block; }
     
     .market-balance { 
       display: flex; justify-content: space-around; font-size: 11px; 
-      background: rgba(0,0,0,0.45); border: 1px solid rgba(245,197,94,0.25); 
+      background: rgba(0,0,0,0.45); border: 1px solid rgba(148,163,184,0.25); 
       padding: 8px; border-radius: 8px; margin-bottom: 12px; color: #e2e8f0; font-weight: 700;
     }
     
     .shipyard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
     .ship-card-item {
-      background: rgba(11, 26, 38, 0.95); border: 1.5px solid rgba(245, 197, 94, 0.4); border-radius: 14px;
+      background: rgba(11, 26, 38, 0.95); border: 1.5px solid rgba(148, 163, 184, 0.35); border-radius: 14px;
       padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
       box-shadow: 0 8px 22px rgba(0,0,0,0.7); transition: transform 0.15s, border-color 0.15s;
     }
-    .ship-card-item:hover { border-color: #fbbf24; transform: translateY(-2px); }
+    .ship-card-item:hover { border-color: #cbd5e1; transform: translateY(-2px); }
     .ship-card-img-wrap {
       width: 100%; height: 115px; border-radius: 10px; 
       background: radial-gradient(circle at 50% 50%, #083344, #031420);
@@ -329,7 +329,7 @@
     .market-item-title { font-size: 12px; font-weight: 700; color: #fff; }
     .market-item-sub { font-size: 10px; color: #94a3b8; }
     
-    .buy-btn { width: 100%; padding: 7px 12px; border-radius: 8px; border: 1px solid #ffd783; background: linear-gradient(135deg, #d97706, #92400e); color: #fff; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap; margin-top: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    .buy-btn { width: 100%; padding: 7px 12px; border-radius: 8px; border: 1px solid #94a3b8; background: linear-gradient(135deg, #334155, #1e293b); color: #fff; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap; margin-top: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
     .buy-btn:disabled { opacity: 0.42; background: rgba(30, 41, 59, 0.8); cursor: not-allowed; box-shadow: none; }
     .buy-btn.equipped { background: #1e40af; border-color: #60a5fa; color: #eff6ff; }
     #market-feedback { font-size: 11px; min-height: 14px; margin-top: 5px; text-align: center; color: #4ade80; font-weight: 700; }
@@ -339,27 +339,27 @@
       display: none; position: fixed; inset: 0; background: rgba(3, 11, 18, 0.92);
       flex-direction: column; align-items: center; justify-content: center; z-index: 30; text-align: center; padding: 20px;
     }
-    #gameover h1 { color: #ffd783; margin: 0 0 10px; font-size: 32px; }
+    #gameover h1 { color: #f8fafc; margin: 0 0 10px; font-size: 32px; }
     #gameover p { font-size: 16px; margin: 0 0 24px; color: #cbd5e1; }
-    #restart-btn { padding: 12px 28px; font-size: 16px; font-weight: bold; border-radius: 12px; border: 2px solid #ffd783; background: #a33d22; color: white; cursor: pointer; }
+    #restart-btn { padding: 12px 28px; font-size: 16px; font-weight: bold; border-radius: 12px; border: 2px solid #94a3b8; background: #334155; color: white; cursor: pointer; }
 
     #auth-overlay {
       position: fixed; inset: 0; z-index: 999999;
       background: radial-gradient(circle at 50% 35%, rgba(10, 28, 41, 0.98), rgba(2, 6, 10, 0.99));
       backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 18px;
     }
-    .auth-card { width: 100%; max-width: 420px; background: linear-gradient(160deg, #0b2233, #030a11); border: 1px solid rgba(245,197,94,0.5); border-radius: 24px; padding: 28px 24px; box-shadow: 0 25px 70px rgba(0,0,0,0.9); }
+    .auth-card { width: 100%; max-width: 420px; background: linear-gradient(160deg, #0b2233, #030a11); border: 1px solid rgba(148,163,184,0.4); border-radius: 24px; padding: 28px 24px; box-shadow: 0 25px 70px rgba(0,0,0,0.9); }
     .auth-brand { text-align: center; margin-bottom: 18px; }
-    .auth-brand h1 { margin: 0; font-size: 26px; color: #ffdc92; }
+    .auth-brand h1 { margin: 0; font-size: 26px; color: #f8fafc; }
     .auth-brand p { margin: 6px 0 0; font-size: 12px; color: #94a3b8; }
     .auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: rgba(255, 255, 255, 0.06); padding: 4px; border-radius: 12px; margin-bottom: 16px; }
     .auth-tab { border: none; background: transparent; color: #cbd5e1; padding: 10px; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; }
-    .auth-tab.active { background: linear-gradient(135deg, #c2410c, #7c2d12); color: #fff; }
+    .auth-tab.active { background: linear-gradient(135deg, #334155, #1e293b); color: #fff; }
     .auth-field { margin-bottom: 14px; }
     .auth-field label { display: block; font-size: 12px; color: #cbd5e1; margin-bottom: 5px; font-weight: 600; }
     .auth-field input { width: 100%; height: 46px; padding: 0 14px; border-radius: 12px; border: 1px solid #334155; background: #081622; color: #fff; font-size: 16px; outline: none; }
     .auth-msg { min-height: 18px; font-size: 12px; margin: 4px 0 12px; color: #fca5a5; }
-    .auth-submit { width: 100%; height: 50px; border-radius: 14px; border: 1px solid #ffd783; background: linear-gradient(135deg, #c2410c, #7c2d12); color: #fffbeb; font-size: 15px; font-weight: 900; cursor: pointer; }
+    .auth-submit { width: 100%; height: 50px; border-radius: 14px; border: 1px solid #94a3b8; background: linear-gradient(135deg, #334155, #1e293b); color: #f8fafc; font-size: 15px; font-weight: 900; cursor: pointer; }
     .quick-test-box { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #bae6fd; }
     .quick-test-btn { border: 1px solid rgba(186, 230, 253, 0.35); background: rgba(14, 116, 144, 0.35); color: #e0f2fe; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; }
   </style>
@@ -494,7 +494,7 @@
     <div class="auth-card">
       <div class="auth-brand">
         <h1>⚓ Korsan Dünyası</h1>
-        <p>15 Harita & Sınır Çerçeveli Okyanus</p>
+        <p>99x99 Devasa Haritalar & Şık Çerçeve</p>
       </div>
       <div class="auth-tabs">
         <button id="tab-login" class="auth-tab active" type="button">Giriş Yap</button>
@@ -621,8 +621,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v50';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v50';
+const USERS_STORAGE_KEY = 'pirate3d_users_v51';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v51';
 let authMode = 'login';
 let currentUser = null;
 
@@ -694,16 +694,17 @@ let castleProjectiles = [];
 let activeProjectiles = [], particleSystems = [], cannonEffects = [];
 let raycaster, planeGeo, mouse;
 let selectedRingMesh = null;
-let borderFrameMesh = null; // Harita sınır çerçevesi
+let borderFrameMesh = null;
 
-const WORLD_SIZE = 2400; 
-const ATTACK_RANGE = 280;
-const CASTLE_AGGRO_RANGE = 330;
+// HARİTA BOYUTU 99X99 ÖLÇEĞİNE YÜKSELTİLDİ (DEVAASA OKYANUS)
+const WORLD_SIZE = 9900; 
+const ATTACK_RANGE = 300;
+const CASTLE_AGGRO_RANGE = 350;
 const SHIP_Y_POS = 100;
 
-// Yakınlaştırılmış Kamera Ayarları (İstediğin gibi daha yakın ve net açı)
-const CAMERA_HEIGHT = 680;
-const CAMERA_DEPTH = 520;
+// İdeal Yakın Kamer Hızı ve Mesafesi
+const CAMERA_HEIGHT = 650;
+const CAMERA_DEPTH = 500;
 
 let currentMapIndex = 0; 
 const MAP_DATA = [
@@ -777,18 +778,18 @@ function createStaticOceanTextures() {
 
   const mapTex = new THREE.CanvasTexture(colorCanvas);
   mapTex.wrapS = THREE.RepeatWrapping; mapTex.wrapT = THREE.RepeatWrapping;
-  mapTex.repeat.set(16, 16);
+  mapTex.repeat.set(32, 32);
 
   const bumpTex = new THREE.CanvasTexture(bumpCanvas);
   bumpTex.wrapS = THREE.RepeatWrapping; bumpTex.wrapT = THREE.RepeatWrapping;
-  bumpTex.repeat.set(16, 16);
+  bumpTex.repeat.set(32, 32);
 
   return { mapTex, bumpTex };
 }
 
-// Harita Sınırlarında Kalın Çerçeve Oluşturucu
+// OLGUN VE ŞIK ÇERÇEVE TASARIMI (Metalik Antrasit + Mat Fener Detaylı)
 function createBorderFrame() {
-  const size = WORLD_SIZE - 80;
+  const size = WORLD_SIZE - 200;
   const shape = new THREE.Shape();
   shape.moveTo(-size/2, -size/2);
   shape.lineTo(size/2, -size/2);
@@ -797,7 +798,7 @@ function createBorderFrame() {
   shape.closePath();
 
   const holePath = new THREE.Path();
-  const innerSize = size - 40;
+  const innerSize = size - 80;
   holePath.moveTo(-innerSize/2, -innerSize/2);
   holePath.lineTo(-innerSize/2, innerSize/2);
   holePath.lineTo(innerSize/2, innerSize/2);
@@ -805,83 +806,83 @@ function createBorderFrame() {
   holePath.closePath();
   shape.holes.push(holePath);
 
-  const extrudeSettings = { depth: 25, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 2, bevelThickness: 2 };
+  const extrudeSettings = { depth: 35, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 4, bevelThickness: 4 };
   const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
   geometry.rotateX(Math.PI / 2);
 
   const material = new THREE.MeshStandardMaterial({
-    color: 0xf59e0b,
-    emissive: 0xd97706,
-    emissiveIntensity: 0.6,
-    roughness: 0.3,
-    metalness: 0.8
+    color: 0x1e293b,
+    roughness: 0.4,
+    metalness: 0.9,
+    emissive: 0x0f172a,
+    emissiveIntensity: 0.2
   });
 
   borderFrameMesh = new THREE.Mesh(geometry, material);
-  borderFrameMesh.position.y = 10;
+  borderFrameMesh.position.y = 15;
   scene.add(borderFrameMesh);
 }
 
 function buildCastleIsland() {
   castleGroup = new THREE.Group();
-  castleGroup.position.set(0, 0, -500);
+  castleGroup.position.set(0, 0, -2000);
 
-  const islandGeo = new THREE.CylinderGeometry(150, 170, 32, 36);
+  const islandGeo = new THREE.CylinderGeometry(400, 450, 60, 40);
   const islandMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.85, metalness: 0.1 });
   const islandMesh = new THREE.Mesh(islandGeo, islandMat);
-  islandMesh.position.y = 14;
+  islandMesh.position.y = 30;
   castleGroup.add(islandMesh);
 
-  const wallRadius = 120;
-  const wallCount = 20;
+  const wallRadius = 320;
+  const wallCount = 28;
   const wallMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.8, metalness: 0.2 });
 
   for (let i = 0; i < wallCount; i++) {
     const angle = (i / wallCount) * Math.PI * 1.6 - (Math.PI * 0.8);
     const wx = Math.cos(angle) * wallRadius;
     const wz = Math.sin(angle) * wallRadius;
-    const wGeo = new THREE.BoxGeometry(18, 30, 10);
+    const wGeo = new THREE.BoxGeometry(45, 50, 15);
     const wMesh = new THREE.Mesh(wGeo, wallMat);
-    wMesh.position.set(wx, 30, wz);
+    wMesh.position.set(wx, 50, wz);
     wMesh.rotation.y = -angle;
     castleGroup.add(wMesh);
   }
 
-  const keepGeo = new THREE.BoxGeometry(45, 60, 45);
+  const keepGeo = new THREE.BoxGeometry(100, 120, 100);
   const keepMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6, metalness: 0.3 });
   const keepMesh = new THREE.Mesh(keepGeo, keepMat);
-  keepMesh.position.set(0, 52, 20);
+  keepMesh.position.set(0, 95, 40);
   castleGroup.add(keepMesh);
 
-  const roofGeo = new THREE.ConeGeometry(34, 32, 4);
-  const roofMat = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.5 });
+  const roofGeo = new THREE.ConeGeometry(75, 65, 4);
+  const roofMat = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.5 });
   const roofMesh = new THREE.Mesh(roofGeo, roofMat);
-  roofMesh.position.set(0, 95, 20);
+  roofMesh.position.set(0, 185, 40);
   castleGroup.add(roofMesh);
 
   castleTowers = [];
   castleTowerMeshes = [];
-  const towerCount = 15;
+  const towerCount = 20;
 
   for (let i = 0; i < towerCount; i++) {
     const angle = (i / towerCount) * Math.PI * 1.5 - (Math.PI * 0.75);
     const tx = Math.cos(angle) * wallRadius;
     const tz = Math.sin(angle) * wallRadius;
 
-    const tGeo = new THREE.CylinderGeometry(8, 10, 42, 16);
+    const tGeo = new THREE.CylinderGeometry(18, 22, 75, 16);
     const tMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.7 });
     const towerMesh = new THREE.Mesh(tGeo, tMat);
-    towerMesh.position.set(tx, 45, tz);
+    towerMesh.position.set(tx, 75, tz);
     
     const towerId = 100 + i;
     towerMesh.userData = { towerId: towerId, name: `Kale Kulesi #${i+1}` };
     castleGroup.add(towerMesh);
     castleTowerMeshes.push(towerMesh);
 
-    const tRoofGeo = new THREE.ConeGeometry(11, 15, 12);
-    const tRoofMat = new THREE.MeshStandardMaterial({ color: 0x7f1d1d, roughness: 0.5 });
+    const tRoofGeo = new THREE.ConeGeometry(24, 30, 12);
+    const tRoofMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.5 });
     const tRoofMesh = new THREE.Mesh(tRoofGeo, tRoofMat);
-    tRoofMesh.position.set(tx, 71, tz);
+    tRoofMesh.position.set(tx, 125, tz);
     castleGroup.add(tRoofMesh);
 
     castleTowers.push({
@@ -890,8 +891,8 @@ function buildCastleIsland() {
       mesh: towerMesh,
       localX: tx,
       localZ: tz,
-      hp: 350,
-      maxHp: 350,
+      hp: 500,
+      maxHp: 500,
       lastShotTime: 0
     });
   }
@@ -902,9 +903,9 @@ function buildCastleIsland() {
 function initThreeGame() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x052236);
-  scene.fog = new THREE.FogExp2(0x052236, 0.00018);
+  scene.fog = new THREE.FogExp2(0x052236, 0.00005); // Devasa dünya için genişletilmiş sis mesafesi
 
-  camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 30000);
+  camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 50000);
   camera.position.set(0, CAMERA_HEIGHT, CAMERA_DEPTH);
   camera.lookAt(0, 0, 0);
 
@@ -919,14 +920,14 @@ function initThreeGame() {
   scene.add(ambientLight);
 
   const sunLight = new THREE.DirectionalLight(0xffedd5, 1.8);
-  sunLight.position.set(800, 1200, 600);
+  sunLight.position.set(2000, 3000, 1500);
   scene.add(sunLight);
 
   const oceanTexData = createStaticOceanTextures();
   oceanTexture = oceanTexData.mapTex;
   oceanBumpTexture = oceanTexData.bumpTex;
 
-  planeGeo = new THREE.PlaneGeometry(WORLD_SIZE * 3, WORLD_SIZE * 3, 64, 64);
+  planeGeo = new THREE.PlaneGeometry(WORLD_SIZE * 2, WORLD_SIZE * 2, 64, 64);
   const oceanMat = new THREE.MeshStandardMaterial({
     map: oceanTexture,
     bumpMap: oceanBumpTexture,
@@ -1063,7 +1064,7 @@ function startGameLogic() {
   gameOverEl.style.display = 'none';
 
   player = {
-    x: 0, z: 0, a: -Math.PI / 2, speed: 0, maxSpeed: 120,
+    x: 0, z: 0, a: -Math.PI / 2, speed: 0, maxSpeed: 180,
     hp: 1000000, maxHp: 1000000, score: 100000000,
     level: 1, exp: 0, maxExp: 100,
     selectedAmmo: 'iron',
@@ -1087,7 +1088,7 @@ function changeMap(mapIdx, entrySide = 'center') {
   targetPos = null;
   hideTransitButton();
 
-  const BOUND = (WORLD_SIZE / 2) - 120;
+  const BOUND = (WORLD_SIZE / 2) - 300;
   if (entrySide === 'left') {
     player.x = BOUND;
   } else if (entrySide === 'right') {
@@ -1107,7 +1108,7 @@ function changeMap(mapIdx, entrySide = 'center') {
   });
   enemies = [];
 
-  const count = 5 + (mapIdx % 3);
+  const count = 6 + (mapIdx % 4);
   for (let i = 0; i < count; i++) spawnEnemyGlb(i + 1);
   renderMapsGrid();
 }
@@ -1135,9 +1136,9 @@ mapTransitBanner.addEventListener('click', () => {
 function spawnEnemyGlb(id) {
   let ex, ez;
   do {
-    ex = (Math.random() - 0.5) * 1400;
-    ez = (Math.random() - 0.5) * 1000;
-  } while (Math.hypot(ex, ez) < 250);
+    ex = (Math.random() - 0.5) * (WORLD_SIZE * 0.6);
+    ez = (Math.random() - 0.5) * (WORLD_SIZE * 0.6);
+  } while (Math.hypot(ex, ez) < 400);
 
   const labelEl = document.createElement('div');
   labelEl.className = 'enemy-label';
@@ -1151,8 +1152,8 @@ function spawnEnemyGlb(id) {
     id, name: `Korsan Gemisi #${id}`, mesh: null, labelEl,
     hpFillEl: labelEl.querySelector('.enemy-hp-fill'),
     x: ex, z: ez,
-    hp: 520 + (currentMapIndex * 150), maxHp: 520 + (currentMapIndex * 150),
-    baseSpeed: 70, slowTimer: 0,
+    hp: 520 + (currentMapIndex * 200), maxHp: 520 + (currentMapIndex * 200),
+    baseSpeed: 90, slowTimer: 0,
     a: 0, wanderAngle: Math.random() * Math.PI * 2, wanderTimer: 0,
     lastAttackTime: 0, isAggro: false
   };
@@ -1289,7 +1290,7 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
   const mesh = new THREE.Mesh(pGeo, pMat);
   mesh.position.set(startX, SHIP_Y_POS - 50, startZ);
   scene.add(mesh);
-  activeProjectiles.push({ mesh, x: startX, z: startZ, targetX, targetZ, speed: 320, ammoKey, onHit, yOffset: 50 });
+  activeProjectiles.push({ mesh, x: startX, z: startZ, targetX, targetZ, speed: 380, ammoKey, onHit, yOffset: 50 });
 }
 
 function fireCastleProjectile(startX, startZ, targetX, targetZ, onHit) {
@@ -1298,7 +1299,7 @@ function fireCastleProjectile(startX, startZ, targetX, targetZ, onHit) {
   const mesh = new THREE.Mesh(pGeo, pMat);
   mesh.position.set(startX, 50, startZ);
   scene.add(mesh);
-  castleProjectiles.push({ mesh, x: startX, z: startZ, targetX, targetZ, speed: 280, onHit });
+  castleProjectiles.push({ mesh, x: startX, z: startZ, targetX, targetZ, speed: 320, onHit });
 }
 
 function animate3D() {
@@ -1338,9 +1339,9 @@ function animate3D() {
   player.x += Math.cos(player.a) * player.speed * dt;
   player.z += Math.sin(player.a) * player.speed * dt;
 
-  const HALF_WORLD = WORLD_SIZE / 2;
-  const HARD_LIMIT = HALF_WORLD - 50;
-  const TRIGGER_THRESHOLD = HALF_WORLD - 220;
+  const HALF_WORLD = WORLD_SIZE / 2; // 4950
+  const HARD_LIMIT = HALF_WORLD - 120;
+  const TRIGGER_THRESHOLD = HALF_WORLD - 400; // Harita geçiş tetikleme eşiği genişletildi
 
   const curMeta = MAP_DATA[currentMapIndex];
   let nearEdge = false;
@@ -1350,6 +1351,7 @@ function animate3D() {
   if (player.z > HARD_LIMIT) player.z = HARD_LIMIT;
   if (player.z < -HARD_LIMIT) player.z = -HARD_LIMIT;
 
+  // TÜM 15 HARİTA İÇİN (Harita 1 mantığıyla) KENAR GEÇİŞLERİ
   if (player.x > TRIGGER_THRESHOLD) {
     if (curMeta.col < 4) {
       showTransitButton(currentMapIndex + 1, 'right');
@@ -1442,10 +1444,9 @@ function animate3D() {
     playerLabelEl.style.transform = `translate(-50%, 0) translate(${(tempVector.x * .5 + .5) * window.innerWidth}px, ${(tempVector.y * -.5 + .5) * window.innerHeight + 38}px)`;
   }
 
-  // Kamera Takibi (Yakınlaştırılmış Konum)
-  camera.position.x += (player.x - camera.position.x) * (5.5 * dt);
-  camera.position.y += (CAMERA_HEIGHT - camera.position.y) * (5.5 * dt);
-  camera.position.z += (player.z + CAMERA_DEPTH - camera.position.z) * (5.5 * dt);
+  camera.position.x += (player.x - camera.position.x) * (6.0 * dt);
+  camera.position.y += (CAMERA_HEIGHT - camera.position.y) * (6.0 * dt);
+  camera.position.z += (player.z + CAMERA_DEPTH - camera.position.z) * (6.0 * dt);
   camera.lookAt(player.x, 0, player.z);
 
   if (castleGroup) {
@@ -1657,7 +1658,7 @@ function drawMinimap() {
 
   mctx.fillStyle = '#475569';
   mctx.beginPath();
-  mctx.arc(cx + 0, cy + (-500 * scale), 22 * scale, 0, Math.PI * 2);
+  mctx.arc(cx + 0, cy + (-2000 * scale), 45 * scale, 0, Math.PI * 2);
   mctx.fill();
 
   mctx.fillStyle = '#dc2626';
