@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Çarpışma Kaldırıldı</title>
+  <title>Korsan Dünyası - GLB Kuleler & Güncel Hasarlar</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -494,11 +494,11 @@
             <button class="buy-btn ammo-buy-btn" type="button" data-type="chain" data-amount="15" data-cost="35" style="width:auto;">35 Altın</button>
           </div>
           <div class="market-item">
-            <div class="market-item-info"><span class="market-item-title">🔥 15x Alevli Gülle</span><span class="market-item-sub">290 Hasar · Yüksek yanma gücü</span></div>
+            <div class="market-item-info"><span class="market-item-title">🔥 15x Alevli Gülle</span><span class="market-item-sub">30.000 Hasar · Yüksek yanma gücü</span></div>
             <button class="buy-btn ammo-buy-btn" type="button" data-type="fire" data-amount="15" data-cost="60" style="width:auto;">60 Altın</button>
           </div>
           <div class="market-item">
-            <div class="market-item-info"><span class="market-item-title">🐉 10x Ejderha Nefesi</span><span class="market-item-sub">450 Hasar · Efsanevi yıkım güllesi</span></div>
+            <div class="market-item-info"><span class="market-item-title">🐉 10x Ejderha Nefesi</span><span class="market-item-sub">40.000 Hasar · Efsanevi yıkım güllesi</span></div>
             <button class="buy-btn ammo-buy-btn" type="button" data-type="dragon" data-amount="10" data-cost="120" style="width:auto;">120 Altın</button>
           </div>
         </div>
@@ -626,8 +626,8 @@ function formatShortNumber(num) {
 const AMMO_TYPES = {
   iron:   { id: 'iron',   name: 'Demir Gülle',    damage: 180, slow: 1.0,  desc: '180 Hasar', color: 0x555555 },
   chain:  { id: 'chain',  name: 'Zincirli Gülle', damage: 140, slow: 0.5,  desc: '140 Hasar + Yavaşlatma', color: 0x888888 },
-  fire:   { id: 'fire',   name: 'Alevli Gülle',   damage: 290, slow: 1.0,  desc: '290 Patlayıcı Hasar', color: 0xff3300 },
-  dragon: { id: 'dragon', name: 'Ejderha Nefesi', damage: 450, slow: 0.85, desc: '450 Efsanevi Hasar', color: 0x3b82f6 }
+  fire:   { id: 'fire',   name: 'Alevli Gülle',   damage: 30000, slow: 1.0,  desc: '30.000 Patlayıcı Hasar', color: 0xff3300 },
+  dragon: { id: 'dragon', name: 'Ejderha Nefesi', damage: 40000, slow: 0.85, desc: '40.000 Efsanevi Hasar', color: 0x3b82f6 }
 };
 
 const SHIP_MODELS = {
@@ -829,43 +829,10 @@ function createBorderFrame() {
   scene.add(borderFrameMesh);
 }
 
-// ADA ÇARPIŞMASI KALDIRILDI - KULELER KULE.GLB DOSYASINDAN YÜKLENİYOR
+// PNG ADA KALDIRILDI - SADECE GLB KULELER DENİZDE
 function buildCastleIsland() {
   castleGroup = new THREE.Group();
   castleGroup.position.set(0, 0, -2200);
-
-  const textureLoader = new THREE.TextureLoader();
-  textureLoader.load('ada.png', (castleTexture) => {
-    const castleGeo = new THREE.PlaneGeometry(900, 900);
-    const castleMat = new THREE.MeshStandardMaterial({
-      map: castleTexture,
-      transparent: true,
-      side: THREE.DoubleSide,
-      depthWrite: true,
-      depthTest: true,
-      roughness: 0.9
-    });
-    const castleMesh = new THREE.Mesh(castleGeo, castleMat);
-    castleMesh.rotation.x = -Math.PI / 2;
-    castleMesh.position.y = 10;
-    castleGroup.add(castleMesh);
-  }, undefined, () => {
-    textureLoader.load('https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1024&q=80', (castleTexture) => {
-      const castleGeo = new THREE.PlaneGeometry(900, 900);
-      const castleMat = new THREE.MeshStandardMaterial({
-        map: castleTexture,
-        transparent: true,
-        side: THREE.DoubleSide,
-        depthWrite: true,
-        depthTest: true,
-        roughness: 0.9
-      });
-      const castleMesh = new THREE.Mesh(castleGeo, castleMat);
-      castleMesh.rotation.x = -Math.PI / 2;
-      castleMesh.position.y = 10;
-      castleGroup.add(castleMesh);
-    });
-  });
 
   castleTowers = [];
   castleTowerMeshes = [];
@@ -878,16 +845,16 @@ function buildCastleIsland() {
     const tz = Math.sin(angle) * radius;
     const towerId = 100 + i;
 
-    // Kule GLB modeli yükleniyor (Eğer kule.glb dosyası yoksa konsola uyarı yazar, artık silindir yerine boş görünür)
     gltfLoader.load('kule.glb', (gltf) => {
       const towerModel = gltf.scene || gltf.scenes[0];
       const box = new THREE.Box3().setFromObject(towerModel);
       const size = new THREE.Vector3();
       box.getSize(size);
-      let scaleFactor = 55 / Math.max(size.x, size.y, size.z);
+      let scaleFactor = 65 / Math.max(size.x, size.y, size.z);
       towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      towerModel.position.set(tx, 75, tz);
+      // Kuleler doğrudan su seviyesine/denize yerleştirildi
+      towerModel.position.set(tx, SHIP_Y_POS - 40, tz);
       towerModel.rotation.y = -angle + Math.PI / 2;
 
       towerModel.userData = { towerId: towerId, name: `Korsan Kulesi #${i+1}` };
@@ -914,8 +881,8 @@ function buildCastleIsland() {
       name: `Korsan Kulesi #${i+1}`,
       localX: tx,
       localZ: tz,
-      hp: 550,
-      maxHp: 550,
+      hp: 500000,
+      maxHp: 500000,
       lastShotTime: 0
     });
   }
@@ -1364,7 +1331,6 @@ function animate3D() {
     player.speed = 0;
   }
 
-  // Çarpışma kodu tamamen kaldırıldı; gemi adanın içine ve dilediği yere serbestçe girebilir
   player.x += Math.cos(player.a) * player.speed * dt;
   player.z += Math.sin(player.a) * player.speed * dt;
 
@@ -1615,7 +1581,7 @@ function animate3D() {
           fireProjectile(player.x, player.z, target.x, target.z, ammoKey, () => {
             target.hp -= ammoSpec.damage;
             if (ammoSpec.slow < 1.0) target.slowTimer = 240;
-            showFloatingDamage(target.x, target.z, '-' + ammoSpec.damage, '#f97316');
+            showFloatingDamage(target.x, target.z, '-' + ammoSpec.damage.toLocaleString(), '#f97316');
             updateTargetCard(); updateHUD(); syncAttackButton();
 
             if (target.hp <= 0) {
@@ -1651,7 +1617,7 @@ function animate3D() {
 
           fireProjectile(player.x, player.z, twWorldX, twWorldZ, ammoKey, () => {
             tower.hp -= ammoSpec.damage;
-            showFloatingDamage(twWorldX, twWorldZ, '-' + ammoSpec.damage, '#f97316');
+            showFloatingDamage(twWorldX, twWorldZ, '-' + ammoSpec.damage.toLocaleString(), '#f97316');
             updateTargetCard(); updateHUD(); syncAttackButton();
 
             if (tower.hp <= 0) {
