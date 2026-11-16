@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Ada Çarpışması ve Kule Katmanı Düzeltildi</title>
+  <title>Korsan Dünyası - Tam Kod Düzeltmesi</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -829,12 +829,10 @@ function createBorderFrame() {
   scene.add(borderFrameMesh);
 }
 
-// ADA VE KULELERİN KATMAN SIRALAMASI VE ADADAN GEÇİŞİ ENGELLEYEN ÇARPIŞMA FİZİĞİ
 function buildCastleIsland() {
   castleGroup = new THREE.Group();
   castleGroup.position.set(0, 0, -2200);
 
-  // 1. Ada PNG görseli (Derinlik testini aktif hale getirerek kulelerin arkada kalmasını önlüyoruz)
   const textureLoader = new THREE.TextureLoader();
   textureLoader.load('ada.png', (castleTexture) => {
     const castleGeo = new THREE.PlaneGeometry(900, 900);
@@ -868,7 +866,6 @@ function buildCastleIsland() {
     });
   });
 
-  // 2. Kule.glb modellerini üst katmanda konumlandırıyoruz
   castleTowers = [];
   castleTowerMeshes = [];
   const towerCount = 15;
@@ -1374,19 +1371,17 @@ function animate3D() {
   let nextX = player.x + Math.cos(player.a) * player.speed * dt;
   let nextZ = player.z + Math.sin(player.a) * player.speed * dt;
 
-  // ADANIN İÇİNE GİRİŞİ ENGELLEYEN ÇARPIŞMA FİZİĞİ (Kapak/Kapı boşluğu hariç)
   if (castleGroup) {
     const castleWorldX = castleGroup.position.x;
     const castleWorldZ = castleGroup.position.z;
     const distToCastleCenter = Math.hypot(nextX - castleWorldX, nextZ - castleWorldZ);
-    const islandRadius = 380; // Ada çarpışma yarıçapı
+    const islandRadius = 380;
 
     if (distToCastleCenter < islandRadius) {
       const angleFromCenter = Math.atan2(nextZ - castleWorldZ, nextX - castleWorldX);
-      const gateAngle = Math.PI / 2; // Kapının yönü (Güney tarafındaki boşluk)
-      const gateTolerance = 0.35; // Kapı genişliği
+      const gateAngle = Math.PI / 2;
+      const gateTolerance = 0.35;
 
-      // Eğer gemi kapı açısının dışındaysa adanın duvarına çarpar ve içeri giremez
       if (Math.abs(angleFromCenter - gateAngle) > gateTolerance) {
         nextX = player.x;
         nextZ = player.z;
@@ -1873,4 +1868,40 @@ function renderShipyardList() {
       if (player.score < cost) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Yetersiz hazine (altın)!'; return; }
       player.score -= cost;
       
-      ...
+      const users = loadUsers();
+      const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
+      if (uIdx !== -1) {
+        if (!users[uIdx].ownedShips) users[uIdx].ownedShips = ['standard'];
+        users[uIdx].ownedShips.push(shipId);
+        users[uIdx].equippedShip = shipId;
+        saveUsers(users);
+      }
+      currentUser.ownedShips.push(shipId); currentUser.equippedShip = shipId;
+      updateHUD(); setupPlayerShipVisual(); renderShipyardList();
+      marketFeedbackEl.style.color = '#4ade80';
+      marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} satın alındı ve kuşanıldı!`;
+      setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2500);
+    });
+  });
+
+  shipyardListEl.querySelectorAll('.ship-equip-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const shipId = btn.dataset.id;
+      const users = loadUsers();
+      const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
+      if (uIdx !== -1) { users[uIdx].equippedShip = shipId; saveUsers(users); }
+      currentUser.equippedShip = shipId;
+      setupPlayerShipVisual(); renderShipyardList();
+      marketFeedbackEl.style.color = '#4ade80';
+      marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} kuşanıldı!`;
+      setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+    });
+  });
+}
+
+loadUsers();
+const session = JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY) || 'null');
+if (session) { completeLogin(session); }
+</script>
+</body>
+</html>
