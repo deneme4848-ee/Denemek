@@ -698,7 +698,7 @@ let scene, camera, renderer;
 let playerSprite, activeGlbShip = null, playerNeonRing, enemies = [], rangeRingMesh, oceanTexture, oceanBumpTexture;
 let castleGroup = null, castleTowers = [];
 let castleProjectiles = [];
-let activeProjectiles = [], particleSystems = [];
+let activeProjectiles = [], particleSystems = [], cannonEffects = [];
 let raycaster, planeGeo, mouse;
 let shipTextures = {};
 let textureLoader, gltfLoader;
@@ -1077,7 +1077,7 @@ function initThreeGame() {
 }
 
 // ==========================================================
-// OYUN MANTIĞI & GLB YÜKLEME
+// OYUN MANTIĞI & GLB YÜKLEME (KORUNMUŞ AYARLAR)
 // ==========================================================
 let player;
 let targetPos = null, selectedEnemyId = null, selectedTowerId = null, isAttacking = false, isGameOver = false;
@@ -1286,7 +1286,57 @@ function showFloatingDamage(wx, wz, text, colorHex) {
   setTimeout(() => div.remove(), 900);
 }
 
+// ==========================================================
+// GEMİYE ÖZEL TOP ATIŞ ALEVİ & DUMAN EFEKTİ
+// ==========================================================
+function triggerCannonFireEffect(shipX, shipZ, targetX, targetZ) {
+  const angleToTarget = Math.atan2(targetZ - shipZ, targetX - shipX);
+  const offsetDist = 28; // Gemi bordasından çıkış mesafesi
+  const muzzleX = shipX + Math.cos(angleToTarget) * offsetDist;
+  const muzzleZ = shipZ + Math.sin(angleToTarget) * offsetDist;
+
+  // 1. Namlu Alevi Parlaması
+  const flashGeo = new THREE.SphereGeometry(12, 12, 12);
+  const flashMat = new THREE.MeshBasicMaterial({ color: 0xffaa00, transparent: true, opacity: 0.95 });
+  const flashMesh = new THREE.Mesh(flashGeo, flashMat);
+  flashMesh.position.set(muzzleX, 24, muzzleZ);
+  scene.add(flashMesh);
+  cannonEffects.push({ mesh: flashMesh, vx: 0, vy: 0.2, vz: 0, grow: 1.08, fade: 0.14, life: 8 });
+
+  // 2. Barut Dumanı Parçacıkları
+  for (let i = 0; i < 8; i++) {
+    const smokeGeo = new THREE.SphereGeometry(5 + Math.random() * 5, 8, 8);
+    const grayTone = 0.75 + Math.random() * 0.2;
+    const smokeMat = new THREE.MeshBasicMaterial({
+      color: new THREE.Color(grayTone, grayTone, grayTone),
+      transparent: true,
+      opacity: 0.75
+    });
+    const smokeMesh = new THREE.Mesh(smokeGeo, smokeMat);
+    smokeMesh.position.set(
+      muzzleX + (Math.random() - 0.5) * 14,
+      22 + Math.random() * 8,
+      muzzleZ + (Math.random() - 0.5) * 14
+    );
+    scene.add(smokeMesh);
+
+    const spreadSpeed = 0.6 + Math.random() * 1.1;
+    const spreadAngle = angleToTarget + (Math.random() - 0.5) * 0.7;
+    cannonEffects.push({
+      mesh: smokeMesh,
+      vx: Math.cos(spreadAngle) * spreadSpeed,
+      vy: 0.45 + Math.random() * 0.4,
+      vz: Math.sin(spreadAngle) * spreadSpeed,
+      grow: 1.03,
+      fade: 0.025,
+      life: 32
+    });
+  }
+}
+
 function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
+  triggerCannonFireEffect(startX, startZ, targetX, targetZ);
+
   const ammoSpec = AMMO_TYPES[ammoKey];
   const pGeo = new THREE.SphereGeometry(6, 16, 16);
   const pMat = new THREE.MeshStandardMaterial({ 
@@ -1360,13 +1410,22 @@ function animate3D() {
 
   coordDisplayEl.textContent = `X: ${Math.round((player.x / (WORLD_SIZE / 2)) * 50)} · Y: ${Math.round((player.z / (WORLD_SIZE / 2)) * 50)}`;
 
+  // Oyuncu Sprite veya GLB Model Güncellemesi (Dalga & Salınım Efekti Dahil)
   if (playerSprite && playerSprite.visible) {
     playerSprite.position.set(player.x, SHIP_Y_POS, player.z);
     applyNormalizedSprite(playerSprite, player.a);
   }
   if (activeGlbShip) {
-    activeGlbShip.position.set(player.x, SHIP_Y_POS, player.z);
+    const timeSec = now * 0.0025;
+    const waveBobY = Math.sin(timeSec) * 1.4;
+    const waveRollZ = Math.cos(timeSec * 0.85) * 0.045;
+    const speedPitchX = (player.speed / player.maxSpeed) * -0.05 + Math.sin(timeSec * 1.2) * 0.025;
+
+    activeGlbShip.position.set(player.x, SHIP_Y_POS + waveBobY, player.z);
+    activeGlbShip.rotation.order = 'YXZ';
     activeGlbShip.rotation.y = -player.a + Math.PI / 2;
+    activeGlbShip.rotation.x = speedPitchX;
+    activeGlbShip.rotation.z = waveRollZ;
   }
 
   if (playerNeonRing) {
@@ -1434,6 +1493,24 @@ function animate3D() {
         });
       }
     });
+  }
+
+  // Top Ateşi Alev & Duman Efektlerini Güncelle
+  for (let i = cannonEffects.length - 1; i >= 0; i--) {
+    const ce = cannonEffects[i];
+    ce.life--;
+    ce.mesh.position.x += ce.vx;
+    ce.mesh.position.y += ce.vy;
+    ce.mesh.position.z += ce.vz;
+    ce.mesh.scale.multiplyScalar(ce.grow);
+    ce.mesh.material.opacity = Math.max(0, ce.mesh.material.opacity - ce.fade);
+
+    if (ce.life <= 0 || ce.mesh.material.opacity <= 0) {
+      scene.remove(ce.mesh);
+      ce.mesh.geometry.dispose();
+      ce.mesh.material.dispose();
+      cannonEffects.splice(i, 1);
+    }
   }
 
   for (let i = castleProjectiles.length - 1; i >= 0; i--) {
