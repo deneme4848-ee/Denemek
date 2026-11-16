@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - GLB Kuleler ve Ada PNG</title>
+  <title>Korsan Dünyası - Mükemmel Kule Konumlandırma</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -648,8 +648,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v59';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v59';
+const USERS_STORAGE_KEY = 'pirate3d_users_v60';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v60';
 let authMode = 'login';
 let currentUser = null;
 
@@ -829,12 +829,12 @@ function createBorderFrame() {
   scene.add(borderFrameMesh);
 }
 
-// ADA PNG GÖRSELİ VE 15 ADET KULE.GLB MODELİNİ ENTEGRE EDEN FONKSİYON
+// ADA PNG GÖRSELİNİN ARKA PLANDA KALMASINI SAĞLAYIP KULE.GLB'LERİ TAŞ ÇIKINTILARINA KONUMLANDIRAN FONKSİYON
 function buildCastleIsland() {
   castleGroup = new THREE.Group();
   castleGroup.position.set(0, 0, -2200);
 
-  // 1. Ada / Kalenin dairesel sur PNG görseli
+  // 1. Ada PNG görseli (Derinliği ve yüksekliği optimize edildi, kulelerin arkasında kalacak)
   const textureLoader = new THREE.TextureLoader();
   textureLoader.load('ada.png', (castleTexture) => {
     const castleGeo = new THREE.PlaneGeometry(900, 900);
@@ -845,45 +845,65 @@ function buildCastleIsland() {
     });
     const castleMesh = new THREE.Mesh(castleGeo, castleMat);
     castleMesh.rotation.x = -Math.PI / 2;
-    castleMesh.position.y = 35;
+    castleMesh.position.y = 10; // Arka planda kalması için hafif aşağı çekildi
     castleGroup.add(castleMesh);
+  }, undefined, () => {
+    // Eğer ada.png bulunamazsa yedek olarak internetten yükler
+    textureLoader.load('https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1024&q=80', (castleTexture) => {
+      const castleGeo = new THREE.PlaneGeometry(900, 900);
+      const castleMat = new THREE.MeshBasicMaterial({
+        map: castleTexture,
+        transparent: true,
+        side: THREE.DoubleSide
+      });
+      const castleMesh = new THREE.Mesh(castleGeo, castleMat);
+      castleMesh.rotation.x = -Math.PI / 2;
+      castleMesh.position.y = 10;
+      castleGroup.add(castleMesh);
+    });
   });
 
-  // 2. Kule.glb modellerini dairesel surun etrafına tam 15 adet yerleştiriyoruz
+  // 2. Kule.glb modellerini PNG üzerindeki taş burç çıkıntılarının üzerine yerleştiriyoruz
   castleTowers = [];
   castleTowerMeshes = [];
   const towerCount = 15;
-  const radius = 390;
+  const radius = 370; // Taş çıkıntılara tam oturacak yarıçap
 
   for (let i = 0; i < towerCount; i++) {
-    const angle = (i / towerCount) * Math.PI * 1.6 - (Math.PI * 0.8);
+    const angle = (i / towerCount) * Math.PI * 1.62 - (Math.PI * 0.81);
     const tx = Math.cos(angle) * radius;
     const tz = Math.sin(angle) * radius;
     const towerId = 100 + i;
 
-    // Kule.glb modelini yüklüyoruz
     gltfLoader.load('kule.glb', (gltf) => {
       const towerModel = gltf.scene || gltf.scenes[0];
       const box = new THREE.Box3().setFromObject(towerModel);
       const size = new THREE.Vector3();
       box.getSize(size);
-      let scaleFactor = 50 / Math.max(size.x, size.y, size.z);
+      let scaleFactor = 55 / Math.max(size.x, size.y, size.z);
       towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      towerModel.position.set(tx, 55, tz);
+      // Kuleler PNG'nin ön planda ve taş çıkıntılarının tam üstünde yer alacak
+      towerModel.position.set(tx, 75, tz);
       towerModel.rotation.y = -angle + Math.PI / 2;
 
       towerModel.userData = { towerId: towerId, name: `Korsan Kulesi #${i+1}` };
-      towerModel.traverse(child => { child.userData = { towerId: towerId }; });
+      towerModel.traverse(child => { 
+        child.userData = { towerId: towerId };
+        // Render sıralamasında kulelerin ön planda kalmasını garantiler
+        if (child.material) {
+          if (Array.isArray(child.material)) child.material.forEach(m => { m.depthWrite = true; });
+          else child.material.depthWrite = true;
+        }
+      });
 
       castleGroup.add(towerModel);
       castleTowerMeshes.push(towerModel);
     }, undefined, (err) => {
-      // Eğer kule.glb yüklenemezse yedek olarak tıklanabilir gizli çember oluşturur
-      const fallbackGeo = new THREE.CylinderGeometry(20, 20, 60, 8);
+      const fallbackGeo = new THREE.CylinderGeometry(25, 25, 65, 8);
       const fallbackMat = new THREE.MeshBasicMaterial({ visible: false });
       const fallbackMesh = new THREE.Mesh(fallbackGeo, fallbackMat);
-      fallbackMesh.position.set(tx, 55, tz);
+      fallbackMesh.position.set(tx, 75, tz);
       fallbackMesh.userData = { towerId: towerId, name: `Korsan Kulesi #${i+1}` };
       castleGroup.add(fallbackMesh);
       castleTowerMeshes.push(fallbackMesh);
@@ -1821,6 +1841,7 @@ function renderShipyardList() {
       if (player.score < cost) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Yetersiz hazine (altın)!'; return; }
       player.score -= cost;
       
+      .score -= cost;
       const users = loadUsers();
       const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
       if (uIdx !== -1) {
