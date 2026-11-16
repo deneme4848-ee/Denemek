@@ -707,7 +707,7 @@ const WORLD_SIZE = 1000;
 const ATTACK_RANGE = 280;
 const CASTLE_AGGRO_RANGE = 330;
 const BASE_SHIP_HEIGHT = 85;
-const SHIP_Y_POS = 0;
+const SHIP_Y_POS = 100;
 let castleTowerMeshes = [];
 
 function createStaticOceanTextures() {
@@ -1097,7 +1097,7 @@ function setupPlayerShipVisual() {
   if (modelSpec.type === 'glb' && modelSpec.modelPath) {
     gltfLoader.load(modelSpec.modelPath, (gltf) => {
       activeGlbShip = gltf.scene || gltf.scenes[0];
-      activeGlbShip.scale.set(5, 5, 5);
+      activeGlbShip.scale.set(3, 3, 3);
       scene.add(activeGlbShip);
     }, undefined, (err) => {
       console.warn("GLB yüklenemedi, yedek sprite'a dönülüyor:", err);
