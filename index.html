@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - 99x99 Devasa 15 Harita Sistemi</title>
+  <title>Korsan Dünyası - Gelişmiş 99x99 Harita & Efektler</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -372,7 +372,7 @@
   <div id="game"></div>
 
   <!-- Harita Geçiş Butonu -->
-  <button id="map-transit-banner" type="button">Harita 2'ye Geç</button>
+  <button id="map-transit-banner" type="button">Harita Değiştir</button>
 
   <div id="player-label">
     <div class="ship-hp-track"><div id="player-ship-hp-fill"></div></div>
@@ -621,8 +621,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v51';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v51';
+const USERS_STORAGE_KEY = 'pirate3d_users_v52';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v52';
 let authMode = 'login';
 let currentUser = null;
 
@@ -696,15 +696,14 @@ let raycaster, planeGeo, mouse;
 let selectedRingMesh = null;
 let borderFrameMesh = null;
 
-// HARİTA BOYUTU 99X99 ÖLÇEĞİNE YÜKSELTİLDİ (DEVAASA OKYANUS)
 const WORLD_SIZE = 9900; 
 const ATTACK_RANGE = 300;
 const CASTLE_AGGRO_RANGE = 350;
 const SHIP_Y_POS = 100;
 
-// İdeal Yakın Kamer Hızı ve Mesafesi
-const CAMERA_HEIGHT = 650;
-const CAMERA_DEPTH = 500;
+// KAMERA İSTEDİĞİN GİBİ HAFİFÇE UZAKLAŞTIRILDI
+const CAMERA_HEIGHT = 800;
+const CAMERA_DEPTH = 650;
 
 let currentMapIndex = 0; 
 const MAP_DATA = [
@@ -729,33 +728,31 @@ let pendingTransitMapIndex = null;
 let lastClockTime = performance.now();
 let gltfLoader;
 
-function createStaticOceanTextures() {
+// Deniz çizgileri giderildi, kusursuz pürüzsüz okyanus dokusu oluşturuldu
+function createCleanOceanTextures() {
   const size = 1024;
   const colorCanvas = document.createElement('canvas');
   colorCanvas.width = size; colorCanvas.height = size;
   const ctx = colorCanvas.getContext('2d');
 
-  const grad = ctx.createRadialGradient(size/2, size/2, 100, size/2, size/2, size/1.1);
-  grad.addColorStop(0, '#0284c7');
-  grad.addColorStop(0.4, '#0369a1');
-  grad.addColorStop(0.8, '#075985');
-  grad.addColorStop(1, '#0c4a6e');
+  const grad = ctx.createLinearGradient(0, 0, 0, size);
+  grad.addColorStop(0, '#0369a1');
+  grad.addColorStop(0.5, '#0284c7');
+  grad.addColorStop(1, '#075985');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, size, size);
 
-  for (let i = 0; i < 800; i++) {
+  // Yumuşak doğal dalga gradyanları (Çizgiler tamamen temizlendi)
+  for (let i = 0; i < 400; i++) {
     const cx = Math.random() * size, cy = Math.random() * size;
-    const rx = 15 + Math.random() * 55, ry = 6 + Math.random() * 18;
-    const rot = Math.random() * Math.PI;
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(rot);
+    const r = 40 + Math.random() * 120;
+    const circleGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+    circleGrad.addColorStop(0, 'rgba(56, 189, 248, 0.08)');
+    circleGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = circleGrad;
     ctx.beginPath();
-    ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
-    ctx.strokeStyle = i % 3 === 0 ? 'rgba(255, 255, 255, 0.14)' : 'rgba(56, 189, 248, 0.12)';
-    ctx.lineWidth = 1.8;
-    ctx.stroke();
-    ctx.restore();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   const bumpCanvas = document.createElement('canvas');
@@ -764,11 +761,11 @@ function createStaticOceanTextures() {
   bCtx.fillStyle = '#808080';
   bCtx.fillRect(0, 0, size, size);
 
-  for (let i = 0; i < 900; i++) {
+  for (let i = 0; i < 600; i++) {
     const x = Math.random() * size, y = Math.random() * size;
-    const r = 10 + Math.random() * 35;
+    const r = 20 + Math.random() * 60;
     const bGrad = bCtx.createRadialGradient(x, y, 1, x, y, r);
-    bGrad.addColorStop(0, 'rgba(255,255,255,0.35)');
+    bGrad.addColorStop(0, 'rgba(255,255,255,0.25)');
     bGrad.addColorStop(1, 'rgba(128,128,128,0)');
     bCtx.fillStyle = bGrad;
     bCtx.beginPath();
@@ -778,16 +775,15 @@ function createStaticOceanTextures() {
 
   const mapTex = new THREE.CanvasTexture(colorCanvas);
   mapTex.wrapS = THREE.RepeatWrapping; mapTex.wrapT = THREE.RepeatWrapping;
-  mapTex.repeat.set(32, 32);
+  mapTex.repeat.set(16, 16);
 
   const bumpTex = new THREE.CanvasTexture(bumpCanvas);
   bumpTex.wrapS = THREE.RepeatWrapping; bumpTex.wrapT = THREE.RepeatWrapping;
-  bumpTex.repeat.set(32, 32);
+  bumpTex.repeat.set(16, 16);
 
   return { mapTex, bumpTex };
 }
 
-// OLGUN VE ŞIK ÇERÇEVE TASARIMI (Metalik Antrasit + Mat Fener Detaylı)
 function createBorderFrame() {
   const size = WORLD_SIZE - 200;
   const shape = new THREE.Shape();
@@ -903,7 +899,7 @@ function buildCastleIsland() {
 function initThreeGame() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x052236);
-  scene.fog = new THREE.FogExp2(0x052236, 0.00005); // Devasa dünya için genişletilmiş sis mesafesi
+  scene.fog = new THREE.FogExp2(0x052236, 0.00004);
 
   camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 50000);
   camera.position.set(0, CAMERA_HEIGHT, CAMERA_DEPTH);
@@ -923,17 +919,17 @@ function initThreeGame() {
   sunLight.position.set(2000, 3000, 1500);
   scene.add(sunLight);
 
-  const oceanTexData = createStaticOceanTextures();
+  const oceanTexData = createCleanOceanTextures();
   oceanTexture = oceanTexData.mapTex;
   oceanBumpTexture = oceanTexData.bumpTex;
 
-  planeGeo = new THREE.PlaneGeometry(WORLD_SIZE * 2, WORLD_SIZE * 2, 64, 64);
+  planeGeo = new THREE.PlaneGeometry(WORLD_SIZE * 2, WORLD_SIZE * 2, 32, 32);
   const oceanMat = new THREE.MeshStandardMaterial({
     map: oceanTexture,
     bumpMap: oceanBumpTexture,
-    bumpScale: 8.5,
-    roughness: 0.12,
-    metalness: 0.65
+    bumpScale: 5.0,
+    roughness: 0.15,
+    metalness: 0.5
   });
   const ocean = new THREE.Mesh(planeGeo, oceanMat);
   ocean.rotation.x = -Math.PI / 2;
@@ -1088,7 +1084,7 @@ function changeMap(mapIdx, entrySide = 'center') {
   targetPos = null;
   hideTransitButton();
 
-  const BOUND = (WORLD_SIZE / 2) - 300;
+  const BOUND = (WORLD_SIZE / 2) - 350;
   if (entrySide === 'left') {
     player.x = BOUND;
   } else if (entrySide === 'right') {
@@ -1290,7 +1286,7 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
   const mesh = new THREE.Mesh(pGeo, pMat);
   mesh.position.set(startX, SHIP_Y_POS - 50, startZ);
   scene.add(mesh);
-  activeProjectiles.push({ mesh, x: startX, z: startZ, targetX, targetZ, speed: 380, ammoKey, onHit, yOffset: 50 });
+  activeProjectiles.push({ mesh, x: startX, z: startZ, targetX, targetZ, speed: 380, ammoKey, onHit, yOffset: 50, lastSparkDist: 0 });
 }
 
 function fireCastleProjectile(startX, startZ, targetX, targetZ, onHit) {
@@ -1341,7 +1337,7 @@ function animate3D() {
 
   const HALF_WORLD = WORLD_SIZE / 2; // 4950
   const HARD_LIMIT = HALF_WORLD - 120;
-  const TRIGGER_THRESHOLD = HALF_WORLD - 400; // Harita geçiş tetikleme eşiği genişletildi
+  const TRIGGER_THRESHOLD = HALF_WORLD - 350;
 
   const curMeta = MAP_DATA[currentMapIndex];
   let nearEdge = false;
@@ -1351,7 +1347,7 @@ function animate3D() {
   if (player.z > HARD_LIMIT) player.z = HARD_LIMIT;
   if (player.z < -HARD_LIMIT) player.z = -HARD_LIMIT;
 
-  // TÜM 15 HARİTA İÇİN (Harita 1 mantığıyla) KENAR GEÇİŞLERİ
+  // ÇİFT YÖNLÜ VE TÜM 15 HARİTA İÇİN GEÇİŞ SİSTEMİ DÜZELTİLDİ
   if (player.x > TRIGGER_THRESHOLD) {
     if (curMeta.col < 4) {
       showTransitButton(currentMapIndex + 1, 'right');
@@ -1499,6 +1495,20 @@ function animate3D() {
     const dx = p.targetX - p.x, dz = p.targetZ - p.z;
     const dist = Math.hypot(dx, dz);
     const step = p.speed * dt;
+
+    // Alevli ve diğer güllerde arkadan nokta gibi sinematik kıvılcım bırakma mantığı
+    if (p.ammoKey === 'fire' || p.ammoKey === 'dragon') {
+      if (!p.lastSparkDist || p.lastSparkDist - dist > 18) {
+        p.lastSparkDist = dist;
+        const sparkGeo = new THREE.SphereGeometry(2.0, 6, 6);
+        const sparkMat = new THREE.MeshBasicMaterial({ color: p.ammoKey === 'fire' ? 0xff5500 : 0x38bdf8, transparent: true, opacity: 0.9 });
+        const sparkMesh = new THREE.Mesh(sparkGeo, sparkMat);
+        sparkMesh.position.copy(p.mesh.position);
+        scene.add(sparkMesh);
+        particleSystems.push({ mesh: sparkMesh, life: 18, scaleDecay: 0.85 });
+      }
+    }
+
     if (dist < step) {
       scene.remove(p.mesh); p.mesh.geometry.dispose(); p.mesh.material.dispose();
       activeProjectiles.splice(i, 1);
@@ -1508,16 +1518,16 @@ function animate3D() {
       p.mesh.position.set(p.x, SHIP_Y_POS - p.yOffset, p.z);
       p.mesh.rotation.x += (12 * dt); p.mesh.rotation.y += (12 * dt);
 
-      for (let s = 0; s < 3; s++) {
+      for (let s = 0; s < 2; s++) {
         let sparkColor = p.ammoKey === 'fire' ? (Math.random() > 0.4 ? 0xff3300 : 0xffaa00) :
                          p.ammoKey === 'dragon' ? [0x38bdf8, 0xa855f7, 0x34d399, 0xffffff][Math.floor(Math.random()*4)] :
                          p.ammoKey === 'chain' ? 0x94a3b8 : 0xffa500;
-        const sparkGeo = new THREE.SphereGeometry(3.5 + Math.random() * 2.5, 8, 8);
-        const sparkMat = new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 1.0 });
+        const sparkGeo = new THREE.SphereGeometry(3.0 + Math.random() * 2.0, 8, 8);
+        const sparkMat = new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 0.9 });
         const sparkMesh = new THREE.Mesh(sparkGeo, sparkMat);
-        sparkMesh.position.set(p.x + (Math.random() - 0.5) * 12, (SHIP_Y_POS - p.yOffset) + (Math.random() - 0.5) * 12, p.z + (Math.random() - 0.5) * 12);
+        sparkMesh.position.set(p.x + (Math.random() - 0.5) * 8, (SHIP_Y_POS - p.yOffset) + (Math.random() - 0.5) * 8, p.z + (Math.random() - 0.5) * 8);
         scene.add(sparkMesh);
-        particleSystems.push({ mesh: sparkMesh, life: 30, scaleDecay: 0.88 });
+        particleSystems.push({ mesh: sparkMesh, life: 25, scaleDecay: 0.88 });
       }
     }
   }
@@ -1525,7 +1535,7 @@ function animate3D() {
   for (let i = particleSystems.length - 1; i >= 0; i--) {
     const pt = particleSystems[i];
     pt.life--; pt.mesh.scale.multiplyScalar(pt.scaleDecay || 0.90);
-    pt.mesh.material.opacity = Math.max(0, pt.mesh.material.opacity - (1.5 * dt));
+    pt.mesh.material.opacity = Math.max(0, pt.mesh.material.opacity - (2.0 * dt));
     if (pt.life <= 0 || pt.mesh.material.opacity <= 0) {
       scene.remove(pt.mesh); pt.mesh.geometry.dispose(); pt.mesh.material.dispose();
       particleSystems.splice(i, 1);
@@ -1599,7 +1609,17 @@ function animate3D() {
               enemies = enemies.filter(e => e.id !== target.id);
               selectedEnemyId = null; isAttacking = false;
               if (selectedRingMesh) selectedRingMesh.visible = false;
-              player.score += 150; player.exp += 35;
+              player.score += 150;
+              
+              // DENEYİM VE LEVEL ATLAMA MANTIĞI DÜZELTİLDİ
+              player.exp += 45;
+              if (player.exp >= player.maxExp) {
+                player.level++;
+                player.exp -= player.maxExp;
+                player.maxExp = Math.floor(player.maxExp * 1.35);
+                showFloatingDamage(player.x, player.z, `LEVEL UP! Lv.${player.level}`, '#38bdf8');
+              }
+
               updateTargetCard(); updateHUD(); syncAttackButton();
               setTimeout(() => spawnEnemyGlb(target.id), 3000);
             }
@@ -1627,6 +1647,15 @@ function animate3D() {
               selectedTowerId = null; isAttacking = false;
               if (selectedRingMesh) selectedRingMesh.visible = false;
               player.score += 300;
+              
+              player.exp += 80;
+              if (player.exp >= player.maxExp) {
+                player.level++;
+                player.exp -= player.maxExp;
+                player.maxExp = Math.floor(player.maxExp * 1.35);
+                showFloatingDamage(player.x, player.z, `LEVEL UP! Lv.${player.level}`, '#38bdf8');
+              }
+
               updateTargetCard(); updateHUD(); syncAttackButton();
             }
           });
@@ -1680,7 +1709,7 @@ function updateHUD() {
   hpTextEl.textContent = `Can ${Math.ceil(player.hp).toLocaleString()} / ${player.maxHp.toLocaleString()}`;
   expTextEl.textContent = `Deneyim ${player.exp.toLocaleString()} / ${player.maxExp.toLocaleString()}`;
   hpBarEl.style.width = ((player.hp / player.maxHp) * 100) + '%';
-  expBarEl.style.width = ((player.exp / player.maxExp) * 100) + '%';
+  expBarEl.style.width = Math.min(100, (player.exp / player.maxExp) * 100) + '%';
   marketGoldEl.textContent = player.score.toLocaleString();
 
   const hpPercent = Math.max(0, Math.min(100, (player.hp / player.maxHp) * 100));
