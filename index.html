@@ -494,7 +494,7 @@
     <div class="auth-card">
       <div class="auth-brand">
         <h1>⚓ Korsan Dünyası</h1>
-        <p>15 Harita & Sınır Butonlu Geçiş Sistemi</p>
+        <p>15 Harita & Genişletilmiş Sınır Sistemi</p>
       </div>
       <div class="auth-tabs">
         <button id="tab-login" class="auth-tab active" type="button">Giriş Yap</button>
@@ -621,8 +621,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v47';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v47';
+const USERS_STORAGE_KEY = 'pirate3d_users_v48';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v48';
 let authMode = 'login';
 let currentUser = null;
 
@@ -701,8 +701,6 @@ const CASTLE_AGGRO_RANGE = 330;
 const SHIP_Y_POS = 100;
 
 // Harita Sistemi (15 Harita 3x5 Grid Düzeni)
-// 0:Harita1(0,0), 1:Harita2(1,0), 2:Harita3(2,0), 3:Harita4(3,0), 4:Harita5(4,0)
-// 5:Harita6(0,1), ... 10:Harita11(0,2) vb.
 let currentMapIndex = 0; 
 const MAP_DATA = [
   { id: 1, name: "Harita 1", subtitle: "Sığcık Limanı", levelReq: "Seviye 1+", col: 0, row: 0 },
@@ -722,7 +720,7 @@ const MAP_DATA = [
   { id: 15, name: "Harita 15", subtitle: "Son Ufuk", levelReq: "Seviye 15+", col: 4, row: 2 }
 ];
 
-let pendingTransitMapIndex = null; // Kenara gelince binilecek hedef harita
+let pendingTransitMapIndex = null;
 let lastClockTime = performance.now();
 
 function createStaticOceanTextures() {
@@ -1027,7 +1025,7 @@ function startGameLogic() {
   gameOverEl.style.display = 'none';
 
   player = {
-    x: 0, z: 220, a: -Math.PI / 2, speed: 0, maxSpeed: 110,
+    x: 0, z: 0, a: -Math.PI / 2, speed: 0, maxSpeed: 110,
     hp: 1000000, maxHp: 1000000, score: 100000000,
     level: 1, exp: 0, maxExp: 100,
     selectedAmmo: 'iron',
@@ -1036,7 +1034,7 @@ function startGameLogic() {
   };
 
   setupPlayerShipVisual();
-  changeMap(0); // Harita 1 ile başla
+  changeMap(0);
 
   selectAmmoSlot('iron');
   updateTargetCard();
@@ -1051,21 +1049,20 @@ function changeMap(mapIdx, entrySide = 'center') {
   targetPos = null;
   hideTransitButton();
 
-  // Kapıdan geçiş mantığına göre geminin yeni koordinatını belirle
-  const BOUND = (WORLD_SIZE / 2) - 80;
+  // Doğum konumu (Kapıdan geçiş mantığı, 0 merkezli simetrik)
+  const BOUND = (WORLD_SIZE / 2) - 100;
   if (entrySide === 'left') {
-    player.x = BOUND; // Sağ kenardan girdiyse sol kenarda doğ
+    player.x = BOUND;
   } else if (entrySide === 'right') {
-    player.x = -BOUND; // Sol kenardan girdiyse sağ kenarda doğ
+    player.x = -BOUND;
   } else if (entrySide === 'top') {
-    player.z = BOUND; // Alt kenardan girdiyse üst kenarda doğ
+    player.z = BOUND;
   } else if (entrySide === 'bottom') {
-    player.z = -BOUND; // Üst kenardan girdiyse alt kenarda doğ
+    player.z = -BOUND;
   } else {
-    player.x = 0; player.z = 220; // Varsayılan orta
+    player.x = 0; player.z = 0; // Merkez (0,0)
   }
 
-  // Düşmanları temizle ve yeni haritaya göre yeniden üret
   document.querySelectorAll('.enemy-label').forEach(el => el.remove());
   enemies.forEach(en => {
     if (en.mesh) scene.remove(en.mesh);
@@ -1102,8 +1099,8 @@ function spawnEnemyGlb(id) {
   let ex, ez;
   do {
     ex = (Math.random() - 0.5) * 800;
-    ez = (Math.random() - 0.5) * 600 + 100;
-  } while (Math.hypot(ex, ez) < 250);
+    ez = (Math.random() - 0.5) * 600;
+  } while (Math.hypot(ex, ez) < 200);
 
   const labelEl = document.createElement('div');
   labelEl.className = 'enemy-label';
@@ -1304,29 +1301,33 @@ function animate3D() {
   player.x += Math.cos(player.a) * player.speed * dt;
   player.z += Math.sin(player.a) * player.speed * dt;
 
-  // ORİJİNAL HARİTA YAPISI KORUNARAK SINIR KONTROLÜ VE BUTON ÇIKIŞI (15 Harita Grid 3x5)
-  const LIMIT = (WORLD_SIZE / 2) - 40;
+  // DÜNYA SINIRLARI VE ERİŞİLEBİLİRLİK (0 dahil tüm eksenler serbest, kenarlarda genişletilmiş geçiş eşiği)
+  const HALF_WORLD = WORLD_SIZE / 2; // 600
+  const HARD_LIMIT = HALF_WORLD - 30; // Geminin dışarı taşmasını engelleyen mutlak fizik sınırı (-570 ile +570 arası tam serbest, 0 dahil)
+  const TRIGGER_THRESHOLD = HALF_WORLD - 140; // Butonun çıkacağı daha konforlu/geniş eşik
+
   const curMeta = MAP_DATA[currentMapIndex];
   let nearEdge = false;
 
-  // Sağ Kenar -> curMeta.col < 4 ise (Harita index + 1)
-  if (player.x > LIMIT) {
-    player.x = LIMIT;
-    targetPos = null;
+  // Koordinatları mutlak sınırda tut (0 dahil her yere gidebilir)
+  if (player.x > HARD_LIMIT) player.x = HARD_LIMIT;
+  if (player.x < -HARD_LIMIT) player.x = -HARD_LIMIT;
+  if (player.z > HARD_LIMIT) player.z = HARD_LIMIT;
+  if (player.z < -HARD_LIMIT) player.z = -HARD_LIMIT;
+
+  // Sağ Kenar Eşiği
+  if (player.x > TRIGGER_THRESHOLD) {
     if (curMeta.col < 4) {
       showTransitButton(currentMapIndex + 1, 'right');
       nearEdge = true;
     }
   }
-  // Sol Kenar -> curMeta.col > 0 ise (Harita index - 1), yoksa dünya yuvarlaktır mantığıyla 5. Haritaya (veya satır başı) atlasın
-  else if (player.x < -LIMIT) {
-    player.x = -LIMIT;
-    targetPos = null;
+  // Sol Kenar Eşiği
+  else if (player.x < -TRIGGER_THRESHOLD) {
     if (curMeta.col > 0) {
       showTransitButton(currentMapIndex - 1, 'left');
       nearEdge = true;
     } else {
-      // Örnek: 1. Haritanın solundan çıkınca 5. Haritaya atla
       const targetIdx = currentMapIndex + 4;
       if (targetIdx < MAP_DATA.length) {
         showTransitButton(targetIdx, 'left');
@@ -1334,24 +1335,19 @@ function animate3D() {
       }
     }
   }
-  // Alt Kenar -> curMeta.row < 2 ise (Harita index + 5)
-  else if (player.z > LIMIT) {
-    player.z = LIMIT;
-    targetPos = null;
+  // Alt Kenar Eşiği
+  else if (player.z > TRIGGER_THRESHOLD) {
     if (curMeta.row < 2) {
       showTransitButton(currentMapIndex + 5, 'bottom');
       nearEdge = true;
     }
   }
-  // Üst Kenar -> curMeta.row > 0 ise (Harita index - 5)
-  else if (player.z < -LIMIT) {
-    player.z = -LIMIT;
-    targetPos = null;
+  // Üst Kenar Eşiği
+  else if (player.z < -TRIGGER_THRESHOLD) {
     if (curMeta.row > 0) {
       showTransitButton(currentMapIndex - 5, 'top');
       nearEdge = true;
     } else {
-      // Örnek: 1. Haritanın üstünden çıkınca 11. Haritaya geç
       const targetIdx = currentMapIndex + 10;
       if (targetIdx < MAP_DATA.length) {
         showTransitButton(targetIdx, 'top');
@@ -1361,11 +1357,11 @@ function animate3D() {
   }
 
   if (!nearEdge && pendingTransitMapIndex !== null) {
-    // Kenardan uzaklaşıldıysa butonu gizle
     hideTransitButton();
   }
 
-  coordDisplayEl.textContent = `X: ${Math.round((player.x / (WORLD_SIZE / 2)) * 50)} · Y: ${Math.round((player.z / (WORLD_SIZE / 2)) * 50)}`;
+  // Koordinat gösterimi (0 merkezli ölçekli)
+  coordDisplayEl.textContent = `X: ${Math.round((player.x / HALF_WORLD) * 100)} · Y: ${Math.round((player.z / HALF_WORLD) * 100)}`;
   
   if (activeGlbShip) {
     const timeSec = now * 0.0025;
@@ -1532,8 +1528,8 @@ function animate3D() {
       en.z += Math.sin(en.a) * (activeSpeed * 0.5) * dt;
     }
 
-    en.x = Math.max(-WORLD_SIZE/2, Math.min(WORLD_SIZE/2, en.x));
-    en.z = Math.max(-WORLD_SIZE/2, Math.min(WORLD_SIZE/2, en.z));
+    en.x = Math.max(-HALF_WORLD, Math.min(HALF_WORLD, en.x));
+    en.z = Math.max(-HALF_WORLD, Math.min(HALF_WORLD, en.z));
 
     if (en.mesh) {
       const timeSec = now * 0.0025 + en.id;
