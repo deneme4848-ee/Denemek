@@ -760,59 +760,61 @@ let gltfLoader;
 
 function createSeamlessDarkOceanTexture() {
   const canvas = document.createElement('canvas');
-  canvas.width = 1024;
-  canvas.height = 1024;
+  canvas.width = 2048;
+  canvas.height = 2048;
   const ctx = canvas.getContext('2d');
 
-  const base = ctx.createLinearGradient(0, 0, 1024, 1024);
-  base.addColorStop(0, '#07364b');
-  base.addColorStop(0.38, '#05283d');
-  base.addColorStop(0.72, '#031d31');
-  base.addColorStop(1, '#041522');
-  ctx.fillStyle = base;
-  ctx.fillRect(0, 0, 1024, 1024);
+  ctx.fillStyle = '#042638';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  for (let i = 0; i < 95; i++) {
-    const x = Math.random() * 1024;
-    const y = Math.random() * 1024;
-    const r = 70 + Math.random() * 150;
-    const glow = ctx.createRadialGradient(x, y, 0, x, y, r);
-    glow.addColorStop(0, 'rgba(20, 150, 170, 0.10)');
-    glow.addColorStop(0.55, 'rgba(12, 105, 140, 0.045)');
-    glow.addColorStop(1, 'rgba(4, 35, 55, 0)');
+  for (let i = 0; i < 260; i++) {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
+    const rx = 45 + Math.random() * 115;
+    const ry = 30 + Math.random() * 90;
+    const glow = ctx.createRadialGradient(x, y, 0, x, y, Math.max(rx, ry));
+    glow.addColorStop(0, 'rgba(18, 119, 143, 0.16)');
+    glow.addColorStop(0.55, 'rgba(10, 88, 112, 0.075)');
+    glow.addColorStop(1, 'rgba(4, 38, 56, 0)');
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(rx / Math.max(rx, ry), ry / Math.max(rx, ry));
     ctx.fillStyle = glow;
-    ctx.fillRect(x - r, y - r, r * 2, r * 2);
+    ctx.beginPath();
+    ctx.arc(0, 0, Math.max(rx, ry), 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
   }
 
-  for (let i = 0; i < 1450; i++) {
-    const x = Math.random() * 1024;
-    const y = Math.random() * 1024;
-    const length = 8 + Math.random() * 54;
-    const bend = (Math.random() - 0.5) * 9;
+  for (let i = 0; i < 11500; i++) {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
+    const length = 5 + Math.random() * 24;
+    const bend = (Math.random() - 0.5) * 4;
     ctx.beginPath();
     ctx.moveTo(x, y);
-    ctx.quadraticCurveTo(x + length * 0.5, y + bend, x + length, y + bend * 0.35);
-    ctx.strokeStyle = Math.random() > 0.72
-      ? 'rgba(126, 220, 226, 0.12)'
-      : 'rgba(93, 177, 199, 0.055)';
-    ctx.lineWidth = 0.6 + Math.random() * 1.25;
+    ctx.quadraticCurveTo(x + length * 0.5, y + bend, x + length, y + bend * 0.25);
+    ctx.strokeStyle = Math.random() > 0.82
+      ? `rgba(105, 205, 214, ${0.035 + Math.random() * 0.035})`
+      : `rgba(65, 153, 174, ${0.018 + Math.random() * 0.028})`;
+    ctx.lineWidth = 0.45 + Math.random() * 0.8;
     ctx.stroke();
   }
 
-  for (let i = 0; i < 420; i++) {
-    const x = Math.random() * 1024;
-    const y = Math.random() * 1024;
-    const radius = 0.5 + Math.random() * 1.5;
+  for (let i = 0; i < 5200; i++) {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
+    const r = 0.35 + Math.random() * 0.85;
     ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(190, 235, 238, ${0.035 + Math.random() * 0.09})`;
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(155, 220, 225, ${0.018 + Math.random() * 0.045})`;
     ctx.fill();
   }
 
   const texture = new THREE.CanvasTexture(canvas);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(24, 24);
+  texture.wrapS = THREE.ClampToEdgeWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
+  texture.repeat.set(1, 1);
   texture.anisotropy = 8;
   texture.needsUpdate = true;
   return texture;
@@ -874,10 +876,10 @@ function buildCastleIsland() {
       const box = new THREE.Box3().setFromObject(towerModel);
       const size = new THREE.Vector3();
       box.getSize(size);
-      let scaleFactor = (120 / Math.max(size.x, size.y, size.z)) * 10; 
+      let scaleFactor = (120 / Math.max(size.x, size.y, size.z)) ; 
       towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      towerModel.position.set(tx, SHIP_Y_POS, tz);
+      towerModel.position.set(tx, SHIP_Y_POS - 40, tz);
       towerModel.rotation.y = -angle + Math.PI / 2;
 
       towerModel.userData = { towerId: towerId, name: `Korsan Kulesi #${i+1}` };
@@ -1327,12 +1329,6 @@ function animate3D() {
   let dt = (nowTime - lastClockTime) / 1000;
   lastClockTime = nowTime;
   if (dt > 0.1) dt = 0.1;
-
-  if (oceanTexture) {
-    oceanFlowTime += dt;
-    oceanTexture.offset.x = (oceanFlowTime * 0.0018) % 1;
-    oceanTexture.offset.y = (oceanFlowTime * 0.0009) % 1;
-  }
 
   if (activeShipyardPreviews.length > 0) {
     activeShipyardPreviews.forEach(p => {
