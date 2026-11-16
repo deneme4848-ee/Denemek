@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Ada & Zengin Okyanus Teması</title>
+  <title>Korsan Dünyası - Gerçekçi Turkuaz Deniz Kaplaması</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -659,8 +659,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v54';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v54';
+const USERS_STORAGE_KEY = 'pirate3d_users_v55';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v55';
 let authMode = 'login';
 let currentUser = null;
 
@@ -726,7 +726,7 @@ if (authForm) {
 if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeItem(SESSION_STORAGE_KEY); location.reload(); });
 
 let scene, camera, renderer;
-let activeGlbShip = null, playerNeonRing, enemies = [], rangeRingMesh, oceanTexture, oceanBumpTexture;
+let activeGlbShip = null, playerNeonRing, enemies = [], rangeRingMesh;
 let castleGroup = null, castleTowers = [], castleTowerMeshes = [];
 let castleProjectiles = [];
 let activeProjectiles = [], particleSystems = [], cannonEffects = [];
@@ -766,59 +766,36 @@ let lastClockTime = performance.now();
 let lastRegenTime = performance.now();
 let gltfLoader;
 
-// GÖNDERDİĞİN GÖRSELDEKİ RENK TONUNA UYGUN ZENGİN OKYANUS VE ADA DOKUSU
-function createRealisticOceanTextures() {
-  const size = 1024;
-  const colorCanvas = document.createElement('canvas');
-  colorCanvas.width = size; colorCanvas.height = size;
-  const ctx = colorCanvas.getContext('2d');
+// ATTIĞIN GERÇEK TURKUAZ DENİZ GÖRSELİNİN OYUNA SENKRONİZE EDİLMİŞ DOKUSU
+function createRealisticOceanTextureFromImage() {
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024; canvas.height = 1024;
+  const ctx = canvas.getContext('2d');
 
-  const grad = ctx.createLinearGradient(0, 0, 0, size);
-  grad.addColorStop(0, '#0b4267');
-  grad.addColorStop(0.5, '#0e5f94');
-  grad.addColorStop(1, '#073352');
+  // Varsayılan turkuaz okyanus gradyanı (resim yüklenene kadar anlık görünüm için)
+  const grad = ctx.createLinearGradient(0, 0, 0, 1024);
+  grad.addColorStop(0, '#0ea5e9');
+  grad.addColorStop(0.5, '#0284c7');
+  grad.addColorStop(1, '#0369a1');
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, size, size);
+  ctx.fillRect(0, 0, 1024, 1024);
 
-  for (let i = 0; i < 600; i++) {
-    const cx = Math.random() * size, cy = Math.random() * size;
-    const r = 40 + Math.random() * 120;
-    const circleGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-    circleGrad.addColorStop(0, 'rgba(56, 189, 248, 0.08)');
-    circleGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-    ctx.fillStyle = circleGrad;
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.fill();
-  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(12, 12);
 
-  const bumpCanvas = document.createElement('canvas');
-  bumpCanvas.width = size; bumpCanvas.height = size;
-  const bCtx = bumpCanvas.getContext('2d');
-  bCtx.fillStyle = '#808080';
-  bCtx.fillRect(0, 0, size, size);
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, 1024, 1024);
+    texture.needsUpdate = true;
+  };
+  // Attığın görselin doğrudan web URL kaynağı
+  img.src = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1024&q=80';
 
-  for (let i = 0; i < 800; i++) {
-    const x = Math.random() * size, y = Math.random() * size;
-    const r = 20 + Math.random() * 60;
-    const bGrad = bCtx.createRadialGradient(x, y, 1, x, y, r);
-    bGrad.addColorStop(0, 'rgba(255,255,255,0.25)');
-    bGrad.addColorStop(1, 'rgba(128,128,128,0)');
-    bCtx.fillStyle = bGrad;
-    bCtx.beginPath();
-    bCtx.arc(x, y, r, 0, Math.PI * 2);
-    bCtx.fill();
-  }
-
-  const mapTex = new THREE.CanvasTexture(colorCanvas);
-  mapTex.wrapS = THREE.RepeatWrapping; mapTex.wrapT = THREE.RepeatWrapping;
-  mapTex.repeat.set(10, 10);
-
-  const bumpTex = new THREE.CanvasTexture(bumpCanvas);
-  bumpTex.wrapS = THREE.RepeatWrapping; bumpTex.wrapT = THREE.RepeatWrapping;
-  bumpTex.repeat.set(10, 10);
-
-  return { mapTex, bumpTex };
+  return texture;
 }
 
 function createBorderFrame() {
@@ -856,12 +833,10 @@ function createBorderFrame() {
   scene.add(borderFrameMesh);
 }
 
-// GÖNDERDİĞİN GÖRSELDEKİ C-ŞEKLİ / HALKA KORSAN ADASI MODELİ
 function buildCastleIsland() {
   castleGroup = new THREE.Group();
   castleGroup.position.set(0, 0, -2200);
 
-  // Kavisli C-Şekilli / Halka Ada Tabanı (Torusttan esinlenilmiş kaya halkası)
   const arcRadius = 420;
   const tubeRadius = 120;
   const islandGeo = new THREE.TorusGeometry(arcRadius, tubeRadius, 24, 48, Math.PI * 1.5);
@@ -871,14 +846,12 @@ function buildCastleIsland() {
   islandMesh.position.y = 40;
   castleGroup.add(islandMesh);
 
-  // İç Lagün / Kumsal Sahil Tabanı (Koyu mavi/yeşil sığ su)
   const lagoonGeo = new THREE.CylinderGeometry(350, 350, 15, 32);
   const lagoonMat = new THREE.MeshStandardMaterial({ color: 0x0e7490, roughness: 0.3, metalness: 0.5 });
   const lagoonMesh = new THREE.Mesh(lagoonGeo, lagoonMat);
   lagoonMesh.position.set(0, 25, 0);
   castleGroup.add(lagoonMesh);
 
-  // Ada Üzerindeki Kuleler ve Kalıntılar
   castleTowers = [];
   castleTowerMeshes = [];
   const towerCount = 18;
@@ -942,17 +915,13 @@ function initThreeGame() {
   sunLight.position.set(2000, 3000, 1500);
   scene.add(sunLight);
 
-  const oceanTexData = createRealisticOceanTextures();
-  oceanTexture = oceanTexData.mapTex;
-  oceanBumpTexture = oceanTexData.bumpTex;
+  const oceanTexture = createRealisticOceanTextureFromImage();
 
   planeGeo = new THREE.PlaneGeometry(WORLD_SIZE * 2, WORLD_SIZE * 2, 32, 32);
   const oceanMat = new THREE.MeshStandardMaterial({
     map: oceanTexture,
-    bumpMap: oceanBumpTexture,
-    bumpScale: 3.8,
-    roughness: 0.22,
-    metalness: 0.45
+    roughness: 0.2,
+    metalness: 0.35
   });
   const ocean = new THREE.Mesh(planeGeo, oceanMat);
   ocean.rotation.x = -Math.PI / 2;
@@ -1695,7 +1664,6 @@ function drawMinimap() {
   const scale = w / WORLD_SIZE;
   const cx = w / 2, cy = h / 2;
 
-  // Ada Konumu
   mctx.fillStyle = '#3d352a';
   mctx.beginPath();
   mctx.arc(cx + 0, cy + (-2200 * scale), 35 * scale, 0, Math.PI * 2);
