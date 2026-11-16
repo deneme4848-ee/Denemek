@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Kesin Çözüm</title>
+  <title>Korsan Dünyası - Dengeli Genişletme & Arayüz</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -134,8 +134,8 @@
     .ship-level-badge {
       background: linear-gradient(135deg, #b45309, #78350f);
       border: 1px solid #f59e0b; color: #fef3c7;
-      font-size: 8px; font-weight: 900; padding: 1px 4px; border-radius: 5px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.6); display: inline-flex; align-items: center; gap: 2px;
+      font-size: 9px; font-weight: 900; padding: 1px 5px; border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.6); display: inline-flex; align-items: center;
       letter-spacing: 0.3px; white-space: nowrap;
     }
 
@@ -369,7 +369,7 @@
     <div class="ship-hp-track"><div id="player-ship-hp-fill"></div></div>
     <div style="display: flex; align-items: center; gap: 4px;">
       <span class="ship-name-tag" id="tag-username">Test</span>
-      <span class="ship-level-badge" id="player-label-level-badge">Lv. 1</span>
+      <span class="ship-level-badge" id="player-label-level-badge">1</span>
     </div>
     <div class="ship-fleet-tag">[TST]</div>
   </div>
@@ -473,7 +473,8 @@
         
         <div id="section-expand" class="market-section">
           <div style="background: rgba(14, 116, 144, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); padding: 10px; border-radius: 10px; margin-bottom: 12px; font-size: 11px; color: #bae6fd; text-align: center;">
-            Kalan Genişletme Hakkın: <strong id="expansion-rights-info" style="color: #f59e0b; font-size: 13px;">3</strong> (Her seviye atlamada +3 hak kazanırsın)
+            Kalan Genişletme Hakları (Her türden 1 adet kullanılabilir):<br>
+            Top Hak: <strong id="rights-cannon" style="color:#f59e0b;">1</strong> | Can Hak: <strong id="rights-hp" style="color:#f87171;">1</strong> | Hız Hak: <strong id="rights-speed" style="color:#4ade80;">1</strong>
           </div>
           <div class="market-item">
             <div class="market-item-info">
@@ -494,7 +495,7 @@
               <span class="market-item-title">⚡ HIZ GENİŞLETMESİ</span>
               <span class="market-item-sub">Gemi Hızı: <strong id="stat-speed" style="color:#4ade80;">180</strong> (%2 Hız artırır)</span>
             </div>
-            <button class="buy-btn" id="btn-expand-speed" type="button" style="width:auto; background: linear-gradient(135deg, #166534, #14532d); border-color: #4ade80;">5 Elmas</button>
+            <button class="buy-btn" id="btn-expand-speed" type="button" style="width:auto; background: linear-gradient(166deg, #166534, #14532d); border-color: #4ade80;">5 Elmas</button>
           </div>
         </div>
 
@@ -593,7 +594,10 @@ const sectionCrew = document.querySelector('#section-crew');
 const statCannonsEl = document.querySelector('#stat-cannons');
 const statHpEl = document.querySelector('#stat-hp');
 const statSpeedEl = document.querySelector('#stat-speed');
-const expansionRightsInfoEl = document.querySelector('#expansion-rights-info');
+const rightsCannonEl = document.querySelector('#rights-cannon');
+const rightsHpEl = document.querySelector('#rights-hp');
+const rightsSpeedEl = document.querySelector('#rights-speed');
+
 const btnExpandCannon = document.querySelector('#btn-expand-cannon');
 const btnExpandHp = document.querySelector('#btn-expand-hp');
 const btnExpandSpeed = document.querySelector('#btn-expand-speed');
@@ -648,8 +652,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v63';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v63';
+const USERS_STORAGE_KEY = 'pirate3d_users_v64';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v64';
 let authMode = 'login';
 let currentUser = null;
 
@@ -1080,7 +1084,7 @@ function startGameLogic() {
     x: 0, z: 0, a: -Math.PI / 2, speed: 0, baseSpeed: 180, maxSpeed: 180,
     hp: 1000000, maxHp: 1000000, score: 100000000, diamonds: 1103,
     level: 1, exp: 0, maxExp: 100,
-    expansionRights: 3,
+    expansionRights: { cannon: 1, hp: 1, speed: 1 }, // Her türden başlangıçta 1 adet hak
     cannons: 250,
     selectedAmmo: 'iron',
     ammo: { iron: 1000000, chain: 1000000, fire: 1000000, dragon: 1000000 },
@@ -1640,8 +1644,10 @@ function animate3D() {
                 player.level++;
                 player.exp -= player.maxExp;
                 player.maxExp = Math.floor(player.maxExp * 1.35);
-                player.expansionRights += 3;
-                showFloatingDamage(player.x, player.z, `LEVEL UP! +3 Genişletme Hakkı`, '#38bdf8');
+                player.expansionRights.cannon++; // Her seviye 1 top hakkı
+                player.expansionRights.hp++;     // Her seviye 1 can hakkı
+                player.expansionRights.speed++;  // Her seviye 1 hız hakkı
+                showFloatingDamage(player.x, player.z, `LEVEL UP! +1 Top, +1 Can, +1 Hız Hakkı`, '#38bdf8');
               }
 
               updateTargetCard(); updateHUD(); syncAttackButton();
@@ -1679,8 +1685,10 @@ function animate3D() {
                 player.level++;
                 player.exp -= player.maxExp;
                 player.maxExp = Math.floor(player.maxExp * 1.35);
-                player.expansionRights += 3;
-                showFloatingDamage(player.x, player.z, `LEVEL UP! +3 Genişletme Hakkı`, '#38bdf8');
+                player.expansionRights.cannon++;
+                player.expansionRights.hp++;
+                player.expansionRights.speed++;
+                showFloatingDamage(player.x, player.z, `LEVEL UP! +1 Top, +1 Can, +1 Hız Hakkı`, '#38bdf8');
               }
 
               updateTargetCard(); updateHUD(); syncAttackButton();
@@ -1733,7 +1741,7 @@ function drawMinimap() {
 function updateHUD() {
   if (!player) return;
   levelEl.textContent = player.level;
-  if (playerLabelLevelBadgeEl) playerLabelLevelBadgeEl.textContent = `Lv. ${player.level}`;
+  if (playerLabelLevelBadgeEl) playerLabelLevelBadgeEl.textContent = player.level; // Sadece sayı
   hpTextEl.textContent = `Can ${Math.ceil(player.hp).toLocaleString()} / ${player.maxHp.toLocaleString()}`;
   expTextEl.textContent = `Deneyim ${player.exp.toLocaleString()} / ${player.maxExp.toLocaleString()}`;
   hpBarEl.style.width = ((player.hp / player.maxHp) * 100) + '%';
@@ -1744,7 +1752,10 @@ function updateHUD() {
   statCannonsEl.textContent = player.cannons;
   statHpEl.textContent = player.maxHp.toLocaleString();
   statSpeedEl.textContent = Math.round(player.maxSpeed);
-  expansionRightsInfoEl.textContent = player.expansionRights;
+
+  rightsCannonEl.textContent = player.expansionRights.cannon;
+  rightsHpEl.textContent = player.expansionRights.hp;
+  rightsSpeedEl.textContent = player.expansionRights.speed;
 
   const hpPercent = Math.max(0, Math.min(100, (player.hp / player.maxHp) * 100));
   playerShipHpFillEl.style.width = hpPercent + '%';
@@ -1759,10 +1770,10 @@ function updateHUD() {
 }
 
 btnExpandCannon.addEventListener('click', () => {
-  if (player.expansionRights <= 0) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Yeterli genişletme hakkın yok! (Seviye atla)'; return; }
+  if (player.expansionRights.cannon <= 0) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Bu kategoride genişletme hakkın kalmadı! (Seviye atla)'; return; }
   if (player.diamonds < 5) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Yetersiz elmas!'; return; }
   player.diamonds -= 5;
-  player.expansionRights--;
+  player.expansionRights.cannon--;
   player.cannons += 20;
   updateHUD(); syncAttackButton();
   marketFeedbackEl.style.color = '#4ade80';
@@ -1771,10 +1782,10 @@ btnExpandCannon.addEventListener('click', () => {
 });
 
 btnExpandHp.addEventListener('click', () => {
-  if (player.expansionRights <= 0) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Yeterli genişletme hakkın yok! (Seviye atla)'; return; }
+  if (player.expansionRights.hp <= 0) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Bu kategoride genişletme hakkın kalmadı! (Seviye atla)'; return; }
   if (player.diamonds < 5) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Yetersiz elmas!'; return; }
   player.diamonds -= 5;
-  player.expansionRights--;
+  player.expansionRights.hp--;
   player.maxHp += 50000;
   player.hp = Math.min(player.maxHp, player.hp + 50000);
   updateHUD();
@@ -1784,10 +1795,10 @@ btnExpandHp.addEventListener('click', () => {
 });
 
 btnExpandSpeed.addEventListener('click', () => {
-  if (player.expansionRights <= 0) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Yeterli genişletme hakkın yok! (Seviye atla)'; return; }
+  if (player.expansionRights.speed <= 0) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Bu kategoride genişletme hakkın kalmadı! (Seviye atla)'; return; }
   if (player.diamonds < 5) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Yetersiz elmas!'; return; }
   player.diamonds -= 5;
-  player.expansionRights--;
+  player.expansionRights.speed--;
   player.maxSpeed *= 1.02;
   updateHUD();
   marketFeedbackEl.style.color = '#4ade80';
