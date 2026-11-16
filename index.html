@@ -854,7 +854,7 @@ function buildCastleIsland() {
       let scaleFactor = (65 / Math.max(size.x, size.y, size.z)) * 10; // 10 Kat Büyütüldü
       towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      towerModel.position.set(tx, SHIP_Y_POS 100, tz);
+      towerModel.position.set(tx, SHIP_Y_POS + 100, tz);
       towerModel.rotation.y = -angle + Math.PI / 2;
 
       towerModel.userData = { towerId: towerId, name: `Korsan Kulesi #${i+1}` };
