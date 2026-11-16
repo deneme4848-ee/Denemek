@@ -623,6 +623,21 @@ const SHIP_MODELS = {
   ghost:    { id: 'ghost',    name: 'Hayalet Fırkateyn', desc: 'Gizli Sis Gövdesi', cost: 5000000, type: 'sprite', img: 'gemi18.png' },
   gold:     { id: 'gold',     name: 'Altın Korsan', desc: 'İhtişamlı Altın Kalyon', cost: 15000000, type: 'sprite', img: 'gemi18.png' },
   customGlb:{ id: 'customGlb', name: 'Özel 3D Kalyon', desc: 'GLB Formatlı Savaş Gemisi', cost: 25000000, type: 'glb', modelPath: 'ejder_kalyon.glb', img: 'gemi18.png' }
+
+Tasarim1:{ id: 'tasarim1', name: 'Tasarim 1, desc: 'GLB Formatlı Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim1.glb', img: 'gemi18.png' }
+
+Tasarim2:{ id: 'tasarim2', name: 'Tasarim 2, desc: 'GLB Formatlı Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim3.glb', img: 'gemi18.png' }
+
+Tasarim3:{ id: 'tasarim3', name: 'Tasarim 3, desc: 'GLB Formatlı Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim3.glb', img: 'gemi18.png' }
+
+Tasarim5:{ id: 'tasarim5', name: 'Tasarim 5, desc: 'GLB Formatlı Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim5.glb', img: 'gemi18.png' }
+
+Tasarim6:{ id: 'tasarim6', name: 'Tasarim 6, desc: 'GLB Formatlı Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim6.glb', img: 'gemi18.png' }
+
+Tasarim7:{ id: 'tasarim7', name: 'Tasarim 7, desc: 'GLB Formatlı Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim7.glb', img: 'gemi18.png' }
+
+Tasarim8:{ id: 'tasarim8', name: 'Tasarim 8, desc: 'GLB Formatlı Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim8.glb', img: 'gemi18.png' }
+
 };
 
 const USERS_STORAGE_KEY = 'pirate3d_users_v41';
@@ -1640,7 +1655,7 @@ function animate3D() {
       const tempVector = new THREE.Vector3(en.x, SHIP_Y_POS, en.z);
       tempVector.project(camera);
       const xPx = (tempVector.x *  .5 + .5) * window.innerWidth;
-      const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 38;
+      const yPx = (tempVector.y * -.5 + .5) * window.innerHeight + 50;
       en.labelEl.style.transform = `translate(-50%, 0) translate(${xPx}px, ${yPx}px)`;
 
       const hpP = Math.max(0, (en.hp / en.maxHp) * 100);
