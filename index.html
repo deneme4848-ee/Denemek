@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Mükemmel Kule Konumlandırma</title>
+  <title>Korsan Dünyası - Hata Düzeltildi</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -834,7 +834,7 @@ function buildCastleIsland() {
   castleGroup = new THREE.Group();
   castleGroup.position.set(0, 0, -2200);
 
-  // 1. Ada PNG görseli (Derinliği ve yüksekliği optimize edildi, kulelerin arkasında kalacak)
+  // 1. Ada PNG görseli
   const textureLoader = new THREE.TextureLoader();
   textureLoader.load('ada.png', (castleTexture) => {
     const castleGeo = new THREE.PlaneGeometry(900, 900);
@@ -845,10 +845,9 @@ function buildCastleIsland() {
     });
     const castleMesh = new THREE.Mesh(castleGeo, castleMat);
     castleMesh.rotation.x = -Math.PI / 2;
-    castleMesh.position.y = 10; // Arka planda kalması için hafif aşağı çekildi
+    castleMesh.position.y = 10;
     castleGroup.add(castleMesh);
   }, undefined, () => {
-    // Eğer ada.png bulunamazsa yedek olarak internetten yükler
     textureLoader.load('https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1024&q=80', (castleTexture) => {
       const castleGeo = new THREE.PlaneGeometry(900, 900);
       const castleMat = new THREE.MeshBasicMaterial({
@@ -867,7 +866,7 @@ function buildCastleIsland() {
   castleTowers = [];
   castleTowerMeshes = [];
   const towerCount = 15;
-  const radius = 370; // Taş çıkıntılara tam oturacak yarıçap
+  const radius = 370;
 
   for (let i = 0; i < towerCount; i++) {
     const angle = (i / towerCount) * Math.PI * 1.62 - (Math.PI * 0.81);
@@ -883,14 +882,12 @@ function buildCastleIsland() {
       let scaleFactor = 55 / Math.max(size.x, size.y, size.z);
       towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      // Kuleler PNG'nin ön planda ve taş çıkıntılarının tam üstünde yer alacak
       towerModel.position.set(tx, 75, tz);
       towerModel.rotation.y = -angle + Math.PI / 2;
 
       towerModel.userData = { towerId: towerId, name: `Korsan Kulesi #${i+1}` };
       towerModel.traverse(child => { 
         child.userData = { towerId: towerId };
-        // Render sıralamasında kulelerin ön planda kalmasını garantiler
         if (child.material) {
           if (Array.isArray(child.material)) child.material.forEach(m => { m.depthWrite = true; });
           else child.material.depthWrite = true;
@@ -1841,7 +1838,6 @@ function renderShipyardList() {
       if (player.score < cost) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Yetersiz hazine (altın)!'; return; }
       player.score -= cost;
       
-      .score -= cost;
       const users = loadUsers();
       const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
       if (uIdx !== -1) {
