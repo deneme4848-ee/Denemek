@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Yarım Ay Sinematik Kuleler</title>
+  <title>Korsan Dünyası - Zırhlı Sinematik Hilal Kale</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -652,8 +652,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v66';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v66';
+const USERS_STORAGE_KEY = 'pirate3d_users_v67';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v67';
 let authMode = 'login';
 let currentUser = null;
 
@@ -856,79 +856,84 @@ function createBorderFrame() {
   scene.add(borderFrameMesh);
 }
 
-function buildCinematicCrescentTowerMesh() {
-  const towerGroup = new THREE.Group();
+function buildCinematicFortressMesh() {
+  const group = new THREE.Group();
 
-  const stoneMat = new THREE.MeshStandardMaterial({
-    color: 0x273444,
-    roughness: 0.85,
-    metalness: 0.15,
-    bumpScale: 0.05
-  });
-  const ironMat = new THREE.MeshStandardMaterial({
-    color: 0x0f172a,
-    roughness: 0.4,
-    metalness: 0.85
-  });
-  const brassMat = new THREE.MeshStandardMaterial({
-    color: 0xd97706,
-    roughness: 0.3,
-    metalness: 0.9
-  });
+  const stoneMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.8, metalness: 0.2 });
+  const darkArmorMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4, metalness: 0.85 });
+  const brassMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.3, metalness: 0.9 });
+  const rockMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.95 });
 
-  const baseGeo = new THREE.CylinderGeometry(28, 36, 45, 18);
+  const rockGeo = new THREE.DodecahedronGeometry(36, 1);
+  const rockMesh = new THREE.Mesh(rockGeo, rockMat);
+  rockMesh.position.set(0, -18, 0);
+  rockMesh.scale.set(1.4, 0.6, 1.4);
+  group.add(rockMesh);
+
+  const baseGeo = new THREE.CylinderGeometry(30, 36, 50, 16);
   const baseMesh = new THREE.Mesh(baseGeo, stoneMat);
-  baseMesh.position.y = 22.5;
+  baseMesh.position.y = 25;
   baseMesh.castShadow = true;
   baseMesh.receiveShadow = true;
-  towerGroup.add(baseMesh);
+  group.add(baseMesh);
 
-  const midGeo = new THREE.CylinderGeometry(22, 28, 60, 16);
-  const midMesh = new THREE.Mesh(midGeo, stoneMat);
-  midMesh.position.y = 67.5;
-  midMesh.castShadow = true;
-  midMesh.receiveShadow = true;
-  towerGroup.add(midMesh);
+  const armorRingGeo = new THREE.CylinderGeometry(30.6, 30.6, 14, 16);
+  const armorRingMesh = new THREE.Mesh(armorRingGeo, darkArmorMat);
+  armorRingMesh.position.y = 35;
+  group.add(armorRingMesh);
 
-  const shieldShape = new THREE.Shape();
-  shieldShape.absarc(0, 0, 24, 0, Math.PI, false);
-  shieldShape.lineTo(-20, -12);
-  shieldShape.absarc(0, 0, 20, Math.PI, 0, true);
-  shieldShape.closePath();
+  const topGeo = new THREE.CylinderGeometry(26, 28, 40, 16);
+  const topMesh = new THREE.Mesh(topGeo, stoneMat);
+  topMesh.position.y = 65;
+  topMesh.castShadow = true;
+  group.add(topMesh);
 
-  const extrudeSettings = { depth: 35, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 1, bevelThickness: 1 };
-  const crescentGeo = new THREE.ExtrudeGeometry(shieldShape, extrudeSettings);
-  crescentGeo.rotateX(Math.PI / 2);
-  const crescentMesh = new THREE.Mesh(crescentGeo, stoneMat);
-  crescentMesh.position.set(0, 80, -4);
-  crescentMesh.castShadow = true;
-  towerGroup.add(crescentMesh);
-
-  const topGeo = new THREE.CylinderGeometry(24, 22, 14, 16);
-  const topMesh = new THREE.Mesh(topGeo, ironMat);
-  topMesh.position.y = 104;
-  towerGroup.add(topMesh);
-
-  const roofGeo = new THREE.ConeGeometry(26, 32, 16);
-  const roofMesh = new THREE.Mesh(roofGeo, ironMat);
-  roofMesh.position.y = 127;
-  roofMesh.castShadow = true;
-  towerGroup.add(roofMesh);
-
-  const spireGeo = new THREE.CylinderGeometry(1.5, 3, 22, 8);
-  const spireMesh = new THREE.Mesh(spireGeo, brassMat);
-  spireMesh.position.y = 150;
-  towerGroup.add(spireMesh);
-
-  for (let i = 0; i < 4; i++) {
-    const bandGeo = new THREE.TorusGeometry(23.5 + (i * 0.5), 1.2, 8, 24);
-    const bandMesh = new THREE.Mesh(bandGeo, brassMat);
-    bandMesh.rotation.x = Math.PI / 2;
-    bandMesh.position.y = 50 + (i * 18);
-    towerGroup.add(bandMesh);
+  const battlements = 10;
+  for (let i = 0; i < battlements; i++) {
+    const angle = (i / battlements) * Math.PI * 2;
+    const bGeo = new THREE.BoxGeometry(5, 7, 3);
+    const bMesh = new THREE.Mesh(bGeo, darkArmorMat);
+    bMesh.position.set(Math.cos(angle) * 25, 87, Math.sin(angle) * 25);
+    bMesh.rotation.y = -angle;
+    group.add(bMesh);
   }
 
-  return towerGroup;
+  for (let i = 0; i < 3; i++) {
+    const bandGeo = new THREE.TorusGeometry(27.5 + (i * 1.5), 1.2, 8, 24);
+    const bandMesh = new THREE.Mesh(bandGeo, brassMat);
+    bandMesh.rotation.x = Math.PI / 2;
+    bandMesh.position.y = 15 + (i * 22);
+    group.add(bandMesh);
+  }
+
+  return group;
+}
+
+function buildConnectingWall(x1, z1, x2, z2) {
+  const wallGroup = new THREE.Group();
+  const dx = x2 - x1;
+  const dz = z2 - z1;
+  const dist = Math.hypot(dx, dz);
+  const angle = Math.atan2(dz, dx);
+
+  const wallGeo = new THREE.BoxGeometry(dist, 32, 12);
+  const wallMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.85, metalness: 0.1 });
+  const wallMesh = new THREE.Mesh(wallGeo, wallMat);
+  wallMesh.position.set(0, 16, 0);
+  wallMesh.castShadow = true;
+  wallMesh.receiveShadow = true;
+  wallGroup.add(wallMesh);
+
+  const topPlateGeo = new THREE.BoxGeometry(dist, 4, 14);
+  const topPlateMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.5, metalness: 0.7 });
+  const topPlateMesh = new THREE.Mesh(topPlateGeo, topPlateMat);
+  topPlateMesh.position.set(0, 34, 0);
+  wallGroup.add(topPlateMesh);
+
+  wallGroup.position.set((x1 + x2) / 2, SHIP_Y_POS - 40, (z1 + z2) / 2);
+  wallGroup.rotation.y = -angle;
+
+  return wallGroup;
 }
 
 function buildCastleIsland() {
@@ -938,22 +943,25 @@ function buildCastleIsland() {
   castleTowers = [];
   castleTowerMeshes = [];
   const towerCount = 15;
-  const radius = 420;
+  const radius = 440;
+  const towerPositions = [];
 
   for (let i = 0; i < towerCount; i++) {
-    const angle = (i / (towerCount - 1)) * Math.PI - Math.PI;
+    const angle = (i / (towerCount - 1)) * Math.PI * 1.35 - (Math.PI * 1.175);
     const tx = Math.cos(angle) * radius;
-    const tz = Math.sin(angle) * (radius * 0.75);
-    const towerId = 100 + i;
+    const tz = Math.sin(angle) * (radius * 0.8);
+    towerPositions.push({ x: tx, z: tz });
+  }
 
-    const towerModel = buildCinematicCrescentTowerMesh();
-    let scaleFactor = 1.35;
+  towerPositions.forEach((pos, i) => {
+    const towerId = 100 + i;
+    const towerModel = buildCinematicFortressMesh();
+    let scaleFactor = 1.25;
     towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-    towerModel.position.set(tx, SHIP_Y_POS - 40, tz);
-    towerModel.rotation.y = -angle - Math.PI / 2;
+    towerModel.position.set(pos.x, SHIP_Y_POS - 40, pos.z);
+    towerModel.userData = { towerId: towerId, name: `Zırhlı Kule #${i+1}` };
 
-    towerModel.userData = { towerId: towerId, name: `Sinematik Kule #${i+1}` };
     towerModel.traverse(child => { 
       child.userData = { towerId: towerId };
       if (child.material) {
@@ -971,13 +979,20 @@ function buildCastleIsland() {
 
     castleTowers.push({
       id: towerId,
-      name: `Sinematik Kule #${i+1}`,
-      localX: tx,
-      localZ: tz,
+      name: `Zırhlı Kule #${i+1}`,
+      localX: pos.x,
+      localZ: pos.z,
       hp: 500000,
       maxHp: 500000,
       lastShotTime: 0
     });
+  });
+
+  for (let i = 0; i < towerPositions.length - 1; i++) {
+    const p1 = towerPositions[i];
+    const p2 = towerPositions[i + 1];
+    const wallSegment = buildConnectingWall(p1.x, p1.z, p2.x, p2.z);
+    castleGroup.add(wallSegment);
   }
 
   scene.add(castleGroup);
