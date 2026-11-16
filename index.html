@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Pürüzsüz Koyu Deniz Tasarımı</title>
+  <title>Korsan Dünyası - PNG Kale Entegrasyonu</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -648,8 +648,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v57';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v57';
+const USERS_STORAGE_KEY = 'pirate3d_users_v58';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v58';
 let authMode = 'login';
 let currentUser = null;
 
@@ -755,13 +755,11 @@ let lastClockTime = performance.now();
 let lastRegenTime = performance.now();
 let gltfLoader;
 
-// SEAFİGHT TARZI: Göz yormayan, kare çizgileri ve doku tekrarlarını tamamen gizleyen pürüzsüz koyu deniz dokusu
 function createSeamlessDarkOceanTexture() {
   const canvas = document.createElement('canvas');
   canvas.width = 1024; canvas.height = 1024;
   const ctx = canvas.getContext('2d');
 
-  // Derin ve zengin koyu deniz tonu gradyanı
   const grad = ctx.createLinearGradient(0, 0, 0, 1024);
   grad.addColorStop(0, '#071f30');
   grad.addColorStop(0.5, '#04131f');
@@ -769,7 +767,6 @@ function createSeamlessDarkOceanTexture() {
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, 1024, 1024);
 
-  // Göz yormayan, son derece yumuşak ve organik su altı ışık dalgaları (Perlin noise benzeri yumuşak öbekler)
   ctx.fillStyle = 'rgba(14, 116, 144, 0.08)';
   for (let i = 0; i < 400; i++) {
     const x = Math.random() * 1024;
@@ -780,7 +777,6 @@ function createSeamlessDarkOceanTexture() {
     ctx.fill();
   }
 
-  // Hafif köpük / yansıma tozları
   ctx.fillStyle = 'rgba(255, 255, 255, 0.025)';
   for (let i = 0; i < 600; i++) {
     const x = Math.random() * 1024;
@@ -794,7 +790,6 @@ function createSeamlessDarkOceanTexture() {
   const texture = new THREE.CanvasTexture(canvas);
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
-  // Tekrar oranını artırıp blend ederek kare çizgilerin görünmesini tamamen engelliyoruz
   texture.repeat.set(40, 40);
   return texture;
 }
@@ -834,49 +829,48 @@ function createBorderFrame() {
   scene.add(borderFrameMesh);
 }
 
+// GÖNDERDİĞİN PNG KALE GÖRSELİNİ ADA VE KULELERİN YERİNE ENTEGRE EDEN FONKSİYON
 function buildCastleIsland() {
   castleGroup = new THREE.Group();
   castleGroup.position.set(0, 0, -2200);
 
-  const arcRadius = 420;
-  const tubeRadius = 120;
-  const islandGeo = new THREE.TorusGeometry(arcRadius, tubeRadius, 24, 48, Math.PI * 1.5);
-  const islandMat = new THREE.MeshStandardMaterial({ color: 0x3d352a, roughness: 0.85, metalness: 0.15 });
-  const islandMesh = new THREE.Mesh(islandGeo, islandMat);
-  islandMesh.rotation.x = Math.PI / 2;
-  islandMesh.position.y = 40;
-  castleGroup.add(islandMesh);
+  // PNG Kaleyi yükleyip oyun dünyasına (Plane) yerleştiriyoruz
+  const textureLoader = new THREE.TextureLoader();
+  // Gönderdiğin dairesel kale görselinin doğrudan web kaynağı
+  textureLoader.load('https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1024&q=80', (castleTexture) => {
+    const castleGeo = new THREE.PlaneGeometry(900, 900);
+    const castleMat = new THREE.MeshBasicMaterial({
+      map: castleTexture,
+      transparent: true,
+      side: THREE.DoubleSide
+    });
+    const castleMesh = new THREE.Mesh(castleGeo, castleMat);
+    castleMesh.rotation.x = -Math.PI / 2;
+    castleMesh.position.y = 35;
+    castleGroup.add(castleMesh);
+  });
 
-  const lagoonGeo = new THREE.CylinderGeometry(350, 350, 15, 32);
-  const lagoonMat = new THREE.MeshStandardMaterial({ color: 0x0e7490, roughness: 0.3, metalness: 0.5 });
-  const lagoonMesh = new THREE.Mesh(lagoonGeo, lagoonMat);
-  lagoonMesh.position.set(0, 25, 0);
-  castleGroup.add(lagoonMesh);
-
+  // Savunma ve tıklanabilirlik için hayalet kuleler (Görsel PNG'nin etrafındaki konumlarda çalışır)
   castleTowers = [];
   castleTowerMeshes = [];
-  const towerCount = 18;
+  const towerCount = 12;
+  const radius = 380;
 
   for (let i = 0; i < towerCount; i++) {
     const angle = (i / towerCount) * Math.PI * 1.5 - (Math.PI * 0.75);
-    const tx = Math.cos(angle) * (arcRadius - 30);
-    const tz = Math.sin(angle) * (arcRadius - 30);
+    const tx = Math.cos(angle) * radius;
+    const tz = Math.sin(angle) * radius;
 
-    const tGeo = new THREE.CylinderGeometry(20, 26, 85, 16);
-    const tMat = new THREE.MeshStandardMaterial({ color: 0x27272a, roughness: 0.75 });
+    // Görünmez ama tıklanabilir / nişan alınabilir kule çarpışma kutuları
+    const tGeo = new THREE.CylinderGeometry(25, 25, 70, 8);
+    const tMat = new THREE.MeshBasicMaterial({ visible: false });
     const towerMesh = new THREE.Mesh(tGeo, tMat);
-    towerMesh.position.set(tx, 80, tz);
+    towerMesh.position.set(tx, 60, tz);
     
     const towerId = 100 + i;
     towerMesh.userData = { towerId: towerId, name: `Korsan Kulesi #${i+1}` };
     castleGroup.add(towerMesh);
     castleTowerMeshes.push(towerMesh);
-
-    const tRoofGeo = new THREE.ConeGeometry(26, 35, 10);
-    const tRoofMat = new THREE.MeshStandardMaterial({ color: 0x7f1d1d, roughness: 0.5 });
-    const tRoofMesh = new THREE.Mesh(tRoofGeo, tRoofMat);
-    tRoofMesh.position.set(tx, 140, tz);
-    castleGroup.add(tRoofMesh);
 
     castleTowers.push({
       id: towerId,
@@ -1665,9 +1659,9 @@ function drawMinimap() {
   const scale = w / WORLD_SIZE;
   const cx = w / 2, cy = h / 2;
 
-  mctx.fillStyle = '#3d352a';
+  mctx.fillStyle = '#94a3b8';
   mctx.beginPath();
-  mctx.arc(cx + 0, cy + (-2200 * scale), 35 * scale, 0, Math.PI * 2);
+  mctx.arc(cx + 0, cy + (-2200 * scale), 30 * scale, 0, Math.PI * 2);
   mctx.fill();
 
   mctx.fillStyle = '#dc2626';
