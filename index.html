@@ -494,7 +494,7 @@
     <div class="auth-card">
       <div class="auth-brand">
         <h1>⚓ Korsan Dünyası</h1>
-        <p>15 Harita & Tam Genişletilmiş Okyanus</p>
+        <p>15 Harita & Sınır Çerçeveli Okyanus</p>
       </div>
       <div class="auth-tabs">
         <button id="tab-login" class="auth-tab active" type="button">Giriş Yap</button>
@@ -621,8 +621,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v49';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v49';
+const USERS_STORAGE_KEY = 'pirate3d_users_v50';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v50';
 let authMode = 'login';
 let currentUser = null;
 
@@ -693,16 +693,18 @@ let castleGroup = null, castleTowers = [], castleTowerMeshes = [];
 let castleProjectiles = [];
 let activeProjectiles = [], particleSystems = [], cannonEffects = [];
 let raycaster, planeGeo, mouse;
-let gltfLoader;
 let selectedRingMesh = null;
+let borderFrameMesh = null; // Harita sınır çerçevesi
 
-// DÜNYA BOYUTU GENİŞLETİLDİ (Tam görüş ve uçsuz bucaksız deniz için)
 const WORLD_SIZE = 2400; 
 const ATTACK_RANGE = 280;
 const CASTLE_AGGRO_RANGE = 330;
 const SHIP_Y_POS = 100;
 
-// Harita Sistemi (15 Harita 3x5 Grid Düzeni)
+// Yakınlaştırılmış Kamera Ayarları (İstediğin gibi daha yakın ve net açı)
+const CAMERA_HEIGHT = 680;
+const CAMERA_DEPTH = 520;
+
 let currentMapIndex = 0; 
 const MAP_DATA = [
   { id: 1, name: "Harita 1", subtitle: "Sığcık Limanı", levelReq: "Seviye 1+", col: 0, row: 0 },
@@ -724,6 +726,7 @@ const MAP_DATA = [
 
 let pendingTransitMapIndex = null;
 let lastClockTime = performance.now();
+let gltfLoader;
 
 function createStaticOceanTextures() {
   const size = 1024;
@@ -781,6 +784,42 @@ function createStaticOceanTextures() {
   bumpTex.repeat.set(16, 16);
 
   return { mapTex, bumpTex };
+}
+
+// Harita Sınırlarında Kalın Çerçeve Oluşturucu
+function createBorderFrame() {
+  const size = WORLD_SIZE - 80;
+  const shape = new THREE.Shape();
+  shape.moveTo(-size/2, -size/2);
+  shape.lineTo(size/2, -size/2);
+  shape.lineTo(size/2, size/2);
+  shape.lineTo(-size/2, size/2);
+  shape.closePath();
+
+  const holePath = new THREE.Path();
+  const innerSize = size - 40;
+  holePath.moveTo(-innerSize/2, -innerSize/2);
+  holePath.lineTo(-innerSize/2, innerSize/2);
+  holePath.lineTo(innerSize/2, innerSize/2);
+  holePath.lineTo(innerSize/2, -innerSize/2);
+  holePath.closePath();
+  shape.holes.push(holePath);
+
+  const extrudeSettings = { depth: 25, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 2, bevelThickness: 2 };
+  const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+  geometry.rotateX(Math.PI / 2);
+
+  const material = new THREE.MeshStandardMaterial({
+    color: 0xf59e0b,
+    emissive: 0xd97706,
+    emissiveIntensity: 0.6,
+    roughness: 0.3,
+    metalness: 0.8
+  });
+
+  borderFrameMesh = new THREE.Mesh(geometry, material);
+  borderFrameMesh.position.y = 10;
+  scene.add(borderFrameMesh);
 }
 
 function buildCastleIsland() {
@@ -863,15 +902,10 @@ function buildCastleIsland() {
 function initThreeGame() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x052236);
-  scene.fog = new THREE.FogExp2(0x052236, 0.00018); // Sis mesafesi genişletildi
-
-  // Geniş görüş açısı için kamera mesafesi artırıldı
-  const isDesktop = window.innerWidth > 768;
-  const camHeight = isDesktop ? 1250 : 1250;
-  const camDepth = isDesktop ? 950 : 900;
+  scene.fog = new THREE.FogExp2(0x052236, 0.00018);
 
   camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 30000);
-  camera.position.set(0, camHeight, camDepth);
+  camera.position.set(0, CAMERA_HEIGHT, CAMERA_DEPTH);
   camera.lookAt(0, 0, 0);
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -904,6 +938,7 @@ function initThreeGame() {
   ocean.rotation.x = -Math.PI / 2;
   scene.add(ocean);
 
+  createBorderFrame();
   buildCastleIsland();
 
   const ringGeo = new THREE.RingGeometry(ATTACK_RANGE - 3, ATTACK_RANGE, 64);
@@ -1303,10 +1338,9 @@ function animate3D() {
   player.x += Math.cos(player.a) * player.speed * dt;
   player.z += Math.sin(player.a) * player.speed * dt;
 
-  // DÜNYA SINIRLARI TAMAMEN GENİŞLETİLDİ (Uçsuz bucaksız deniz ve 0 koordinatı dahil tam özgürlük)
-  const HALF_WORLD = WORLD_SIZE / 2; // 1200
-  const HARD_LIMIT = HALF_WORLD - 50; // Kenara kadar tam gidiş izni
-  const TRIGGER_THRESHOLD = HALF_WORLD - 220; // Harita geçiş butonu için geniş ve konforlu eşik
+  const HALF_WORLD = WORLD_SIZE / 2;
+  const HARD_LIMIT = HALF_WORLD - 50;
+  const TRIGGER_THRESHOLD = HALF_WORLD - 220;
 
   const curMeta = MAP_DATA[currentMapIndex];
   let nearEdge = false;
@@ -1408,10 +1442,10 @@ function animate3D() {
     playerLabelEl.style.transform = `translate(-50%, 0) translate(${(tempVector.x * .5 + .5) * window.innerWidth}px, ${(tempVector.y * -.5 + .5) * window.innerHeight + 38}px)`;
   }
 
-  const isDesktop = window.innerWidth > 768;
-  camera.position.x += (player.x - camera.position.x) * (4.5 * dt);
-  camera.position.y += ((isDesktop ? 1250 : 1250) - camera.position.y) * (4.5 * dt);
-  camera.position.z += (player.z + (isDesktop ? 950 : 900) - camera.position.z) * (4.5 * dt);
+  // Kamera Takibi (Yakınlaştırılmış Konum)
+  camera.position.x += (player.x - camera.position.x) * (5.5 * dt);
+  camera.position.y += (CAMERA_HEIGHT - camera.position.y) * (5.5 * dt);
+  camera.position.z += (player.z + CAMERA_DEPTH - camera.position.z) * (5.5 * dt);
   camera.lookAt(player.x, 0, player.z);
 
   if (castleGroup) {
