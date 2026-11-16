@@ -1097,7 +1097,7 @@ function setupPlayerShipVisual() {
   if (modelSpec.type === 'glb' && modelSpec.modelPath) {
     gltfLoader.load(modelSpec.modelPath, (gltf) => {
       activeGlbShip = gltf.scene || gltf.scenes[0];
-      activeGlbShip.scale.set(12, 12, 12);
+      activeGlbShip.scale.set(5, 5, 5);
       scene.add(activeGlbShip);
     }, undefined, (err) => {
       console.warn("GLB yüklenemedi, yedek sprite'a dönülüyor:", err);
