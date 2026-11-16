@@ -550,7 +550,7 @@
     <div class="auth-card">
       <div class="auth-brand">
         <h1>⚓ Korsan Dünyası</h1>
-        <p>3D GLB Model Desteği & Yoğun Kıvılcım Efektleri</p>
+        <p>Delta Time Senkronizasyonu & Multiplayer Uyumlu</p>
       </div>
       <div class="auth-tabs">
         <button id="tab-login" class="auth-tab active" type="button">Giriş Yap</button>
@@ -657,7 +657,7 @@ const AMMO_TYPES = {
 };
 
 // ==========================================================
-// TERSANE MODEL LİSTESİ (STANDART ARTIK EJDER KALYON GLB)
+// TERSANE MODEL LİSTESİ (STANDART ARTIK EJDERHA KALYONU)
 // ==========================================================
 const SHIP_MODELS = {
   standard:  { id: 'standard',  name: 'Ejderha Kalyonu', desc: 'Başlangıç 3D Savaş Gemisi', cost: 0,        type: 'glb', modelPath: 'ejder_kalyon.glb', img: 'gemi18.png', heightOffset: 45 },
@@ -679,8 +679,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v43';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v43';
+const USERS_STORAGE_KEY = 'pirate3d_users_v44';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v44';
 let authMode = 'login';
 let currentUser = null;
 
@@ -761,6 +761,9 @@ const ATTACK_RANGE = 280;
 const CASTLE_AGGRO_RANGE = 330;
 const SHIP_Y_POS = 100;
 let castleTowerMeshes = [];
+
+// Delta Time için zaman takibi
+let lastClockTime = performance.now();
 
 function createStaticOceanTextures() {
   const size = 1024;
@@ -1035,6 +1038,7 @@ function initThreeGame() {
     }
   });
 
+  lastClockTime = performance.now();
   startGameLogic();
   animate3D();
 }
@@ -1079,7 +1083,7 @@ function startGameLogic() {
   gameOverEl.style.display = 'none';
 
   player = {
-    x: 0, z: 220, a: -Math.PI / 2, speed: 0, maxSpeed: 1.85,
+    x: 0, z: 220, a: -Math.PI / 2, speed: 0, maxSpeed: 110, // Birim/saniye cinsinden dengeli hız
     hp: 1000000, maxHp: 1000000, score: 100000000,
     level: 1, exp: 0, maxExp: 100,
     selectedAmmo: 'iron',
@@ -1123,7 +1127,7 @@ function spawnEnemyGlb(id) {
     id, name: `Korsan Gemisi #${id}`, mesh: null, labelEl,
     hpFillEl: labelEl.querySelector('.enemy-hp-fill'),
     x: ex, z: ez,
-    hp: 520, maxHp: 520, baseSpeed: 1.15, slowTimer: 0,
+    hp: 520, maxHp: 520, baseSpeed: 70, slowTimer: 0,
     a: 0, wanderAngle: Math.random() * Math.PI * 2, wanderTimer: 0,
     lastAttackTime: 0, isAggro: false
   };
@@ -1319,7 +1323,7 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
 
   activeProjectiles.push({
     mesh, x: startX, z: startZ, targetX, targetZ,
-    speed: 5, 
+    speed: 320, // Birim/saniye cinsinden sabit gülle hızı (Mobil/PC eşit)
     ammoKey, onHit, sparkTimer: 0,
     yOffset: GULLE_Y_OFFSET
   });
@@ -1338,12 +1342,22 @@ function fireCastleProjectile(startX, startZ, targetX, targetZ, onHit) {
 
   castleProjectiles.push({
     mesh, x: startX, z: startZ, targetX, targetZ,
-    speed: 4.5, onHit
+    speed: 280, onHit
   });
 }
 
+// ==========================================================
+// DELTA TIME İLE SENKRONİZE EDİLMİŞ 3D DÖNGÜSÜ
+// ==========================================================
 function animate3D() {
   requestAnimationFrame(animate3D);
+
+  const nowTime = performance.now();
+  let dt = (nowTime - lastClockTime) / 1000; // Saniye cinsinden geçen süre
+  lastClockTime = nowTime;
+
+  // Ani takılma (lag spike) durumlarında oyunun fırlamasını önlemek için üst sınır koyuyoruz
+  if (dt > 0.1) dt = 0.1;
 
   if (!player || isGameOver) {
     if (scene && camera && renderer) renderer.render(scene, camera);
@@ -1362,17 +1376,18 @@ function animate3D() {
     const dist = Math.hypot(dx, dz);
     if (dist > 8) {
       player.a = Math.atan2(dz, dx);
-      player.speed = Math.min(player.maxSpeed, player.speed + 0.12);
+      player.speed = Math.min(player.maxSpeed, player.speed + (65 * dt));
     } else {
       targetPos = null;
-      player.speed *= 0.9;
+      player.speed *= Math.pow(0.1, dt);
     }
   } else {
-    player.speed *= 0.92;
+    player.speed *= Math.pow(0.05, dt);
   }
 
-  player.x += Math.cos(player.a) * player.speed;
-  player.z += Math.sin(player.a) * player.speed;
+  // Delta time ile çarpılarak tüm cihazlarda birebir aynı hızda hareket
+  player.x += Math.cos(player.a) * player.speed * dt;
+  player.z += Math.sin(player.a) * player.speed * dt;
 
   coordDisplayEl.textContent = `X: ${Math.round((player.x / (WORLD_SIZE / 2)) * 50)} · Y: ${Math.round((player.z / (WORLD_SIZE / 2)) * 50)}`;
   
@@ -1397,7 +1412,7 @@ function animate3D() {
 
   if (playerNeonRing) {
     playerNeonRing.position.set(player.x, 0.8, player.z);
-    playerNeonRing.rotation.z += 0.02;
+    playerNeonRing.rotation.z += (1.2 * dt);
   }
 
   rangeRingMesh.position.set(player.x, 0.6, player.z);
@@ -1408,7 +1423,7 @@ function animate3D() {
       if (target) {
         selectedRingMesh.visible = true;
         selectedRingMesh.position.set(target.x, 0.9, target.z);
-        selectedRingMesh.rotation.z += 0.02;
+        selectedRingMesh.rotation.z += (1.2 * dt);
       }
     } else if (selectedTowerId) {
       const tower = castleTowers.find(t => t.id === selectedTowerId);
@@ -1417,7 +1432,7 @@ function animate3D() {
         const twX = castleGroup.position.x + tower.localX;
         const twZ = castleGroup.position.z + tower.localZ;
         selectedRingMesh.position.set(twX, 0.9, twZ);
-        selectedRingMesh.rotation.z += 0.02;
+        selectedRingMesh.rotation.z += (1.2 * dt);
       }
     }
   }
@@ -1434,9 +1449,9 @@ function animate3D() {
   const targetCamH = isDesktop ? 920 : 920;
   const targetCamD = isDesktop ? 720 : 680;
 
-  camera.position.x += (player.x - camera.position.x) * 0.08;
-  camera.position.y += (targetCamH - camera.position.y) * 0.08;
-  camera.position.z += (player.z + targetCamD - camera.position.z) * 0.08;
+  camera.position.x += (player.x - camera.position.x) * (4.5 * dt);
+  camera.position.y += (targetCamH - camera.position.y) * (4.5 * dt);
+  camera.position.z += (player.z + targetCamD - camera.position.z) * (4.5 * dt);
   camera.lookAt(player.x, 0, player.z);
 
   if (castleGroup) {
@@ -1489,45 +1504,46 @@ function animate3D() {
     const dx = player.x - cp.x;
     const dz = player.z - cp.z;
     const dist = Math.hypot(dx, dz);
+    const step = cp.speed * dt;
 
-    if (dist < cp.speed) {
+    if (dist < step) {
       scene.remove(cp.mesh);
       cp.mesh.geometry.dispose();
       cp.mesh.material.dispose();
       castleProjectiles.splice(i, 1);
       if (cp.onHit) cp.onHit();
     } else {
-      cp.x += (dx / dist) * cp.speed;
-      cp.z += (dz / dist) * cp.speed;
+      cp.x += (dx / dist) * step;
+      cp.z += (dz / dist) * step;
       cp.mesh.position.set(cp.x, 50, cp.z);
     }
   }
 
   // ==========================================================
-  // ÇOK DAHA YOĞUN VE GÖZE BATAN KIVILCIM / İZ SİSTEMİ
+  // GÜLLELER VE DELTA TIME BAĞLI YOĞUN KIVILCIMLAR
   // ==========================================================
   for (let i = activeProjectiles.length - 1; i >= 0; i--) {
     const p = activeProjectiles[i];
     const dx = p.targetX - p.x;
     const dz = p.targetZ - p.z;
     const dist = Math.hypot(dx, dz);
+    const step = p.speed * dt;
 
-    if (dist < p.speed) {
+    if (dist < step) {
       scene.remove(p.mesh);
       p.mesh.geometry.dispose();
       p.mesh.material.dispose();
       activeProjectiles.splice(i, 1);
       if (p.onHit) p.onHit();
     } else {
-      p.x += (dx / dist) * p.speed;
-      p.z += (dz / dist) * p.speed;
+      p.x += (dx / dist) * step;
+      p.z += (dz / dist) * step;
       p.mesh.position.set(p.x, SHIP_Y_POS - p.yOffset, p.z);
-      p.mesh.rotation.x += 0.2;
-      p.mesh.rotation.y += 0.2;
+      p.mesh.rotation.x += (12 * dt);
+      p.mesh.rotation.y += (12 * dt);
 
-      // Her karede birden fazla ve parlak kıvılcım üret (Yoğun efekt)
       for (let s = 0; s < 3; s++) {
-        let sparkColor = 0xffd700; // Parlak altın/sarısı
+        let sparkColor = 0xffd700;
         if (p.ammoKey === 'fire') {
           sparkColor = Math.random() > 0.4 ? 0xff3300 : 0xffaa00;
         } else if (p.ammoKey === 'dragon') {
@@ -1562,7 +1578,7 @@ function animate3D() {
     const pt = particleSystems[i];
     pt.life--;
     pt.mesh.scale.multiplyScalar(pt.scaleDecay || 0.90);
-    pt.mesh.material.opacity = Math.max(0, pt.mesh.material.opacity - 0.04);
+    pt.mesh.material.opacity = Math.max(0, pt.mesh.material.opacity - (1.5 * dt));
     if (pt.life <= 0 || pt.mesh.material.opacity <= 0) {
       scene.remove(pt.mesh);
       pt.mesh.geometry.dispose();
@@ -1572,7 +1588,7 @@ function animate3D() {
   }
 
   for (const en of enemies) {
-    if (en.slowTimer > 0) en.slowTimer--;
+    if (en.slowTimer > 0) en.slowTimer -= (dt * 60);
     const activeSpeed = en.slowTimer > 0 ? en.baseSpeed * 0.5 : en.baseSpeed;
     const distToPlayer = Math.hypot(player.x - en.x, player.z - en.z);
 
@@ -1580,8 +1596,8 @@ function animate3D() {
       en.a = Math.atan2(player.z - en.z, player.x - en.x);
       
       if (distToPlayer > ATTACK_RANGE - 20) {
-        en.x += Math.cos(en.a) * (activeSpeed * 1.25);
-        en.z += Math.sin(en.a) * (activeSpeed * 1.25);
+        en.x += Math.cos(en.a) * (activeSpeed * 1.25) * dt;
+        en.z += Math.sin(en.a) * (activeSpeed * 1.25) * dt;
       }
 
       if (distToPlayer <= ATTACK_RANGE && (now - en.lastAttackTime >= 1000)) {
@@ -1600,14 +1616,14 @@ function animate3D() {
         }
       }
     } else {
-      en.wanderTimer--;
+      en.wanderTimer -= (dt * 60);
       if (en.wanderTimer <= 0) {
         en.wanderAngle += (Math.random() - 0.5) * 1.5;
         en.wanderTimer = 180 + Math.random() * 200;
       }
       en.a = en.wanderAngle;
-      en.x += Math.cos(en.a) * (activeSpeed * 0.5);
-      en.z += Math.sin(en.a) * (activeSpeed * 0.5);
+      en.x += Math.cos(en.a) * (activeSpeed * 0.5) * dt;
+      en.z += Math.sin(en.a) * (activeSpeed * 0.5) * dt;
     }
 
     en.x = Math.max(-WORLD_SIZE/2, Math.min(WORLD_SIZE/2, en.x));
