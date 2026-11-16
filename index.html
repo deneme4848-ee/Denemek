@@ -836,7 +836,7 @@ function buildCastleIsland() {
 
   // 1. Ada / Kalenin dairesel sur PNG görseli
   const textureLoader = new THREE.TextureLoader();
-  textureLoader.load('https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1024&q=80', (castleTexture) => {
+  textureLoader.load('ada.png', (castleTexture) => {
     const castleGeo = new THREE.PlaneGeometry(900, 900);
     const castleMat = new THREE.MeshBasicMaterial({
       map: castleTexture,
