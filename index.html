@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Dengeli Genişletme & Arayüz</title>
+  <title>Korsan Dünyası - Sade Market & Gemi Görselleri</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -652,8 +652,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v64';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v64';
+const USERS_STORAGE_KEY = 'pirate3d_users_v65';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v65';
 let authMode = 'login';
 let currentUser = null;
 
@@ -1084,7 +1084,7 @@ function startGameLogic() {
     x: 0, z: 0, a: -Math.PI / 2, speed: 0, baseSpeed: 180, maxSpeed: 180,
     hp: 1000000, maxHp: 1000000, score: 100000000, diamonds: 1103,
     level: 1, exp: 0, maxExp: 100,
-    expansionRights: { cannon: 1, hp: 1, speed: 1 }, // Her türden başlangıçta 1 adet hak
+    expansionRights: { cannon: 1, hp: 1, speed: 1 },
     cannons: 250,
     selectedAmmo: 'iron',
     ammo: { iron: 1000000, chain: 1000000, fire: 1000000, dragon: 1000000 },
@@ -1644,9 +1644,9 @@ function animate3D() {
                 player.level++;
                 player.exp -= player.maxExp;
                 player.maxExp = Math.floor(player.maxExp * 1.35);
-                player.expansionRights.cannon++; // Her seviye 1 top hakkı
-                player.expansionRights.hp++;     // Her seviye 1 can hakkı
-                player.expansionRights.speed++;  // Her seviye 1 hız hakkı
+                player.expansionRights.cannon++;
+                player.expansionRights.hp++;
+                player.expansionRights.speed++;
                 showFloatingDamage(player.x, player.z, `LEVEL UP! +1 Top, +1 Can, +1 Hız Hakkı`, '#38bdf8');
               }
 
@@ -1741,7 +1741,7 @@ function drawMinimap() {
 function updateHUD() {
   if (!player) return;
   levelEl.textContent = player.level;
-  if (playerLabelLevelBadgeEl) playerLabelLevelBadgeEl.textContent = player.level; // Sadece sayı
+  if (playerLabelLevelBadgeEl) playerLabelLevelBadgeEl.textContent = player.level;
   hpTextEl.textContent = `Can ${Math.ceil(player.hp).toLocaleString()} / ${player.maxHp.toLocaleString()}`;
   expTextEl.textContent = `Deneyim ${player.exp.toLocaleString()} / ${player.maxExp.toLocaleString()}`;
   hpBarEl.style.width = ((player.hp / player.maxHp) * 100) + '%';
