@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Dinamik Level & GLB Kule</title>
+  <title>Korsan Dünyası - Genişletme & Gülle Sistemi</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -441,12 +441,12 @@
       <div class="port-tabs-scroll">
         <button id="tab-ammo" class="market-tab-btn active" type="button">Gülle</button>
         <button id="tab-shipyard" class="market-tab-btn" type="button">Tersane</button>
-        <button id="tab-expand" class="market-tab-btn" type="button">Genişlet</button>
+        <button id="tab-expand" class="market-tab-btn" type="button">Genişletme</button>
         <button id="tab-crew" class="market-tab-btn" type="button">Tayfa</button>
       </div>
       <div class="market-balance">
         <span>Altın: <strong id="market-gold" style="color:#ffd783;">100,000,000</strong></span>
-        <span>Elmas: <strong style="color:#38bdf8;">1,103</strong></span>
+        <span>Elmas: <strong id="market-diamond" style="color:#38bdf8;">1,103</strong></span>
       </div>
       
       <div class="market-scroll-body">
@@ -468,8 +468,37 @@
             <button class="buy-btn ammo-buy-btn" type="button" data-type="dragon" data-amount="10" data-cost="120" style="width:auto;">120 Altın</button>
           </div>
         </div>
+
         <div id="section-shipyard" class="market-section"><div class="shipyard-grid" id="shipyard-list"></div></div>
-        <div id="section-expand" class="market-section"><div class="generic-tab-content">Genişletme modülleri yakında eklenecektir.</div></div>
+        
+        <!-- YENİ GENİŞLETME SEKMESİ -->
+        <div id="section-expand" class="market-section">
+          <div style="background: rgba(14, 116, 144, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); padding: 10px; border-radius: 10px; margin-bottom: 12px; font-size: 11px; color: #bae6fd; text-align: center;">
+            Kalan Genişletme Hakkın: <strong id="expansion-rights-info" style="color: #f59e0b; font-size: 13px;">3</strong> (Her seviye atlamada +3 hak kazanırsın)
+          </div>
+          <div class="market-item">
+            <div class="market-item-info">
+              <span class="market-item-title">🎯 TOP GENİŞLETMESİ</span>
+              <span class="market-item-sub">Kapasite: <strong id="stat-cannons" style="color:#38bdf8;">250</strong> Top (+20 Top artırır)</span>
+            </div>
+            <button class="buy-btn" id="btn-expand-cannon" type="button" style="width:auto; background: linear-gradient(135deg, #b45309, #78350f); border-color: #f59e0b;">5 Elmas</button>
+          </div>
+          <div class="market-item">
+            <div class="market-item-info">
+              <span class="market-item-title">❤️ CAN GENİŞLETMESİ</span>
+              <span class="market-item-sub">Toplam Can: <strong id="stat-hp" style="color:#f87171;">1.000.000</strong> (+50.000 Can artırır)</span>
+            </div>
+            <button class="buy-btn" id="btn-expand-hp" type="button" style="width:auto; background: linear-gradient(135deg, #991b1b, #7f1d1d); border-color: #f87171;">5 Elmas</button>
+          </div>
+          <div class="market-item">
+            <div class="market-item-info">
+              <span class="market-item-title">⚡ HIZ GENİŞLETMESİ</span>
+              <span class="market-item-sub">Gemi Hızı: <strong id="stat-speed" style="color:#4ade80;">180</strong> (%2 Hız artırır)</span>
+            </div>
+            <button class="buy-btn" id="btn-expand-speed" type="button" style="width:auto; background: linear-gradient(135deg, #166534, #14532d); border-color: #4ade80;">5 Elmas</button>
+          </div>
+        </div>
+
         <div id="section-crew" class="market-section"><div class="generic-tab-content">Tayfa kiralama ve yönetim paneli yakında eklenecektir.</div></div>
       </div>
 
@@ -548,6 +577,7 @@ const portToggleBtn = document.querySelector('#port-toggle-btn');
 const marketPanel = document.querySelector('#market-panel');
 const marketCloseBtn = document.querySelector('#market-close-btn');
 const marketGoldEl = document.querySelector('#market-gold');
+const marketDiamondEl = document.querySelector('#market-diamond');
 const marketFeedbackEl = document.querySelector('#market-feedback');
 const shipyardListEl = document.querySelector('#shipyard-list');
 const portPanelTitle = document.querySelector('#port-panel-title');
@@ -561,6 +591,14 @@ const sectionAmmo = document.querySelector('#section-ammo');
 const sectionShipyard = document.querySelector('#section-shipyard');
 const sectionExpand = document.querySelector('#section-expand');
 const sectionCrew = document.querySelector('#section-crew');
+
+const statCannonsEl = document.querySelector('#stat-cannons');
+const statHpEl = document.querySelector('#stat-hp');
+const statSpeedEl = document.querySelector('#stat-speed');
+const expansionRightsInfoEl = document.querySelector('#expansion-rights-info');
+const btnExpandCannon = document.querySelector('#btn-expand-cannon');
+const btnExpandHp = document.querySelector('#btn-expand-hp');
+const btnExpandSpeed = document.querySelector('#btn-expand-speed');
 
 const authOverlay = document.querySelector('#auth-overlay');
 const tabLogin = document.querySelector('#tab-login');
@@ -612,8 +650,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v60';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v60';
+const USERS_STORAGE_KEY = 'pirate3d_users_v61';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v61';
 let authMode = 'login';
 let currentUser = null;
 
@@ -1041,9 +1079,11 @@ function startGameLogic() {
   gameOverEl.style.display = 'none';
 
   player = {
-    x: 0, z: 0, a: -Math.PI / 2, speed: 0, maxSpeed: 180,
-    hp: 1000000, maxHp: 1000000, score: 100000000,
+    x: 0, z: 0, a: -Math.PI / 2, speed: 0, baseSpeed: 180, maxSpeed: 180,
+    hp: 1000000, maxHp: 1000000, score: 100000000, diamonds: 1103,
     level: 1, exp: 0, maxExp: 100,
+    expansionRights: 3, // Her seviye 3 hak verir
+    cannons: 250, // Başlangıç top kapasitesi
     selectedAmmo: 'iron',
     ammo: { iron: 1000000, chain: 1000000, fire: 1000000, dragon: 1000000 },
     lastDamagedTime: 0
@@ -1205,14 +1245,14 @@ function updateTargetCard() {
 function syncAttackButton() {
   if (isGameOver || !player) return;
   const currentAmmoQty = player.ammo[player.selectedAmmo] || 0;
-  attackBtn.disabled = (!selectedEnemyId && !selectedTowerId) || currentAmmoQty <= 0;
+  attackBtn.disabled = (!selectedEnemyId && !selectedTowerId) || currentAmmoQty < player.cannons;
   attackBtn.classList.toggle('firing', isAttacking);
   attackBtnText.textContent = isAttacking ? 'DURDUR' : 'ATEŞ ET';
 }
 
 attackBtn.addEventListener('click', () => {
   if (!selectedEnemyId && !selectedTowerId) return;
-  if ((player.ammo[player.selectedAmmo] || 0) <= 0) return;
+  if ((player.ammo[player.selectedAmmo] || 0) < player.cannons) return;
   isAttacking = !isAttacking;
   syncAttackButton();
 });
@@ -1566,15 +1606,25 @@ function animate3D() {
     const ammoKey = player.selectedAmmo;
     const ammoSpec = AMMO_TYPES[ammoKey];
 
-    if (selectedEnemyId) {
-      const target = enemies.find(e => e.id === selectedEnemyId);
-      if (target && player.ammo[ammoKey] > 0) {
-        if (Math.hypot(target.x - player.x, target.z - player.z) <= ATTACK_RANGE && (now - lastPlayerAttackTime >= 1000)) {
-          lastPlayerAttackTime = now;
-          player.ammo[ammoKey]--;
-          target.isAggro = true;
+    if (player.ammo[ammoKey] < player.cannons) {
+      isAttacking = false;
+      syncAttackButton();
+      showFloatingDamage(player.x, player.z, 'GÜLLE YETERSİZ!', '#f87171');
+    } else if (Math.hypot((selectedEnemyId ? enemies.find(e=>e.id===selectedEnemyId)?.x : castleGroup.position.x + castleTowers.find(t=>t.id===selectedTowerId)?.localX) - player.x, 
+                          (selectedEnemyId ? enemies.find(e=>e.id===selectedEnemyId)?.z : castleGroup.position.z + castleTowers.find(t=>t.id===selectedTowerId)?.localZ) - player.z) <= ATTACK_RANGE && (now - lastPlayerAttackTime >= 1000)) {
+      
+      lastPlayerAttackTime = now;
+      player.ammo[ammoKey] -= player.cannons; // Top sayısı kadar gülle düşer!
 
+      const targetX = selectedEnemyId ? enemies.find(e=>e.id===selectedEnemyId).x : castleGroup.position.x + castleTowers.find(t=>t.id===selectedTowerId).localX;
+      const targetZ = selectedEnemyId ? enemies.find(e=>e.id===selectedEnemyId).z : castleGroup.position.z + castleTowers.find(t=>t.id===selectedTowerId).localZ;
+
+      if (selectedEnemyId) {
+        const target = enemies.find(e => e.id === selectedEnemyId);
+        if (target) {
+          target.isAggro = true;
           fireProjectile(player.x, player.z, target.x, target.z, ammoKey, () => {
+            const totalDamage = ammoSpec.damage * (player.cannons / 250); // Top kapasitesine göre hasar ölçeklenebilir veya sabit kalabilir
             target.hp -= ammoSpec.damage;
             if (ammoSpec.slow < 1.0) target.slowTimer = 240;
             showFloatingDamage(target.x, target.z, '-' + ammoSpec.damage.toLocaleString(), '#f97316');
@@ -1593,7 +1643,8 @@ function animate3D() {
                 player.level++;
                 player.exp -= player.maxExp;
                 player.maxExp = Math.floor(player.maxExp * 1.35);
-                showFloatingDamage(player.x, player.z, `LEVEL UP! Lv.${player.level}`, '#38bdf8');
+                player.expansionRights += 3; // HER SEVİYE ATLADIĞINDA +3 GENİŞLETME HAKKI!
+                showFloatingDamage(player.x, player.z, `LEVEL UP! +3 Genişletme Hakkı`, '#38bdf8');
               }
 
               updateTargetCard(); updateHUD(); syncAttackButton();
@@ -1601,19 +1652,12 @@ function animate3D() {
             }
           });
         }
-      }
-    } else if (selectedTowerId) {
-      const tower = castleTowers.find(t => t.id === selectedTowerId);
-      if (tower && tower.hp > 0 && player.ammo[ammoKey] > 0) {
-        const twWorldX = castleGroup.position.x + tower.localX;
-        const twWorldZ = castleGroup.position.z + tower.localZ;
-        if (Math.hypot(twWorldX - player.x, twWorldZ - player.z) <= ATTACK_RANGE && (now - lastPlayerAttackTime >= 1000)) {
-          lastPlayerAttackTime = now;
-          player.ammo[ammoKey]--;
-
-          fireProjectile(player.x, player.z, twWorldX, twWorldZ, ammoKey, () => {
+      } else if (selectedTowerId) {
+        const tower = castleTowers.find(t => t.id === selectedTowerId);
+        if (tower && tower.hp > 0) {
+          fireProjectile(player.x, player.z, targetX, targetZ, ammoKey, () => {
             tower.hp -= ammoSpec.damage;
-            showFloatingDamage(twWorldX, twWorldZ, '-' + ammoSpec.damage.toLocaleString(), '#f97316');
+            showFloatingDamage(targetX, targetZ, '-' + ammoSpec.damage.toLocaleString(), '#f97316');
             updateTargetCard(); updateHUD(); syncAttackButton();
 
             if (tower.hp <= 0) {
@@ -1638,7 +1682,8 @@ function animate3D() {
                 player.level++;
                 player.exp -= player.maxExp;
                 player.maxExp = Math.floor(player.maxExp * 1.35);
-                showFloatingDamage(player.x, player.z, `LEVEL UP! Lv.${player.level}`, '#38bdf8');
+                player.expansionRights += 3;
+                showFloatingDamage(player.x, player.z, `LEVEL UP! +3 Genişletme Hakkı`, '#38bdf8');
               }
 
               updateTargetCard(); updateHUD(); syncAttackButton();
@@ -1697,6 +1742,12 @@ function updateHUD() {
   hpBarEl.style.width = ((player.hp / player.maxHp) * 100) + '%';
   expBarEl.style.width = Math.min(100, (player.exp / player.maxExp) * 100) + '%';
   marketGoldEl.textContent = player.score.toLocaleString();
+  marketDiamondEl.textContent = player.diamonds.toLocaleString();
+
+  statCannonsEl.textContent = player.cannons;
+  statHpEl.textContent = player.maxHp.toLocaleString();
+  statSpeedEl.textContent = Math.round(player.maxSpeed);
+  expansionRightsInfoEl.textContent = player.expansionRights;
 
   const hpPercent = Math.max(0, Math.min(100, (player.hp / player.maxHp) * 100));
   playerShipHpFillEl.style.width = hpPercent + '%';
@@ -1706,9 +1757,47 @@ function updateHUD() {
     const count = player.ammo[type] || 0;
     qtyEls[type].textContent = formatShortNumber(count);
     const slotEl = document.querySelector(`.ammo-slot[data-type="${type}"]`);
-    if (slotEl) slotEl.classList.toggle('empty', count <= 0);
+    if (slotEl) slotEl.classList.toggle('empty', count < player.cannons);
   });
 }
+
+// GENİŞLETME İŞLEMLERİ
+btnExpandCannon.addEventListener('click', () => {
+  if (player.expansionRights <= 0) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Yeterli genişletme hakkın yok! (Seviye atla)'; return; }
+  if (player.diamonds < 5) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Yetersiz elmas!'; return; }
+  player.diamonds -= 5;
+  player.expansionRights--;
+  player.cannons += 20;
+  updateHUD(); syncAttackButton();
+  marketFeedbackEl.style.color = '#4ade80';
+  marketFeedbackEl.textContent = 'Top kapasitesi +20 artırıldı!';
+  setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+});
+
+btnExpandHp.addEventListener('click', () => {
+  if (player.expansionRights <= 0) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Yeterli genişletme hakkın yok! (Seviye atla)'; return; }
+  if (player.diamonds < 5) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Yetersiz elmas!'; return; }
+  player.diamonds -= 5;
+  player.expansionRights--;
+  player.maxHp += 50000;
+  player.hp = Math.min(player.maxHp, player.hp + 50000);
+  updateHUD();
+  marketFeedbackEl.style.color = '#4ade80';
+  marketFeedbackEl.textContent = 'Gemi canı +50.000 artırıldı!';
+  setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+});
+
+btnExpandSpeed.addEventListener('click', () => {
+  if (player.expansionRights <= 0) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Yeterli genişletme hakkın yok! (Seviye atla)'; return; }
+  if (player.diamonds < 5) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Yetersiz elmas!'; return; }
+  player.diamonds -= 5;
+  player.expansionRights--;
+  player.maxSpeed *= 1.02; // %2 hız artışı
+  updateHUD();
+  marketFeedbackEl.style.color = '#4ade80';
+  marketFeedbackEl.textContent = 'Gemi hızı %2 artırıldı!';
+  setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+});
 
 function toggleMapsPanel() {
   mapsPanel.classList.toggle('open');
