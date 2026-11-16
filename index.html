@@ -12,11 +12,9 @@
     }
     #game { display: block; width: 100%; height: 100%; position: fixed; inset: 0; z-index: 0; }
 
-    /* Masaüstü ve Mobil Arayüz Senkronizasyonu (PC'de UI oranını mobille eşitler) */
+    /* Masaüstü Arayüz Düzenlemesi (Mobil Dokunulmadı) */
     @media (min-width: 1024px) {
-      body {
-        zoom: 1.25; 
-      }
+      body { zoom: 1.15; }
       #top-vital-hud { width: 460px; }
       .shipyard-grid { grid-template-columns: repeat(4, 1fr); }
       #market-panel { width: 680px; max-width: 90vw; }
@@ -628,7 +626,6 @@ const AMMO_TYPES = {
   dragon: { id: 'dragon', name: 'Ejderha Nefesi', damage: 450, slow: 0.85, desc: '450 Efsanevi Hasar', color: 0x3b82f6 }
 };
 
-// TÜM GEMİLERİN BOYUT, YÜKSEKLİK VE AÇI AYARLARI
 const SHIP_MODELS = {
   standard:  { id: 'standard',  name: '8 Yönlü Gemi',    desc: 'Standart Savaş Gemisi', cost: 0,        type: 'sprite', img: 'gemi18.png' },
   ghost:     { id: 'ghost',     name: 'Hayalet Fırkateyn', desc: 'Gizli Sis Gövdesi',     cost: 5000000,  type: 'sprite', img: 'gemi18.png' },
@@ -973,10 +970,10 @@ function initThreeGame() {
   scene.background = new THREE.Color(0x052236);
   scene.fog = new THREE.FogExp2(0x052236, 0.0003);
 
-  // MASAÜSTÜ VE MOBİL İÇİN DİNAMİK KAMERA MESAFESİ (PC'DE YAKINLAŞTIRILDI)
+  // MASAÜSTÜNDE KAMERA İDEAL SEVİYEDE UZAKLAŞTIRILDI (MOBİL KORUNDU)
   const isDesktop = window.innerWidth > 768;
-  const camHeight = isDesktop ? 650 : 920;
-  const camDepth = isDesktop ? 450 : 680;
+  const camHeight = isDesktop ? 920 : 920;
+  const camDepth = isDesktop ? 720 : 680;
 
   camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 1, 18000);
   camera.position.set(0, camHeight, camDepth);
@@ -1046,6 +1043,7 @@ function initThreeGame() {
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
+  // DÜZELTİLMİŞ RAYCASTER TIKLAMA KOORDİNATLARI (BİLGİSAYAR & MOBİL UYUMLU)
   window.addEventListener('pointerdown', e => {
     if (
       e.target.closest('#top-vital-hud') ||
@@ -1056,8 +1054,13 @@ function initThreeGame() {
       e.target.closest('#auth-overlay')
     ) return;
 
-    mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    const rect = renderer.domElement.getBoundingClientRect();
+    const clientX = e.clientX - rect.left;
+    const clientY = e.clientY - rect.top;
+
+    mouse.x = (clientX / rect.width) * 2 - 1;
+    mouse.y = -(clientY / rect.height) * 2 + 1;
+    
     raycaster.setFromCamera(mouse, camera);
 
     const enemySprites = enemies.map(en => en.sprite);
@@ -1494,10 +1497,10 @@ function animate3D() {
     playerLabelEl.style.transform = `translate(-50%, 0) translate(${xPx}px, ${yPx}px)`;
   }
 
-  // DİNAMİK KAMERA HAREKET TAKİBİ (PC İÇİN YAKINLAŞTIRILMIŞ)
+  // MASAÜSTÜNDE KAMERA TAKİP MESAFESİ UZAKLAŞTIRILDI
   const isDesktop = window.innerWidth > 768;
-  const targetCamH = isDesktop ? 650 : 920;
-  const targetCamD = isDesktop ? 450 : 680;
+  const targetCamH = isDesktop ? 920 : 920;
+  const targetCamD = isDesktop ? 720 : 680;
 
   camera.position.x += (player.x - camera.position.x) * 0.08;
   camera.position.y += (targetCamH - camera.position.y) * 0.08;
