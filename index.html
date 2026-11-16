@@ -146,7 +146,7 @@
     .tool-icon-btn span.lbl { font-weight: 800; color: #cbd5e1; }
 
     .captain-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
-    .captain-name-group { display: flex; align-items: center; gap: 8px; } /* İsim ile ikon arasında boşluk bırakıldı */
+    .captain-name-group { display: flex; align-items: center; gap: 8px; }
     .captain-row strong { font-size: 12px; color: #fffbeb; }
     
     .ship-level-badge {
@@ -430,7 +430,6 @@
     <div class="captain-row">
       <div class="captain-name-group">
         <strong id="captain-name">Test</strong>
-        <!-- İSMİN SAĞINDA DİNAMİK SEVİYE ROZETİ -->
         <span class="ship-level-badge" id="hud-level-badge">Lv. 1</span>
       </div>
       <button id="logout-btn" class="logout-chip" type="button">Çıkış</button>
@@ -716,6 +715,8 @@ if (authForm) {
 if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeItem(SESSION_STORAGE_KEY); location.reload(); });
 
 let scene, camera, renderer;
+let oceanTexture = null;
+let oceanFlowTime = 0;
 let activeGlbShip = null, playerNeonRing, enemies = [], rangeRingMesh;
 let castleGroup = null, castleTowers = [], castleTowerMeshes = [];
 let castleProjectiles = [];
@@ -759,40 +760,61 @@ let gltfLoader;
 
 function createSeamlessDarkOceanTexture() {
   const canvas = document.createElement('canvas');
-  canvas.width = 1024; canvas.height = 1024;
+  canvas.width = 1024;
+  canvas.height = 1024;
   const ctx = canvas.getContext('2d');
 
-  const grad = ctx.createLinearGradient(0, 0, 0, 1024);
-  grad.addColorStop(0, '#071f30');
-  grad.addColorStop(0.5, '#04131f');
-  grad.addColorStop(1, '#020b12');
-  ctx.fillStyle = grad;
+  const base = ctx.createLinearGradient(0, 0, 1024, 1024);
+  base.addColorStop(0, '#07364b');
+  base.addColorStop(0.38, '#05283d');
+  base.addColorStop(0.72, '#031d31');
+  base.addColorStop(1, '#041522');
+  ctx.fillStyle = base;
   ctx.fillRect(0, 0, 1024, 1024);
 
-  ctx.fillStyle = 'rgba(14, 116, 144, 0.08)';
-  for (let i = 0; i < 400; i++) {
+  for (let i = 0; i < 95; i++) {
     const x = Math.random() * 1024;
     const y = Math.random() * 1024;
-    const r = Math.random() * 80 + 30;
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fill();
+    const r = 70 + Math.random() * 150;
+    const glow = ctx.createRadialGradient(x, y, 0, x, y, r);
+    glow.addColorStop(0, 'rgba(20, 150, 170, 0.10)');
+    glow.addColorStop(0.55, 'rgba(12, 105, 140, 0.045)');
+    glow.addColorStop(1, 'rgba(4, 35, 55, 0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(x - r, y - r, r * 2, r * 2);
   }
 
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.025)';
-  for (let i = 0; i < 600; i++) {
+  for (let i = 0; i < 1450; i++) {
     const x = Math.random() * 1024;
     const y = Math.random() * 1024;
-    const r = Math.random() * 3 + 1;
+    const length = 8 + Math.random() * 54;
+    const bend = (Math.random() - 0.5) * 9;
     ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.moveTo(x, y);
+    ctx.quadraticCurveTo(x + length * 0.5, y + bend, x + length, y + bend * 0.35);
+    ctx.strokeStyle = Math.random() > 0.72
+      ? 'rgba(126, 220, 226, 0.12)'
+      : 'rgba(93, 177, 199, 0.055)';
+    ctx.lineWidth = 0.6 + Math.random() * 1.25;
+    ctx.stroke();
+  }
+
+  for (let i = 0; i < 420; i++) {
+    const x = Math.random() * 1024;
+    const y = Math.random() * 1024;
+    const radius = 0.5 + Math.random() * 1.5;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(190, 235, 238, ${0.035 + Math.random() * 0.09})`;
     ctx.fill();
   }
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(40, 40);
+  texture.repeat.set(24, 24);
+  texture.anisotropy = 8;
+  texture.needsUpdate = true;
   return texture;
 }
 
@@ -831,7 +853,6 @@ function createBorderFrame() {
   scene.add(borderFrameMesh);
 }
 
-// KULE YÜKLEME VE KONSOL KONTROLÜ EKLENDİ
 function buildCastleIsland() {
   castleGroup = new THREE.Group();
   castleGroup.position.set(0, 0, -2200);
@@ -853,7 +874,7 @@ function buildCastleIsland() {
       const box = new THREE.Box3().setFromObject(towerModel);
       const size = new THREE.Vector3();
       box.getSize(size);
-      let scaleFactor = (65 / Math.max(size.x, size.y, size.z)) * 10; 
+      let scaleFactor = (120 / Math.max(size.x, size.y, size.z)) * 10; 
       towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
       towerModel.position.set(tx, SHIP_Y_POS - 40, tz);
@@ -915,16 +936,21 @@ function initThreeGame() {
   sunLight.position.set(2000, 3000, 1500);
   scene.add(sunLight);
 
-  const oceanTexture = createSeamlessDarkOceanTexture();
+  oceanTexture = createSeamlessDarkOceanTexture();
 
   planeGeo = new THREE.PlaneGeometry(WORLD_SIZE * 2, WORLD_SIZE * 2, 64, 64);
   const oceanMat = new THREE.MeshStandardMaterial({
     map: oceanTexture,
-    roughness: 0.25,
-    metalness: 0.4
+    color: 0x9acbd2,
+    roughness: 0.2,
+    metalness: 0.34,
+    emissive: 0x062536,
+    emissiveIntensity: 0.16
   });
   const ocean = new THREE.Mesh(planeGeo, oceanMat);
   ocean.rotation.x = -Math.PI / 2;
+  ocean.position.y = -2;
+  ocean.receiveShadow = true;
   scene.add(ocean);
 
   createBorderFrame();
@@ -1301,6 +1327,12 @@ function animate3D() {
   let dt = (nowTime - lastClockTime) / 1000;
   lastClockTime = nowTime;
   if (dt > 0.1) dt = 0.1;
+
+  if (oceanTexture) {
+    oceanFlowTime += dt;
+    oceanTexture.offset.x = (oceanFlowTime * 0.0018) % 1;
+    oceanTexture.offset.y = (oceanFlowTime * 0.0009) % 1;
+  }
 
   if (activeShipyardPreviews.length > 0) {
     activeShipyardPreviews.forEach(p => {
@@ -1706,7 +1738,7 @@ function drawMinimap() {
 function updateHUD() {
   scoreEl.textContent = player.score.toLocaleString();
   levelEl.textContent = player.level;
-  if (hudLevelBadgeEl) hudLevelBadgeEl.textContent = `Lv. ${player.level}`; // İSMİN SAĞINDAKİ ROZET GÜNCELLENİYOR
+  if (hudLevelBadgeEl) hudLevelBadgeEl.textContent = `Lv. ${player.level}`;
   hpTextEl.textContent = `Can ${Math.ceil(player.hp).toLocaleString()} / ${player.maxHp.toLocaleString()}`;
   expTextEl.textContent = `Deneyim ${player.exp.toLocaleString()} / ${player.maxExp.toLocaleString()}`;
   hpBarEl.style.width = ((player.hp / player.maxHp) * 100) + '%';
