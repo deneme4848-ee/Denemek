@@ -3,45 +3,64 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Gelişmiş Okyanus & UI</title>
+  <title>Korsan Dünyası - Ada & Zengin Okyanus Teması</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
       margin: 0; width: 100%; height: 100%; overflow: hidden;
-      background: #021019; color: #fff; font-family: system-ui, -apple-system, sans-serif;
+      background: #061c2c; color: #fff; font-family: system-ui, -apple-system, sans-serif;
     }
     #game { display: block; width: 100%; height: 100%; position: fixed; inset: 0; z-index: 0; }
 
+    /* BİLGİSAYAR / BÜYÜK EKRAN İÇİN BÜYÜTÜLMÜŞ ÖLÇEKLENDİRME */
     @media (min-width: 1024px) {
       body { zoom: 1.0; }
       #top-vital-hud {
-        position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
-        width: 560px; z-index: 6; pointer-events: none;
-        display: flex; flex-direction: row; align-items: center; gap: 8px;
-        background: rgba(6, 17, 27, 0.9); backdrop-filter: blur(8px);
-        border: 1.5px solid rgba(245, 197, 94, 0.55); border-radius: 14px;
-        padding: 6px 14px; box-shadow: 0 8px 25px rgba(0,0,0,0.85);
+        position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+        width: 640px; z-index: 6; pointer-events: none;
+        display: flex; flex-direction: row; align-items: center; gap: 12px;
+        background: rgba(6, 17, 27, 0.92); backdrop-filter: blur(8px);
+        border: 2px solid rgba(245, 197, 94, 0.6); border-radius: 16px;
+        padding: 8px 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.85);
       }
       #top-left-hud {
-        position: fixed; top: 14px; left: 16px;
-        display: flex; flex-direction: row; align-items: flex-start; gap: 10px;
+        position: fixed; top: 16px; left: 20px;
+        display: flex; flex-direction: row; align-items: flex-start; gap: 14px;
         z-index: 6; pointer-events: none;
       }
-      .side-tool-col { flex-direction: column; }
+      .side-tool-col { flex-direction: column; gap: 8px; }
       #top-right-hud {
-        position: fixed; top: 14px; right: 16px; z-index: 6;
-        background: rgba(7, 20, 31, 0.92); backdrop-filter: blur(6px);
-        border: 1px solid rgba(245, 197, 94, 0.45); border-radius: 12px;
-        padding: 8px 14px; min-width: 180px; box-shadow: 0 6px 20px rgba(0,0,0,0.8);
-        display: flex; flex-direction: column; gap: 4px;
+        position: fixed; top: 16px; right: 20px; z-index: 6;
+        background: rgba(7, 20, 31, 0.94); backdrop-filter: blur(8px);
+        border: 1.5px solid rgba(245, 197, 94, 0.5); border-radius: 14px;
+        padding: 10px 18px; min-width: 210px; box-shadow: 0 8px 24px rgba(0,0,0,0.85);
+        display: flex; flex-direction: column; gap: 6px;
       }
       #bottom-dock {
-        position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
-        width: auto; display: flex; flex-direction: row; align-items: flex-end; gap: 16px;
+        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+        width: auto; display: flex; flex-direction: row; align-items: flex-end; gap: 20px;
         z-index: 6; pointer-events: none;
       }
+      /* BİLGİSAYAR İÇİN MİNİMAP BÜYÜTME */
+      .radar-card { padding: 6px !important; border-radius: 14px !important; }
+      #minimap { width: 110px !important; height: 110px !important; border-radius: 8px !important; }
+      .coord-pill { font-size: 11px !important; padding: 3px 6px !important; }
+      .radar-title { font-size: 10px !important; margin-bottom: 2px; }
+      /* BİLGİSAYAR İÇİN BUTONLAR BÜYÜTME */
+      .tool-icon-btn { width: 50px !important; height: 50px !important; border-radius: 12px !important; }
+      .tool-icon-btn span.ico { font-size: 20px !important; }
+      .tool-icon-btn span.lbl { font-size: 8px !important; }
+      /* GÜLLE SLOTLARI BÜYÜTME */
+      .ammo-slot { width: 62px !important; height: 66px !important; border-radius: 12px !important; }
+      .ammo-slot .ammo-ico { font-size: 24px !important; }
+      .ammo-slot .ammo-qty { font-size: 12px !important; }
+      .ammo-slot .key-hint { font-size: 10px !important; top: 3px !important; left: 5px !important; }
+      /* ATEŞ ET BUTONU BÜYÜTME */
+      #attack-btn { width: 90px !important; height: 90px !important; font-size: 13px !important; }
+      #attack-btn .crosshair { font-size: 26px !important; }
     }
 
+    /* MOBİL İÇİN KOMPAKT ÖLÇEKLENDİRME */
     @media (max-width: 1023px) {
       #top-vital-hud {
         position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
@@ -62,6 +81,11 @@
         position: fixed; bottom: 10px; left: 8px; right: 8px;
         display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; z-index: 6; pointer-events: none;
       }
+      .radar-card { padding: 4px; }
+      #minimap { width: 72px; height: 72px; border-radius: 5px; }
+      .tool-icon-btn { width: 38px; height: 38px; border-radius: 9px; }
+      .ammo-slot { width: 50px; height: 54px; border-radius: 10px; }
+      #attack-btn { width: 72px; height: 72px; font-size: 11px; }
     }
 
     #map-transit-banner {
@@ -79,44 +103,43 @@
     }
 
     .level-crest {
-      width: 44px; height: 44px; flex-shrink: 0; border-radius: 12px;
+      width: 46px; height: 46px; flex-shrink: 0; border-radius: 12px;
       background: linear-gradient(145deg, #1e293b, #09131d);
       border: 2px solid #f59e0b; box-shadow: 0 4px 14px rgba(0,0,0,0.85);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
     .level-crest span { font-size: 7px; color: #fbbf24; font-weight: 800; letter-spacing: 0.5px; }
-    .level-crest strong { font-size: 15px; color: #fff; line-height: 1; }
+    .level-crest strong { font-size: 16px; color: #fff; line-height: 1; }
 
-    .vital-bars-wrap { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 240px; }
+    .vital-bars-wrap { flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 240px; }
     .vital-track {
-      position: relative; width: 100%; height: 15px;
+      position: relative; width: 100%; height: 16px;
       background: rgba(15, 23, 42, 0.92); border-radius: 6px; overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.14);
     }
     #hp-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #991b1b, #dc2626, #f87171); transition: width 0.2s ease; }
     #exp-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #0369a1, #0284c7, #38bdf8); transition: width 0.25s ease; }
     .vital-label {
       position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-      font-size: 10px; font-weight: 800; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.95);
+      font-size: 11px; font-weight: 800; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.95);
     }
 
     .radar-card {
-      pointer-events: auto; background: rgba(7, 20, 31, 0.92);
-      border: 2px solid rgba(148, 163, 184, 0.45); border-radius: 10px;
-      padding: 4px; box-shadow: 0 8px 24px rgba(0,0,0,0.85);
-      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      pointer-events: auto; background: rgba(7, 20, 31, 0.94);
+      border: 2px solid rgba(148, 163, 184, 0.45); border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.85);
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
     }
-    .radar-title { font-size: 8px; font-weight: 800; color: #94a3b8; letter-spacing: 0.5px; text-transform: uppercase; }
-    #minimap { width: 72px; height: 72px; border-radius: 5px; background: #e6d5b8; border: 1px solid #475569; display: block; }
+    .radar-title { font-size: 9px; font-weight: 800; color: #94a3b8; letter-spacing: 0.5px; text-transform: uppercase; }
+    #minimap { background: #183348; border: 1px solid #475569; display: block; }
     .coord-pill {
-      width: 100%; text-align: center; font-size: 9px; font-weight: 800;
-      background: rgba(2, 8, 14, 0.85); color: #f8fafc; padding: 2px 3px;
+      width: 100%; text-align: center; font-weight: 800;
+      background: rgba(2, 8, 14, 0.85); color: #f8fafc;
       border-radius: 4px; border: 1px solid rgba(148, 163, 184, 0.3);
     }
 
-    .side-tool-col { pointer-events: auto; display: flex; flex-direction: column; gap: 5px; }
+    .side-tool-col { pointer-events: auto; display: flex; flex-direction: column; }
     .tool-icon-btn {
-      width: 38px; height: 38px; border-radius: 9px;
       background: linear-gradient(155deg, #172a3a, #091520);
       border: 1.5px solid rgba(148, 163, 184, 0.4); color: #f8fafc;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -125,32 +148,31 @@
     }
     .tool-icon-btn:hover { border-color: #cbd5e1; transform: translateY(-1px); }
     .tool-icon-btn:active { transform: scale(0.94); }
-    .tool-icon-btn span.ico { font-size: 14px; line-height: 1.1; }
-    .tool-icon-btn span.lbl { font-size: 6px; font-weight: 800; color: #cbd5e1; }
+    .tool-icon-btn span.ico { line-height: 1.1; }
+    .tool-icon-btn span.lbl { font-weight: 800; color: #cbd5e1; }
 
     .captain-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
     .captain-name-group { display: flex; align-items: center; gap: 6px; }
-    .captain-row strong { font-size: 11px; color: #fffbeb; }
+    .captain-row strong { font-size: 12px; color: #fffbeb; }
     
-    /* ŞIK LEVEL İKONU TASARIMI (İsmin sağında, yapışık değil) */
     .ship-level-badge {
       background: linear-gradient(135deg, #b45309, #78350f);
       border: 1px solid #f59e0b; color: #fef3c7;
-      font-size: 9px; font-weight: 900; padding: 1px 6px; border-radius: 6px;
+      font-size: 10px; font-weight: 900; padding: 2px 7px; border-radius: 6px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.6); display: inline-flex; align-items: center; gap: 2px;
       letter-spacing: 0.3px;
     }
 
     .logout-chip {
       border: 1px solid rgba(252, 165, 165, 0.45); background: rgba(153, 27, 27, 0.85);
-      color: #fee2e2; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 5px; cursor: pointer;
+      color: #fee2e2; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 5px; cursor: pointer;
     }
     .gold-row {
       display: flex; align-items: center; justify-content: space-between;
-      font-size: 11px; font-weight: 800; color: #fbbf24;
-      background: rgba(0,0,0,0.35); padding: 3px 6px; border-radius: 6px;
+      font-size: 12px; font-weight: 800; color: #fbbf24;
+      background: rgba(0,0,0,0.35); padding: 4px 8px; border-radius: 6px;
     }
-    .ship-sub-name { font-size: 9px; color: #94a3b8; text-align: right; }
+    .ship-sub-name { font-size: 10px; color: #94a3b8; text-align: right; }
 
     #player-label {
       position: fixed; z-index: 5; pointer-events: none;
@@ -183,7 +205,7 @@
 
     .floating-dmg {
       position: fixed; z-index: 10; pointer-events: none;
-      font-weight: 900; font-size: 15px; text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+      font-weight: 900; font-size: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.9);
       animation: floatUpAndFade 0.9s ease-out forwards;
       transform: translate(-50%, -50%);
     }
@@ -192,16 +214,16 @@
       100% { opacity: 0; transform: translate(-50%, -50px) scale(0.9); }
     }
 
-    .ammo-dock-container { pointer-events: auto; display: flex; flex-direction: column; gap: 5px; }
+    .ammo-dock-container { pointer-events: auto; display: flex; flex-direction: column; gap: 6px; }
     .active-ammo-banner {
       background: rgba(6, 17, 27, 0.88);
       border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 7px;
-      padding: 3px 8px; font-size: 10px; color: #cbd5e1; font-weight: 700;
+      padding: 4px 10px; font-size: 11px; color: #cbd5e1; font-weight: 700;
     }
-    .ammo-slots-row { display: flex; gap: 6px; padding-bottom: 2px; }
+    .ammo-slots-row { display: flex; gap: 8px; padding-bottom: 2px; }
     .ammo-slot {
-      position: relative; width: 50px; height: 54px; flex-shrink: 0;
-      border-radius: 10px; background: linear-gradient(165deg, #132838, #07131d);
+      position: relative; flex-shrink: 0;
+      background: linear-gradient(165deg, #132838, #07131d);
       border: 2px solid rgba(148, 163, 184, 0.35);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       cursor: pointer; transition: all 0.15s ease; box-shadow: 0 5px 12px rgba(0,0,0,0.8);
@@ -210,35 +232,33 @@
       border-color: #cbd5e1; background: linear-gradient(165deg, #1e293b, #0f172a);
       box-shadow: 0 0 14px rgba(148, 163, 184, 0.4); transform: translateY(-2px);
     }
-    .ammo-slot .key-hint { position: absolute; top: 2px; left: 4px; font-size: 8px; font-weight: 800; color: #94a3b8; }
-    .ammo-slot .ammo-ico { font-size: 18px; line-height: 1.1; }
+    .ammo-slot .key-hint { position: absolute; font-weight: 800; color: #94a3b8; }
     .ammo-slot .ammo-qty {
-      font-size: 10px; font-weight: 900; color: #fff; margin-top: 1px;
-      background: rgba(0,0,0,0.55); padding: 1px 5px; border-radius: 4px;
+      font-weight: 900; color: #fff; margin-top: 1px;
+      background: rgba(0,0,0,0.55); padding: 1px 6px; border-radius: 4px;
     }
     .ammo-slot.empty { opacity: 0.45; }
 
-    .right-combat-cluster { pointer-events: auto; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .right-combat-cluster { pointer-events: auto; display: flex; flex-direction: column; align-items: center; gap: 8px; }
     #target-card {
       display: none; background: rgba(15, 23, 42, 0.92);
-      border: 1.5px solid #ef4444; border-radius: 9px;
-      padding: 5px 8px; min-width: 130px; box-shadow: 0 6px 16px rgba(0,0,0,0.85);
+      border: 1.5px solid #ef4444; border-radius: 10px;
+      padding: 6px 10px; min-width: 140px; box-shadow: 0 6px 16px rgba(0,0,0,0.85);
     }
     #target-card.visible { display: block; }
-    .target-header { display: flex; justify-content: space-between; font-size: 10px; font-weight: 800; color: #fca5a5; margin-bottom: 3px; }
+    .target-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: #fca5a5; margin-bottom: 3px; }
     .target-hp-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.15); border-radius: 3px; overflow: hidden; }
     #target-hp-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #dc2626, #f97316); transition: width 0.15s; }
 
     #attack-btn {
-      width: 72px; height: 72px; border-radius: 50%;
+      border-radius: 50%;
       border: 2.5px solid #64748b;
       background: radial-gradient(circle at 35% 30%, #334155, #0f172a 75%, #020617);
-      color: #f8fafc; font-size: 11px; font-weight: 900; letter-spacing: 0.4px;
+      color: #f8fafc; font-weight: 900; letter-spacing: 0.4px;
       box-shadow: 0 6px 20px rgba(0,0,0,0.85), inset 0 2px 5px rgba(255,255,255,0.2);
       cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
       transition: all 0.16s ease;
     }
-    #attack-btn .crosshair { font-size: 20px; line-height: 1; }
     #attack-btn.firing {
       border-color: #ef4444;
       background: radial-gradient(circle at 35% 30%, #dc2626, #7f1d1d 80%);
@@ -266,9 +286,7 @@
     .maps-header strong { color: #f8fafc; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
     .maps-close { background: rgba(255,255,255,0.1); border: none; color: #cbd5e1; width: 28px; height: 28px; border-radius: 8px; font-weight: 700; cursor: pointer; }
     
-    .maps-grid {
-      display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;
-    }
+    .maps-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
     .map-box {
       aspect-ratio: 1; border-radius: 8px; background: #0c3b5e; border: 2px solid rgba(148, 163, 184, 0.4);
       display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4px;
@@ -276,14 +294,13 @@
     }
     .map-box.current {
       background: linear-gradient(135deg, #1e293b, #0f172a);
-      border: 2.5px solid #38bdf8;
-      box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+      border: 2.5px solid #38bdf8; box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
     }
     .map-box .m-num { font-size: 11px; font-weight: 900; color: #fff; line-height: 1; }
     .map-box .m-name { font-size: 8px; font-weight: 800; color: #cbd5e1; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
     .map-box .m-lvl { font-size: 7px; color: #94a3b8; margin-top: 1px; }
 
-    /* MODERN LİMAN PANELİ - KAYDIRILABİLİR İÇERİK */
+    /* MODERN LİMAN PANELİ */
     #market-panel {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
       width: min(94vw, 560px); max-height: 85vh; background: linear-gradient(160deg, #091c2b, #030a11);
@@ -315,10 +332,7 @@
       padding: 8px; border-radius: 8px; margin-bottom: 10px; color: #e2e8f0; font-weight: 700; flex-shrink: 0;
     }
     
-    .market-scroll-body {
-      flex: 1; overflow-y: auto; padding-right: 4px; max-height: 52vh;
-    }
-
+    .market-scroll-body { flex: 1; overflow-y: auto; padding-right: 4px; max-height: 52vh; }
     .market-section { display: none; }
     .market-section.active { display: block; }
     
@@ -406,7 +420,7 @@
   <div id="top-left-hud">
     <div class="radar-card">
       <div class="radar-title" id="radar-title">Harita 1</div>
-      <canvas id="minimap" width="72" height="72"></canvas>
+      <canvas id="minimap" width="80" height="80"></canvas>
       <div class="coord-pill" id="coord-display">X: 0 · Y: 0</div>
     </div>
     <div class="side-tool-col">
@@ -462,7 +476,7 @@
     <div class="maps-grid" id="maps-grid-container"></div>
   </div>
 
-  <!-- Modern Liman Paneli - Sabit Başlık ve Kaydırılabilir İçerik -->
+  <!-- Modern Liman Paneli -->
   <div id="market-panel">
     <div class="market-panel-inner">
       <div class="market-header">
@@ -518,7 +532,7 @@
     <div class="auth-card">
       <div class="auth-brand">
         <h1>⚓ Korsan Dünyası</h1>
-        <p>99x99 Devasa Haritalar & Şık Çerçeve</p>
+        <p>Gelişmiş Ada ve Derin Deniz Tasarımı</p>
       </div>
       <div class="auth-tabs">
         <button id="tab-login" class="auth-tab active" type="button">Giriş Yap</button>
@@ -627,7 +641,6 @@ const AMMO_TYPES = {
   dragon: { id: 'dragon', name: 'Ejderha Nefesi', damage: 450, slow: 0.85, desc: '450 Efsanevi Hasar', color: 0x3b82f6 }
 };
 
-// SADECE GERÇEK 3D GLB GEMİ TASARIMLARI BIRAKILDI
 const SHIP_MODELS = {
   standard:  { id: 'standard',  name: 'Ejderha Kalyonu', desc: 'Başlangıç 3D Savaş Gemisi', cost: 0,        type: 'glb', modelPath: 'ejder_kalyon.glb', img: 'gemi18.png', heightOffset: 45 },
   ghost:     { id: 'ghost',     name: 'Hayalet Fırkateyn', desc: 'Gizli Sis Gövdesi',     cost: 5000000,  type: 'glb', modelPath: 'tasarim1.glb', img: 'gemi18.png', heightOffset: 45 },
@@ -646,8 +659,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v53';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v53';
+const USERS_STORAGE_KEY = 'pirate3d_users_v54';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v54';
 let authMode = 'login';
 let currentUser = null;
 
@@ -753,7 +766,7 @@ let lastClockTime = performance.now();
 let lastRegenTime = performance.now();
 let gltfLoader;
 
-// KARE ÇİZGİLERİ TAMAMEN KALDIRILMIŞ PÜRÜZSÜZ GERÇEKÇİ OKYANUS
+// GÖNDERDİĞİN GÖRSELDEKİ RENK TONUNA UYGUN ZENGİN OKYANUS VE ADA DOKUSU
 function createRealisticOceanTextures() {
   const size = 1024;
   const colorCanvas = document.createElement('canvas');
@@ -761,17 +774,17 @@ function createRealisticOceanTextures() {
   const ctx = colorCanvas.getContext('2d');
 
   const grad = ctx.createLinearGradient(0, 0, 0, size);
-  grad.addColorStop(0, '#02629b');
-  grad.addColorStop(0.5, '#027bbd');
-  grad.addColorStop(1, '#054e79');
+  grad.addColorStop(0, '#0b4267');
+  grad.addColorStop(0.5, '#0e5f94');
+  grad.addColorStop(1, '#073352');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, size, size);
 
-  for (let i = 0; i < 500; i++) {
+  for (let i = 0; i < 600; i++) {
     const cx = Math.random() * size, cy = Math.random() * size;
-    const r = 60 + Math.random() * 150;
+    const r = 40 + Math.random() * 120;
     const circleGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-    circleGrad.addColorStop(0, 'rgba(56, 189, 248, 0.07)');
+    circleGrad.addColorStop(0, 'rgba(56, 189, 248, 0.08)');
     circleGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
     ctx.fillStyle = circleGrad;
     ctx.beginPath();
@@ -785,11 +798,11 @@ function createRealisticOceanTextures() {
   bCtx.fillStyle = '#808080';
   bCtx.fillRect(0, 0, size, size);
 
-  for (let i = 0; i < 700; i++) {
+  for (let i = 0; i < 800; i++) {
     const x = Math.random() * size, y = Math.random() * size;
-    const r = 25 + Math.random() * 70;
+    const r = 20 + Math.random() * 60;
     const bGrad = bCtx.createRadialGradient(x, y, 1, x, y, r);
-    bGrad.addColorStop(0, 'rgba(255,255,255,0.22)');
+    bGrad.addColorStop(0, 'rgba(255,255,255,0.25)');
     bGrad.addColorStop(1, 'rgba(128,128,128,0)');
     bCtx.fillStyle = bGrad;
     bCtx.beginPath();
@@ -799,11 +812,11 @@ function createRealisticOceanTextures() {
 
   const mapTex = new THREE.CanvasTexture(colorCanvas);
   mapTex.wrapS = THREE.RepeatWrapping; mapTex.wrapT = THREE.RepeatWrapping;
-  mapTex.repeat.set(8, 8);
+  mapTex.repeat.set(10, 10);
 
   const bumpTex = new THREE.CanvasTexture(bumpCanvas);
   bumpTex.wrapS = THREE.RepeatWrapping; bumpTex.wrapT = THREE.RepeatWrapping;
-  bumpTex.repeat.set(8, 8);
+  bumpTex.repeat.set(10, 10);
 
   return { mapTex, bumpTex };
 }
@@ -843,76 +856,62 @@ function createBorderFrame() {
   scene.add(borderFrameMesh);
 }
 
+// GÖNDERDİĞİN GÖRSELDEKİ C-ŞEKLİ / HALKA KORSAN ADASI MODELİ
 function buildCastleIsland() {
   castleGroup = new THREE.Group();
-  castleGroup.position.set(0, 0, -2000);
+  castleGroup.position.set(0, 0, -2200);
 
-  const islandGeo = new THREE.CylinderGeometry(400, 450, 60, 40);
-  const islandMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.85, metalness: 0.1 });
+  // Kavisli C-Şekilli / Halka Ada Tabanı (Torusttan esinlenilmiş kaya halkası)
+  const arcRadius = 420;
+  const tubeRadius = 120;
+  const islandGeo = new THREE.TorusGeometry(arcRadius, tubeRadius, 24, 48, Math.PI * 1.5);
+  const islandMat = new THREE.MeshStandardMaterial({ color: 0x3d352a, roughness: 0.85, metalness: 0.15 });
   const islandMesh = new THREE.Mesh(islandGeo, islandMat);
-  islandMesh.position.y = 30;
+  islandMesh.rotation.x = Math.PI / 2;
+  islandMesh.position.y = 40;
   castleGroup.add(islandMesh);
 
-  const wallRadius = 320;
-  const wallCount = 28;
-  const wallMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.8, metalness: 0.2 });
+  // İç Lagün / Kumsal Sahil Tabanı (Koyu mavi/yeşil sığ su)
+  const lagoonGeo = new THREE.CylinderGeometry(350, 350, 15, 32);
+  const lagoonMat = new THREE.MeshStandardMaterial({ color: 0x0e7490, roughness: 0.3, metalness: 0.5 });
+  const lagoonMesh = new THREE.Mesh(lagoonGeo, lagoonMat);
+  lagoonMesh.position.set(0, 25, 0);
+  castleGroup.add(lagoonMesh);
 
-  for (let i = 0; i < wallCount; i++) {
-    const angle = (i / wallCount) * Math.PI * 1.6 - (Math.PI * 0.8);
-    const wx = Math.cos(angle) * wallRadius;
-    const wz = Math.sin(angle) * wallRadius;
-    const wGeo = new THREE.BoxGeometry(45, 50, 15);
-    const wMesh = new THREE.Mesh(wGeo, wallMat);
-    wMesh.position.set(wx, 50, wz);
-    wMesh.rotation.y = -angle;
-    castleGroup.add(wMesh);
-  }
-
-  const keepGeo = new THREE.BoxGeometry(100, 120, 100);
-  const keepMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6, metalness: 0.3 });
-  const keepMesh = new THREE.Mesh(keepGeo, keepMat);
-  keepMesh.position.set(0, 95, 40);
-  castleGroup.add(keepMesh);
-
-  const roofGeo = new THREE.ConeGeometry(75, 65, 4);
-  const roofMat = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.5 });
-  const roofMesh = new THREE.Mesh(roofGeo, roofMat);
-  roofMesh.position.set(0, 185, 40);
-  castleGroup.add(roofMesh);
-
+  // Ada Üzerindeki Kuleler ve Kalıntılar
   castleTowers = [];
   castleTowerMeshes = [];
-  const towerCount = 20;
+  const towerCount = 18;
 
   for (let i = 0; i < towerCount; i++) {
     const angle = (i / towerCount) * Math.PI * 1.5 - (Math.PI * 0.75);
-    const tx = Math.cos(angle) * wallRadius;
-    const tz = Math.sin(angle) * wallRadius;
+    const tx = Math.cos(angle) * (arcRadius - 30);
+    const tz = Math.sin(angle) * (arcRadius - 30);
 
-    const tGeo = new THREE.CylinderGeometry(18, 22, 75, 16);
-    const tMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.7 });
+    const tGeo = new THREE.CylinderGeometry(20, 26, 85, 16);
+    const tMat = new THREE.MeshStandardMaterial({ color: 0x27272a, roughness: 0.75 });
     const towerMesh = new THREE.Mesh(tGeo, tMat);
-    towerMesh.position.set(tx, 75, tz);
+    towerMesh.position.set(tx, 80, tz);
     
     const towerId = 100 + i;
-    towerMesh.userData = { towerId: towerId, name: `Kale Kulesi #${i+1}` };
+    towerMesh.userData = { towerId: towerId, name: `Korsan Kulesi #${i+1}` };
     castleGroup.add(towerMesh);
     castleTowerMeshes.push(towerMesh);
 
-    const tRoofGeo = new THREE.ConeGeometry(24, 30, 12);
-    const tRoofMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.5 });
+    const tRoofGeo = new THREE.ConeGeometry(26, 35, 10);
+    const tRoofMat = new THREE.MeshStandardMaterial({ color: 0x7f1d1d, roughness: 0.5 });
     const tRoofMesh = new THREE.Mesh(tRoofGeo, tRoofMat);
-    tRoofMesh.position.set(tx, 125, tz);
+    tRoofMesh.position.set(tx, 140, tz);
     castleGroup.add(tRoofMesh);
 
     castleTowers.push({
       id: towerId,
-      name: `Kale Kulesi #${i+1}`,
+      name: `Korsan Kulesi #${i+1}`,
       mesh: towerMesh,
       localX: tx,
       localZ: tz,
-      hp: 500,
-      maxHp: 500,
+      hp: 550,
+      maxHp: 550,
       lastShotTime: 0
     });
   }
@@ -922,8 +921,8 @@ function buildCastleIsland() {
 
 function initThreeGame() {
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x052236);
-  scene.fog = new THREE.FogExp2(0x052236, 0.00004);
+  scene.background = new THREE.Color(0x072236);
+  scene.fog = new THREE.FogExp2(0x072236, 0.00004);
 
   camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 50000);
   camera.position.set(0, CAMERA_HEIGHT, CAMERA_DEPTH);
@@ -936,10 +935,10 @@ function initThreeGame() {
 
   gltfLoader = new THREE.GLTFLoader();
 
-  const ambientLight = new THREE.AmbientLight(0xe0f2fe, 0.95);
+  const ambientLight = new THREE.AmbientLight(0xe0f2fe, 1.0);
   scene.add(ambientLight);
 
-  const sunLight = new THREE.DirectionalLight(0xffedd5, 1.8);
+  const sunLight = new THREE.DirectionalLight(0xffedd5, 1.9);
   sunLight.position.set(2000, 3000, 1500);
   scene.add(sunLight);
 
@@ -951,9 +950,9 @@ function initThreeGame() {
   const oceanMat = new THREE.MeshStandardMaterial({
     map: oceanTexture,
     bumpMap: oceanBumpTexture,
-    bumpScale: 3.5,
-    roughness: 0.2,
-    metalness: 0.4
+    bumpScale: 3.8,
+    roughness: 0.22,
+    metalness: 0.45
   });
   const ocean = new THREE.Mesh(planeGeo, oceanMat);
   ocean.rotation.x = -Math.PI / 2;
@@ -1129,7 +1128,6 @@ function changeMap(mapIdx, entrySide = 'center') {
   });
   enemies = [];
 
-  // HARİTA BÜYÜKLÜĞÜNE UYGUN ZENGİN NPC SPAWN MİKTARI (22 NPC)
   const count = 22 + (mapIdx % 4);
   for (let i = 0; i < count; i++) spawnEnemyGlb(i + 1);
   renderMapsGrid();
@@ -1339,7 +1337,6 @@ function animate3D() {
 
   const now = Date.now();
 
-  // ATIŞ ALMAZSA 5 SANİYEDE BİR 5000 CAN TAMİR OLMA & YÜZEN ANİMASYON
   if (player.hp < player.maxHp && (now - player.lastDamagedTime >= 5000)) {
     if (now - lastRegenTime >= 5000) {
       lastRegenTime = now;
@@ -1380,45 +1377,27 @@ function animate3D() {
   if (player.z < -HARD_LIMIT) player.z = -HARD_LIMIT;
 
   if (player.x > TRIGGER_THRESHOLD) {
-    if (curMeta.col < 4) {
-      showTransitButton(currentMapIndex + 1, 'right');
-      nearEdge = true;
-    }
+    if (curMeta.col < 4) { showTransitButton(currentMapIndex + 1, 'right'); nearEdge = true; }
   }
   else if (player.x < -TRIGGER_THRESHOLD) {
-    if (curMeta.col > 0) {
-      showTransitButton(currentMapIndex - 1, 'left');
-      nearEdge = true;
-    } else {
+    if (curMeta.col > 0) { showTransitButton(currentMapIndex - 1, 'left'); nearEdge = true; }
+    else {
       const targetIdx = currentMapIndex + 4;
-      if (targetIdx < MAP_DATA.length) {
-        showTransitButton(targetIdx, 'left');
-        nearEdge = true;
-      }
+      if (targetIdx < MAP_DATA.length) { showTransitButton(targetIdx, 'left'); nearEdge = true; }
     }
   }
   else if (player.z > TRIGGER_THRESHOLD) {
-    if (curMeta.row < 2) {
-      showTransitButton(currentMapIndex + 5, 'bottom');
-      nearEdge = true;
-    }
+    if (curMeta.row < 2) { showTransitButton(currentMapIndex + 5, 'bottom'); nearEdge = true; }
   }
   else if (player.z < -TRIGGER_THRESHOLD) {
-    if (curMeta.row > 0) {
-      showTransitButton(currentMapIndex - 5, 'top');
-      nearEdge = true;
-    } else {
+    if (curMeta.row > 0) { showTransitButton(currentMapIndex - 5, 'top'); nearEdge = true; }
+    else {
       const targetIdx = currentMapIndex + 10;
-      if (targetIdx < MAP_DATA.length) {
-        showTransitButton(targetIdx, 'top');
-        nearEdge = true;
-      }
+      if (targetIdx < MAP_DATA.length) { showTransitButton(targetIdx, 'top'); nearEdge = true; }
     }
   }
 
-  if (!nearEdge && pendingTransitMapIndex !== null) {
-    hideTransitButton();
-  }
+  if (!nearEdge && pendingTransitMapIndex !== null) { hideTransitButton(); }
 
   coordDisplayEl.textContent = `X: ${Math.round((player.x / HALF_WORLD) * 100)} · Y: ${Math.round((player.z / HALF_WORLD) * 100)}`;
   
@@ -1483,7 +1462,7 @@ function animate3D() {
       const twZ = castleGroup.position.z + tower.localZ;
       if (Math.hypot(player.x - twX, player.z - twZ) <= CASTLE_AGGRO_RANGE && (now - tower.lastShotTime >= 2200)) {
         tower.lastShotTime = now;
-        lastRegenTime = now; // Hasar alındı, tamir sayacını sıfırla
+        lastRegenTime = now;
         fireCastleProjectile(twX, twZ, player.x, player.z, () => {
           player.hp = Math.max(0, player.hp - 80);
           player.lastDamagedTime = now;
@@ -1588,7 +1567,7 @@ function animate3D() {
         en.lastAttackTime = now;
         player.hp = Math.max(0, player.hp - 100);
         player.lastDamagedTime = now;
-        lastRegenTime = now; // Hasar alındı, tamir sayacını sıfırla
+        lastRegenTime = now;
         showFloatingDamage(player.x, player.z, '-100', '#ef4444');
         updateHUD();
         if (player.hp <= 0) { isGameOver = true; isAttacking = false; gameOverEl.style.display = 'flex'; finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString(); }
@@ -1702,10 +1681,10 @@ function animate3D() {
 function drawMinimap() {
   const w = miniCanvas.width, h = miniCanvas.height;
   mctx.clearRect(0, 0, w, h);
-  mctx.fillStyle = '#e7d5b5';
+  mctx.fillStyle = '#143048';
   mctx.fillRect(0, 0, w, h);
 
-  mctx.strokeStyle = 'rgba(120, 53, 15, 0.18)';
+  mctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
   mctx.lineWidth = 1;
   mctx.beginPath();
   mctx.moveTo(w / 2, 0); mctx.lineTo(w / 2, h);
@@ -1716,21 +1695,22 @@ function drawMinimap() {
   const scale = w / WORLD_SIZE;
   const cx = w / 2, cy = h / 2;
 
-  mctx.fillStyle = '#475569';
+  // Ada Konumu
+  mctx.fillStyle = '#3d352a';
   mctx.beginPath();
-  mctx.arc(cx + 0, cy + (-2000 * scale), 45 * scale, 0, Math.PI * 2);
+  mctx.arc(cx + 0, cy + (-2200 * scale), 35 * scale, 0, Math.PI * 2);
   mctx.fill();
 
   mctx.fillStyle = '#dc2626';
   enemies.forEach(en => {
     mctx.beginPath();
-    mctx.arc(cx + en.x * scale, cy + en.z * scale, 2.0, 0, Math.PI * 2);
+    mctx.arc(cx + en.x * scale, cy + en.z * scale, 2.2, 0, Math.PI * 2);
     mctx.fill();
   });
 
-  mctx.fillStyle = '#1d4ed8';
+  mctx.fillStyle = '#38bdf8';
   mctx.beginPath();
-  mctx.arc(cx + player.x * scale, cy + player.z * scale, 2.6, 0, Math.PI * 2);
+  mctx.arc(cx + player.x * scale, cy + player.z * scale, 3.0, 0, Math.PI * 2);
   mctx.fill();
 }
 
@@ -1758,9 +1738,7 @@ function updateHUD() {
 
 function toggleMapsPanel() {
   mapsPanel.classList.toggle('open');
-  if (mapsPanel.classList.contains('open')) {
-    renderMapsGrid();
-  }
+  if (mapsPanel.classList.contains('open')) { renderMapsGrid(); }
 }
 
 mapsToggleBtn.addEventListener('click', toggleMapsPanel);
