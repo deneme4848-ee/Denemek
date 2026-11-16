@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - PNG Kale Entegrasyonu</title>
+  <title>Korsan Dünyası - GLB Kuleler ve Ada PNG</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -648,8 +648,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v58';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v58';
+const USERS_STORAGE_KEY = 'pirate3d_users_v59';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v59';
 let authMode = 'login';
 let currentUser = null;
 
@@ -829,15 +829,14 @@ function createBorderFrame() {
   scene.add(borderFrameMesh);
 }
 
-// GÖNDERDİĞİN PNG KALE GÖRSELİNİ ADA VE KULELERİN YERİNE ENTEGRE EDEN FONKSİYON
+// ADA PNG GÖRSELİ VE 15 ADET KULE.GLB MODELİNİ ENTEGRE EDEN FONKSİYON
 function buildCastleIsland() {
   castleGroup = new THREE.Group();
   castleGroup.position.set(0, 0, -2200);
 
-  // PNG Kaleyi yükleyip oyun dünyasına (Plane) yerleştiriyoruz
+  // 1. Ada / Kalenin dairesel sur PNG görseli
   const textureLoader = new THREE.TextureLoader();
-  // Gönderdiğin dairesel kale görselinin doğrudan web kaynağı
-  textureLoader.load('ada.png', (castleTexture) => {
+  textureLoader.load('https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1024&q=80', (castleTexture) => {
     const castleGeo = new THREE.PlaneGeometry(900, 900);
     const castleMat = new THREE.MeshBasicMaterial({
       map: castleTexture,
@@ -850,32 +849,49 @@ function buildCastleIsland() {
     castleGroup.add(castleMesh);
   });
 
-  // Savunma ve tıklanabilirlik için hayalet kuleler (Görsel PNG'nin etrafındaki konumlarda çalışır)
+  // 2. Kule.glb modellerini dairesel surun etrafına tam 15 adet yerleştiriyoruz
   castleTowers = [];
   castleTowerMeshes = [];
-  const towerCount = 12;
-  const radius = 380;
+  const towerCount = 15;
+  const radius = 390;
 
   for (let i = 0; i < towerCount; i++) {
-    const angle = (i / towerCount) * Math.PI * 1.5 - (Math.PI * 0.75);
+    const angle = (i / towerCount) * Math.PI * 1.6 - (Math.PI * 0.8);
     const tx = Math.cos(angle) * radius;
     const tz = Math.sin(angle) * radius;
-
-    // Görünmez ama tıklanabilir / nişan alınabilir kule çarpışma kutuları
-    const tGeo = new THREE.CylinderGeometry(25, 25, 70, 8);
-    const tMat = new THREE.MeshBasicMaterial({ visible: false });
-    const towerMesh = new THREE.Mesh(tGeo, tMat);
-    towerMesh.position.set(tx, 60, tz);
-    
     const towerId = 100 + i;
-    towerMesh.userData = { towerId: towerId, name: `Korsan Kulesi #${i+1}` };
-    castleGroup.add(towerMesh);
-    castleTowerMeshes.push(towerMesh);
+
+    // Kule.glb modelini yüklüyoruz
+    gltfLoader.load('kule.glb', (gltf) => {
+      const towerModel = gltf.scene || gltf.scenes[0];
+      const box = new THREE.Box3().setFromObject(towerModel);
+      const size = new THREE.Vector3();
+      box.getSize(size);
+      let scaleFactor = 50 / Math.max(size.x, size.y, size.z);
+      towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
+
+      towerModel.position.set(tx, 55, tz);
+      towerModel.rotation.y = -angle + Math.PI / 2;
+
+      towerModel.userData = { towerId: towerId, name: `Korsan Kulesi #${i+1}` };
+      towerModel.traverse(child => { child.userData = { towerId: towerId }; });
+
+      castleGroup.add(towerModel);
+      castleTowerMeshes.push(towerModel);
+    }, undefined, (err) => {
+      // Eğer kule.glb yüklenemezse yedek olarak tıklanabilir gizli çember oluşturur
+      const fallbackGeo = new THREE.CylinderGeometry(20, 20, 60, 8);
+      const fallbackMat = new THREE.MeshBasicMaterial({ visible: false });
+      const fallbackMesh = new THREE.Mesh(fallbackGeo, fallbackMat);
+      fallbackMesh.position.set(tx, 55, tz);
+      fallbackMesh.userData = { towerId: towerId, name: `Korsan Kulesi #${i+1}` };
+      castleGroup.add(fallbackMesh);
+      castleTowerMeshes.push(fallbackMesh);
+    });
 
     castleTowers.push({
       id: towerId,
       name: `Korsan Kulesi #${i+1}`,
-      mesh: towerMesh,
       localX: tx,
       localZ: tz,
       hp: 550,
@@ -993,9 +1009,12 @@ function initThreeGame() {
       }
     }
 
-    const intersectsTowers = raycaster.intersectObjects(castleTowerMeshes);
+    const intersectsTowers = raycaster.intersectObjects(castleTowerMeshes, true);
     if (intersectsTowers.length > 0) {
       let obj = intersectsTowers[0].object;
+      while (obj.parent && !obj.userData.towerId) {
+        obj = obj.parent;
+      }
       if (obj.userData.towerId) {
         selectedTowerId = obj.userData.towerId;
         selectedEnemyId = null;
@@ -1615,9 +1634,18 @@ function animate3D() {
             updateTargetCard(); updateHUD(); syncAttackButton();
 
             if (tower.hp <= 0) {
-              castleGroup.remove(tower.mesh);
-              tower.mesh.geometry.dispose(); tower.mesh.material.dispose();
-              castleTowerMeshes = castleTowerMeshes.filter(m => m !== tower.mesh);
+              const meshToRemove = castleTowerMeshes.find(m => m.userData.towerId === tower.id);
+              if (meshToRemove) {
+                castleGroup.remove(meshToRemove);
+                meshToRemove.traverse(child => {
+                  if (child.geometry) child.geometry.dispose();
+                  if (child.material) {
+                    if (Array.isArray(child.material)) child.material.forEach(m => m.dispose());
+                    else child.material.dispose();
+                  }
+                });
+              }
+              castleTowerMeshes = castleTowerMeshes.filter(m => m.userData.towerId !== tower.id);
               selectedTowerId = null; isAttacking = false;
               if (selectedRingMesh) selectedRingMesh.visible = false;
               player.score += 300;
