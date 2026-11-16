@@ -633,7 +633,6 @@ const SHIP_MODELS = {
   tasarim8: { id: 'tasarim8', name: 'Tasarim 8', desc: 'GLB Formatlı Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim8.glb', img: 'gemi18.png' }
 };
 
-
 const USERS_STORAGE_KEY = 'pirate3d_users_v41';
 const SESSION_STORAGE_KEY = 'pirate3d_session_v41';
 let authMode = 'login';
@@ -1086,7 +1085,7 @@ function initThreeGame() {
 }
 
 // ==========================================================
-// OYUN MANTIĞI & GLB YÜKLEME (KORUNMUŞ AYARLAR)
+// OYUN MANTIĞI & OTOMATİK BOYUTLANDIRMALI GLB YÜKLEME
 // ==========================================================
 let player;
 let targetPos = null, selectedEnemyId = null, selectedTowerId = null, isAttacking = false, isGameOver = false;
@@ -1106,7 +1105,17 @@ function setupPlayerShipVisual() {
   if (modelSpec.type === 'glb' && modelSpec.modelPath) {
     gltfLoader.load(modelSpec.modelPath, (gltf) => {
       activeGlbShip = gltf.scene || gltf.scenes[0];
-      activeGlbShip.scale.set(3, 3, 3);
+      
+      // OTOMATİK BOYUT NORMALİZASYONU (Farklı boyutlardaki GLB modelleri ortak boyuta sabitler)
+      const box = new THREE.Box3().setFromObject(activeGlbShip);
+      const size = new THREE.Vector3();
+      box.getSize(size);
+      
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const targetSize = 120; // Tüm GLB gemilerin sahip olacağı standart ortak boyut (Gerekirse bu sayıyı değiştirebilirsin)
+      const scaleFactor = targetSize / maxDim;
+      
+      activeGlbShip.scale.set(scaleFactor, scaleFactor, scaleFactor);
       scene.add(activeGlbShip);
     }, undefined, (err) => {
       console.warn("GLB yüklenemedi, yedek sprite'a dönülüyor:", err);
@@ -1430,7 +1439,7 @@ function animate3D() {
     const waveRollZ = Math.cos(timeSec * 0.85) * 0.045;
     const speedPitchX = (player.speed / player.maxSpeed) * -0.05 + Math.sin(timeSec * 1.2) * 0.025;
 
-    activeGlbShip.position.set(player.x, SHIP_Y_POS + waveBobY - 100, player.z); // -12 değerini geminin durumuna göre artırıp azaltabilirsin
+    activeGlbShip.position.set(player.x, SHIP_Y_POS + waveBobY - 100, player.z);
     activeGlbShip.rotation.order = 'YXZ';
     activeGlbShip.rotation.y = -player.a + Math.PI / 2;
     activeGlbShip.rotation.x = speedPitchX;
