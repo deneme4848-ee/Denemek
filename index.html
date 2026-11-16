@@ -618,23 +618,36 @@ const AMMO_TYPES = {
   dragon: { id: 'dragon', name: 'Ejderha Nefesi', damage: 450, slow: 0.85, desc: '450 Efsanevi Hasar', color: 0x3b82f6 }
 };
 
+// GEMİLERE ÖZEL AYARLAR (Yükseklik, Ters Yön Düzeltmesi ve Ölçek/Boyut Çarpanları)
 const SHIP_MODELS = {
-  standard: { id: 'standard', name: '8 Yönlü Gemi', desc: 'Standart Savaş Gemisi', cost: 0, type: 'sprite', img: 'gemi18.png' },
-  ghost:    { id: 'ghost',    name: 'Hayalet Fırkateyn', desc: 'Gizli Sis Gövdesi', cost: 5000000, type: 'sprite', img: 'gemi18.png' },
-  gold:     { id: 'gold',     name: 'Altın Korsan', desc: 'İhtişamlı Altın Kalyon', cost: 15000000, type: 'sprite', img: 'gemi18.png' },
-  customGlb:{ id: 'customGlb', name: 'Özel 3D Kalyon', desc: 'GLB Formatlı Savaş Gemisi', cost: 25000000, type: 'glb', modelPath: 'ejder_kalyon.glb', img: 'gemi18.png' },
+  standard:  { id: 'standard',  name: '8 Yönlü Gemi',    desc: 'Standart Savaş Gemisi', cost: 0,        type: 'sprite', img: 'gemi18.png' },
+  ghost:     { id: 'ghost',     name: 'Hayalet Fırkateyn', desc: 'Gizli Sis Gövdesi',     cost: 5000000,  type: 'sprite', img: 'gemi18.png' },
+  gold:      { id: 'gold',      name: 'Altın Korsan',     desc: 'İhtişamlı Altın Kalyon', cost: 15000000, type: 'sprite', img: 'gemi18.png' },
+  customGlb: { id: 'customGlb', name: 'Özel 3D Kalyon',   desc: 'GLB Formatlı Savaş Gemisi', cost: 25000000, type: 'glb', modelPath: 'ejder_kalyon.glb', img: 'gemi18.png' },
   
-  tasarim1: { id: 'tasarim1', name: 'Tasarim 1', desc: 'GLB Formatlı Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim1.glb', img: 'gemi18.png' },
-  tasarim2: { id: 'tasarim2', name: 'Tasarim 2', desc: 'GLB Formatlı Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim2.glb', img: 'gemi18.png' },
-  tasarim3: { id: 'tasarim3', name: 'Tasarim 3', desc: 'GLB Formatlı Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim3.glb', img: 'gemi18.png' },
-  tasarim5: { id: 'tasarim5', name: 'Tasarim 5', desc: 'GLB Formatlı Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim5.glb', img: 'gemi18.png' },
-  tasarim6: { id: 'tasarim6', name: 'Tasarim 6', desc: 'GLB Formatlı Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim6.glb', img: 'gemi18.png' },
-  tasarim7: { id: 'tasarim7', name: 'Tasarim 7', desc: 'GLB Formatlı Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim7.glb', img: 'gemi18.png' },
-  tasarim8: { id: 'tasarim8', name: 'Tasarim 8', desc: 'GLB Formatlı Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim8.glb', img: 'gemi18.png' }
+  tasarim1:  { id: 'tasarim1',  name: 'Tasarim 1', desc: 'GLB Formatlı Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim1.glb', img: 'gemi18.png' },
+  
+  // Tasarım 2: Denizin altındaydı ve ters hareket ediyordu -> Yükseklik + Yön düzeltmesi (180 derece)
+  tasarim2:  { id: 'tasarim2',  name: 'Tasarim 2', desc: 'GLB Formatlı Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim2.glb', img: 'gemi18.png', heightOffset: 45, rotationOffset: Math.PI },
+  
+  // Tasarım 3: Denizin altındaydı, ters hareket ediyordu ve 1.3 kat büyütülecek -> Yükseklik + Yön + 1.3 scale
+  tasarim3:  { id: 'tasarim3',  name: 'Tasarim 3', desc: 'GLB Formatlı Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim3.glb', img: 'gemi18.png', heightOffset: 45, rotationOffset: Math.PI, scaleMultiplier: 1.3 },
+  
+  // Tasarım 5: Denizin altındaydı ve 1.5 kat büyütülecek -> Yükseklik + 1.5 scale
+  tasarim5:  { id: 'tasarim5',  name: 'Tasarim 5', desc: 'GLB Formatlı Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim5.glb', img: 'gemi18.png', heightOffset: 45, scaleMultiplier: 1.5 },
+  
+  // Tasarım 6: Hiç gözükmüyordu (tamamen denizin altındaydı) -> Büyük bir yükseklik artışı
+  tasarim6:  { id: 'tasarim6',  name: 'Tasarim 6', desc: 'GLB Formatlı Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim6.glb', img: 'gemi18.png', heightOffset: 85 },
+  
+  // Tasarım 7: Denizin altındaydı ve ters hareket ediyordu -> Yükseklik + Yön düzeltmesi
+  tasarim7:  { id: 'tasarim7',  name: 'Tasarim 7', desc: 'GLB Formatlı Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim7.glb', img: 'gemi18.png', heightOffset: 45, rotationOffset: Math.PI },
+  
+  // Tasarım 8: Hiç gözükmüyordu (tamamen denizin altındaydı) -> Büyük bir yükseklik artışı
+  tasarim8:  { id: 'tasarim8',  name: 'Tasarim 8', desc: 'GLB Formatlı Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim8.glb', img: 'gemi18.png', heightOffset: 85 }
 };
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v41';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v41';
+const USERS_STORAGE_KEY = 'pirate3d_users_v42';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v42';
 let authMode = 'login';
 let currentUser = null;
 
@@ -1106,14 +1119,17 @@ function setupPlayerShipVisual() {
     gltfLoader.load(modelSpec.modelPath, (gltf) => {
       activeGlbShip = gltf.scene || gltf.scenes[0];
       
-      // OTOMATİK BOYUT NORMALİZASYONU (Farklı boyutlardaki GLB modelleri ortak boyuta sabitler)
+      // OTOMATİK BOYUT NORMALİZASYONU VE ÖZEL ÇARPANLAR
       const box = new THREE.Box3().setFromObject(activeGlbShip);
       const size = new THREE.Vector3();
       box.getSize(size);
       
       const maxDim = Math.max(size.x, size.y, size.z);
-      const targetSize = 120; // Tüm GLB gemilerin sahip olacağı standart ortak boyut (Gerekirse bu sayıyı değiştirebilirsin)
-      const scaleFactor = targetSize / maxDim;
+      const targetSize = 120; 
+      let scaleFactor = targetSize / maxDim;
+      
+      const multiplier = modelSpec.scaleMultiplier || 1.0;
+      scaleFactor *= multiplier;
       
       activeGlbShip.scale.set(scaleFactor, scaleFactor, scaleFactor);
       scene.add(activeGlbShip);
@@ -1304,16 +1320,12 @@ function showFloatingDamage(wx, wz, text, colorHex) {
   setTimeout(() => div.remove(), 900);
 }
 
-// ==========================================================
-// GEMİYE ÖZEL TOP ATIŞ ALEVİ & DUMAN EFEKTİ
-// ==========================================================
 function triggerCannonFireEffect(shipX, shipZ, targetX, targetZ) {
   const angleToTarget = Math.atan2(targetZ - shipZ, targetX - shipX);
-  const offsetDist = 28; // Gemi bordasından çıkış mesafesi
+  const offsetDist = 28;
   const muzzleX = shipX + Math.cos(angleToTarget) * offsetDist;
   const muzzleZ = shipZ + Math.sin(angleToTarget) * offsetDist;
 
-  // 1. Namlu Alevi Parlaması
   const flashGeo = new THREE.SphereGeometry(12, 12, 12);
   const flashMat = new THREE.MeshBasicMaterial({ color: 0xffaa00, transparent: true, opacity: 0.95 });
   const flashMesh = new THREE.Mesh(flashGeo, flashMat);
@@ -1321,7 +1333,6 @@ function triggerCannonFireEffect(shipX, shipZ, targetX, targetZ) {
   scene.add(flashMesh);
   cannonEffects.push({ mesh: flashMesh, vx: 0, vy: 0.2, vz: 0, grow: 1.08, fade: 0.14, life: 8 });
 
-  // 2. Barut Dumanı Parçacıkları
   for (let i = 0; i < 8; i++) {
     const smokeGeo = new THREE.SphereGeometry(5 + Math.random() * 5, 8, 8);
     const grayTone = 0.75 + Math.random() * 0.2;
@@ -1428,20 +1439,27 @@ function animate3D() {
 
   coordDisplayEl.textContent = `X: ${Math.round((player.x / (WORLD_SIZE / 2)) * 50)} · Y: ${Math.round((player.z / (WORLD_SIZE / 2)) * 50)}`;
 
-  // Oyuncu Sprite veya GLB Model Güncellemesi (Dalga & Salınım Efekti Dahil)
   if (playerSprite && playerSprite.visible) {
     playerSprite.position.set(player.x, SHIP_Y_POS, player.z);
     applyNormalizedSprite(playerSprite, player.a);
   }
+  
   if (activeGlbShip) {
     const timeSec = now * 0.0025;
     const waveBobY = Math.sin(timeSec) * 1.4;
     const waveRollZ = Math.cos(timeSec * 0.85) * 0.045;
     const speedPitchX = (player.speed / player.maxSpeed) * -0.05 + Math.sin(timeSec * 1.2) * 0.025;
 
-    activeGlbShip.position.set(player.x, SHIP_Y_POS + waveBobY - 100, player.z);
+    // Aktif gemiye özel heightOffset ve rotationOffset değerleri uygulanıyor
+    const users = loadUsers();
+    const dbUser = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
+    const modelSpec = SHIP_MODELS[dbUser.equippedShip || 'standard'];
+    const hOffset = modelSpec.heightOffset || 0;
+    const rotOffset = modelSpec.rotationOffset || 0;
+
+    activeGlbShip.position.set(player.x, SHIP_Y_POS + hOffset + waveBobY - 100, player.z);
     activeGlbShip.rotation.order = 'YXZ';
-    activeGlbShip.rotation.y = -player.a + Math.PI / 2;
+    activeGlbShip.rotation.y = (-player.a + Math.PI / 2) + rotOffset;
     activeGlbShip.rotation.x = speedPitchX;
     activeGlbShip.rotation.z = waveRollZ;
   }
@@ -1513,7 +1531,6 @@ function animate3D() {
     });
   }
 
-  // Top Ateşi Alev & Duman Efektlerini Güncelle
   for (let i = cannonEffects.length - 1; i >= 0; i--) {
     const ce = cannonEffects[i];
     ce.life--;
