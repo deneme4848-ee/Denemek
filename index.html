@@ -833,7 +833,7 @@ function createBorderFrame() {
 // KULELER 10 KAT BÜYÜTÜLDÜ VE PNG ADA KALDIRILDI
 function buildCastleIsland() {
   castleGroup = new THREE.Group();
-  castleGroup.position.set(0, 0, -2200);
+  castleGroup.position.set(20, 20, 20);
 
   castleTowers = [];
   castleTowerMeshes = [];
@@ -854,7 +854,7 @@ function buildCastleIsland() {
       let scaleFactor = (65 / Math.max(size.x, size.y, size.z)) * 10; // 10 Kat Büyütüldü
       towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      towerModel.position.set(tx, SHIP_Y_POS + 100, tz);
+      towerModel.position.set(tx, SHIP_Y_POS , tz);
       towerModel.rotation.y = -angle + Math.PI / 2;
 
       towerModel.userData = { towerId: towerId, name: `Korsan Kulesi #${i+1}` };
