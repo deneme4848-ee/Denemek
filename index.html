@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - 3D Kule & Tersane Önizlemeleri</title>
+  <title>Korsan Dünyası - Dinamik Level & GLB Kule</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -146,7 +146,7 @@
     .tool-icon-btn span.lbl { font-weight: 800; color: #cbd5e1; }
 
     .captain-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
-    .captain-name-group { display: flex; align-items: center; gap: 6px; }
+    .captain-name-group { display: flex; align-items: center; gap: 8px; } /* İsim ile ikon arasında boşluk bırakıldı */
     .captain-row strong { font-size: 12px; color: #fffbeb; }
     
     .ship-level-badge {
@@ -430,6 +430,7 @@
     <div class="captain-row">
       <div class="captain-name-group">
         <strong id="captain-name">Test</strong>
+        <!-- İSMİN SAĞINDA DİNAMİK SEVİYE ROZETİ -->
         <span class="ship-level-badge" id="hud-level-badge">Lv. 1</span>
       </div>
       <button id="logout-btn" class="logout-chip" type="button">Çıkış</button>
@@ -830,10 +831,10 @@ function createBorderFrame() {
   scene.add(borderFrameMesh);
 }
 
-// KULELER 10 KAT BÜYÜTÜLDÜ VE PNG ADA KALDIRILDI
+// KULE YÜKLEME VE KONSOL KONTROLÜ EKLENDİ
 function buildCastleIsland() {
   castleGroup = new THREE.Group();
-  castleGroup.position.set(20, 20, 20);
+  castleGroup.position.set(0, 0, -2200);
 
   castleTowers = [];
   castleTowerMeshes = [];
@@ -847,14 +848,15 @@ function buildCastleIsland() {
     const towerId = 100 + i;
 
     gltfLoader.load('kule.glb', (gltf) => {
+      console.log(`[BAŞARILI] kule.glb yüklendi (Kule #${i+1})`);
       const towerModel = gltf.scene || gltf.scenes[0];
       const box = new THREE.Box3().setFromObject(towerModel);
       const size = new THREE.Vector3();
       box.getSize(size);
-      let scaleFactor = (65 / Math.max(size.x, size.y, size.z)) * 10; // 10 Kat Büyütüldü
+      let scaleFactor = (65 / Math.max(size.x, size.y, size.z)) * 10; 
       towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      towerModel.position.set(tx, SHIP_Y_POS , tz);
+      towerModel.position.set(tx, SHIP_Y_POS - 40, tz);
       towerModel.rotation.y = -angle + Math.PI / 2;
 
       towerModel.userData = { towerId: towerId, name: `Korsan Kulesi #${i+1}` };
@@ -873,7 +875,7 @@ function buildCastleIsland() {
       castleGroup.add(towerModel);
       castleTowerMeshes.push(towerModel);
     }, undefined, (err) => {
-      console.warn("kule.glb yüklenemedi, dosya adını kontrol edin.");
+      console.error(`[HATA] kule.glb yüklenemedi! Dosya adını veya yerini kontrol edin:`, err);
     });
 
     castleTowers.push({
@@ -1123,7 +1125,6 @@ mapTransitBanner.addEventListener('click', () => {
   }
 });
 
-// NPC CANI 100.000 OLARAK GÜNCELLENDİ
 function spawnEnemyGlb(id) {
   let ex, ez;
   do {
@@ -1301,7 +1302,6 @@ function animate3D() {
   lastClockTime = nowTime;
   if (dt > 0.1) dt = 0.1;
 
-  // Tersane önizleme canvas'larını render et
   if (activeShipyardPreviews.length > 0) {
     activeShipyardPreviews.forEach(p => {
       if (p.renderer && p.scene && p.camera && p.model) {
@@ -1706,7 +1706,7 @@ function drawMinimap() {
 function updateHUD() {
   scoreEl.textContent = player.score.toLocaleString();
   levelEl.textContent = player.level;
-  if (hudLevelBadgeEl) hudLevelBadgeEl.textContent = `Lv. ${player.level}`;
+  if (hudLevelBadgeEl) hudLevelBadgeEl.textContent = `Lv. ${player.level}`; // İSMİN SAĞINDAKİ ROZET GÜNCELLENİYOR
   hpTextEl.textContent = `Can ${Math.ceil(player.hp).toLocaleString()} / ${player.maxHp.toLocaleString()}`;
   expTextEl.textContent = `Deneyim ${player.exp.toLocaleString()} / ${player.maxExp.toLocaleString()}`;
   hpBarEl.style.width = ((player.hp / player.maxHp) * 100) + '%';
@@ -1813,7 +1813,6 @@ function renderShipyardList() {
     `;
     shipyardListEl.appendChild(div);
 
-    // Her gemi kartı için ayrı Three.js önizleme sahnesi oluştur
     const wrapEl = document.getElementById(`preview-wrap-${idx}`);
     setTimeout(() => {
       const width = wrapEl.clientWidth || 180;
