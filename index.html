@@ -13,7 +13,7 @@
     #game { display: block; width: 100%; height: 100%; position: fixed; inset: 0; z-index: 0; }
 
     /* ========================================================== */
-    /* MASAÜSTÜ SEAFIGHT / KLASİK KORSAN OYUNU DÜZENİ (FOTOĞRAFLARA GÖRE) */
+    /* MASAÜSTÜ KLASİK KORSAN OYUNU DÜZENİ (FOTOĞRAFLARA GÖRE) */
     /* ========================================================== */
     @media (min-width: 1024px) {
       body { zoom: 1.0; }
@@ -667,7 +667,7 @@ const AMMO_TYPES = {
 };
 
 const SHIP_MODELS = {
-  standard:  { id: 'standard',  name: '8 Yönlü Gemi',    desc: 'Standart Savaş Gemisi', cost: 0,        type: 'sprite', img: 'gemi18.png' },
+  standard:  { id: 'standard',  name: '8 Yönlü Gemi',    desc: 'Standart Savaş Gemisi', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', img: 'gemi18.png' },
   ghost:     { id: 'ghost',     name: 'Hayalet Fırkateyn', desc: 'Gizli Sis Gövdesi',     cost: 5000000,  type: 'sprite', img: 'gemi18.png' },
   gold:      { id: 'gold',      name: 'Altın Korsan',     desc: 'İhtişamlı Altın Kalyon', cost: 15000000, type: 'sprite', img: 'gemi18.png' },
   customGlb: { id: 'customGlb', name: 'Özel 3D Kalyon',   desc: 'GLB Formatlı Savaş Gemisi', cost: 25000000, type: 'glb', modelPath: 'ejder_kalyon.glb', img: 'gemi18.png' },
