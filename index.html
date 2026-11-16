@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - GLB Kuleler & Güncel Hasarlar</title>
+  <title>Korsan Dünyası - 3D Kule & Tersane Önizlemeleri</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -336,12 +336,12 @@
     }
     .ship-card-item:hover { border-color: #cbd5e1; transform: translateY(-2px); }
     .ship-card-img-wrap {
-      width: 100%; height: 100px; border-radius: 10px; 
+      width: 100%; height: 110px; border-radius: 10px; 
       background: radial-gradient(circle at 50% 50%, #083344, #031420);
       border: 1.5px solid rgba(56, 189, 248, 0.35); display: flex; align-items: center; justify-content: center;
-      overflow: hidden; box-shadow: inset 0 3px 10px rgba(0,0,0,0.9);
+      overflow: hidden; box-shadow: inset 0 3px 10px rgba(0,0,0,0.9); position: relative;
     }
-    .ship-card-img-wrap img { width: 70px; height: 70px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.9)); }
+    .ship-card-img-wrap canvas { width: 100% !important; height: 100% !important; display: block; }
     .ship-card-title { font-size: 12px; font-weight: 800; color: #fffbeb; margin-top: 2px; }
     .ship-card-sub { font-size: 10px; color: #94a3b8; line-height: 1.2; margin-bottom: 2px; }
 
@@ -451,7 +451,7 @@
 
     <div class="right-combat-cluster">
       <div id="target-card">
-        <div class="target-header"><span id="target-name">Korsan Fırkateyni</span><span id="target-hp-text">520/520</span></div>
+        <div class="target-header"><span id="target-name">Korsan Fırkateyni</span><span id="target-hp-text">100.000/100.000</span></div>
         <div class="target-hp-bg"><div id="target-hp-bar"></div></div>
       </div>
       <button id="attack-btn" disabled><span class="crosshair">🎯</span><span id="attack-btn-text">ATEŞ ET</span></button>
@@ -631,16 +631,16 @@ const AMMO_TYPES = {
 };
 
 const SHIP_MODELS = {
-  standard:  { id: 'standard',  name: 'Ejderha Kalyonu', desc: 'Başlangıç 3D Savaş Gemisi', cost: 0,        type: 'glb', modelPath: 'ejder_kalyon.glb', img: 'gemi18.png', heightOffset: 45 },
-  ghost:     { id: 'ghost',     name: 'Hayalet Fırkateyn', desc: 'Gizli Sis Gövdesi',     cost: 5000000,  type: 'glb', modelPath: 'tasarim1.glb', img: 'gemi18.png', heightOffset: 45 },
-  gold:      { id: 'gold',      name: 'Altın Korsan',     desc: 'İhtişamlı Altın Kalyon', cost: 15000000, type: 'glb', modelPath: 'tasarim3.glb', img: 'gemi18.png', heightOffset: 45, scaleMultiplier: 1.3 },
-  tasarim1:  { id: 'tasarim1',  name: 'Tasarim 1', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim1.glb', img: 'gemi18.png' },
-  tasarim2:  { id: 'tasarim2',  name: 'Tasarim 2', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim2.glb', img: 'gemi18.png', heightOffset: 45, rotationOffset: Math.PI / 2 },
-  tasarim3:  { id: 'tasarim3',  name: 'Tasarim 3', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim3.glb', img: 'gemi18.png', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3 },
-  tasarim5:  { id: 'tasarim5',  name: 'Tasarim 5', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim5.glb', img: 'gemi18.png', heightOffset: 45, scaleMultiplier: 1.5 },
-  tasarim6:  { id: 'tasarim6',  name: 'Tasarim 6', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim6.glb', img: 'gemi18.png', heightOffset: 85 },
-  tasarim7:  { id: 'tasarim7',  name: 'Tasarim 7', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim7.glb', img: 'gemi18.png', heightOffset: 45, rotationOffset: Math.PI },
-  tasarim8:  { id: 'tasarim8',  name: 'Tasarim 8', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim8.glb', img: 'gemi18.png', heightOffset: 85 }
+  standard:  { id: 'standard',  name: 'Ejderha Kalyonu', desc: 'Başlangıç 3D Savaş Gemisi', cost: 0,        type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45 },
+  ghost:     { id: 'ghost',     name: 'Hayalet Fırkateyn', desc: 'Gizli Sis Gövdesi',     cost: 5000000,  type: 'glb', modelPath: 'tasarim1.glb', heightOffset: 45 },
+  gold:      { id: 'gold',      name: 'Altın Korsan',     desc: 'İhtişamlı Altın Kalyon', cost: 15000000, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, scaleMultiplier: 1.3 },
+  tasarim1:  { id: 'tasarim1',  name: 'Tasarim 1', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim1.glb' },
+  tasarim2:  { id: 'tasarim2',  name: 'Tasarim 2', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim2.glb', heightOffset: 45, rotationOffset: Math.PI / 2 },
+  tasarim3:  { id: 'tasarim3',  name: 'Tasarim 3', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3 },
+  tasarim5:  { id: 'tasarim5',  name: 'Tasarim 5', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim5.glb', heightOffset: 45, scaleMultiplier: 1.5 },
+  tasarim6:  { id: 'tasarim6',  name: 'Tasarim 6', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim6.glb', heightOffset: 85 },
+  tasarim7:  { id: 'tasarim7',  name: 'Tasarim 7', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim7.glb', heightOffset: 45, rotationOffset: Math.PI },
+  tasarim8:  { id: 'tasarim8',  name: 'Tasarim 8', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim8.glb', heightOffset: 85 }
 };
 
 const ENEMY_GLB_MODEL_PATH = 'tasarim2.glb';
@@ -722,6 +722,7 @@ let activeProjectiles = [], particleSystems = [], cannonEffects = [];
 let raycaster, planeGeo, mouse;
 let selectedRingMesh = null;
 let borderFrameMesh = null;
+let activeShipyardPreviews = [];
 
 const WORLD_SIZE = 9900; 
 const ATTACK_RANGE = 300;
@@ -829,7 +830,7 @@ function createBorderFrame() {
   scene.add(borderFrameMesh);
 }
 
-// PNG ADA KALDIRILDI - SADECE GLB KULELER DENİZDE
+// KULELER 10 KAT BÜYÜTÜLDÜ VE PNG ADA KALDIRILDI
 function buildCastleIsland() {
   castleGroup = new THREE.Group();
   castleGroup.position.set(0, 0, -2200);
@@ -850,10 +851,9 @@ function buildCastleIsland() {
       const box = new THREE.Box3().setFromObject(towerModel);
       const size = new THREE.Vector3();
       box.getSize(size);
-      let scaleFactor = 65 / Math.max(size.x, size.y, size.z);
+      let scaleFactor = (65 / Math.max(size.x, size.y, size.z)) * 10; // 10 Kat Büyütüldü
       towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      // Kuleler doğrudan su seviyesine/denize yerleştirildi
       towerModel.position.set(tx, SHIP_Y_POS - 40, tz);
       towerModel.rotation.y = -angle + Math.PI / 2;
 
@@ -1123,6 +1123,7 @@ mapTransitBanner.addEventListener('click', () => {
   }
 });
 
+// NPC CANI 100.000 OLARAK GÜNCELLENDİ
 function spawnEnemyGlb(id) {
   let ex, ez;
   do {
@@ -1142,7 +1143,7 @@ function spawnEnemyGlb(id) {
     id, name: `Korsan Gemisi #${id}`, mesh: null, labelEl,
     hpFillEl: labelEl.querySelector('.enemy-hp-fill'),
     x: ex, z: ez,
-    hp: 520 + (currentMapIndex * 200), maxHp: 520 + (currentMapIndex * 200),
+    hp: 100000, maxHp: 100000,
     baseSpeed: 90, slowTimer: 0,
     a: 0, wanderAngle: Math.random() * Math.PI * 2, wanderTimer: 0,
     lastAttackTime: 0, isAggro: false
@@ -1199,14 +1200,14 @@ function updateTargetCard() {
     const target = enemies.find(e => e.id === selectedEnemyId);
     if (!target) { targetCardEl.classList.remove('visible'); if (selectedRingMesh) selectedRingMesh.visible = false; return; }
     targetNameEl.textContent = target.name;
-    targetHpTextEl.textContent = `${Math.ceil(target.hp)}/${target.maxHp}`;
+    targetHpTextEl.textContent = `${Math.ceil(target.hp).toLocaleString()}/${target.maxHp.toLocaleString()}`;
     targetHpBarEl.style.width = Math.max(0, (target.hp / target.maxHp) * 100) + '%';
     if (selectedRingMesh) { selectedRingMesh.visible = true; selectedRingMesh.position.set(target.x, 0.9, target.z); }
   } else if (selectedTowerId) {
     const tower = castleTowers.find(t => t.id === selectedTowerId);
     if (!tower) { targetCardEl.classList.remove('visible'); if (selectedRingMesh) selectedRingMesh.visible = false; return; }
     targetNameEl.textContent = tower.name;
-    targetHpTextEl.textContent = `${Math.ceil(tower.hp)}/${tower.maxHp}`;
+    targetHpTextEl.textContent = `${Math.ceil(tower.hp).toLocaleString()}/${tower.maxHp.toLocaleString()}`;
     targetHpBarEl.style.width = Math.max(0, (tower.hp / tower.maxHp) * 100) + '%';
     if (selectedRingMesh) {
       selectedRingMesh.visible = true;
@@ -1299,6 +1300,16 @@ function animate3D() {
   let dt = (nowTime - lastClockTime) / 1000;
   lastClockTime = nowTime;
   if (dt > 0.1) dt = 0.1;
+
+  // Tersane önizleme canvas'larını render et
+  if (activeShipyardPreviews.length > 0) {
+    activeShipyardPreviews.forEach(p => {
+      if (p.renderer && p.scene && p.camera && p.model) {
+        p.model.rotation.y += 0.01;
+        p.renderer.render(p.scene, p.camera);
+      }
+    });
+  }
 
   if (!player || isGameOver) {
     if (scene && camera && renderer) renderer.render(scene, camera);
@@ -1780,11 +1791,12 @@ document.querySelectorAll('.ammo-buy-btn').forEach(btn => {
 
 function renderShipyardList() {
   shipyardListEl.innerHTML = '';
+  activeShipyardPreviews = [];
   const users = loadUsers();
   const dbUser = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
   const owned = dbUser.ownedShips || ['standard'], equipped = dbUser.equippedShip || 'standard';
 
-  Object.values(SHIP_MODELS).forEach(model => {
+  Object.values(SHIP_MODELS).forEach((model, idx) => {
     const isOwned = owned.includes(model.id), isEquipped = equipped === model.id;
     const div = document.createElement('div');
     div.className = 'ship-card-item';
@@ -1794,12 +1806,47 @@ function renderShipyardList() {
                   `<button class="buy-btn ship-buy-btn" type="button" data-id="${model.id}" data-cost="${model.cost}">${model.cost.toLocaleString()} Altın</button>`;
 
     div.innerHTML = `
-      <div class="ship-card-img-wrap"><img src="${model.img}" alt="${model.name}"></div>
+      <div class="ship-card-img-wrap" id="preview-wrap-${idx}"></div>
       <div class="ship-card-title">${model.name}</div>
       <div class="ship-card-sub">${model.desc}</div>
       ${btnHtml}
     `;
     shipyardListEl.appendChild(div);
+
+    // Her gemi kartı için ayrı Three.js önizleme sahnesi oluştur
+    const wrapEl = document.getElementById(`preview-wrap-${idx}`);
+    setTimeout(() => {
+      const width = wrapEl.clientWidth || 180;
+      const height = wrapEl.clientHeight || 110;
+
+      const pScene = new THREE.Scene();
+      const pCamera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+      pCamera.position.set(0, 50, 120);
+      pCamera.lookAt(0, 0, 0);
+
+      const pRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      pRenderer.setSize(width, height);
+      wrapEl.appendChild(pRenderer.domElement);
+
+      const pAmbient = new THREE.AmbientLight(0xffffff, 1.2);
+      pScene.add(pAmbient);
+      const pDir = new THREE.DirectionalLight(0xfff08a, 1.5);
+      pDir.position.set(50, 100, 50);
+      pScene.add(pDir);
+
+      gltfLoader.load(model.modelPath, (gltf) => {
+        const pModel = gltf.scene || gltf.scenes[0];
+        const box = new THREE.Box3().setFromObject(pModel);
+        const size = new THREE.Vector3();
+        box.getSize(size);
+        let scaleFactor = (60 / Math.max(size.x, size.y, size.z)) * (model.scaleMultiplier || 1.0);
+        pModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        pModel.position.set(0, -10, 0);
+        pScene.add(pModel);
+
+        activeShipyardPreviews.push({ renderer: pRenderer, scene: pScene, camera: pCamera, model: pModel });
+      }, undefined, (err) => { console.warn("Önizleme GLB yüklenemedi:", err); });
+    }, 50);
   });
 
   shipyardListEl.querySelectorAll('.ship-buy-btn').forEach(btn => {
