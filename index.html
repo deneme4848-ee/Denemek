@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Kusursuz Deniz Görünümü</title>
+  <title>Korsan Dünyası - Pürüzsüz Koyu Deniz Tasarımı</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
       margin: 0; width: 100%; height: 100%; overflow: hidden;
-      background: #0284c7; color: #fff; font-family: system-ui, -apple-system, sans-serif;
+      background: #031422; color: #fff; font-family: system-ui, -apple-system, sans-serif;
     }
     #game { display: block; width: 100%; height: 100%; position: fixed; inset: 0; z-index: 0; }
 
@@ -125,7 +125,7 @@
       display: flex; flex-direction: column; align-items: center; gap: 3px;
     }
     .radar-title { font-size: 9px; font-weight: 800; color: #94a3b8; letter-spacing: 0.5px; text-transform: uppercase; }
-    #minimap { background: #183348; border: 1px solid #475569; display: block; }
+    #minimap { background: #0b1d2c; border: 1px solid #475569; display: block; }
     .coord-pill {
       width: 100%; text-align: center; font-weight: 800;
       background: rgba(2, 8, 14, 0.85); color: #f8fafc;
@@ -648,8 +648,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v56';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v56';
+const USERS_STORAGE_KEY = 'pirate3d_users_v57';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v57';
 let authMode = 'login';
 let currentUser = null;
 
@@ -755,25 +755,37 @@ let lastClockTime = performance.now();
 let lastRegenTime = performance.now();
 let gltfLoader;
 
-// Harici dosyalara takılmayan, hatasız ve kusursuz turkuaz okyanus dokusu üreticisi
-function createRobustOceanTexture() {
+// SEAFİGHT TARZI: Göz yormayan, kare çizgileri ve doku tekrarlarını tamamen gizleyen pürüzsüz koyu deniz dokusu
+function createSeamlessDarkOceanTexture() {
   const canvas = document.createElement('canvas');
-  canvas.width = 512; canvas.height = 512;
+  canvas.width = 1024; canvas.height = 1024;
   const ctx = canvas.getContext('2d');
 
-  const grad = ctx.createLinearGradient(0, 0, 0, 512);
-  grad.addColorStop(0, '#0ea5e9');
-  grad.addColorStop(0.5, '#0284c7');
-  grad.addColorStop(1, '#0369a1');
+  // Derin ve zengin koyu deniz tonu gradyanı
+  const grad = ctx.createLinearGradient(0, 0, 0, 1024);
+  grad.addColorStop(0, '#071f30');
+  grad.addColorStop(0.5, '#04131f');
+  grad.addColorStop(1, '#020b12');
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 512, 512);
+  ctx.fillRect(0, 0, 1024, 1024);
 
-  // Hafif dalga / parlaklık dokusu
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
-  for (let i = 0; i < 300; i++) {
-    const x = Math.random() * 512;
-    const y = Math.random() * 512;
-    const r = Math.random() * 30 + 10;
+  // Göz yormayan, son derece yumuşak ve organik su altı ışık dalgaları (Perlin noise benzeri yumuşak öbekler)
+  ctx.fillStyle = 'rgba(14, 116, 144, 0.08)';
+  for (let i = 0; i < 400; i++) {
+    const x = Math.random() * 1024;
+    const y = Math.random() * 1024;
+    const r = Math.random() * 80 + 30;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Hafif köpük / yansıma tozları
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.025)';
+  for (let i = 0; i < 600; i++) {
+    const x = Math.random() * 1024;
+    const y = Math.random() * 1024;
+    const r = Math.random() * 3 + 1;
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
     ctx.fill();
@@ -782,7 +794,8 @@ function createRobustOceanTexture() {
   const texture = new THREE.CanvasTexture(canvas);
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(30, 30);
+  // Tekrar oranını artırıp blend ederek kare çizgilerin görünmesini tamamen engelliyoruz
+  texture.repeat.set(40, 40);
   return texture;
 }
 
@@ -882,8 +895,8 @@ function buildCastleIsland() {
 
 function initThreeGame() {
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x072236);
-  scene.fog = new THREE.FogExp2(0x072236, 0.00004);
+  scene.background = new THREE.Color(0x030f1a);
+  scene.fog = new THREE.FogExp2(0x030f1a, 0.00005);
 
   camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 50000);
   camera.position.set(0, CAMERA_HEIGHT, CAMERA_DEPTH);
@@ -896,20 +909,20 @@ function initThreeGame() {
 
   gltfLoader = new THREE.GLTFLoader();
 
-  const ambientLight = new THREE.AmbientLight(0xe0f2fe, 1.0);
+  const ambientLight = new THREE.AmbientLight(0x93c5fd, 0.85);
   scene.add(ambientLight);
 
-  const sunLight = new THREE.DirectionalLight(0xffedd5, 1.9);
+  const sunLight = new THREE.DirectionalLight(0xfef08a, 1.4);
   sunLight.position.set(2000, 3000, 1500);
   scene.add(sunLight);
 
-  const oceanTexture = createRobustOceanTexture();
+  const oceanTexture = createSeamlessDarkOceanTexture();
 
-  planeGeo = new THREE.PlaneGeometry(WORLD_SIZE * 2, WORLD_SIZE * 2, 32, 32);
+  planeGeo = new THREE.PlaneGeometry(WORLD_SIZE * 2, WORLD_SIZE * 2, 64, 64);
   const oceanMat = new THREE.MeshStandardMaterial({
     map: oceanTexture,
-    roughness: 0.2,
-    metalness: 0.35
+    roughness: 0.25,
+    metalness: 0.4
   });
   const ocean = new THREE.Mesh(planeGeo, oceanMat);
   ocean.rotation.x = -Math.PI / 2;
@@ -1638,7 +1651,7 @@ function animate3D() {
 function drawMinimap() {
   const w = miniCanvas.width, h = miniCanvas.height;
   mctx.clearRect(0, 0, w, h);
-  mctx.fillStyle = '#143048';
+  mctx.fillStyle = '#06131f';
   mctx.fillRect(0, 0, w, h);
 
   mctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
