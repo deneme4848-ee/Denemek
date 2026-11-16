@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Tam Kod Düzeltmesi</title>
+  <title>Korsan Dünyası - Çarpışma Kaldırıldı</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -829,6 +829,7 @@ function createBorderFrame() {
   scene.add(borderFrameMesh);
 }
 
+// ADA ÇARPIŞMASI KALDIRILDI - KULELER KULE.GLB DOSYASINDAN YÜKLENİYOR
 function buildCastleIsland() {
   castleGroup = new THREE.Group();
   castleGroup.position.set(0, 0, -2200);
@@ -877,6 +878,7 @@ function buildCastleIsland() {
     const tz = Math.sin(angle) * radius;
     const towerId = 100 + i;
 
+    // Kule GLB modeli yükleniyor (Eğer kule.glb dosyası yoksa konsola uyarı yazar, artık silindir yerine boş görünür)
     gltfLoader.load('kule.glb', (gltf) => {
       const towerModel = gltf.scene || gltf.scenes[0];
       const box = new THREE.Box3().setFromObject(towerModel);
@@ -904,13 +906,7 @@ function buildCastleIsland() {
       castleGroup.add(towerModel);
       castleTowerMeshes.push(towerModel);
     }, undefined, (err) => {
-      const fallbackGeo = new THREE.CylinderGeometry(25, 25, 65, 8);
-      const fallbackMat = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.5 });
-      const fallbackMesh = new THREE.Mesh(fallbackGeo, fallbackMat);
-      fallbackMesh.position.set(tx, 75, tz);
-      fallbackMesh.userData = { towerId: towerId, name: `Korsan Kulesi #${i+1}` };
-      castleGroup.add(fallbackMesh);
-      castleTowerMeshes.push(fallbackMesh);
+      console.warn("kule.glb yüklenemedi, dosya adını kontrol edin.");
     });
 
     castleTowers.push({
@@ -1368,31 +1364,9 @@ function animate3D() {
     player.speed = 0;
   }
 
-  let nextX = player.x + Math.cos(player.a) * player.speed * dt;
-  let nextZ = player.z + Math.sin(player.a) * player.speed * dt;
-
-  if (castleGroup) {
-    const castleWorldX = castleGroup.position.x;
-    const castleWorldZ = castleGroup.position.z;
-    const distToCastleCenter = Math.hypot(nextX - castleWorldX, nextZ - castleWorldZ);
-    const islandRadius = 380;
-
-    if (distToCastleCenter < islandRadius) {
-      const angleFromCenter = Math.atan2(nextZ - castleWorldZ, nextX - castleWorldX);
-      const gateAngle = Math.PI / 2;
-      const gateTolerance = 0.35;
-
-      if (Math.abs(angleFromCenter - gateAngle) > gateTolerance) {
-        nextX = player.x;
-        nextZ = player.z;
-        targetPos = null;
-        player.speed = 0;
-      }
-    }
-  }
-
-  player.x = nextX;
-  player.z = nextZ;
+  // Çarpışma kodu tamamen kaldırıldı; gemi adanın içine ve dilediği yere serbestçe girebilir
+  player.x += Math.cos(player.a) * player.speed * dt;
+  player.z += Math.sin(player.a) * player.speed * dt;
 
   const HALF_WORLD = WORLD_SIZE / 2;
   const HARD_LIMIT = HALF_WORLD - 120;
