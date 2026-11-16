@@ -1421,7 +1421,7 @@ function animate3D() {
     const waveRollZ = Math.cos(timeSec * 0.85) * 0.045;
     const speedPitchX = (player.speed / player.maxSpeed) * -0.05 + Math.sin(timeSec * 1.2) * 0.025;
 
-    activeGlbShip.position.set(player.x, SHIP_Y_POS + waveBobY - 12, player.z); // -12 değerini geminin durumuna göre artırıp azaltabilirsin
+    activeGlbShip.position.set(player.x, SHIP_Y_POS + waveBobY - 50, player.z); // -12 değerini geminin durumuna göre artırıp azaltabilirsin
     activeGlbShip.rotation.order = 'YXZ';
     activeGlbShip.rotation.y = -player.a + Math.PI / 2;
     activeGlbShip.rotation.x = speedPitchX;
