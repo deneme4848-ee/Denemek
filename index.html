@@ -726,6 +726,7 @@ const BASE_SHIP_HEIGHT = 85;
 const SHIP_Y_POS = 100;
 let castleTowerMeshes = [];
 
+// GERÇEKÇİ OKYANUS VE DALGA DOKULARI
 function createStaticOceanTextures() {
   const size = 1024;
   const colorCanvas = document.createElement('canvas');
@@ -733,18 +734,19 @@ function createStaticOceanTextures() {
   colorCanvas.height = size;
   const ctx = colorCanvas.getContext('2d');
 
-  const grad = ctx.createRadialGradient(size/2, size/2, 50, size/2, size/2, size/1.2);
-  grad.addColorStop(0, '#0c4a6e');
-  grad.addColorStop(0.5, '#07334d');
-  grad.addColorStop(1, '#042033');
+  const grad = ctx.createRadialGradient(size/2, size/2, 100, size/2, size/2, size/1.1);
+  grad.addColorStop(0, '#0284c7');
+  grad.addColorStop(0.4, '#0369a1');
+  grad.addColorStop(0.8, '#075985');
+  grad.addColorStop(1, '#0c4a6e');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, size, size);
 
-  for (let i = 0; i < 420; i++) {
+  for (let i = 0; i < 800; i++) {
     const cx = Math.random() * size;
     const cy = Math.random() * size;
-    const rx = 25 + Math.random() * 65;
-    const ry = 10 + Math.random() * 28;
+    const rx = 15 + Math.random() * 55;
+    const ry = 6 + Math.random() * 18;
     const rot = Math.random() * Math.PI;
 
     ctx.save();
@@ -752,8 +754,8 @@ function createStaticOceanTextures() {
     ctx.rotate(rot);
     ctx.beginPath();
     ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
-    ctx.strokeStyle = i % 2 === 0 ? 'rgba(56, 189, 248, 0.09)' : 'rgba(14, 165, 233, 0.07)';
-    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = i % 3 === 0 ? 'rgba(255, 255, 255, 0.14)' : 'rgba(56, 189, 248, 0.12)';
+    ctx.lineWidth = 1.8;
     ctx.stroke();
     ctx.restore();
   }
@@ -765,12 +767,12 @@ function createStaticOceanTextures() {
   bCtx.fillStyle = '#808080';
   bCtx.fillRect(0, 0, size, size);
 
-  for (let i = 0; i < 600; i++) {
+  for (let i = 0; i < 900; i++) {
     const x = Math.random() * size;
     const y = Math.random() * size;
-    const r = 15 + Math.random() * 45;
+    const r = 10 + Math.random() * 35;
     const bGrad = bCtx.createRadialGradient(x, y, 1, x, y, r);
-    bGrad.addColorStop(0, 'rgba(255,255,255,0.22)');
+    bGrad.addColorStop(0, 'rgba(255,255,255,0.35)');
     bGrad.addColorStop(1, 'rgba(128,128,128,0)');
     bCtx.fillStyle = bGrad;
     bCtx.beginPath();
@@ -781,12 +783,12 @@ function createStaticOceanTextures() {
   const mapTex = new THREE.CanvasTexture(colorCanvas);
   mapTex.wrapS = THREE.RepeatWrapping;
   mapTex.wrapT = THREE.RepeatWrapping;
-  mapTex.repeat.set(16, 16);
+  mapTex.repeat.set(12, 12);
 
   const bumpTex = new THREE.CanvasTexture(bumpCanvas);
   bumpTex.wrapS = THREE.RepeatWrapping;
   bumpTex.wrapT = THREE.RepeatWrapping;
-  bumpTex.repeat.set(16, 16);
+  bumpTex.repeat.set(12, 12);
 
   return { mapTex, bumpTex };
 }
@@ -970,7 +972,6 @@ function initThreeGame() {
   scene.background = new THREE.Color(0x052236);
   scene.fog = new THREE.FogExp2(0x052236, 0.0003);
 
-  // MASAÜSTÜNDE KAMERA İDEAL SEVİYEDE UZAKLAŞTIRILDI (MOBİL KORUNDU)
   const isDesktop = window.innerWidth > 768;
   const camHeight = isDesktop ? 920 : 920;
   const camDepth = isDesktop ? 720 : 680;
@@ -1002,9 +1003,9 @@ function initThreeGame() {
   const oceanMat = new THREE.MeshStandardMaterial({
     map: oceanTexture,
     bumpMap: oceanBumpTexture,
-    bumpScale: 4.5,
-    roughness: 0.18,
-    metalness: 0.45
+    bumpScale: 8.5,
+    roughness: 0.12,
+    metalness: 0.65
   });
   const ocean = new THREE.Mesh(planeGeo, oceanMat);
   ocean.rotation.x = -Math.PI / 2;
@@ -1043,7 +1044,6 @@ function initThreeGame() {
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
-  // DÜZELTİLMİŞ RAYCASTER TIKLAMA KOORDİNATLARI (BİLGİSAYAR & MOBİL UYUMLU)
   window.addEventListener('pointerdown', e => {
     if (
       e.target.closest('#top-vital-hud') ||
@@ -1497,7 +1497,6 @@ function animate3D() {
     playerLabelEl.style.transform = `translate(-50%, 0) translate(${xPx}px, ${yPx}px)`;
   }
 
-  // MASAÜSTÜNDE KAMERA TAKİP MESAFESİ UZAKLAŞTIRILDI
   const isDesktop = window.innerWidth > 768;
   const targetCamH = isDesktop ? 920 : 920;
   const targetCamD = isDesktop ? 720 : 680;
