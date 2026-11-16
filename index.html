@@ -64,7 +64,7 @@
       }
     }
 
-    /* HARİTA GEÇİŞ BUTONU (Üst Orta) */
+    /* HARİTA GEÇİŞ BUTONU */
     #map-transit-banner {
       display: none; position: fixed; top: 85px; left: 50%; transform: translateX(-50%);
       z-index: 12; background: linear-gradient(135deg, #b45309, #d97706);
@@ -240,7 +240,7 @@
       to { box-shadow: 0 0 22px rgba(239, 68, 68, 0.95); }
     }
 
-    /* HARİTALAR SEÇİM PANELİ (Görseldeki Stilde) */
+    /* HARİTALAR SEÇİM PANELİ */
     #maps-panel {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
       width: min(94vw, 520px); background: linear-gradient(160deg, #092238, #030c14);
@@ -371,7 +371,7 @@
 
   <div id="game"></div>
 
-  <!-- Harita Geçiş Butonu (Üst Orta) -->
+  <!-- Harita Geçiş Butonu -->
   <button id="map-transit-banner" type="button">Harita 2'ye Geç</button>
 
   <div id="player-label">
@@ -494,7 +494,7 @@
     <div class="auth-card">
       <div class="auth-brand">
         <h1>⚓ Korsan Dünyası</h1>
-        <p>15 Harita & Genişletilmiş Sınır Sistemi</p>
+        <p>15 Harita & Tam Genişletilmiş Okyanus</p>
       </div>
       <div class="auth-tabs">
         <button id="tab-login" class="auth-tab active" type="button">Giriş Yap</button>
@@ -621,8 +621,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v48';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v48';
+const USERS_STORAGE_KEY = 'pirate3d_users_v49';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v49';
 let authMode = 'login';
 let currentUser = null;
 
@@ -695,7 +695,9 @@ let activeProjectiles = [], particleSystems = [], cannonEffects = [];
 let raycaster, planeGeo, mouse;
 let gltfLoader;
 let selectedRingMesh = null;
-const WORLD_SIZE = 1200;
+
+// DÜNYA BOYUTU GENİŞLETİLDİ (Tam görüş ve uçsuz bucaksız deniz için)
+const WORLD_SIZE = 2400; 
 const ATTACK_RANGE = 280;
 const CASTLE_AGGRO_RANGE = 330;
 const SHIP_Y_POS = 100;
@@ -772,18 +774,18 @@ function createStaticOceanTextures() {
 
   const mapTex = new THREE.CanvasTexture(colorCanvas);
   mapTex.wrapS = THREE.RepeatWrapping; mapTex.wrapT = THREE.RepeatWrapping;
-  mapTex.repeat.set(12, 12);
+  mapTex.repeat.set(16, 16);
 
   const bumpTex = new THREE.CanvasTexture(bumpCanvas);
   bumpTex.wrapS = THREE.RepeatWrapping; bumpTex.wrapT = THREE.RepeatWrapping;
-  bumpTex.repeat.set(12, 12);
+  bumpTex.repeat.set(16, 16);
 
   return { mapTex, bumpTex };
 }
 
 function buildCastleIsland() {
   castleGroup = new THREE.Group();
-  castleGroup.position.set(0, 0, -350);
+  castleGroup.position.set(0, 0, -500);
 
   const islandGeo = new THREE.CylinderGeometry(150, 170, 32, 36);
   const islandMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.85, metalness: 0.1 });
@@ -861,13 +863,14 @@ function buildCastleIsland() {
 function initThreeGame() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x052236);
-  scene.fog = new THREE.FogExp2(0x052236, 0.0003);
+  scene.fog = new THREE.FogExp2(0x052236, 0.00018); // Sis mesafesi genişletildi
 
+  // Geniş görüş açısı için kamera mesafesi artırıldı
   const isDesktop = window.innerWidth > 768;
-  const camHeight = isDesktop ? 920 : 920;
-  const camDepth = isDesktop ? 720 : 680;
+  const camHeight = isDesktop ? 1250 : 1250;
+  const camDepth = isDesktop ? 950 : 900;
 
-  camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 1, 18000);
+  camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 30000);
   camera.position.set(0, camHeight, camDepth);
   camera.lookAt(0, 0, 0);
 
@@ -882,7 +885,7 @@ function initThreeGame() {
   scene.add(ambientLight);
 
   const sunLight = new THREE.DirectionalLight(0xffedd5, 1.8);
-  sunLight.position.set(500, 850, 400);
+  sunLight.position.set(800, 1200, 600);
   scene.add(sunLight);
 
   const oceanTexData = createStaticOceanTextures();
@@ -1025,7 +1028,7 @@ function startGameLogic() {
   gameOverEl.style.display = 'none';
 
   player = {
-    x: 0, z: 0, a: -Math.PI / 2, speed: 0, maxSpeed: 110,
+    x: 0, z: 0, a: -Math.PI / 2, speed: 0, maxSpeed: 120,
     hp: 1000000, maxHp: 1000000, score: 100000000,
     level: 1, exp: 0, maxExp: 100,
     selectedAmmo: 'iron',
@@ -1049,8 +1052,7 @@ function changeMap(mapIdx, entrySide = 'center') {
   targetPos = null;
   hideTransitButton();
 
-  // Doğum konumu (Kapıdan geçiş mantığı, 0 merkezli simetrik)
-  const BOUND = (WORLD_SIZE / 2) - 100;
+  const BOUND = (WORLD_SIZE / 2) - 120;
   if (entrySide === 'left') {
     player.x = BOUND;
   } else if (entrySide === 'right') {
@@ -1060,7 +1062,7 @@ function changeMap(mapIdx, entrySide = 'center') {
   } else if (entrySide === 'bottom') {
     player.z = -BOUND;
   } else {
-    player.x = 0; player.z = 0; // Merkez (0,0)
+    player.x = 0; player.z = 0;
   }
 
   document.querySelectorAll('.enemy-label').forEach(el => el.remove());
@@ -1098,9 +1100,9 @@ mapTransitBanner.addEventListener('click', () => {
 function spawnEnemyGlb(id) {
   let ex, ez;
   do {
-    ex = (Math.random() - 0.5) * 800;
-    ez = (Math.random() - 0.5) * 600;
-  } while (Math.hypot(ex, ez) < 200);
+    ex = (Math.random() - 0.5) * 1400;
+    ez = (Math.random() - 0.5) * 1000;
+  } while (Math.hypot(ex, ez) < 250);
 
   const labelEl = document.createElement('div');
   labelEl.className = 'enemy-label';
@@ -1301,28 +1303,25 @@ function animate3D() {
   player.x += Math.cos(player.a) * player.speed * dt;
   player.z += Math.sin(player.a) * player.speed * dt;
 
-  // DÜNYA SINIRLARI VE ERİŞİLEBİLİRLİK (0 dahil tüm eksenler serbest, kenarlarda genişletilmiş geçiş eşiği)
-  const HALF_WORLD = WORLD_SIZE / 2; // 600
-  const HARD_LIMIT = HALF_WORLD - 30; // Geminin dışarı taşmasını engelleyen mutlak fizik sınırı (-570 ile +570 arası tam serbest, 0 dahil)
-  const TRIGGER_THRESHOLD = HALF_WORLD - 140; // Butonun çıkacağı daha konforlu/geniş eşik
+  // DÜNYA SINIRLARI TAMAMEN GENİŞLETİLDİ (Uçsuz bucaksız deniz ve 0 koordinatı dahil tam özgürlük)
+  const HALF_WORLD = WORLD_SIZE / 2; // 1200
+  const HARD_LIMIT = HALF_WORLD - 50; // Kenara kadar tam gidiş izni
+  const TRIGGER_THRESHOLD = HALF_WORLD - 220; // Harita geçiş butonu için geniş ve konforlu eşik
 
   const curMeta = MAP_DATA[currentMapIndex];
   let nearEdge = false;
 
-  // Koordinatları mutlak sınırda tut (0 dahil her yere gidebilir)
   if (player.x > HARD_LIMIT) player.x = HARD_LIMIT;
   if (player.x < -HARD_LIMIT) player.x = -HARD_LIMIT;
   if (player.z > HARD_LIMIT) player.z = HARD_LIMIT;
   if (player.z < -HARD_LIMIT) player.z = -HARD_LIMIT;
 
-  // Sağ Kenar Eşiği
   if (player.x > TRIGGER_THRESHOLD) {
     if (curMeta.col < 4) {
       showTransitButton(currentMapIndex + 1, 'right');
       nearEdge = true;
     }
   }
-  // Sol Kenar Eşiği
   else if (player.x < -TRIGGER_THRESHOLD) {
     if (curMeta.col > 0) {
       showTransitButton(currentMapIndex - 1, 'left');
@@ -1335,14 +1334,12 @@ function animate3D() {
       }
     }
   }
-  // Alt Kenar Eşiği
   else if (player.z > TRIGGER_THRESHOLD) {
     if (curMeta.row < 2) {
       showTransitButton(currentMapIndex + 5, 'bottom');
       nearEdge = true;
     }
   }
-  // Üst Kenar Eşiği
   else if (player.z < -TRIGGER_THRESHOLD) {
     if (curMeta.row > 0) {
       showTransitButton(currentMapIndex - 5, 'top');
@@ -1360,7 +1357,6 @@ function animate3D() {
     hideTransitButton();
   }
 
-  // Koordinat gösterimi (0 merkezli ölçekli)
   coordDisplayEl.textContent = `X: ${Math.round((player.x / HALF_WORLD) * 100)} · Y: ${Math.round((player.z / HALF_WORLD) * 100)}`;
   
   if (activeGlbShip) {
@@ -1414,8 +1410,8 @@ function animate3D() {
 
   const isDesktop = window.innerWidth > 768;
   camera.position.x += (player.x - camera.position.x) * (4.5 * dt);
-  camera.position.y += ((isDesktop ? 920 : 920) - camera.position.y) * (4.5 * dt);
-  camera.position.z += (player.z + (isDesktop ? 720 : 680) - camera.position.z) * (4.5 * dt);
+  camera.position.y += ((isDesktop ? 1250 : 1250) - camera.position.y) * (4.5 * dt);
+  camera.position.z += (player.z + (isDesktop ? 950 : 900) - camera.position.z) * (4.5 * dt);
   camera.lookAt(player.x, 0, player.z);
 
   if (castleGroup) {
@@ -1627,7 +1623,7 @@ function drawMinimap() {
 
   mctx.fillStyle = '#475569';
   mctx.beginPath();
-  mctx.arc(cx + 0, cy + (-350 * scale), 22 * scale, 0, Math.PI * 2);
+  mctx.arc(cx + 0, cy + (-500 * scale), 22 * scale, 0, Math.PI * 2);
   mctx.fill();
 
   mctx.fillStyle = '#dc2626';
@@ -1664,7 +1660,6 @@ function updateHUD() {
   });
 }
 
-// HARİTALAR SEÇİM PANELİ KONTROLLERİ
 function toggleMapsPanel() {
   mapsPanel.classList.toggle('open');
   if (mapsPanel.classList.contains('open')) {
@@ -1690,7 +1685,6 @@ function renderMapsGrid() {
   });
 }
 
-// LİMAN PANELİ KONTROLLERİ
 function togglePortPanel() {
   marketPanel.classList.toggle('open');
   if (marketPanel.classList.contains('open') && sectionShipyard.classList.contains('active')) {
