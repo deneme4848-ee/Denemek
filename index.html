@@ -3,16 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Gerçekçi Turkuaz Deniz Kaplaması</title>
+  <title>Korsan Dünyası - Kusursuz Deniz Görünümü</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
       margin: 0; width: 100%; height: 100%; overflow: hidden;
-      background: #061c2c; color: #fff; font-family: system-ui, -apple-system, sans-serif;
+      background: #0284c7; color: #fff; font-family: system-ui, -apple-system, sans-serif;
     }
     #game { display: block; width: 100%; height: 100%; position: fixed; inset: 0; z-index: 0; }
 
-    /* BİLGİSAYAR / BÜYÜK EKRAN İÇİN BÜYÜTÜLMÜŞ ÖLÇEKLENDİRME */
     @media (min-width: 1024px) {
       body { zoom: 1.0; }
       #top-vital-hud {
@@ -41,26 +40,21 @@
         width: auto; display: flex; flex-direction: row; align-items: flex-end; gap: 20px;
         z-index: 6; pointer-events: none;
       }
-      /* BİLGİSAYAR İÇİN MİNİMAP BÜYÜTME */
       .radar-card { padding: 6px !important; border-radius: 14px !important; }
       #minimap { width: 110px !important; height: 110px !important; border-radius: 8px !important; }
       .coord-pill { font-size: 11px !important; padding: 3px 6px !important; }
       .radar-title { font-size: 10px !important; margin-bottom: 2px; }
-      /* BİLGİSAYAR İÇİN BUTONLAR BÜYÜTME */
       .tool-icon-btn { width: 50px !important; height: 50px !important; border-radius: 12px !important; }
       .tool-icon-btn span.ico { font-size: 20px !important; }
       .tool-icon-btn span.lbl { font-size: 8px !important; }
-      /* GÜLLE SLOTLARI BÜYÜTME */
       .ammo-slot { width: 62px !important; height: 66px !important; border-radius: 12px !important; }
       .ammo-slot .ammo-ico { font-size: 24px !important; }
       .ammo-slot .ammo-qty { font-size: 12px !important; }
       .ammo-slot .key-hint { font-size: 10px !important; top: 3px !important; left: 5px !important; }
-      /* ATEŞ ET BUTONU BÜYÜTME */
       #attack-btn { width: 90px !important; height: 90px !important; font-size: 13px !important; }
       #attack-btn .crosshair { font-size: 26px !important; }
     }
 
-    /* MOBİL İÇİN KOMPAKT ÖLÇEKLENDİRME */
     @media (max-width: 1023px) {
       #top-vital-hud {
         position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
@@ -270,7 +264,6 @@
       to { box-shadow: 0 0 22px rgba(239, 68, 68, 0.95); }
     }
 
-    /* HARİTALAR SEÇİM PANELİ */
     #maps-panel {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
       width: min(94vw, 520px); background: linear-gradient(160deg, #092238, #030c14);
@@ -300,7 +293,6 @@
     .map-box .m-name { font-size: 8px; font-weight: 800; color: #cbd5e1; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
     .map-box .m-lvl { font-size: 7px; color: #94a3b8; margin-top: 1px; }
 
-    /* MODERN LİMAN PANELİ */
     #market-panel {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
       width: min(94vw, 560px); max-height: 85vh; background: linear-gradient(160deg, #091c2b, #030a11);
@@ -400,7 +392,6 @@
 
   <div id="game"></div>
 
-  <!-- Harita Geçiş Butonu -->
   <button id="map-transit-banner" type="button">Harita Değiştir</button>
 
   <div id="player-label">
@@ -467,7 +458,6 @@
     </div>
   </div>
 
-  <!-- Haritalar Seçim Paneli (15 Harita) -->
   <div id="maps-panel">
     <div class="maps-header">
       <strong id="maps-panel-title">🗺️ Harita Seçimi</strong>
@@ -476,7 +466,6 @@
     <div class="maps-grid" id="maps-grid-container"></div>
   </div>
 
-  <!-- Modern Liman Paneli -->
   <div id="market-panel">
     <div class="market-panel-inner">
       <div class="market-header">
@@ -659,8 +648,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v55';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v55';
+const USERS_STORAGE_KEY = 'pirate3d_users_v56';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v56';
 let authMode = 'login';
 let currentUser = null;
 
@@ -766,35 +755,34 @@ let lastClockTime = performance.now();
 let lastRegenTime = performance.now();
 let gltfLoader;
 
-// ATTIĞIN GERÇEK TURKUAZ DENİZ GÖRSELİNİN OYUNA SENKRONİZE EDİLMİŞ DOKUSU
-function createRealisticOceanTextureFromImage() {
-  const img = new Image();
-  img.crossOrigin = "anonymous";
-  
+// Harici dosyalara takılmayan, hatasız ve kusursuz turkuaz okyanus dokusu üreticisi
+function createRobustOceanTexture() {
   const canvas = document.createElement('canvas');
-  canvas.width = 1024; canvas.height = 1024;
+  canvas.width = 512; canvas.height = 512;
   const ctx = canvas.getContext('2d');
 
-  // Varsayılan turkuaz okyanus gradyanı (resim yüklenene kadar anlık görünüm için)
-  const grad = ctx.createLinearGradient(0, 0, 0, 1024);
+  const grad = ctx.createLinearGradient(0, 0, 0, 512);
   grad.addColorStop(0, '#0ea5e9');
   grad.addColorStop(0.5, '#0284c7');
   grad.addColorStop(1, '#0369a1');
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 1024, 1024);
+  ctx.fillRect(0, 0, 512, 512);
+
+  // Hafif dalga / parlaklık dokusu
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
+  for (let i = 0; i < 300; i++) {
+    const x = Math.random() * 512;
+    const y = Math.random() * 512;
+    const r = Math.random() * 30 + 10;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(12, 12);
-
-  img.onload = () => {
-    ctx.drawImage(img, 0, 0, 1024, 1024);
-    texture.needsUpdate = true;
-  };
-  // Attığın görselin doğrudan web URL kaynağı
-  img.src = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1024&q=80';
-
+  texture.repeat.set(30, 30);
   return texture;
 }
 
@@ -915,7 +903,7 @@ function initThreeGame() {
   sunLight.position.set(2000, 3000, 1500);
   scene.add(sunLight);
 
-  const oceanTexture = createRealisticOceanTextureFromImage();
+  const oceanTexture = createRobustOceanTexture();
 
   planeGeo = new THREE.PlaneGeometry(WORLD_SIZE * 2, WORLD_SIZE * 2, 32, 32);
   const oceanMat = new THREE.MeshStandardMaterial({
