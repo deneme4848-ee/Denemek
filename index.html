@@ -3,14 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Açık Deniz & Mobil Yatay Uyumlu</title>
+  <title>Korsan Dünyası - Serbest Kamera & Gemi Odaklama</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
       margin: 0; width: 100%; height: 100%; overflow: hidden;
       background: #031422; color: #fff; font-family: system-ui, -apple-system, sans-serif;
     }
-    #game { display: block; width: 100%; height: 100%; position: fixed; inset: 0; z-index: 0; }
+    #game { display: block; width: 100%; height: 100%; position: fixed; inset: 0; z-index: 0; cursor: grab; }
+    #game:active { cursor: grabbing; }
 
     /* Masaüstü ve Geniş Ekranlar */
     @media (min-width: 1024px) {
@@ -70,7 +71,7 @@
       #attack-btn { width: 72px; height: 72px; font-size: 11px; }
     }
 
-    /* Mobil Yatay (Landscape) Ekranlar - Özel Düzen */
+    /* Mobil Yatay (Landscape) Ekranlar */
     @media (max-width: 1023px) and (orientation: landscape) {
       #top-vital-hud {
         position: fixed; top: 6px; left: 50%; transform: translateX(-50%);
@@ -92,7 +93,7 @@
       .side-tool-col { flex-direction: row !important; gap: 4px !important; margin-top: 2px; }
       .tool-icon-btn { width: 32px !important; height: 32px !important; border-radius: 6px !important; }
       .tool-icon-btn span.ico { font-size: 14px !important; }
-      .tool-icon-btn span.lbl { display: none; } /* Yatay alanda yerden kazanmak için etiketleri gizle */
+      .tool-icon-btn span.lbl { display: none; }
 
       #bottom-dock {
         position: fixed; bottom: 8px; left: 10px; right: 10px;
@@ -431,6 +432,10 @@
       <div class="coord-pill" id="coord-display">X: 0 · Y: 0</div>
     </div>
     <div class="side-tool-col">
+      <button id="focus-player-btn" class="tool-icon-btn" type="button" title="Gemiye Dön (Q)">
+        <span class="ico">🎯</span>
+        <span class="lbl">Q</span>
+      </button>
       <button id="maps-toggle-btn" class="tool-icon-btn" type="button" title="Haritalar">
         <span class="ico">🗺️</span>
         <span class="lbl">Haritalar</span>
@@ -608,6 +613,7 @@ const restartBtn = document.querySelector('#restart-btn');
 const logoutBtn = document.querySelector('#logout-btn');
 
 const mapsToggleBtn = document.querySelector('#maps-toggle-btn');
+const focusPlayerBtn = document.querySelector('#focus-player-btn');
 const mapsPanel = document.querySelector('#maps-panel');
 const mapsCloseBtn = document.querySelector('#maps-close-btn');
 const mapsGridContainer = document.querySelector('#maps-grid-container');
@@ -766,6 +772,11 @@ let raycaster, planeGeo, mouse;
 let selectedRingMesh = null;
 let borderFrameMesh = null;
 let activeShipyardPreviews = [];
+
+// Kamera serbest gezinme / sürükleme değişkenleri
+let cameraLookOffset = { x: 0, z: 0 };
+let isDraggingCamera = false;
+let previousMousePosition = { x: 0, y: 0 };
 
 const WORLD_SIZE = 9900; 
 const ATTACK_RANGE = 300;
@@ -968,45 +979,59 @@ function initThreeGame() {
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
-  window.addEventListener('pointerdown', e => {
-    if (
-      e.target.closest('#top-vital-hud') ||
-      e.target.closest('#top-left-hud') ||
-      e.target.closest('#bottom-dock') ||
-      e.target.closest('#market-panel') ||
-      e.target.closest('#maps-panel') ||
-      e.target.closest('#map-transit-banner') ||
-      e.target.closest('#auth-overlay')
-    ) return;
+  const gameCanvasEl = document.getElementById('game');
 
-    const rect = renderer.domElement.getBoundingClientRect();
-    const clientX = e.clientX - rect.left;
-    const clientY = e.clientY - rect.top;
+  gameCanvasEl.addEventListener('pointerdown', e => {
+    isDraggingCamera = true;
+    previousMousePosition = { x: e.clientX, y: e.clientY };
+  });
 
-    mouse.x = (clientX / rect.width) * 2 - 1;
-    mouse.y = -(clientY / rect.height) * 2 + 1;
-    
-    raycaster.setFromCamera(mouse, camera);
+  window.addEventListener('pointermove', e => {
+    if (!isDraggingCamera) return;
+    const deltaX = e.clientX - previousMousePosition.x;
+    const deltaY = e.clientY - previousMousePosition.y;
+    previousMousePosition = { x: e.clientX, y: e.clientY };
 
-    const enemyObjects = enemies.map(en => en.mesh).filter(Boolean);
-    const intersectsEnemies = raycaster.intersectObjects(enemyObjects, true);
-    if (intersectsEnemies.length > 0) {
-      let rootObj = intersectsEnemies[0].object;
-      while (rootObj.parent && !rootObj.userData.enemyId) {
-        rootObj = rootObj.parent;
+    // Kamerayı sürükleme yönüne göre kaydır
+    cameraLookOffset.x -= deltaX * 1.8;
+    cameraLookOffset.z -= deltaY * 1.8;
+  });
+
+  window.addEventListener('pointerup', e => {
+    if (!isDraggingCamera) return;
+    isDraggingCamera = false;
+
+    // Eğer çok az hareket ettirildiyse (tıklama ise), gemi hareketi veya düşman seçimi yapalım
+    const totalMove = Math.hypot(e.clientX - previousMousePosition.x, e.clientY - previousMousePosition.y);
+    if (totalMove < 5) {
+      const rect = renderer.domElement.getBoundingClientRect();
+      const clientX = e.clientX - rect.left;
+      const clientY = e.clientY - rect.top;
+
+      mouse.x = (clientX / rect.width) * 2 - 1;
+      mouse.y = -(clientY / rect.height) * 2 + 1;
+      
+      raycaster.setFromCamera(mouse, camera);
+
+      const enemyObjects = enemies.map(en => en.mesh).filter(Boolean);
+      const intersectsEnemies = raycaster.intersectObjects(enemyObjects, true);
+      if (intersectsEnemies.length > 0) {
+        let rootObj = intersectsEnemies[0].object;
+        while (rootObj.parent && !rootObj.userData.enemyId) {
+          rootObj = rootObj.parent;
+        }
+        if (rootObj.userData.enemyId) {
+          selectedEnemyId = rootObj.userData.enemyId;
+          updateTargetCard();
+          syncAttackButton();
+          return;
+        }
       }
-      if (rootObj.userData.enemyId) {
-        selectedEnemyId = rootObj.userData.enemyId;
-        updateTargetCard();
-        syncAttackButton();
-        return;
-      }
-    }
 
-    const oceanIntersect = raycaster.intersectObject(ocean);
-    if (oceanIntersect.length > 0) {
-      const dest = { x: oceanIntersect[0].point.x, z: oceanIntersect[0].point.z };
-      targetDestination = dest;
+      const oceanIntersect = raycaster.intersectObject(ocean);
+      if (oceanIntersect.length > 0) {
+        targetDestination = { x: oceanIntersect[0].point.x, z: oceanIntersect[0].point.z };
+      }
     }
   });
 
@@ -1043,6 +1068,7 @@ function setupPlayerShipVisual() {
 
 function startGameLogic() {
   isGameOver = false; targetDestination = null; selectedEnemyId = null; isAttacking = false;
+  cameraLookOffset = { x: 0, z: 0 };
   gameOverEl.style.display = 'none';
 
   player = {
@@ -1070,6 +1096,7 @@ function changeMap(mapIdx, entrySide = 'center') {
   currentMapIndex = mapIdx;
   radarTitleEl.textContent = MAP_DATA[mapIdx].name;
   targetDestination = null;
+  cameraLookOffset = { x: 0, z: 0 };
   hideTransitButton();
 
   const BOUND = (WORLD_SIZE / 2) - 350;
@@ -1172,6 +1199,13 @@ function selectAmmoSlot(type) {
 
 ammoSlots.forEach(slot => { slot.addEventListener('click', () => selectAmmoSlot(slot.dataset.type)); });
 
+function resetCameraToPlayer() {
+  cameraLookOffset.x = 0;
+  cameraLookOffset.z = 0;
+}
+
+if (focusPlayerBtn) focusPlayerBtn.addEventListener('click', resetCameraToPlayer);
+
 window.addEventListener('keydown', e => {
   if (e.key === '1') selectAmmoSlot('iron');
   if (e.key === '2') selectAmmoSlot('chain');
@@ -1179,6 +1213,7 @@ window.addEventListener('keydown', e => {
   if (e.key === '4') selectAmmoSlot('dragon');
   if (e.key.toLowerCase() === 'm') togglePortPanel();
   if (e.key.toLowerCase() === 'h') toggleMapsPanel();
+  if (e.key.toLowerCase() === 'q') resetCameraToPlayer();
 });
 
 function updateTargetCard() {
@@ -1394,10 +1429,13 @@ function animate3D() {
     playerLabelEl.style.transform = `translate(-50%, 0) translate(${(tempVector.x * .5 + .5) * window.innerWidth}px, ${(tempVector.y * -.5 + .5) * window.innerHeight + 38}px)`;
   }
 
-  camera.position.x += (player.x - camera.position.x) * (6.0 * dt);
+  const targetCamX = player.x + cameraLookOffset.x;
+  const targetCamZ = player.z + CAMERA_DEPTH + cameraLookOffset.z;
+
+  camera.position.x += (targetCamX - camera.position.x) * (6.0 * dt);
   camera.position.y += (CAMERA_HEIGHT - camera.position.y) * (6.0 * dt);
-  camera.position.z += (player.z + CAMERA_DEPTH - camera.position.z) * (6.0 * dt);
-  camera.lookAt(player.x, 0, player.z);
+  camera.position.z += (targetCamZ - camera.position.z) * (6.0 * dt);
+  camera.lookAt(player.x + cameraLookOffset.x, 0, player.z + cameraLookOffset.z);
 
   for (let i = cannonEffects.length - 1; i >= 0; i--) {
     const ce = cannonEffects[i];
@@ -1785,7 +1823,7 @@ function renderShipyardList() {
       if (player.score < cost) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Yetersiz hazine (altın)!'; return; }
       player.score -= cost;
       
-      The users = loadUsers();
+      const users = loadUsers();
       const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
       if (uIdx !== -1) {
         if (!users[uIdx].ownedShips) users[uIdx].ownedShips = ['standard'];
