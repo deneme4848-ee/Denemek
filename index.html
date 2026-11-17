@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Kapı Geçişli Ada Navigasyonu</title>
+  <title>Korsan Dünyası - Kesin Surlardan Kaçınma & Kapı Navigasyonu</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -652,8 +652,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v69';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v69';
+const USERS_STORAGE_KEY = 'pirate3d_users_v70';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v70';
 let authMode = 'login';
 let currentUser = null;
 
@@ -918,7 +918,6 @@ function buildCastleIsland() {
     towerPositions.push({ x: posX, z: posZ, index: i });
   }
 
-  // Kapının tam orta noktasını hesapla (6 ve 7 numaralı kulelerin arası)
   const gateP1 = towerPositions[gateStartIndex];
   const gateP2 = towerPositions[gateEndIndex];
   castleGateCenter = { x: (gateP1.x + gateP2.x) / 2, z: (gateP1.z + gateP2.z) / 2 };
@@ -1125,7 +1124,7 @@ function initThreeGame() {
     if (oceanIntersect.length > 0) {
       const dest = { x: oceanIntersect[0].point.x, z: oceanIntersect[0].point.z };
       
-      // Kapı Geçişli Rota Hesaplayıcı (Engelden Kaçma)
+      // Kusursuz Surlardan Kaçınma ve Kapı Navigasyon Rota Hesaplayıcısı
       navigationQueue = calculateGatePath({ x: player.x, z: player.z }, dest);
     }
   });
@@ -1143,35 +1142,75 @@ let lastPlayerAttackTime = 0;
 
 const ISLAND_RADIUS = 300;
 
-// Gemi içeriden dışarıya veya dışarıdan içeriye geçerken surlardan geçmesin, kapıdan (açıklıktan) dolaşsın
-function calculateGatePath(start, end) {
-  const startInside = Math.hypot(start.x, start.z) < ISLAND_RADIUS;
-  const endInside = Math.hypot(end.x, end.z) < ISLAND_RADIUS;
+// Gemi surların içinden geçemesin: Doğrudan çizgi çizmek yerine adanın sınırından (300 yarıçap) kesilip kesilmediğini kontrol eder.
+// Kesişiyorsa rotayı kapı açıklığına (waypoint) yönlendirir.
+function lineIntersectsIsland(p1, p2) {
+  // Başlangıç veya bitiş noktasından biri adanın içindeyse ve diğeri dışarıdaysa kesinlikle surlardan geçiyordur.
+  const d1 = Math.hypot(p1.x, p1.z);
+  const d2 = Math.hypot(p2.x, p2.z);
+  const inside1 = d1 < ISLAND_RADIUS - 5;
+  const inside2 = d2 < ISLAND_RADIUS - 5;
 
-  // Eğer ikisi de aynı taraftaysa (ikisi de içeride veya ikisi de dışarıda), düz git
-  if (startInside === endInside) {
-    return [end];
+  if (inside1 !== inside2) return true;
+
+  // İkisi de dışarıda ama aralarındaki en kısa mesafe adanın merkezine (0,0) çok yakınsa (yani hat adayı teğet geçip sur içinden kesiyorsa)
+  if (!inside1 && !inside2) {
+    const dx = p2.x - p1.x;
+    const dz = p2.z - p1.z;
+    const len = Math.hypot(dx, dz);
+    if (len === 0) return false;
+    const u = ((0 - p1.x) * dx + (0 - p1.z) * dz) / (len * len);
+    const clampedU = Math.max(0, Math.min(1, u));
+    const nearestX = p1.x + clampedU * dx;
+    const nearestZ = p1.z + clampedU * dz;
+    const distToCenter = Math.hypot(nearestX, nearestZ);
+    if (distToCenter < ISLAND_RADIUS - 5) return true;
   }
 
-  // Taraflar farklıysa (biri içeride biri dışarıda), kapıdan geçiş rotası oluştur
-  // Kapının dış tarafındaki güvenli nokta (kapı yönünde biraz dışarısı)
+  return false;
+}
+
+function calculateGatePath(start, end) {
+  const startInside = Math.hypot(start.x, start.z) < ISLAND_RADIUS - 5;
+  const endInside = Math.hypot(end.x, end.z) < ISLAND_RADIUS - 5;
+
   const gateAngle = Math.atan2(castleGateCenter.z, castleGateCenter.x);
   const gateOutside = {
-    x: Math.cos(gateAngle) * (ISLAND_RADIUS + 45),
-    z: Math.sin(gateAngle) * (ISLAND_RADIUS + 45)
+    x: Math.cos(gateAngle) * (ISLAND_RADIUS + 50),
+    z: Math.sin(gateAngle) * (ISLAND_RADIUS + 50)
   };
   const gateInside = {
-    x: castleGateCenter.x * 0.7,
-    z: castleGateCenter.z * 0.7
+    x: castleGateCenter.x * 0.65,
+    z: castleGateCenter.z * 0.65
   };
 
-  if (!startInside && endInside) {
-    // Dışarıdan içeriye: Önce kapı dışına, oradan kapı içine, oradan nihai hedefe
-    return [gateOutside, gateInside, end];
-  } else {
-    // İçeriden dışarıya: Önce kapı içine, oradan kapı dışına, oradan nihai hedefe
-    return [gateInside, gateOutside, end];
+  // 1. Durum: İçeriden Dışarıya veya Dışarıdan İçeriye (Taraflar farklı)
+  if (startInside !== endInside) {
+    if (!startInside && endInside) {
+      return [gateOutside, gateInside, end];
+    } else {
+      return [gateInside, gateOutside, end];
+    }
   }
+
+  // 2. Durum: İkisi de dışarıda veya ikisi de içeride ama düz hat surların içinden/üstünden geçiyor mu?
+  if (lineIntersectsIsland(start, end)) {
+    // Surları aşmak için rotayı kapı üzerinden büküyoruz
+    if (startInside) {
+      // İçeriden başka bir noktaya giderken surlara çarpacaksa önce kapı içine, sonra kapı dışına, oradan dışarıdaki dolambaçlı yoldan hedefe
+      const safeOuterDest = {
+        x: end.x + Math.cos(gateAngle) * 60,
+        z: end.z + Math.sin(gateAngle) * 60
+      };
+      return [gateInside, gateOutside, safeOuterDest, end];
+    } else {
+      // Dışarıdan başka bir dış noktaya giderken ada ortadan engelliyorsa kapı dışından dolaş
+      return [gateOutside, gateInside, gateOutside, end];
+    }
+  }
+
+  // Engel yoksa doğrudan git
+  return [end];
 }
 
 function setupPlayerShipVisual() {
@@ -1472,7 +1511,6 @@ function animate3D() {
     }
   }
 
-  // Kapı Geçişli Çok Noktalı Rota Takibi
   if (navigationQueue.length > 0) {
     const currentTarget = navigationQueue[0];
     const dx = currentTarget.x - player.x;
@@ -1494,7 +1532,6 @@ function animate3D() {
     player.speed = 0;
   }
 
-  // Tam hız ve serbest geçiş (Sürtünme yok, hız kaybı yok)
   player.x += Math.cos(player.a) * player.speed * dt;
   player.z += Math.sin(player.a) * player.speed * dt;
 
