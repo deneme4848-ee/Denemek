@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Serbest Kamera & Gemi Odaklama</title>
+  <title>Korsan Dünyası - Pürüzsüz Serbest Kamera</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -776,7 +776,8 @@ let activeShipyardPreviews = [];
 // Kamera serbest gezinme / sürükleme değişkenleri
 let cameraLookOffset = { x: 0, z: 0 };
 let isDraggingCamera = false;
-let previousMousePosition = { x: 0, y: 0 };
+let dragStartX = 0, dragStartY = 0;
+let hasDragged = false;
 
 const WORLD_SIZE = 9900; 
 const ATTACK_RANGE = 300;
@@ -983,27 +984,36 @@ function initThreeGame() {
 
   gameCanvasEl.addEventListener('pointerdown', e => {
     isDraggingCamera = true;
-    previousMousePosition = { x: e.clientX, y: e.clientY };
+    hasDragged = false;
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
   });
 
   window.addEventListener('pointermove', e => {
     if (!isDraggingCamera) return;
-    const deltaX = e.clientX - previousMousePosition.x;
-    const deltaY = e.clientY - previousMousePosition.y;
-    previousMousePosition = { x: e.clientX, y: e.clientY };
+    const deltaX = e.clientX - dragStartX;
+    const deltaY = e.clientY - dragStartY;
 
-    // Kamerayı sürükleme yönüne göre kaydır
-    cameraLookOffset.x -= deltaX * 1.8;
-    cameraLookOffset.z -= deltaY * 1.8;
+    if (Math.hypot(deltaX, deltaY) > 6) {
+      hasDragged = true;
+    }
+
+    if (hasDragged) {
+      // Kamerayı x ve z düzleminde pürüzsüz kaydır (zoom veya açı değişimi yok)
+      cameraLookOffset.x -= deltaX * 1.8;
+      cameraLookOffset.z -= deltaY * 1.8;
+
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+    }
   });
 
   window.addEventListener('pointerup', e => {
     if (!isDraggingCamera) return;
     isDraggingCamera = false;
 
-    // Eğer çok az hareket ettirildiyse (tıklama ise), gemi hareketi veya düşman seçimi yapalım
-    const totalMove = Math.hypot(e.clientX - previousMousePosition.x, e.clientY - previousMousePosition.y);
-    if (totalMove < 5) {
+    // Eğer hiç sürükleme yapılmadıysa (tek tık / dokunma) -> Düşman seçimi veya gemi rotası belirle
+    if (!hasDragged) {
       const rect = renderer.domElement.getBoundingClientRect();
       const clientX = e.clientX - rect.left;
       const clientY = e.clientY - rect.top;
@@ -1033,6 +1043,7 @@ function initThreeGame() {
         targetDestination = { x: oceanIntersect[0].point.x, z: oceanIntersect[0].point.z };
       }
     }
+    hasDragged = false;
   });
 
   lastClockTime = performance.now();
