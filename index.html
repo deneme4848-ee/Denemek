@@ -931,7 +931,7 @@ function buildCastleIsland() {
   // 2. Adım: Kuleleri yerleştir (İstediğin gibi sol kule -24'te biter, -25, -26, -27 boş kalır, sağ kule -28'den başlar)
   towerPositions.forEach((pos, i) => {
     const towerId = 100 + i;
-    const isGateOpening = (i >= 6 && i <= 8); // Kapı girişi olan boşluk
+    const isGateOpening = (i >= 4 && i <= 6); // Kapı girişi olan boşluk
 
     if (!isGateOpening) {
       // YEDEK (FALLBACK) SAVAŞÇI KULE GEOMETRİSİ
@@ -944,12 +944,12 @@ function buildCastleIsland() {
       castleTowerMeshes.push(fallbackTower);
 
       // KULE.GLB DOSYASINI YÜKLE VE LÜKS GÖRÜNÜME GETİR
-      gltfLoader.load('kule.glb', (gltf) => {
+      gltfLoader.load(modelPath: 'kule.glb', (gltf) => {
         const towerModel = gltf.scene || gltf.scenes[0];
         const box = new THREE.Box3().setFromObject(towerModel);
         const size = new THREE.Vector3();
         box.getSize(size);
-        let scaleFactor = 95 / Math.max(size.x, size.y, size.z); // Daha görkemli boyut
+        let scaleFactor = 120 / Math.max(size.x, size.y, size.z); // Daha görkemli boyut
         towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
         towerModel.position.set(pos.x, SHIP_Y_POS - 40, pos.z);
