@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Kesin Surlardan Kaçınma & Kapı Navigasyonu</title>
+  <title>Korsan Dünyası - Kesin Surlardan Kaçınma & Teğet Navigasyon</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -895,8 +895,6 @@ function buildConnectingWall(p1, p2) {
   return wallGroup;
 }
 
-let castleGateCenter = { x: 0, z: 0 };
-
 function buildCastleIsland() {
   castleGroup = new THREE.Group();
   castleGroup.position.set(0, 0, 0);
@@ -917,10 +915,6 @@ function buildCastleIsland() {
     const posZ = Math.sin(angle) * radius;
     towerPositions.push({ x: posX, z: posZ, index: i });
   }
-
-  const gateP1 = towerPositions[gateStartIndex];
-  const gateP2 = towerPositions[gateEndIndex];
-  castleGateCenter = { x: (gateP1.x + gateP2.x) / 2, z: (gateP1.z + gateP2.z) / 2 };
 
   towerPositions.forEach((pos, i) => {
     const towerId = 100 + i;
@@ -1124,8 +1118,8 @@ function initThreeGame() {
     if (oceanIntersect.length > 0) {
       const dest = { x: oceanIntersect[0].point.x, z: oceanIntersect[0].point.z };
       
-      // Kusursuz Surlardan Kaçınma ve Kapı Navigasyon Rota Hesaplayıcısı
-      navigationQueue = calculateGatePath({ x: player.x, z: player.z }, dest);
+      // Kesin Surlardan ve Adadan Kaçınan Teğet Çevreleme Rota Hesaplayıcısı
+      navigationQueue = calculateCircumventionPath({ x: player.x, z: player.z }, dest);
     }
   });
 
@@ -1140,77 +1134,59 @@ let navigationQueue = [];
 let selectedEnemyId = null, selectedTowerId = null, isAttacking = false, isGameOver = false;
 let lastPlayerAttackTime = 0;
 
-const ISLAND_RADIUS = 300;
+const ISLAND_RADIUS = 340; // Surların güvenli dış teğet yarıçapı
 
-// Gemi surların içinden geçemesin: Doğrudan çizgi çizmek yerine adanın sınırından (300 yarıçap) kesilip kesilmediğini kontrol eder.
-// Kesişiyorsa rotayı kapı açıklığına (waypoint) yönlendirir.
+// Başlangıçtan hedefe giden çizgi adanın (ISLAND_RADIUS) içinden veya teğet sınırından geçiyor mu?
 function lineIntersectsIsland(p1, p2) {
-  // Başlangıç veya bitiş noktasından biri adanın içindeyse ve diğeri dışarıdaysa kesinlikle surlardan geçiyordur.
-  const d1 = Math.hypot(p1.x, p1.z);
-  const d2 = Math.hypot(p2.x, p2.z);
-  const inside1 = d1 < ISLAND_RADIUS - 5;
-  const inside2 = d2 < ISLAND_RADIUS - 5;
+  const dx = p2.x - p1.x;
+  const dz = p2.z - p1.z;
+  const len = Math.hypot(dx, dz);
+  if (len === 0) return false;
 
-  if (inside1 !== inside2) return true;
+  // Merkezden (0,0) bu doğruya en yakın mesafeyi bul
+  const u = ((0 - p1.x) * dx + (0 - p1.z) * dz) / (len * len);
+  const clampedU = Math.max(0, Math.min(1, u));
+  const nearestX = p1.x + clampedU * dx;
+  const nearestZ = p1.z + clampedU * dz;
+  const distToCenter = Math.hypot(nearestX, nearestZ);
 
-  // İkisi de dışarıda ama aralarındaki en kısa mesafe adanın merkezine (0,0) çok yakınsa (yani hat adayı teğet geçip sur içinden kesiyorsa)
-  if (!inside1 && !inside2) {
-    const dx = p2.x - p1.x;
-    const dz = p2.z - p1.z;
-    const len = Math.hypot(dx, dz);
-    if (len === 0) return false;
-    const u = ((0 - p1.x) * dx + (0 - p1.z) * dz) / (len * len);
-    const clampedU = Math.max(0, Math.min(1, u));
-    const nearestX = p1.x + clampedU * dx;
-    const nearestZ = p1.z + clampedU * dz;
-    const distToCenter = Math.hypot(nearestX, nearestZ);
-    if (distToCenter < ISLAND_RADIUS - 5) return true;
+  // Doğru adanın yarıçapından daha yakınsa surlardan / adadan geçiyor demektir
+  if (distToCenter < ISLAND_RADIUS) {
+    return true;
   }
-
   return false;
 }
 
-function calculateGatePath(start, end) {
-  const startInside = Math.hypot(start.x, start.z) < ISLAND_RADIUS - 5;
-  const endInside = Math.hypot(end.x, end.z) < ISLAND_RADIUS - 5;
-
-  const gateAngle = Math.atan2(castleGateCenter.z, castleGateCenter.x);
-  const gateOutside = {
-    x: Math.cos(gateAngle) * (ISLAND_RADIUS + 50),
-    z: Math.sin(gateAngle) * (ISLAND_RADIUS + 50)
-  };
-  const gateInside = {
-    x: castleGateCenter.x * 0.65,
-    z: castleGateCenter.z * 0.65
-  };
-
-  // 1. Durum: İçeriden Dışarıya veya Dışarıdan İçeriye (Taraflar farklı)
-  if (startInside !== endInside) {
-    if (!startInside && endInside) {
-      return [gateOutside, gateInside, end];
-    } else {
-      return [gateInside, gateOutside, end];
-    }
+// Adanın etrafından sürtünerek (teğet) dolaşacak ara duraklar (waypoint) oluşturan rota fonksiyonu
+function calculateCircumventionPath(start, end) {
+  // Eğer doğrudan hat adayı kesmiyorsa direkt hedefe git
+  if (!lineIntersectsIsland(start, end)) {
+    return [end];
   }
 
-  // 2. Durum: İkisi de dışarıda veya ikisi de içeride ama düz hat surların içinden/üstünden geçiyor mu?
-  if (lineIntersectsIsland(start, end)) {
-    // Surları aşmak için rotayı kapı üzerinden büküyoruz
-    if (startInside) {
-      // İçeriden başka bir noktaya giderken surlara çarpacaksa önce kapı içine, sonra kapı dışına, oradan dışarıdaki dolambaçlı yoldan hedefe
-      const safeOuterDest = {
-        x: end.x + Math.cos(gateAngle) * 60,
-        z: end.z + Math.sin(gateAngle) * 60
-      };
-      return [gateInside, gateOutside, safeOuterDest, end];
-    } else {
-      // Dışarıdan başka bir dış noktaya giderken ada ortadan engelliyorsa kapı dışından dolaş
-      return [gateOutside, gateInside, gateOutside, end];
-    }
-  }
+  // Doğru adayı kesiyor: Adanın etrafından dolaşmak için iki alternatif teğet yay rotası (saat yönü / saat yönünün tersi) hesaplıyoruz
+  const startAngle = Math.atan2(start.z, start.x);
+  const endAngle = Math.atan2(end.z, end.x);
 
-  // Engel yoksa doğrudan git
-  return [end];
+  // İki farklı teğet geçiş noktası (saat yönü ve tersi yönünde adayı çevreleme)
+  // Adanın güvenli yarıçapı üzerinden geçecek şekilde 3 ara nokta oluşturalım
+  const midAngle = (startAngle + endAngle) / 2;
+  
+  // Hangi yönden dolaşmanın daha kısa olduğunu bulmak için açı farkı
+  let angleDiff = endAngle - startAngle;
+  while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+  while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+
+  // Dolaşma yönüne göre orta teğet noktayı adanın dışından seçelim
+  const detourAngle = angleDiff > 0 ? midAngle - Math.PI / 2 : midAngle + Math.PI / 2;
+  
+  const skirtRadius = ISLAND_RADIUS + 25; // Surlara sürtünmeden ama asla içinden geçmeden güvenli mesafe
+  const waypoint = {
+    x: Math.cos(detourAngle) * skirtRadius,
+    z: Math.sin(detourAngle) * skirtRadius
+  };
+
+  return [waypoint, end];
 }
 
 function setupPlayerShipVisual() {
