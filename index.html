@@ -730,7 +730,7 @@ if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeIt
 let scene, camera, renderer;
 let oceanTexture = null;
 let activeGlbShip = null, playerNeonRing, enemies = [], rangeRingMesh;
-let castleGroup = null, castleTowers = [], castleTowerMeshes = [];
+let castleGroup = null, castleTowers = [], castleTowerMeshes = [], castleColliders = [];
 let castleProjectiles = [];
 let activeProjectiles = [], particleSystems = [], cannonEffects = [];
 let raycaster, planeGeo, mouse;
@@ -867,7 +867,7 @@ function createBorderFrame() {
   scene.add(borderFrameMesh);
 }
 
-// Görkemli ve Lüks Sur Oluşturma Fonksiyonu (Gemilerin geçemeyeceği yükseklik ve zırh detaylı)
+// Görkemli ve Lüks Sur Oluşturma Fonksiyonu (Çarpışma Kutusu Dahil)
 function buildConnectingWall(p1, p2) {
   const wallGroup = new THREE.Group();
   const dx = p2.x - p1.x;
@@ -875,7 +875,6 @@ function buildConnectingWall(p1, p2) {
   const dist = Math.hypot(dx, dz);
   const angle = Math.atan2(dz, dx);
 
-  // Ana kalın taş sur gövdesi (Yüksekliği artırıldı ki gemiler üzerinden geçemesin)
   const wallGeo = new THREE.BoxGeometry(dist, 45, 16);
   const wallMat = new THREE.MeshStandardMaterial({ 
     color: 0x1e293b, 
@@ -890,7 +889,6 @@ function buildConnectingWall(p1, p2) {
   wallMesh.receiveShadow = true;
   wallGroup.add(wallMesh);
 
-  // Sur üstü lüks altın/bronz korkuluk ve siperlik profili
   const topPlateGeo = new THREE.BoxGeometry(dist, 6, 20);
   const topPlateMat = new THREE.MeshStandardMaterial({ 
     color: 0xb45309, 
@@ -906,6 +904,11 @@ function buildConnectingWall(p1, p2) {
   wallGroup.position.set((p1.x + p2.x) / 2, SHIP_Y_POS - 40, (p1.z + p2.z) / 2);
   wallGroup.rotation.y = -angle;
 
+  // Çarpışma (Collision) için collider kaydı
+  const worldX = (p1.x + p2.x) / 2;
+  const worldZ = (p1.z + p2.z) / 2;
+  castleColliders.push({ type: 'wall', x: worldX, z: worldZ, dist: dist, angle: angle, radius: 20 });
+
   return wallGroup;
 }
 
@@ -915,12 +918,16 @@ function buildCastleIsland() {
 
   castleTowers = [];
   castleTowerMeshes = [];
+  castleColliders = [];
 
   const totalTowers = 18;
   const radius = 300; // Ada yarıçapı
   const towerPositions = [];
 
-  // 1. Adım: Tüm kulelerin çember üzerindeki 3D pozisyonlarını hesapla
+  // Kapı açıklığı için bırakılacak kule indeksleri (Örn: 6 ve 7 numaralı kuleler arası kapı boşluğu)
+  const gateStartIndex = 6;
+  const gateEndIndex = 7;
+
   for (let i = 0; i < totalTowers; i++) {
     const angle = (i / totalTowers) * Math.PI * 2;
     const posX = Math.cos(angle) * radius;
@@ -928,13 +935,11 @@ function buildCastleIsland() {
     towerPositions.push({ x: posX, z: posZ, index: i });
   }
 
-  // 2. Adım: Kuleleri yerleştir (İstediğin gibi sol kule -24'te biter, -25, -26, -27 boş kalır, sağ kule -28'den başlar)
   towerPositions.forEach((pos, i) => {
     const towerId = 100 + i;
-    const isGateOpening = (i >= 6 && i <= 6); // Kapı girişi olan boşluk
+    const isGateOpening = (i >= gateStartIndex && i <= gateEndIndex);
 
     if (!isGateOpening) {
-      // YEDEK (FALLBACK) SAVAŞÇI KULE GEOMETRİSİ
       const fallbackGeo = new THREE.CylinderGeometry(14, 20, 70, 16);
       const fallbackMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.6, metalness: 0.4 });
       const fallbackTower = new THREE.Mesh(fallbackGeo, fallbackMat);
@@ -943,13 +948,12 @@ function buildCastleIsland() {
       castleGroup.add(fallbackTower);
       castleTowerMeshes.push(fallbackTower);
 
-      // KULE.GLB DOSYASINI YÜKLE VE LÜKS GÖRÜNÜME GETİR
       gltfLoader.load('kule.glb', (gltf) => {
         const towerModel = gltf.scene || gltf.scenes[0];
         const box = new THREE.Box3().setFromObject(towerModel);
         const size = new THREE.Vector3();
         box.getSize(size);
-        let scaleFactor = 120 / Math.max(size.x, size.y, size.z); // Daha görkemli boyut
+        let scaleFactor = 120 / Math.max(size.x, size.y, size.z);
         towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
         towerModel.position.set(pos.x, SHIP_Y_POS - 40, pos.z);
@@ -976,6 +980,9 @@ function buildCastleIsland() {
       }, undefined, (err) => { 
         console.warn("kule.glb yüklenemedi, yedek zırhlı kule gösteriliyor:", err); 
       });
+
+      // Kuleler için çarpışma (Collision) ekle
+      castleColliders.push({ type: 'tower', x: pos.x, z: pos.z, radius: 25 });
     }
 
     castleTowers.push({
@@ -990,11 +997,11 @@ function buildCastleIsland() {
     });
   });
 
-  // 3. Adım: Kulelerin arasına görkemli surlar ör (Kapı boşluğu olan -25, -26, -27 aralığına sur ÖRÜLMEZ)
+  // Kuleler Arasındaki Surları Örme (Kapı boşluğu haricindeki tüm kuleler birbirine bağlanır)
   for (let i = 0; i < totalTowers; i++) {
     const nextIdx = (i + 1) % totalTowers;
-    // Eğer bu iki kule arasından biri kapı boşluğuna denk geliyorsa sur örme
-    if ((i >= 6 && i <= 8) || (nextIdx >= 6 && nextIdx <= 8)) {
+    // Eğer bu kule aralığı kapı açıklığına denk geliyorsa sur örme
+    if (i >= gateStartIndex && i <= gateEndIndex) {
       continue;
     }
     const p1 = towerPositions[i];
@@ -1421,6 +1428,29 @@ function fireCastleProjectile(startX, startZ, targetX, targetZ, onHit) {
   castleProjectiles.push({ mesh, x: startX, z: startZ, targetX, targetZ, speed: 320, onHit });
 }
 
+// Çarpışma Kontrolü (Geminin surların ve kulelerin içinden geçmesini engeller)
+function checkCastleCollision(nx, nz) {
+  for (const col of castleColliders) {
+    if (col.type === 'tower') {
+      const dist = Math.hypot(nx - col.x, nz - col.z);
+      if (dist < col.radius + 15) return true; // Çarpışma var
+    } else if (col.type === 'wall') {
+      // Çizgi segmentine yakınlık hesabı
+      const relX = nx - col.x;
+      const relZ = nz - col.z;
+      const cosA = Math.cos(-col.angle);
+      const sinA = Math.sin(-col.angle);
+      const localX = relX * cosA - relZ * sinA;
+      const localZ = relX * sinA + relZ * cosA;
+      const halfLen = col.dist / 2;
+      if (Math.abs(localX) <= halfLen + 5 && Math.abs(localZ) <= col.radius + 10) {
+        return true; // Çarpışma var
+      }
+    }
+  }
+  return false;
+}
+
 function animate3D() {
   requestAnimationFrame(animate3D);
 
@@ -1469,8 +1499,17 @@ function animate3D() {
     player.speed = 0;
   }
 
-  player.x += Math.cos(player.a) * player.speed * dt;
-  player.z += Math.sin(player.a) * player.speed * dt;
+  const nextX = player.x + Math.cos(player.a) * player.speed * dt;
+  const nextZ = player.z + Math.sin(player.a) * player.speed * dt;
+
+  // Surlara ve kulelere çarpma kontrolü (Geçiş izni yok)
+  if (!checkCastleCollision(nextX, nextZ)) {
+    player.x = nextX;
+    player.z = nextZ;
+  } else {
+    targetPos = null;
+    player.speed = 0;
+  }
 
   const HALF_WORLD = WORLD_SIZE / 2;
   const HARD_LIMIT = HALF_WORLD - 120;
