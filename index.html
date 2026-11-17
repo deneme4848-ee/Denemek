@@ -923,15 +923,25 @@ function buildCastleIsland() {
   towerPositions.forEach((pos, i) => {
     const towerId = 100 + i;
 
+    // YEDEK (FALLBACK) KULE GEOMETRİSİ (GLB yüklenene kadar anında görünür)
+    const fallbackGeo = new THREE.CylinderGeometry(12, 16, 50, 16);
+    const fallbackMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.7, metalness: 0.2 });
+    const fallbackTower = new THREE.Mesh(fallbackGeo, fallbackMat);
+    fallbackTower.position.set(pos.x, SHIP_Y_POS - 15, pos.z);
+    fallbackTower.userData = { towerId: towerId, name: `Zırhlı Kule #${i+1}` };
+    castleGroup.add(fallbackTower);
+    castleTowerMeshes.push(fallbackTower);
+
+    // KULE.GLB DOSYASINI YÜKLE VE YEDEK GEOMETRİNİN YERİNE GEÇİR
     gltfLoader.load('kule.glb', (gltf) => {
       const towerModel = gltf.scene || gltf.scenes[0];
       const box = new THREE.Box3().setFromObject(towerModel);
       const size = new THREE.Vector3();
       box.getSize(size);
-      let scaleFactor = 75 / Math.max(size.x, size.y, size.z);
+      let scaleFactor = 120 / Math.max(size.x, size.y, size.z);
       towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      towerModel.position.set(pos.x, SHIP_Y_POS - 40, pos.z);
+      towerModel.position.set(pos.x, SHIP_Y_POS + 250, pos.z);
       towerModel.userData = { towerId: towerId, name: `Zırhlı Kule #${i+1}` };
 
       towerModel.traverse(child => { 
@@ -946,9 +956,16 @@ function buildCastleIsland() {
         }
       });
 
+      // Yedek kuleyi sahneden kaldırıp GLB modelini ekle
+      castleGroup.remove(fallbackTower);
+      const idx = castleTowerMeshes.indexOf(fallbackTower);
+      if (idx !== -1) castleTowerMeshes.splice(idx, 1);
+
       castleGroup.add(towerModel);
       castleTowerMeshes.push(towerModel);
-    }, undefined, (err) => { console.warn("kule.glb yüklenemedi:", err); });
+    }, undefined, (err) => { 
+      console.warn("kule.glb yüklenemedi, yedek kule gösteriliyor:", err); 
+    });
 
     castleTowers.push({
       id: towerId,
