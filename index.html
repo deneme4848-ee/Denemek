@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Serbest Ada Geçişi</title>
+  <title>Korsan Dünyası - Kapı Geçişli Ada Navigasyonu</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -895,6 +895,8 @@ function buildConnectingWall(p1, p2) {
   return wallGroup;
 }
 
+let castleGateCenter = { x: 0, z: 0 };
+
 function buildCastleIsland() {
   castleGroup = new THREE.Group();
   castleGroup.position.set(0, 0, 0);
@@ -915,6 +917,11 @@ function buildCastleIsland() {
     const posZ = Math.sin(angle) * radius;
     towerPositions.push({ x: posX, z: posZ, index: i });
   }
+
+  // Kapının tam orta noktasını hesapla (6 ve 7 numaralı kulelerin arası)
+  const gateP1 = towerPositions[gateStartIndex];
+  const gateP2 = towerPositions[gateEndIndex];
+  castleGateCenter = { x: (gateP1.x + gateP2.x) / 2, z: (gateP1.z + gateP2.z) / 2 };
 
   towerPositions.forEach((pos, i) => {
     const towerId = 100 + i;
@@ -1116,8 +1123,10 @@ function initThreeGame() {
 
     const oceanIntersect = raycaster.intersectObject(ocean);
     if (oceanIntersect.length > 0) {
-      // Doğrudan tıklanan yere direkt rota (Surlar ve ada içi serbest geçiş)
-      targetDestination = { x: oceanIntersect[0].point.x, z: oceanIntersect[0].point.z };
+      const dest = { x: oceanIntersect[0].point.x, z: oceanIntersect[0].point.z };
+      
+      // Kapı Geçişli Rota Hesaplayıcı (Engelden Kaçma)
+      navigationQueue = calculateGatePath({ x: player.x, z: player.z }, dest);
     }
   });
 
@@ -1128,9 +1137,42 @@ function initThreeGame() {
 }
 
 let player;
-let targetDestination = null;
+let navigationQueue = [];
 let selectedEnemyId = null, selectedTowerId = null, isAttacking = false, isGameOver = false;
 let lastPlayerAttackTime = 0;
+
+const ISLAND_RADIUS = 300;
+
+// Gemi içeriden dışarıya veya dışarıdan içeriye geçerken surlardan geçmesin, kapıdan (açıklıktan) dolaşsın
+function calculateGatePath(start, end) {
+  const startInside = Math.hypot(start.x, start.z) < ISLAND_RADIUS;
+  const endInside = Math.hypot(end.x, end.z) < ISLAND_RADIUS;
+
+  // Eğer ikisi de aynı taraftaysa (ikisi de içeride veya ikisi de dışarıda), düz git
+  if (startInside === endInside) {
+    return [end];
+  }
+
+  // Taraflar farklıysa (biri içeride biri dışarıda), kapıdan geçiş rotası oluştur
+  // Kapının dış tarafındaki güvenli nokta (kapı yönünde biraz dışarısı)
+  const gateAngle = Math.atan2(castleGateCenter.z, castleGateCenter.x);
+  const gateOutside = {
+    x: Math.cos(gateAngle) * (ISLAND_RADIUS + 45),
+    z: Math.sin(gateAngle) * (ISLAND_RADIUS + 45)
+  };
+  const gateInside = {
+    x: castleGateCenter.x * 0.7,
+    z: castleGateCenter.z * 0.7
+  };
+
+  if (!startInside && endInside) {
+    // Dışarıdan içeriye: Önce kapı dışına, oradan kapı içine, oradan nihai hedefe
+    return [gateOutside, gateInside, end];
+  } else {
+    // İçeriden dışarıya: Önce kapı içine, oradan kapı dışına, oradan nihai hedefe
+    return [gateInside, gateOutside, end];
+  }
+}
 
 function setupPlayerShipVisual() {
   const users = loadUsers();
@@ -1153,7 +1195,7 @@ function setupPlayerShipVisual() {
 }
 
 function startGameLogic() {
-  isGameOver = false; targetDestination = null; selectedEnemyId = null; selectedTowerId = null; isAttacking = false;
+  isGameOver = false; navigationQueue = []; selectedEnemyId = null; selectedTowerId = null; isAttacking = false;
   gameOverEl.style.display = 'none';
 
   player = {
@@ -1180,7 +1222,7 @@ function startGameLogic() {
 function changeMap(mapIdx, entrySide = 'center') {
   currentMapIndex = mapIdx;
   radarTitleEl.textContent = MAP_DATA[mapIdx].name;
-  targetDestination = null;
+  navigationQueue = [];
   hideTransitButton();
 
   const BOUND = (WORLD_SIZE / 2) - 350;
@@ -1430,23 +1472,29 @@ function animate3D() {
     }
   }
 
-  // Doğrudan Hedefe Hareket (Engel yok, serbest geçiş)
-  if (targetDestination) {
-    const dx = targetDestination.x - player.x;
-    const dz = targetDestination.z - player.z;
+  // Kapı Geçişli Çok Noktalı Rota Takibi
+  if (navigationQueue.length > 0) {
+    const currentTarget = navigationQueue[0];
+    const dx = currentTarget.x - player.x;
+    const dz = currentTarget.z - player.z;
     const dist = Math.hypot(dx, dz);
 
-    if (dist > 10) {
+    const arrivalThreshold = navigationQueue.length > 1 ? 25 : 10;
+
+    if (dist > arrivalThreshold) {
       player.a = Math.atan2(dz, dx);
       player.speed = player.maxSpeed;
     } else {
-      player.speed = 0;
-      targetDestination = null;
+      navigationQueue.shift();
+      if (navigationQueue.length === 0) {
+        player.speed = 0;
+      }
     }
   } else {
     player.speed = 0;
   }
 
+  // Tam hız ve serbest geçiş (Sürtünme yok, hız kaybı yok)
   player.x += Math.cos(player.a) * player.speed * dt;
   player.z += Math.sin(player.a) * player.speed * dt;
 
