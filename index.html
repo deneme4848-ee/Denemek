@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Zırhlı Kompakt Hilal Kale</title>
+  <title>Korsan Dünyası - Özel Koordinatlı Zırhlı Kale</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -652,8 +652,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v68';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v68';
+const USERS_STORAGE_KEY = 'pirate3d_users_v69';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v69';
 let authMode = 'login';
 let currentUser = null;
 
@@ -942,16 +942,26 @@ function buildCastleIsland() {
 
   castleTowers = [];
   castleTowerMeshes = [];
-  const towerCount = 15;
-  const radius = 320; 
-  const towerPositions = [];
 
-  for (let i = 0; i < towerCount; i++) {
-    const angle = (i / (towerCount - 1)) * Math.PI * 1.15 - (Math.PI * 1.075);
-    const tx = Math.cos(angle) * radius;
-    const tz = Math.sin(angle) * (radius * 0.72);
-    towerPositions.push({ x: tx, z: tz });
-  }
+  // Kullanıcının verdiği hassas koordinatlar (Ölçek katsayısı: 25)
+  const rawCoords = [
+    {x: 28, y: -16},
+    {x: 33, y: -16},
+    {x: 36, y: -20},
+    {x: 37, y: -23},
+    {x: 36, y: -26},
+    {x: 33, y: -29},
+    {x: 32, y: -29},
+    {x: 30, y: -29},
+    {x: 28, y: -28},
+    {x: 27, y: -26},
+    {x: 27, y: -25},
+    {x: 27, y: -24},
+    {x: 28, y: -22},
+    {x: 28, y: -20}
+  ];
+
+  const towerPositions = rawCoords.map(c => ({ x: c.x * 25, z: c.y * 25 }));
 
   towerPositions.forEach((pos, i) => {
     const towerId = 100 + i;
