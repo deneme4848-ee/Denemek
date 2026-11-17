@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - İhtişamlı Surlar ve Savaşçı Kuleler</title>
+  <title>Korsan Dünyası - Akıllı Rota ve Surlar</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -81,15 +81,6 @@
       from { transform: translateX(-50%) scale(1.0); box-shadow: 0 0 15px rgba(148, 163, 184, 0.4); }
       to { transform: translateX(-50%) scale(1.06); box-shadow: 0 0 25px rgba(241, 245, 249, 0.7); }
     }
-
-    #castle-teleport-banner {
-      display: block; position: fixed; top: 135px; left: 50%; transform: translateX(-50%);
-      z-index: 12; background: linear-gradient(135deg, #b45309, #78350f);
-      border: 2px solid #f59e0b; border-radius: 14px; padding: 8px 18px;
-      color: #fef3c7; font-size: 12px; font-weight: 900; cursor: pointer;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.85); pointer-events: auto; letter-spacing: 0.5px;
-    }
-    #castle-teleport-banner:hover { background: linear-gradient(135deg, #d97706, #b45309); }
 
     .level-crest {
       width: 46px; height: 46px; flex-shrink: 0; border-radius: 12px;
@@ -373,7 +364,6 @@
   <div id="game"></div>
 
   <button id="map-transit-banner" type="button">Harita Değiştir</button>
-  <button id="castle-teleport-banner" type="button">🏰 Kaleye Işınlan</button>
 
   <div id="player-label">
     <div class="ship-hp-track"><div id="player-ship-hp-fill"></div></div>
@@ -581,7 +571,6 @@ const mapsCloseBtn = document.querySelector('#maps-close-btn');
 const mapsGridContainer = document.querySelector('#maps-grid-container');
 
 const mapTransitBanner = document.querySelector('#map-transit-banner');
-const castleTeleportBanner = document.querySelector('#castle-teleport-banner');
 
 const portToggleBtn = document.querySelector('#port-toggle-btn');
 const marketPanel = document.querySelector('#market-panel');
@@ -867,7 +856,6 @@ function createBorderFrame() {
   scene.add(borderFrameMesh);
 }
 
-// Görkemli ve Lüks Sur Oluşturma Fonksiyonu (Çarpışma Kutusu Dahil)
 function buildConnectingWall(p1, p2) {
   const wallGroup = new THREE.Group();
   const dx = p2.x - p1.x;
@@ -904,7 +892,6 @@ function buildConnectingWall(p1, p2) {
   wallGroup.position.set((p1.x + p2.x) / 2, SHIP_Y_POS - 40, (p1.z + p2.z) / 2);
   wallGroup.rotation.y = -angle;
 
-  // Çarpışma (Collision) için collider kaydı
   const worldX = (p1.x + p2.x) / 2;
   const worldZ = (p1.z + p2.z) / 2;
   castleColliders.push({ type: 'wall', x: worldX, z: worldZ, dist: dist, angle: angle, radius: 20 });
@@ -921,10 +908,9 @@ function buildCastleIsland() {
   castleColliders = [];
 
   const totalTowers = 18;
-  const radius = 300; // Ada yarıçapı
+  const radius = 300; 
   const towerPositions = [];
 
-  // Kapı açıklığı için bırakılacak kule indeksleri (Örn: 6 ve 7 numaralı kuleler arası kapı boşluğu)
   const gateStartIndex = 6;
   const gateEndIndex = 7;
 
@@ -978,10 +964,9 @@ function buildCastleIsland() {
         castleGroup.add(towerModel);
         castleTowerMeshes.push(towerModel);
       }, undefined, (err) => { 
-        console.warn("kule.glb yüklenemedi, yedek zırhlı kule gösteriliyor:", err); 
+        console.warn("kule.glb yüklenemedi:", err); 
       });
 
-      // Kuleler için çarpışma (Collision) ekle
       castleColliders.push({ type: 'tower', x: pos.x, z: pos.z, radius: 25 });
     }
 
@@ -997,10 +982,8 @@ function buildCastleIsland() {
     });
   });
 
-  // Kuleler Arasındaki Surları Örme (Kapı boşluğu haricindeki tüm kuleler birbirine bağlanır)
   for (let i = 0; i < totalTowers; i++) {
     const nextIdx = (i + 1) % totalTowers;
-    // Eğer bu kule aralığı kapı açıklığına denk geliyorsa sur örme
     if (i >= gateStartIndex && i <= gateEndIndex) {
       continue;
     }
@@ -1095,7 +1078,6 @@ function initThreeGame() {
       e.target.closest('#market-panel') ||
       e.target.closest('#maps-panel') ||
       e.target.closest('#map-transit-banner') ||
-      e.target.closest('#castle-teleport-banner') ||
       e.target.closest('#auth-overlay')
     ) return;
 
@@ -1141,7 +1123,16 @@ function initThreeGame() {
 
     const oceanIntersect = raycaster.intersectObject(ocean);
     if (oceanIntersect.length > 0) {
-      targetPos = { x: oceanIntersect[0].point.x, z: oceanIntersect[0].point.z };
+      const dest = { x: oceanIntersect[0].point.x, z: oceanIntersect[0].point.z };
+      
+      // Akıllı Rota (Yol Bulma / Etrafından Dolaşma) Kontrolü
+      if (getDirectPathBlocked({ x: player.x, z: player.z }, dest)) {
+        currentWaypoint = calculateWaypoint({ x: player.x, z: player.z }, dest);
+        targetPos = dest;
+      } else {
+        currentWaypoint = null;
+        targetPos = dest;
+      }
     }
   });
 
@@ -1152,8 +1143,60 @@ function initThreeGame() {
 }
 
 let player;
-let targetPos = null, selectedEnemyId = null, selectedTowerId = null, isAttacking = false, isGameOver = false;
+let targetPos = null, currentWaypoint = null, selectedEnemyId = null, selectedTowerId = null, isAttacking = false, isGameOver = false;
 let lastPlayerAttackTime = 0;
+
+const ISLAND_AVOID_RADIUS = 390;
+
+function getDirectPathBlocked(p1, p2) {
+  const dx = p2.x - p1.x;
+  const dz = p2.z - p1.z;
+  const len = Math.hypot(dx, dz);
+  if (len === 0) return false;
+  
+  const ux = dx / len;
+  const uz = dz / len;
+  
+  const proj = (-p1.x) * ux + (-p1.z) * uz;
+  
+  let closestX, closestZ;
+  if (proj < 0) {
+    closestX = p1.x; closestZ = p1.z;
+  } else if (proj > len) {
+    closestX = p2.x; closestZ = p2.z;
+  } else {
+    closestX = p1.x + ux * proj;
+    closestZ = p1.z + uz * proj;
+  }
+  
+  const distToOrigin = Math.hypot(closestX, closestZ);
+  return distToOrigin < ISLAND_AVOID_RADIUS;
+}
+
+function calculateWaypoint(p1, p2) {
+  const r = 425;
+  const candidates = [];
+  for (let ang = 0; ang < Math.PI * 2; ang += Math.PI / 8) {
+    candidates.push({
+      x: Math.cos(ang) * r,
+      z: Math.sin(ang) * r
+    });
+  }
+  
+  let bestWp = null;
+  let minDist = Infinity;
+  
+  for (const cand of candidates) {
+    if (!getDirectPathBlocked(p1, cand) && !getDirectPathBlocked(cand, p2)) {
+      const d = Math.hypot(cand.x - p1.x, cand.z - p1.z) + Math.hypot(p2.x - cand.x, p2.z - cand.z);
+      if (d < minDist) {
+        minDist = d;
+        bestWp = cand;
+      }
+    }
+  }
+  return bestWp || p2;
+}
 
 function setupPlayerShipVisual() {
   const users = loadUsers();
@@ -1176,7 +1219,7 @@ function setupPlayerShipVisual() {
 }
 
 function startGameLogic() {
-  isGameOver = false; targetPos = null; selectedEnemyId = null; selectedTowerId = null; isAttacking = false;
+  isGameOver = false; targetPos = null; currentWaypoint = null; selectedEnemyId = null; selectedTowerId = null; isAttacking = false;
   gameOverEl.style.display = 'none';
 
   player = {
@@ -1200,18 +1243,11 @@ function startGameLogic() {
   renderMapsGrid();
 }
 
-castleTeleportBanner.addEventListener('click', () => {
-  if (!player) return;
-  player.x = 750;
-  player.z = -550;
-  targetPos = null;
-  player.speed = 0;
-});
-
 function changeMap(mapIdx, entrySide = 'center') {
   currentMapIndex = mapIdx;
   radarTitleEl.textContent = MAP_DATA[mapIdx].name;
   targetPos = null;
+  currentWaypoint = null;
   hideTransitButton();
 
   const BOUND = (WORLD_SIZE / 2) - 350;
@@ -1428,14 +1464,12 @@ function fireCastleProjectile(startX, startZ, targetX, targetZ, onHit) {
   castleProjectiles.push({ mesh, x: startX, z: startZ, targetX, targetZ, speed: 320, onHit });
 }
 
-// Çarpışma Kontrolü (Geminin surların ve kulelerin içinden geçmesini engeller)
 function checkCastleCollision(nx, nz) {
   for (const col of castleColliders) {
     if (col.type === 'tower') {
       const dist = Math.hypot(nx - col.x, nz - col.z);
-      if (dist < col.radius + 15) return true; // Çarpışma var
+      if (dist < col.radius + 15) return true;
     } else if (col.type === 'wall') {
-      // Çizgi segmentine yakınlık hesabı
       const relX = nx - col.x;
       const relZ = nz - col.z;
       const cosA = Math.cos(-col.angle);
@@ -1444,7 +1478,7 @@ function checkCastleCollision(nx, nz) {
       const localZ = relX * sinA + relZ * cosA;
       const halfLen = col.dist / 2;
       if (Math.abs(localX) <= halfLen + 5 && Math.abs(localZ) <= col.radius + 10) {
-        return true; // Çarpışma var
+        return true;
       }
     }
   }
@@ -1484,16 +1518,22 @@ function animate3D() {
     }
   }
 
-  if (targetPos) {
-    const dx = targetPos.x - player.x;
-    const dz = targetPos.z - player.z;
+  // Akıllı Rota / Waypoint Navigasyon Güncellemesi
+  let destination = currentWaypoint || targetPos;
+  if (destination) {
+    const dx = destination.x - player.x;
+    const dz = destination.z - player.z;
     const dist = Math.hypot(dx, dz);
-    if (dist > 8) {
+    if (dist > 12) {
       player.a = Math.atan2(dz, dx);
       player.speed = player.maxSpeed;
     } else {
-      targetPos = null;
-      player.speed = 0;
+      if (currentWaypoint) {
+        currentWaypoint = null; // Ara noktaya varıldı, şimdi asıl hedefe yönel
+      } else {
+        targetPos = null;
+        player.speed = 0;
+      }
     }
   } else {
     player.speed = 0;
@@ -1502,12 +1542,12 @@ function animate3D() {
   const nextX = player.x + Math.cos(player.a) * player.speed * dt;
   const nextZ = player.z + Math.sin(player.a) * player.speed * dt;
 
-  // Surlara ve kulelere çarpma kontrolü (Geçiş izni yok)
   if (!checkCastleCollision(nextX, nextZ)) {
     player.x = nextX;
     player.z = nextZ;
   } else {
     targetPos = null;
+    currentWaypoint = null;
     player.speed = 0;
   }
 
