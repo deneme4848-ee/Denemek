@@ -242,7 +242,7 @@
       box-shadow: 0 0 14px rgba(148, 163, 184, 0.4); transform: translateY(-2px);
     }
     .ammo-slot .key-hint { position: absolute; font-weight: 800; color: #94a3b8; }
-    .ammo-slot .ammo-ico img { object-fit: contain; }
+    .ammo-slot .ammo-ico img { object-fit: contain; width: 24px; height: 24px; }
     .ammo-slot .ammo-qty {
       font-weight: 900; color: #fff; margin-top: 1px;
       background: rgba(0,0,0,0.55); padding: 1px 6px; border-radius: 4px;
@@ -460,9 +460,9 @@
       <div class="ammo-slots-row" id="ammo-slots-row">
         <div class="ammo-slot selected" data-type="iron"><span class="key-hint">1</span><span class="ammo-ico">⚫</span><span class="ammo-qty" id="qty-iron">1m</span></div>
         <div class="ammo-slot" data-type="chain"><span class="key-hint">2</span><span class="ammo-ico">⛓️</span><span class="ammo-qty" id="qty-chain">1m</span></div>
-        <div class="ammo-slot" data-type="fire"><span class="key-hint">3</span><span class="ammo-ico"><img src="alev.png" alt="Alev Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%23f97316\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';"></span><span class="ammo-qty" id="qty-fire">1m</span></div>
-        <div class="ammo-slot" data-type="amiral"><span class="key-hint">4</span><span class="ammo-ico"><img src="amiral.png" alt="Amiral Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%2338bdf8\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';"></span><span class="ammo-qty" id="qty-amiral">1m</span></div>
-        <div class="ammo-slot" data-type="snow"><span class="key-hint">5</span><span class="ammo-ico"><img src="kar.png" alt="Kar Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%23ffffff\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';"></span><span class="ammo-qty" id="qty-snow">1m</span></div>
+        <div class="ammo-slot" data-type="fire"><span class="key-hint">3</span><span class="ammo-ico"><img src="alev.png" alt="Alev Güllesi"></span><span class="ammo-qty" id="qty-fire">1m</span></div>
+        <div class="ammo-slot" data-type="amiral"><span class="key-hint">4</span><span class="ammo-ico"><img src="amiral.png" alt="Amiral Güllesi"></span><span class="ammo-qty" id="qty-amiral">1m</span></div>
+        <div class="ammo-slot" data-type="snow"><span class="key-hint">5</span><span class="ammo-ico"><img src="kar.png" alt="Kar Güllesi"></span><span class="ammo-qty" id="qty-snow">1m</span></div>
       </div>
     </div>
 
@@ -513,7 +513,7 @@
           <div class="market-item">
             <div class="market-item-info">
               <span class="market-item-title">
-                <img src="alev.png" style="width:18px;height:18px;object-fit:contain;" alt="Alev Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%23f97316\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">
+                <img src="alev.png" style="width:18px;height:18px;object-fit:contain;" alt="Alev Güllesi">
                 15x Alevli Gülle
               </span>
               <span class="market-item-sub">30.000 Hasar · NPC'lere %20 Ekstra Hasar</span>
@@ -523,7 +523,7 @@
           <div class="market-item">
             <div class="market-item-info">
               <span class="market-item-title">
-                <img src="amiral.png" style="width:18px;height:18px;object-fit:contain;" alt="Amiral Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%2338bdf8\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">
+                <img src="amiral.png" style="width:18px;height:18px;object-fit:contain;" alt="Amiral Güllesi">
                 10x Amiral Güllesi
               </span>
               <span class="market-item-sub">40.000 Hasar · Gerçek oyunculara özel yıkım</span>
@@ -533,7 +533,7 @@
           <div class="market-item">
             <div class="market-item-info">
               <span class="market-item-title">
-                <img src="kar.png" style="width:18px;height:18px;object-fit:contain;" alt="Kar Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%23ffffff\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">
+                <img src="kar.png" style="width:18px;height:18px;object-fit:contain;" alt="Kar Güllesi">
                 20x Kar Güllesi
               </span>
               <span class="market-item-sub">+25.000 Can Doldurur (NPC hariç)</span>
@@ -728,8 +728,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v71';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v71';
+const USERS_STORAGE_KEY = 'pirate3d_users_v72';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v72';
 let authMode = 'login';
 let currentUser = null;
 
