@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Çember Kapılı Kule Sistemi</title>
+  <title>Korsan Dünyası - İhtişamlı Surlar ve Savaşçı Kuleler</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -867,6 +867,48 @@ function createBorderFrame() {
   scene.add(borderFrameMesh);
 }
 
+// Görkemli ve Lüks Sur Oluşturma Fonksiyonu (Gemilerin geçemeyeceği yükseklik ve zırh detaylı)
+function buildConnectingWall(p1, p2) {
+  const wallGroup = new THREE.Group();
+  const dx = p2.x - p1.x;
+  const dz = p2.z - p1.z;
+  const dist = Math.hypot(dx, dz);
+  const angle = Math.atan2(dz, dx);
+
+  // Ana kalın taş sur gövdesi (Yüksekliği artırıldı ki gemiler üzerinden geçemesin)
+  const wallGeo = new THREE.BoxGeometry(dist, 45, 16);
+  const wallMat = new THREE.MeshStandardMaterial({ 
+    color: 0x1e293b, 
+    roughness: 0.7, 
+    metalness: 0.3,
+    emissive: 0x09131d,
+    emissiveIntensity: 0.2
+  });
+  const wallMesh = new THREE.Mesh(wallGeo, wallMat);
+  wallMesh.position.set(0, 22.5, 0);
+  wallMesh.castShadow = true;
+  wallMesh.receiveShadow = true;
+  wallGroup.add(wallMesh);
+
+  // Sur üstü lüks altın/bronz korkuluk ve siperlik profili
+  const topPlateGeo = new THREE.BoxGeometry(dist, 6, 20);
+  const topPlateMat = new THREE.MeshStandardMaterial({ 
+    color: 0xb45309, 
+    roughness: 0.3, 
+    metalness: 0.8,
+    emissive: 0x78350f,
+    emissiveIntensity: 0.4
+  });
+  const topPlateMesh = new THREE.Mesh(topPlateGeo, topPlateMat);
+  topPlateMesh.position.set(0, 47, 0);
+  wallGroup.add(topPlateMesh);
+
+  wallGroup.position.set((p1.x + p2.x) / 2, SHIP_Y_POS - 40, (p1.z + p2.z) / 2);
+  wallGroup.rotation.y = -angle;
+
+  return wallGroup;
+}
+
 function buildCastleIsland() {
   castleGroup = new THREE.Group();
   castleGroup.position.set(0, 0, 0);
@@ -874,74 +916,91 @@ function buildCastleIsland() {
   castleTowers = [];
   castleTowerMeshes = [];
 
-  // Toplam 15 kule için çembersel açı hesaplama (aralarında 2 birim boşluk / açısal oran ile)
-  const totalTowers = 18;
-  const radius = 250; // Ada yarıçapı
-  
-  for (let i = 0; i < totalTowers; i++) {
-    // Kapı girişi için -25, -26, -27 indekslerini (veya karşılık gelen açı dilimlerini) atlıyoruz
-    // İstediğin gibi sol kule -24'te biter, giriş boş kalır, sağ kule -28'den başlar.
-    // 0'dan 14'e kadar olan 15 kuleyi yerleştirirken kapı boşluğunu (örneğin 6. 7. 8. kuleler yerine) bırakıyoruz.
-    if (i >= 6 && i <= 8) continue; // -25, -26, 27 boşluk (kapı girişi)
+  const totalTowers = 15;
+  const radius = 750; // Ada yarıçapı
+  const towerPositions = [];
 
+  // 1. Adım: Tüm kulelerin çember üzerindeki 3D pozisyonlarını hesapla
+  for (let i = 0; i < totalTowers; i++) {
     const angle = (i / totalTowers) * Math.PI * 2;
     const posX = Math.cos(angle) * radius;
     const posZ = Math.sin(angle) * radius;
+    towerPositions.push({ x: posX, z: posZ, index: i });
+  }
 
+  // 2. Adım: Kuleleri yerleştir (İstediğin gibi sol kule -24'te biter, -25, -26, -27 boş kalır, sağ kule -28'den başlar)
+  towerPositions.forEach((pos, i) => {
     const towerId = 100 + i;
+    const isGateOpening = (i >= 6 && i <= 8); // Kapı girişi olan boşluk
 
-    // YEDEK (FALLBACK) KULE GEOMETRİSİ
-    const fallbackGeo = new THREE.CylinderGeometry(12, 16, 50, 16);
-    const fallbackMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.7, metalness: 0.2 });
-    const fallbackTower = new THREE.Mesh(fallbackGeo, fallbackMat);
-    fallbackTower.position.set(posX, SHIP_Y_POS - 15, posZ);
-    fallbackTower.userData = { towerId: towerId, name: `Zırhlı Kule #${i+1}` };
-    castleGroup.add(fallbackTower);
-    castleTowerMeshes.push(fallbackTower);
+    if (!isGateOpening) {
+      // YEDEK (FALLBACK) SAVAŞÇI KULE GEOMETRİSİ
+      const fallbackGeo = new THREE.CylinderGeometry(14, 20, 70, 16);
+      const fallbackMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.6, metalness: 0.4 });
+      const fallbackTower = new THREE.Mesh(fallbackGeo, fallbackMat);
+      fallbackTower.position.set(pos.x, SHIP_Y_POS - 5, pos.z);
+      fallbackTower.userData = { towerId: towerId, name: `Lüks Zırhlı Kule #${i+1}` };
+      castleGroup.add(fallbackTower);
+      castleTowerMeshes.push(fallbackTower);
 
-    // KULE.GLB DOSYASINI YÜKLE
-    gltfLoader.load('kule.glb', (gltf) => {
-      const towerModel = gltf.scene || gltf.scenes[0];
-      const box = new THREE.Box3().setFromObject(towerModel);
-      const size = new THREE.Vector3();
-      box.getSize(size);
-      let scaleFactor = 75 / Math.max(size.x, size.y, size.z);
-      towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
+      // KULE.GLB DOSYASINI YÜKLE VE LÜKS GÖRÜNÜME GETİR
+      gltfLoader.load('kule.glb', (gltf) => {
+        const towerModel = gltf.scene || gltf.scenes[0];
+        const box = new THREE.Box3().setFromObject(towerModel);
+        const size = new THREE.Vector3();
+        box.getSize(size);
+        let scaleFactor = 95 / Math.max(size.x, size.y, size.z); // Daha görkemli boyut
+        towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      towerModel.position.set(posX, SHIP_Y_POS - 40, posZ);
-      towerModel.userData = { towerId: towerId, name: `Zırhlı Kule #${i+1}` };
+        towerModel.position.set(pos.x, SHIP_Y_POS - 40, pos.z);
+        towerModel.userData = { towerId: towerId, name: `Lüks Zırhlı Kule #${i+1}` };
 
-      towerModel.traverse(child => { 
-        child.userData = { towerId: towerId };
-        if (child.material) {
-          if (Array.isArray(child.material)) {
-            child.material.forEach(m => { m.depthWrite = true; m.depthTest = true; });
-          } else {
-            child.material.depthWrite = true;
-            child.material.depthTest = true;
+        towerModel.traverse(child => { 
+          child.userData = { towerId: towerId };
+          if (child.material) {
+            if (Array.isArray(child.material)) {
+              child.material.forEach(m => { m.depthWrite = true; m.depthTest = true; });
+            } else {
+              child.material.depthWrite = true;
+              child.material.depthTest = true;
+            }
           }
-        }
+        });
+
+        castleGroup.remove(fallbackTower);
+        const idx = castleTowerMeshes.indexOf(fallbackTower);
+        if (idx !== -1) castleTowerMeshes.splice(idx, 1);
+
+        castleGroup.add(towerModel);
+        castleTowerMeshes.push(towerModel);
+      }, undefined, (err) => { 
+        console.warn("kule.glb yüklenemedi, yedek zırhlı kule gösteriliyor:", err); 
       });
-
-      castleGroup.remove(fallbackTower);
-      const idx = castleTowerMeshes.indexOf(fallbackTower);
-      if (idx !== -1) castleTowerMeshes.splice(idx, 1);
-
-      castleGroup.add(towerModel);
-      castleTowerMeshes.push(towerModel);
-    }, undefined, (err) => { 
-      console.warn("kule.glb yüklenemedi, yedek kule gösteriliyor:", err); 
-    });
+    }
 
     castleTowers.push({
       id: towerId,
-      name: `Zırhlı Kule #${i+1}`,
-      localX: posX,
-      localZ: posZ,
+      name: `Lüks Zırhlı Kule #${i+1}`,
+      localX: pos.x,
+      localZ: pos.z,
       hp: 500000,
       maxHp: 500000,
+      isGate: isGateOpening,
       lastShotTime: 0
     });
+  });
+
+  // 3. Adım: Kulelerin arasına görkemli surlar ör (Kapı boşluğu olan -25, -26, -27 aralığına sur ÖRÜLMEZ)
+  for (let i = 0; i < totalTowers; i++) {
+    const nextIdx = (i + 1) % totalTowers;
+    // Eğer bu iki kule arasından biri kapı boşluğuna denk geliyorsa sur örme
+    if ((i >= 6 && i <= 8) || (nextIdx >= 6 && nextIdx <= 8)) {
+      continue;
+    }
+    const p1 = towerPositions[i];
+    const p2 = towerPositions[nextIdx];
+    const wallSegment = buildConnectingWall(p1, p2);
+    castleGroup.add(wallSegment);
   }
 
   scene.add(castleGroup);
@@ -1274,7 +1333,7 @@ function updateTargetCard() {
     if (selectedRingMesh) { selectedRingMesh.visible = true; selectedRingMesh.position.set(target.x, 0.9, target.z); }
   } else if (selectedTowerId) {
     const tower = castleTowers.find(t => t.id === selectedTowerId);
-    if (!tower) { targetCardEl.classList.remove('visible'); if (selectedRingMesh) selectedRingMesh.visible = false; return; }
+    if (!tower || tower.isGate) { targetCardEl.classList.remove('visible'); if (selectedRingMesh) selectedRingMesh.visible = false; return; }
     targetNameEl.textContent = tower.name;
     targetHpTextEl.textContent = `${Math.ceil(tower.hp).toLocaleString()}/${tower.maxHp.toLocaleString()}`;
     targetHpBarEl.style.width = Math.max(0, (tower.hp / tower.maxHp) * 100) + '%';
@@ -1485,7 +1544,7 @@ function animate3D() {
       }
     } else if (selectedTowerId) {
       const tower = castleTowers.find(t => t.id === selectedTowerId);
-      if (tower) {
+      if (tower && !tower.isGate) {
         selectedRingMesh.visible = true;
         selectedRingMesh.position.set(castleGroup.position.x + tower.localX, 0.9, castleGroup.position.z + tower.localZ);
         selectedRingMesh.rotation.z += (1.2 * dt);
@@ -1506,7 +1565,7 @@ function animate3D() {
 
   if (castleGroup) {
     castleTowers.forEach(tower => {
-      if (tower.hp <= 0) return;
+      if (tower.hp <= 0 || tower.isGate) return;
       const twX = castleGroup.position.x + tower.localX;
       const twZ = castleGroup.position.z + tower.localZ;
       if (Math.hypot(player.x - twX, player.z - twZ) <= CASTLE_AGGRO_RANGE && (now - tower.lastShotTime >= 2200)) {
@@ -1698,7 +1757,7 @@ function animate3D() {
         }
       } else if (selectedTowerId) {
         const tower = castleTowers.find(t => t.id === selectedTowerId);
-        if (tower && tower.hp > 0) {
+        if (tower && !tower.isGate && tower.hp > 0) {
           fireProjectile(player.x, player.z, targetX, targetZ, ammoKey, () => {
             tower.hp -= ammoSpec.damage;
             showFloatingDamage(targetX, targetZ, '-' + ammoSpec.damage.toLocaleString(), '#f97316');
@@ -1763,6 +1822,7 @@ function drawMinimap() {
 
   mctx.fillStyle = '#f59e0b';
   castleTowers.forEach(t => {
+    if (t.isGate) return;
     mctx.beginPath();
     mctx.arc(cx + t.localX * scale, cy + t.localZ * scale, 2.0, 0, Math.PI * 2);
     mctx.fill();
