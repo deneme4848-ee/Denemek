@@ -876,7 +876,7 @@ function buildCastleIsland() {
 
   // Toplam 15 kule için çembersel açı hesaplama (aralarında 2 birim boşluk / açısal oran ile)
   const totalTowers = 15;
-  const radius = 450; // Ada yarıçapı
+  const radius = 100; // Ada yarıçapı
   
   for (let i = 0; i < totalTowers; i++) {
     // Kapı girişi için -25, -26, -27 indekslerini (veya karşılık gelen açı dilimlerini) atlıyoruz
@@ -884,7 +884,7 @@ function buildCastleIsland() {
     // 0'dan 14'e kadar olan 15 kuleyi yerleştirirken kapı boşluğunu (örneğin 6. 7. 8. kuleler yerine) bırakıyoruz.
     if (i >= 6 && i <= 8) continue; // -25, -26, 27 boşluk (kapı girişi)
 
-    const angle = (i / totalTowers) * Math.PI * 1;
+    const angle = (i / totalTowers) * Math.PI * 2;
     const posX = Math.cos(angle) * radius;
     const posZ = Math.sin(angle) * radius;
 
