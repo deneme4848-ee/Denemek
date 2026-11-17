@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Özel Koordinatlı Zırhlı Kale</title>
+  <title>Korsan Dünyası - kule.glb Zırhlı Kale</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -867,59 +867,6 @@ function createBorderFrame() {
   scene.add(borderFrameMesh);
 }
 
-function buildCompactFortressMesh() {
-  const group = new THREE.Group();
-
-  const stoneMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.8, metalness: 0.2 });
-  const darkArmorMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4, metalness: 0.85 });
-  const brassMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.3, metalness: 0.9 });
-  const rockMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.95 });
-
-  const rockGeo = new THREE.DodecahedronGeometry(24, 1);
-  const rockMesh = new THREE.Mesh(rockGeo, rockMat);
-  rockMesh.position.set(0, -14, 0);
-  rockMesh.scale.set(1.3, 0.5, 1.3);
-  group.add(rockMesh);
-
-  const baseGeo = new THREE.CylinderGeometry(20, 24, 40, 16);
-  const baseMesh = new THREE.Mesh(baseGeo, stoneMat);
-  baseMesh.position.y = 20;
-  baseMesh.castShadow = true;
-  baseMesh.receiveShadow = true;
-  group.add(baseMesh);
-
-  const armorRingGeo = new THREE.CylinderGeometry(20.5, 20.5, 12, 16);
-  const armorRingMesh = new THREE.Mesh(armorRingGeo, darkArmorMat);
-  armorRingMesh.position.y = 28;
-  group.add(armorRingMesh);
-
-  const topGeo = new THREE.CylinderGeometry(18, 20, 32, 16);
-  const topMesh = new THREE.Mesh(topGeo, stoneMat);
-  topMesh.position.y = 52;
-  topMesh.castShadow = true;
-  group.add(topMesh);
-
-  const battlements = 8;
-  for (let i = 0; i < battlements; i++) {
-    const angle = (i / battlements) * Math.PI * 2;
-    const bGeo = new THREE.BoxGeometry(4, 6, 2.5);
-    const bMesh = new THREE.Mesh(bGeo, darkArmorMat);
-    bMesh.position.set(Math.cos(angle) * 17, 70, Math.sin(angle) * 17);
-    bMesh.rotation.y = -angle;
-    group.add(bMesh);
-  }
-
-  for (let i = 0; i < 3; i++) {
-    const bandGeo = new THREE.TorusGeometry(19 + (i * 1.0), 0.9, 8, 24);
-    const bandMesh = new THREE.Mesh(bandGeo, brassMat);
-    bandMesh.rotation.x = Math.PI / 2;
-    bandMesh.position.y = 12 + (i * 18);
-    group.add(bandMesh);
-  }
-
-  return group;
-}
-
 function buildConnectingWall(x1, z1, x2, z2) {
   const wallGroup = new THREE.Group();
   const dx = x2 - x1;
@@ -975,27 +922,33 @@ function buildCastleIsland() {
 
   towerPositions.forEach((pos, i) => {
     const towerId = 100 + i;
-    const towerModel = buildCompactFortressMesh();
-    let scaleFactor = 1.1;
-    towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-    towerModel.position.set(pos.x, SHIP_Y_POS - 40, pos.z);
-    towerModel.userData = { towerId: towerId, name: `Zırhlı Kule #${i+1}` };
+    gltfLoader.load('kule.glb', (gltf) => {
+      const towerModel = gltf.scene || gltf.scenes[0];
+      const box = new THREE.Box3().setFromObject(towerModel);
+      const size = new THREE.Vector3();
+      box.getSize(size);
+      let scaleFactor = 75 / Math.max(size.x, size.y, size.z);
+      towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-    towerModel.traverse(child => { 
-      child.userData = { towerId: towerId };
-      if (child.material) {
-        if (Array.isArray(child.material)) {
-          child.material.forEach(m => { m.depthWrite = true; m.depthTest = true; });
-        } else {
-          child.material.depthWrite = true;
-          child.material.depthTest = true;
+      towerModel.position.set(pos.x, SHIP_Y_POS - 40, pos.z);
+      towerModel.userData = { towerId: towerId, name: `Zırhlı Kule #${i+1}` };
+
+      towerModel.traverse(child => { 
+        child.userData = { towerId: towerId };
+        if (child.material) {
+          if (Array.isArray(child.material)) {
+            child.material.forEach(m => { m.depthWrite = true; m.depthTest = true; });
+          } else {
+            child.material.depthWrite = true;
+            child.material.depthTest = true;
+          }
         }
-      }
-    });
+      });
 
-    castleGroup.add(towerModel);
-    castleTowerMeshes.push(towerModel);
+      castleGroup.add(towerModel);
+      castleTowerMeshes.push(towerModel);
+    }, undefined, (err) => { console.warn("kule.glb yüklenemedi:", err); });
 
     castleTowers.push({
       id: towerId,
