@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Saf Surlara Sürtünme & Teğet Navigasyon</title>
+  <title>Korsan Dünyası - Açık Deniz Navigasyonu</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -516,7 +516,7 @@
     <div class="auth-card">
       <div class="auth-brand">
         <h1>⚓ Korsan Dünyası</h1>
-        <p>Gelişmiş Ada ve Derin Deniz Tasarımı</p>
+        <p>Açık Deniz ve Gemi Savaşları</p>
       </div>
       <div class="auth-tabs">
         <button id="tab-login" class="auth-tab active" type="button">Giriş Yap</button>
@@ -719,8 +719,6 @@ if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeIt
 let scene, camera, renderer;
 let oceanTexture = null;
 let activeGlbShip = null, playerNeonRing, enemies = [], rangeRingMesh;
-let castleGroup = null, castleTowers = [], castleTowerMeshes = [];
-let castleProjectiles = [];
 let activeProjectiles = [], particleSystems = [], cannonEffects = [];
 let raycaster, planeGeo, mouse;
 let selectedRingMesh = null;
@@ -729,7 +727,6 @@ let activeShipyardPreviews = [];
 
 const WORLD_SIZE = 9900; 
 const ATTACK_RANGE = 300;
-const CASTLE_AGGRO_RANGE = 350;
 const SHIP_Y_POS = 100;
 
 const CAMERA_HEIGHT = 800;
@@ -856,129 +853,6 @@ function createBorderFrame() {
   scene.add(borderFrameMesh);
 }
 
-function buildConnectingWall(p1, p2) {
-  const wallGroup = new THREE.Group();
-  const dx = p2.x - p1.x;
-  const dz = p2.z - p1.z;
-  const dist = Math.hypot(dx, dz);
-  const angle = Math.atan2(dz, dx);
-
-  const wallGeo = new THREE.BoxGeometry(dist, 45, 16);
-  const wallMat = new THREE.MeshStandardMaterial({ 
-    color: 0x1e293b, 
-    roughness: 0.7, 
-    metalness: 0.3,
-    emissive: 0x09131d,
-    emissiveIntensity: 0.2
-  });
-  const wallMesh = new THREE.Mesh(wallGeo, wallMat);
-  wallMesh.position.set(0, 22.5, 0);
-  wallMesh.castShadow = true;
-  wallMesh.receiveShadow = true;
-  wallGroup.add(wallMesh);
-
-  const topPlateGeo = new THREE.BoxGeometry(dist, 6, 20);
-  const topPlateMat = new THREE.MeshStandardMaterial({ 
-    color: 0xb45309, 
-    roughness: 0.3, 
-    metalness: 0.8,
-    emissive: 0x78350f,
-    emissiveIntensity: 0.4
-  });
-  const topPlateMesh = new THREE.Mesh(topPlateGeo, topPlateMat);
-  topPlateMesh.position.set(0, 47, 0);
-  wallGroup.add(topPlateMesh);
-
-  wallGroup.position.set((p1.x + p2.x) / 2, SHIP_Y_POS - 40, (p1.z + p2.z) / 2);
-  wallGroup.rotation.y = -angle;
-
-  return wallGroup;
-}
-
-function buildCastleIsland() {
-  castleGroup = new THREE.Group();
-  castleGroup.position.set(0, 0, 0);
-
-  castleTowers = [];
-  castleTowerMeshes = [];
-
-  const totalTowers = 18;
-  const radius = 300; 
-  const towerPositions = [];
-
-  for (let i = 0; i < totalTowers; i++) {
-    const angle = (i / totalTowers) * Math.PI * 2;
-    const posX = Math.cos(angle) * radius;
-    const posZ = Math.sin(angle) * radius;
-    towerPositions.push({ x: posX, z: posZ, index: i });
-  }
-
-  towerPositions.forEach((pos, i) => {
-    const towerId = 100 + i;
-    
-    const fallbackGeo = new THREE.CylinderGeometry(14, 20, 70, 16);
-    const fallbackMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.6, metalness: 0.4 });
-    const fallbackTower = new THREE.Mesh(fallbackGeo, fallbackMat);
-    fallbackTower.position.set(pos.x, SHIP_Y_POS - 5, pos.z);
-    fallbackTower.userData = { towerId: towerId, name: `Lüks Zırhlı Kule #${i+1}` };
-    castleGroup.add(fallbackTower);
-    castleTowerMeshes.push(fallbackTower);
-
-    gltfLoader.load('kule.glb', (gltf) => {
-      const towerModel = gltf.scene || gltf.scenes[0];
-      const box = new THREE.Box3().setFromObject(towerModel);
-      const size = new THREE.Vector3();
-      box.getSize(size);
-      let scaleFactor = 120 / Math.max(size.x, size.y, size.z);
-      towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
-
-      towerModel.position.set(pos.x, SHIP_Y_POS - 40, pos.z);
-      towerModel.userData = { towerId: towerId, name: `Lüks Zırhlı Kule #${i+1}` };
-
-      towerModel.traverse(child => { 
-        child.userData = { towerId: towerId };
-        if (child.material) {
-          if (Array.isArray(child.material)) {
-            child.material.forEach(m => { m.depthWrite = true; m.depthTest = true; });
-          } else {
-            child.material.depthWrite = true;
-            child.material.depthTest = true;
-          }
-        }
-      });
-
-      castleGroup.remove(fallbackTower);
-      const idx = castleTowerMeshes.indexOf(fallbackTower);
-      if (idx !== -1) castleTowerMeshes.splice(idx, 1);
-
-      castleGroup.add(towerModel);
-      castleTowerMeshes.push(towerModel);
-    }, undefined, (err) => { 
-      console.warn("kule.glb yüklenemedi:", err); 
-    });
-
-    castleTowers.push({
-      id: towerId,
-      name: `Lüks Zırhlı Kule #${i+1}`,
-      localX: pos.x,
-      localZ: pos.z,
-      hp: 500000,
-      maxHp: 500000,
-      lastShotTime: 0
-    });
-  });
-
-  for (let i = 0; i < totalTowers; i++) {
-    const nextIdx = (i + 1) % totalTowers;
-    const p1 = towerPositions[i];
-    const p2 = towerPositions[nextIdx];
-    const wallSegment = buildConnectingWall(p1, p2);
-    castleGroup.add(wallSegment);
-  }
-
-  scene.add(castleGroup);
-}
-
 function initThreeGame() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x030f1a);
@@ -1020,7 +894,6 @@ function initThreeGame() {
   scene.add(ocean);
 
   createBorderFrame();
-  buildCastleIsland();
 
   const ringGeo = new THREE.RingGeometry(ATTACK_RANGE - 3, ATTACK_RANGE, 64);
   const ringMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.6 });
@@ -1082,22 +955,6 @@ function initThreeGame() {
       }
       if (rootObj.userData.enemyId) {
         selectedEnemyId = rootObj.userData.enemyId;
-        selectedTowerId = null;
-        updateTargetCard();
-        syncAttackButton();
-        return;
-      }
-    }
-
-    const intersectsTowers = raycaster.intersectObjects(castleTowerMeshes, true);
-    if (intersectsTowers.length > 0) {
-      let obj = intersectsTowers[0].object;
-      while (obj.parent && !obj.userData.towerId) {
-        obj = obj.parent;
-      }
-      if (obj.userData.towerId) {
-        selectedTowerId = obj.userData.towerId;
-        selectedEnemyId = null;
         updateTargetCard();
         syncAttackButton();
         return;
@@ -1108,8 +965,8 @@ function initThreeGame() {
     if (oceanIntersect.length > 0) {
       const dest = { x: oceanIntersect[0].point.x, z: oceanIntersect[0].point.z };
       
-      // Kapısız, Saf Surlara Sürtünen Teğet Rota Hesaplayıcısı
-      navigationQueue = calculateCircumventionPath({ x: player.x, z: player.z }, dest);
+      // Açık deniz direkt hedef rotası (engelsiz)
+      targetDestination = dest;
     }
   });
 
@@ -1120,50 +977,9 @@ function initThreeGame() {
 }
 
 let player;
-let navigationQueue = [];
-let selectedEnemyId = null, selectedTowerId = null, isAttacking = false, isGameOver = false;
+let targetDestination = null;
+let selectedEnemyId = null, isAttacking = false, isGameOver = false;
 let lastPlayerAttackTime = 0;
-
-const ISLAND_RADIUS = 330; // Surların güvenli dış teğet sınırı
-
-function lineIntersectsIsland(p1, p2) {
-  const dx = p2.x - p1.x;
-  const dz = p2.z - p1.z;
-  const len = Math.hypot(dx, dz);
-  if (len === 0) return false;
-
-  const u = ((0 - p1.x) * dx + (0 - p1.z) * dz) / (len * len);
-  const clampedU = Math.max(0, Math.min(1, u));
-  const nearestX = p1.x + clampedU * dx;
-  const nearestZ = p1.z + clampedU * dz;
-  const distToCenter = Math.hypot(nearestX, nearestZ);
-
-  return distToCenter < ISLAND_RADIUS;
-}
-
-function calculateCircumventionPath(start, end) {
-  if (!lineIntersectsIsland(start, end)) {
-    return [end];
-  }
-
-  const startAngle = Math.atan2(start.z, start.x);
-  const endAngle = Math.atan2(end.z, end.x);
-  const midAngle = (startAngle + endAngle) / 2;
-  
-  let angleDiff = endAngle - startAngle;
-  while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
-  while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
-
-  const detourAngle = angleDiff > 0 ? midAngle - Math.PI / 2 : midAngle + Math.PI / 2;
-  const skirtRadius = ISLAND_RADIUS + 20; // Surlara sıfıra sıfır sürtünerek dönemeç oluşturur
-  
-  const waypoint = {
-    x: Math.cos(detourAngle) * skirtRadius,
-    z: Math.sin(detourAngle) * skirtRadius
-  };
-
-  return [waypoint, end];
-}
 
 function setupPlayerShipVisual() {
   const users = loadUsers();
@@ -1186,11 +1002,11 @@ function setupPlayerShipVisual() {
 }
 
 function startGameLogic() {
-  isGameOver = false; navigationQueue = []; selectedEnemyId = null; selectedTowerId = null; isAttacking = false;
+  isGameOver = false; targetDestination = null; selectedEnemyId = null; isAttacking = false;
   gameOverEl.style.display = 'none';
 
   player = {
-    x: 750, z: -550, a: -Math.PI / 2, speed: 0, baseSpeed: 180, maxSpeed: 180,
+    x: 0, z: 0, a: -Math.PI / 2, speed: 0, baseSpeed: 180, maxSpeed: 180,
     hp: 1000000, maxHp: 1000000, score: 100000000, diamonds: 1103,
     level: 1, exp: 0, maxExp: 100,
     expansionRights: { cannon: 1, hp: 1, speed: 1 },
@@ -1213,7 +1029,7 @@ function startGameLogic() {
 function changeMap(mapIdx, entrySide = 'center') {
   currentMapIndex = mapIdx;
   radarTitleEl.textContent = MAP_DATA[mapIdx].name;
-  navigationQueue = [];
+  targetDestination = null;
   hideTransitButton();
 
   const BOUND = (WORLD_SIZE / 2) - 350;
@@ -1226,7 +1042,7 @@ function changeMap(mapIdx, entrySide = 'center') {
   } else if (entrySide === 'bottom') {
     player.z = -BOUND;
   } else {
-    player.x = 750; player.z = -550;
+    player.x = 0; player.z = 0;
   }
 
   document.querySelectorAll('.enemy-label').forEach(el => el.remove());
@@ -1266,7 +1082,7 @@ function spawnEnemyGlb(id) {
   do {
     ex = (Math.random() - 0.5) * (WORLD_SIZE * 0.7);
     ez = (Math.random() - 0.5) * (WORLD_SIZE * 0.7);
-  } while (Math.hypot(ex, ez) < 430);
+  } while (Math.hypot(ex, ez) < 300);
 
   const labelEl = document.createElement('div');
   labelEl.className = 'enemy-label';
@@ -1326,43 +1142,31 @@ window.addEventListener('keydown', e => {
 });
 
 function updateTargetCard() {
-  if (!selectedEnemyId && !selectedTowerId) {
+  if (!selectedEnemyId) {
     targetCardEl.classList.remove('visible');
     if (selectedRingMesh) selectedRingMesh.visible = false;
     return;
   }
   targetCardEl.classList.add('visible');
 
-  if (selectedEnemyId) {
-    const target = enemies.find(e => e.id === selectedEnemyId);
-    if (!target) { targetCardEl.classList.remove('visible'); if (selectedRingMesh) selectedRingMesh.visible = false; return; }
-    targetNameEl.textContent = target.name;
-    targetHpTextEl.textContent = `${Math.ceil(target.hp).toLocaleString()}/${target.maxHp.toLocaleString()}`;
-    targetHpBarEl.style.width = Math.max(0, (target.hp / target.maxHp) * 100) + '%';
-    if (selectedRingMesh) { selectedRingMesh.visible = true; selectedRingMesh.position.set(target.x, 0.9, target.z); }
-  } else if (selectedTowerId) {
-    const tower = castleTowers.find(t => t.id === selectedTowerId);
-    if (!tower) { targetCardEl.classList.remove('visible'); if (selectedRingMesh) selectedRingMesh.visible = false; return; }
-    targetNameEl.textContent = tower.name;
-    targetHpTextEl.textContent = `${Math.ceil(tower.hp).toLocaleString()}/${tower.maxHp.toLocaleString()}`;
-    targetHpBarEl.style.width = Math.max(0, (tower.hp / tower.maxHp) * 100) + '%';
-    if (selectedRingMesh) {
-      selectedRingMesh.visible = true;
-      selectedRingMesh.position.set(castleGroup.position.x + tower.localX, 0.9, castleGroup.position.z + tower.localZ);
-    }
-  }
+  const target = enemies.find(e => e.id === selectedEnemyId);
+  if (!target) { targetCardEl.classList.remove('visible'); if (selectedRingMesh) selectedRingMesh.visible = false; return; }
+  targetNameEl.textContent = target.name;
+  targetHpTextEl.textContent = `${Math.ceil(target.hp).toLocaleString()}/${target.maxHp.toLocaleString()}`;
+  targetHpBarEl.style.width = Math.max(0, (target.hp / target.maxHp) * 100) + '%';
+  if (selectedRingMesh) { selectedRingMesh.visible = true; selectedRingMesh.position.set(target.x, 0.9, target.z); }
 }
 
 function syncAttackButton() {
   if (isGameOver || !player) return;
   const currentAmmoQty = player.ammo[player.selectedAmmo] || 0;
-  attackBtn.disabled = (!selectedEnemyId && !selectedTowerId) || currentAmmoQty < player.cannons;
+  attackBtn.disabled = !selectedEnemyId || currentAmmoQty < player.cannons;
   attackBtn.classList.toggle('firing', isAttacking);
   attackBtnText.textContent = isAttacking ? 'DURDUR' : 'ATEŞ ET';
 }
 
 attackBtn.addEventListener('click', () => {
-  if (!selectedEnemyId && !selectedTowerId) return;
+  if (!selectedEnemyId) return;
   if ((player.ammo[player.selectedAmmo] || 0) < player.cannons) return;
   isAttacking = !isAttacking;
   syncAttackButton();
@@ -1421,15 +1225,6 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
   activeProjectiles.push({ mesh, x: startX, z: startZ, targetX, targetZ, speed: 380, ammoKey, onHit, yOffset: 50, lastSparkDist: 0 });
 }
 
-function fireCastleProjectile(startX, startZ, targetX, targetZ, onHit) {
-  const pGeo = new THREE.SphereGeometry(5, 16, 16);
-  const pMat = new THREE.MeshStandardMaterial({ color: 0xff4500, emissive: 0xff0000, emissiveIntensity: 1.2 });
-  const mesh = new THREE.Mesh(pGeo, pMat);
-  mesh.position.set(startX, 50, startZ);
-  scene.add(mesh);
-  castleProjectiles.push({ mesh, x: startX, z: startZ, targetX, targetZ, speed: 320, onHit });
-}
-
 function animate3D() {
   requestAnimationFrame(animate3D);
 
@@ -1463,22 +1258,17 @@ function animate3D() {
     }
   }
 
-  if (navigationQueue.length > 0) {
-    const currentTarget = navigationQueue[0];
-    const dx = currentTarget.x - player.x;
-    const dz = currentTarget.z - player.z;
+  if (targetDestination) {
+    const dx = targetDestination.x - player.x;
+    const dz = targetDestination.z - player.z;
     const dist = Math.hypot(dx, dz);
 
-    const arrivalThreshold = navigationQueue.length > 1 ? 25 : 10;
-
-    if (dist > arrivalThreshold) {
+    if (dist > 10) {
       player.a = Math.atan2(dz, dx);
       player.speed = player.maxSpeed;
     } else {
-      navigationQueue.shift();
-      if (navigationQueue.length === 0) {
-        player.speed = 0;
-      }
+      player.speed = 0;
+      targetDestination = null;
     }
   } else {
     player.speed = 0;
@@ -1549,21 +1339,12 @@ function animate3D() {
   }
   rangeRingMesh.position.set(player.x, 0.6, player.z);
 
-  if (selectedRingMesh) {
-    if (selectedEnemyId) {
-      const target = enemies.find(e => e.id === selectedEnemyId);
-      if (target) {
-        selectedRingMesh.visible = true;
-        selectedRingMesh.position.set(target.x, 0.9, target.z);
-        selectedRingMesh.rotation.z += (1.2 * dt);
-      }
-    } else if (selectedTowerId) {
-      const tower = castleTowers.find(t => t.id === selectedTowerId);
-      if (tower) {
-        selectedRingMesh.visible = true;
-        selectedRingMesh.position.set(castleGroup.position.x + tower.localX, 0.9, castleGroup.position.z + tower.localZ);
-        selectedRingMesh.rotation.z += (1.2 * dt);
-      }
+  if (selectedRingMesh && selectedEnemyId) {
+    const target = enemies.find(e => e.id === selectedEnemyId);
+    if (target) {
+      selectedRingMesh.visible = true;
+      selectedRingMesh.position.set(target.x, 0.9, target.z);
+      selectedRingMesh.rotation.z += (1.2 * dt);
     }
   }
 
@@ -1578,25 +1359,6 @@ function animate3D() {
   camera.position.z += (player.z + CAMERA_DEPTH - camera.position.z) * (6.0 * dt);
   camera.lookAt(player.x, 0, player.z);
 
-  if (castleGroup) {
-    castleTowers.forEach(tower => {
-      if (tower.hp <= 0) return;
-      const twX = castleGroup.position.x + tower.localX;
-      const twZ = castleGroup.position.z + tower.localZ;
-      if (Math.hypot(player.x - twX, player.z - twZ) <= CASTLE_AGGRO_RANGE && (now - tower.lastShotTime >= 2200)) {
-        tower.lastShotTime = now;
-        lastRegenTime = now;
-        fireCastleProjectile(twX, twZ, player.x, player.z, () => {
-          player.hp = Math.max(0, player.hp - 80);
-          player.lastDamagedTime = now;
-          showFloatingDamage(player.x, player.z, '-80 (Kule)', '#dc2626');
-          updateHUD();
-          if (player.hp <= 0) { isGameOver = true; isAttacking = false; gameOverEl.style.display = 'flex'; finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString(); }
-        });
-      }
-    });
-  }
-
   for (let i = cannonEffects.length - 1; i >= 0; i--) {
     const ce = cannonEffects[i];
     ce.life--;
@@ -1606,21 +1368,6 @@ function animate3D() {
     if (ce.life <= 0 || ce.mesh.material.opacity <= 0) {
       scene.remove(ce.mesh); ce.mesh.geometry.dispose(); ce.mesh.material.dispose();
       cannonEffects.splice(i, 1);
-    }
-  }
-
-  for (let i = castleProjectiles.length - 1; i >= 0; i--) {
-    const cp = castleProjectiles[i];
-    const dx = player.x - cp.x, dz = player.z - cp.z;
-    const dist = Math.hypot(dx, dz);
-    const step = cp.speed * dt;
-    if (dist < step) {
-      scene.remove(cp.mesh); cp.mesh.geometry.dispose(); cp.mesh.material.dispose();
-      castleProjectiles.splice(i, 1);
-      if (cp.onHit) cp.onHit();
-    } else {
-      cp.x += (dx / dist) * step; cp.z += (dz / dist) * step;
-      cp.mesh.position.set(cp.x, 50, cp.z);
     }
   }
 
@@ -1719,7 +1466,7 @@ function animate3D() {
     }
   }
 
-  if (isAttacking && (selectedEnemyId || selectedTowerId)) {
+  if (isAttacking && selectedEnemyId) {
     const ammoKey = player.selectedAmmo;
     const ammoSpec = AMMO_TYPES[ammoKey];
 
@@ -1727,89 +1474,42 @@ function animate3D() {
       isAttacking = false;
       syncAttackButton();
       showFloatingDamage(player.x, player.z, 'GÜLLE YETERSİZ!', '#f87171');
-    } else if (Math.hypot((selectedEnemyId ? enemies.find(e=>e.id===selectedEnemyId)?.x : castleGroup.position.x + castleTowers.find(t=>t.id===selectedTowerId)?.localX) - player.x, 
-                          (selectedEnemyId ? enemies.find(e=>e.id===selectedEnemyId)?.z : castleGroup.position.z + castleTowers.find(t=>t.id===selectedTowerId)?.localZ) - player.z) <= ATTACK_RANGE && (now - lastPlayerAttackTime >= 1000)) {
-      
-      lastPlayerAttackTime = now;
-      player.ammo[ammoKey] -= player.cannons;
+    } else {
+      const target = enemies.find(e => e.id === selectedEnemyId);
+      if (target && Math.hypot(target.x - player.x, target.z - player.z) <= ATTACK_RANGE && (now - lastPlayerAttackTime >= 1000)) {
+        lastPlayerAttackTime = now;
+        player.ammo[ammoKey] -= player.cannons;
 
-      const targetX = selectedEnemyId ? enemies.find(e=>e.id===selectedEnemyId).x : castleGroup.position.x + castleTowers.find(t=>t.id===selectedTowerId).localX;
-      const targetZ = selectedEnemyId ? enemies.find(e=>e.id===selectedEnemyId).z : castleGroup.position.z + castleTowers.find(t=>t.id===selectedTowerId).localZ;
+        target.isAggro = true;
+        fireProjectile(player.x, player.z, target.x, target.z, ammoKey, () => {
+          target.hp -= ammoSpec.damage;
+          if (ammoSpec.slow < 1.0) target.slowTimer = 240;
+          showFloatingDamage(target.x, target.z, '-' + ammoSpec.damage.toLocaleString(), '#f97316');
+          updateTargetCard(); updateHUD(); syncAttackButton();
 
-      if (selectedEnemyId) {
-        const target = enemies.find(e => e.id === selectedEnemyId);
-        if (target) {
-          target.isAggro = true;
-          fireProjectile(player.x, player.z, target.x, target.z, ammoKey, () => {
-            target.hp -= ammoSpec.damage;
-            if (ammoSpec.slow < 1.0) target.slowTimer = 240;
-            showFloatingDamage(target.x, target.z, '-' + ammoSpec.damage.toLocaleString(), '#f97316');
-            updateTargetCard(); updateHUD(); syncAttackButton();
-
-            if (target.hp <= 0) {
-              if (target.mesh) scene.remove(target.mesh);
-              target.labelEl.remove();
-              enemies = enemies.filter(e => e.id !== target.id);
-              selectedEnemyId = null; isAttacking = false;
-              if (selectedRingMesh) selectedRingMesh.visible = false;
-              player.score += 150;
-              
-              player.exp += 45;
-              if (player.exp >= player.maxExp) {
-                player.level++;
-                player.exp -= player.maxExp;
-                player.maxExp = Math.floor(player.maxExp * 1.35);
-                player.expansionRights.cannon++;
-                player.expansionRights.hp++;
-                player.expansionRights.speed++;
-                showFloatingDamage(player.x, player.z, `LEVEL UP! +1 Top, +1 Can, +1 Hız Hakkı`, '#38bdf8');
-              }
-
-              updateTargetCard(); updateHUD(); syncAttackButton();
-              setTimeout(() => spawnEnemyGlb(target.id), 3000);
+          if (target.hp <= 0) {
+            if (target.mesh) scene.remove(target.mesh);
+            target.labelEl.remove();
+            enemies = enemies.filter(e => e.id !== target.id);
+            selectedEnemyId = null; isAttacking = false;
+            if (selectedRingMesh) selectedRingMesh.visible = false;
+            player.score += 150;
+            
+            player.exp += 45;
+            if (player.exp >= player.maxExp) {
+              player.level++;
+              player.exp -= player.maxExp;
+              player.maxExp = Math.floor(player.maxExp * 1.35);
+              player.expansionRights.cannon++;
+              player.expansionRights.hp++;
+              player.expansionRights.speed++;
+              showFloatingDamage(player.x, player.z, `LEVEL UP! +1 Top, +1 Can, +1 Hız Hakkı`, '#38bdf8');
             }
-          });
-        }
-      } else if (selectedTowerId) {
-        const tower = castleTowers.find(t => t.id === selectedTowerId);
-        if (tower && tower.hp > 0) {
-          fireProjectile(player.x, player.z, targetX, targetZ, ammoKey, () => {
-            tower.hp -= ammoSpec.damage;
-            showFloatingDamage(targetX, targetZ, '-' + ammoSpec.damage.toLocaleString(), '#f97316');
+
             updateTargetCard(); updateHUD(); syncAttackButton();
-
-            if (tower.hp <= 0) {
-              const meshToRemove = castleTowerMeshes.find(m => m.userData.towerId === tower.id);
-              if (meshToRemove) {
-                castleGroup.remove(meshToRemove);
-                meshToRemove.traverse(child => {
-                  if (child.geometry) child.geometry.dispose();
-                  if (child.material) {
-                    if (Array.isArray(child.material)) child.material.forEach(m => m.dispose());
-                    else child.material.dispose();
-                  }
-                });
-              }
-              castleTowerMeshes = castleTowerMeshes.filter(m => m.userData.towerId !== tower.id);
-              selectedTowerId = null; isAttacking = false;
-              if (selectedRingMesh) selectedRingMesh.visible = false;
-              player.score += 300;
-              
-              player.exp += 80;
-              if (player.exp >= player.maxExp) {
-                player.level++;
-                player.exp -= player.maxExp;
-                player.maxExp = Math.floor(player.maxExp * 1.35);
-                player.expansionRights.cannon++;
-                player.expansionRights.hp++;
-                player.expansionRights.speed++;
-                showFloatingDamage(player.x, player.z, `LEVEL UP! +1 Top, +1 Can, +1 Hız Hakkı`, '#38bdf8');
-              }
-
-              updateTargetCard(); updateHUD(); syncAttackButton();
-            }
-          });
-        }
+            setTimeout(() => spawnEnemyGlb(target.id), 3000);
+          }
+        });
       }
     }
   }
@@ -1834,13 +1534,6 @@ function drawMinimap() {
   if (!player) return;
   const scale = w / WORLD_SIZE;
   const cx = w / 2, cy = h / 2;
-
-  mctx.fillStyle = '#f59e0b';
-  castleTowers.forEach(t => {
-    mctx.beginPath();
-    mctx.arc(cx + t.localX * scale, cy + t.localZ * scale, 2.0, 0, Math.PI * 2);
-    mctx.fill();
-  });
 
   mctx.fillStyle = '#dc2626';
   enemies.forEach(en => {
