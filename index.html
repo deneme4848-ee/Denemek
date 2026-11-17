@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Kesin Surlardan Kaçınma & Teğet Navigasyon</title>
+  <title>Korsan Dünyası - Saf Surlara Sürtünme & Teğet Navigasyon</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -906,9 +906,6 @@ function buildCastleIsland() {
   const radius = 300; 
   const towerPositions = [];
 
-  const gateStartIndex = 6;
-  const gateEndIndex = 7;
-
   for (let i = 0; i < totalTowers; i++) {
     const angle = (i / totalTowers) * Math.PI * 2;
     const posX = Math.cos(angle) * radius;
@@ -918,50 +915,47 @@ function buildCastleIsland() {
 
   towerPositions.forEach((pos, i) => {
     const towerId = 100 + i;
-    const isGateOpening = (i >= gateStartIndex && i <= gateEndIndex);
+    
+    const fallbackGeo = new THREE.CylinderGeometry(14, 20, 70, 16);
+    const fallbackMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.6, metalness: 0.4 });
+    const fallbackTower = new THREE.Mesh(fallbackGeo, fallbackMat);
+    fallbackTower.position.set(pos.x, SHIP_Y_POS - 5, pos.z);
+    fallbackTower.userData = { towerId: towerId, name: `Lüks Zırhlı Kule #${i+1}` };
+    castleGroup.add(fallbackTower);
+    castleTowerMeshes.push(fallbackTower);
 
-    if (!isGateOpening) {
-      const fallbackGeo = new THREE.CylinderGeometry(14, 20, 70, 16);
-      const fallbackMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.6, metalness: 0.4 });
-      const fallbackTower = new THREE.Mesh(fallbackGeo, fallbackMat);
-      fallbackTower.position.set(pos.x, SHIP_Y_POS - 5, pos.z);
-      fallbackTower.userData = { towerId: towerId, name: `Lüks Zırhlı Kule #${i+1}` };
-      castleGroup.add(fallbackTower);
-      castleTowerMeshes.push(fallbackTower);
+    gltfLoader.load('kule.glb', (gltf) => {
+      const towerModel = gltf.scene || gltf.scenes[0];
+      const box = new THREE.Box3().setFromObject(towerModel);
+      const size = new THREE.Vector3();
+      box.getSize(size);
+      let scaleFactor = 120 / Math.max(size.x, size.y, size.z);
+      towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      gltfLoader.load('kule.glb', (gltf) => {
-        const towerModel = gltf.scene || gltf.scenes[0];
-        const box = new THREE.Box3().setFromObject(towerModel);
-        const size = new THREE.Vector3();
-        box.getSize(size);
-        let scaleFactor = 120 / Math.max(size.x, size.y, size.z);
-        towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
+      towerModel.position.set(pos.x, SHIP_Y_POS - 40, pos.z);
+      towerModel.userData = { towerId: towerId, name: `Lüks Zırhlı Kule #${i+1}` };
 
-        towerModel.position.set(pos.x, SHIP_Y_POS - 40, pos.z);
-        towerModel.userData = { towerId: towerId, name: `Lüks Zırhlı Kule #${i+1}` };
-
-        towerModel.traverse(child => { 
-          child.userData = { towerId: towerId };
-          if (child.material) {
-            if (Array.isArray(child.material)) {
-              child.material.forEach(m => { m.depthWrite = true; m.depthTest = true; });
-            } else {
-              child.material.depthWrite = true;
-              child.material.depthTest = true;
-            }
+      towerModel.traverse(child => { 
+        child.userData = { towerId: towerId };
+        if (child.material) {
+          if (Array.isArray(child.material)) {
+            child.material.forEach(m => { m.depthWrite = true; m.depthTest = true; });
+          } else {
+            child.material.depthWrite = true;
+            child.material.depthTest = true;
           }
-        });
-
-        castleGroup.remove(fallbackTower);
-        const idx = castleTowerMeshes.indexOf(fallbackTower);
-        if (idx !== -1) castleTowerMeshes.splice(idx, 1);
-
-        castleGroup.add(towerModel);
-        castleTowerMeshes.push(towerModel);
-      }, undefined, (err) => { 
-        console.warn("kule.glb yüklenemedi:", err); 
+        }
       });
-    }
+
+      castleGroup.remove(fallbackTower);
+      const idx = castleTowerMeshes.indexOf(fallbackTower);
+      if (idx !== -1) castleTowerMeshes.splice(idx, 1);
+
+      castleGroup.add(towerModel);
+      castleTowerMeshes.push(towerModel);
+    }, undefined, (err) => { 
+      console.warn("kule.glb yüklenemedi:", err); 
+    });
 
     castleTowers.push({
       id: towerId,
@@ -970,16 +964,12 @@ function buildCastleIsland() {
       localZ: pos.z,
       hp: 500000,
       maxHp: 500000,
-      isGate: isGateOpening,
       lastShotTime: 0
     });
   });
 
   for (let i = 0; i < totalTowers; i++) {
     const nextIdx = (i + 1) % totalTowers;
-    if (i >= gateStartIndex && i <= gateEndIndex) {
-      continue;
-    }
     const p1 = towerPositions[i];
     const p2 = towerPositions[nextIdx];
     const wallSegment = buildConnectingWall(p1, p2);
@@ -1118,7 +1108,7 @@ function initThreeGame() {
     if (oceanIntersect.length > 0) {
       const dest = { x: oceanIntersect[0].point.x, z: oceanIntersect[0].point.z };
       
-      // Kesin Surlardan ve Adadan Kaçınan Teğet Çevreleme Rota Hesaplayıcısı
+      // Kapısız, Saf Surlara Sürtünen Teğet Rota Hesaplayıcısı
       navigationQueue = calculateCircumventionPath({ x: player.x, z: player.z }, dest);
     }
   });
@@ -1134,53 +1124,39 @@ let navigationQueue = [];
 let selectedEnemyId = null, selectedTowerId = null, isAttacking = false, isGameOver = false;
 let lastPlayerAttackTime = 0;
 
-const ISLAND_RADIUS = 340; // Surların güvenli dış teğet yarıçapı
+const ISLAND_RADIUS = 330; // Surların güvenli dış teğet sınırı
 
-// Başlangıçtan hedefe giden çizgi adanın (ISLAND_RADIUS) içinden veya teğet sınırından geçiyor mu?
 function lineIntersectsIsland(p1, p2) {
   const dx = p2.x - p1.x;
   const dz = p2.z - p1.z;
   const len = Math.hypot(dx, dz);
   if (len === 0) return false;
 
-  // Merkezden (0,0) bu doğruya en yakın mesafeyi bul
   const u = ((0 - p1.x) * dx + (0 - p1.z) * dz) / (len * len);
   const clampedU = Math.max(0, Math.min(1, u));
   const nearestX = p1.x + clampedU * dx;
   const nearestZ = p1.z + clampedU * dz;
   const distToCenter = Math.hypot(nearestX, nearestZ);
 
-  // Doğru adanın yarıçapından daha yakınsa surlardan / adadan geçiyor demektir
-  if (distToCenter < ISLAND_RADIUS) {
-    return true;
-  }
-  return false;
+  return distToCenter < ISLAND_RADIUS;
 }
 
-// Adanın etrafından sürtünerek (teğet) dolaşacak ara duraklar (waypoint) oluşturan rota fonksiyonu
 function calculateCircumventionPath(start, end) {
-  // Eğer doğrudan hat adayı kesmiyorsa direkt hedefe git
   if (!lineIntersectsIsland(start, end)) {
     return [end];
   }
 
-  // Doğru adayı kesiyor: Adanın etrafından dolaşmak için iki alternatif teğet yay rotası (saat yönü / saat yönünün tersi) hesaplıyoruz
   const startAngle = Math.atan2(start.z, start.x);
   const endAngle = Math.atan2(end.z, end.x);
-
-  // İki farklı teğet geçiş noktası (saat yönü ve tersi yönünde adayı çevreleme)
-  // Adanın güvenli yarıçapı üzerinden geçecek şekilde 3 ara nokta oluşturalım
   const midAngle = (startAngle + endAngle) / 2;
   
-  // Hangi yönden dolaşmanın daha kısa olduğunu bulmak için açı farkı
   let angleDiff = endAngle - startAngle;
   while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
   while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
 
-  // Dolaşma yönüne göre orta teğet noktayı adanın dışından seçelim
   const detourAngle = angleDiff > 0 ? midAngle - Math.PI / 2 : midAngle + Math.PI / 2;
+  const skirtRadius = ISLAND_RADIUS + 20; // Surlara sıfıra sıfır sürtünerek dönemeç oluşturur
   
-  const skirtRadius = ISLAND_RADIUS + 25; // Surlara sürtünmeden ama asla içinden geçmeden güvenli mesafe
   const waypoint = {
     x: Math.cos(detourAngle) * skirtRadius,
     z: Math.sin(detourAngle) * skirtRadius
@@ -1366,7 +1342,7 @@ function updateTargetCard() {
     if (selectedRingMesh) { selectedRingMesh.visible = true; selectedRingMesh.position.set(target.x, 0.9, target.z); }
   } else if (selectedTowerId) {
     const tower = castleTowers.find(t => t.id === selectedTowerId);
-    if (!tower || tower.isGate) { targetCardEl.classList.remove('visible'); if (selectedRingMesh) selectedRingMesh.visible = false; return; }
+    if (!tower) { targetCardEl.classList.remove('visible'); if (selectedRingMesh) selectedRingMesh.visible = false; return; }
     targetNameEl.textContent = tower.name;
     targetHpTextEl.textContent = `${Math.ceil(tower.hp).toLocaleString()}/${tower.maxHp.toLocaleString()}`;
     targetHpBarEl.style.width = Math.max(0, (tower.hp / tower.maxHp) * 100) + '%';
@@ -1583,7 +1559,7 @@ function animate3D() {
       }
     } else if (selectedTowerId) {
       const tower = castleTowers.find(t => t.id === selectedTowerId);
-      if (tower && !tower.isGate) {
+      if (tower) {
         selectedRingMesh.visible = true;
         selectedRingMesh.position.set(castleGroup.position.x + tower.localX, 0.9, castleGroup.position.z + tower.localZ);
         selectedRingMesh.rotation.z += (1.2 * dt);
@@ -1604,7 +1580,7 @@ function animate3D() {
 
   if (castleGroup) {
     castleTowers.forEach(tower => {
-      if (tower.hp <= 0 || tower.isGate) return;
+      if (tower.hp <= 0) return;
       const twX = castleGroup.position.x + tower.localX;
       const twZ = castleGroup.position.z + tower.localZ;
       if (Math.hypot(player.x - twX, player.z - twZ) <= CASTLE_AGGRO_RANGE && (now - tower.lastShotTime >= 2200)) {
@@ -1796,7 +1772,7 @@ function animate3D() {
         }
       } else if (selectedTowerId) {
         const tower = castleTowers.find(t => t.id === selectedTowerId);
-        if (tower && !tower.isGate && tower.hp > 0) {
+        if (tower && tower.hp > 0) {
           fireProjectile(player.x, player.z, targetX, targetZ, ammoKey, () => {
             tower.hp -= ammoSpec.damage;
             showFloatingDamage(targetX, targetZ, '-' + ammoSpec.damage.toLocaleString(), '#f97316');
@@ -1861,7 +1837,6 @@ function drawMinimap() {
 
   mctx.fillStyle = '#f59e0b';
   castleTowers.forEach(t => {
-    if (t.isGate) return;
     mctx.beginPath();
     mctx.arc(cx + t.localX * scale, cy + t.localZ * scale, 2.0, 0, Math.PI * 2);
     mctx.fill();
