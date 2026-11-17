@@ -944,7 +944,7 @@ function buildCastleIsland() {
       castleTowerMeshes.push(fallbackTower);
 
       // KULE.GLB DOSYASINI YÜKLE VE LÜKS GÖRÜNÜME GETİR
-      gltfLoader.load(modelPath: 'kule.glb', (gltf) => {
+      gltfLoader.load('kule.glb', (gltf) => {
         const towerModel = gltf.scene || gltf.scenes[0];
         const box = new THREE.Box3().setFromObject(towerModel);
         const size = new THREE.Vector3();
