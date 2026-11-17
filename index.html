@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Gelişmiş Ada Navigasyonu</title>
+  <title>Korsan Dünyası - Serbest Ada Geçişi</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -719,7 +719,7 @@ if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeIt
 let scene, camera, renderer;
 let oceanTexture = null;
 let activeGlbShip = null, playerNeonRing, enemies = [], rangeRingMesh;
-let castleGroup = null, castleTowers = [], castleTowerMeshes = [], castleColliders = [];
+let castleGroup = null, castleTowers = [], castleTowerMeshes = [];
 let castleProjectiles = [];
 let activeProjectiles = [], particleSystems = [], cannonEffects = [];
 let raycaster, planeGeo, mouse;
@@ -892,10 +892,6 @@ function buildConnectingWall(p1, p2) {
   wallGroup.position.set((p1.x + p2.x) / 2, SHIP_Y_POS - 40, (p1.z + p2.z) / 2);
   wallGroup.rotation.y = -angle;
 
-  const worldX = (p1.x + p2.x) / 2;
-  const worldZ = (p1.z + p2.z) / 2;
-  castleColliders.push({ type: 'wall', x: worldX, z: worldZ, dist: dist, angle: angle, radius: 20 });
-
   return wallGroup;
 }
 
@@ -905,7 +901,6 @@ function buildCastleIsland() {
 
   castleTowers = [];
   castleTowerMeshes = [];
-  castleColliders = [];
 
   const totalTowers = 18;
   const radius = 300; 
@@ -966,8 +961,6 @@ function buildCastleIsland() {
       }, undefined, (err) => { 
         console.warn("kule.glb yüklenemedi:", err); 
       });
-
-      castleColliders.push({ type: 'tower', x: pos.x, z: pos.z, radius: 25 });
     }
 
     castleTowers.push({
@@ -1123,10 +1116,8 @@ function initThreeGame() {
 
     const oceanIntersect = raycaster.intersectObject(ocean);
     if (oceanIntersect.length > 0) {
-      let dest = { x: oceanIntersect[0].point.x, z: oceanIntersect[0].point.z };
-      
-      // Çok Noktalı Akıllı Rota Hesaplama (Adanın içine ve arkasına tıklamaları çözer)
-      navigationQueue = buildSafePath({ x: player.x, z: player.z }, dest);
+      // Doğrudan tıklanan yere direkt rota (Surlar ve ada içi serbest geçiş)
+      targetDestination = { x: oceanIntersect[0].point.x, z: oceanIntersect[0].point.z };
     }
   });
 
@@ -1137,69 +1128,9 @@ function initThreeGame() {
 }
 
 let player;
-let navigationQueue = [];
+let targetDestination = null;
 let selectedEnemyId = null, selectedTowerId = null, isAttacking = false, isGameOver = false;
 let lastPlayerAttackTime = 0;
-
-// Surlara ve adaya güvenli mesafe yarıçapı (Ada yarıçapı 300 + kule/gemi payı = 395)
-const ISLAND_SAFE_RADIUS = 395;
-
-function isLineIntersectingCircle(p1, p2, r) {
-  const dx = p2.x - p1.x;
-  const dz = p2.z - p1.z;
-  const lenSq = dx * dx + dz * dz;
-  if (lenSq === 0) return Math.hypot(p1.x, p1.z) < r;
-  
-  let t = ((-p1.x) * dx + (-p1.z) * dz) / lenSq;
-  t = Math.max(0, Math.min(1, t));
-  
-  const closestX = p1.x + t * dx;
-  const closestZ = p1.z + t * dz;
-  return Math.hypot(closestX, closestZ) < r;
-}
-
-function buildSafePath(start, end) {
-  let finalDest = { x: end.x, z: end.z };
-  
-  // 1. Hedef adanın (surların) içindeyse, adanın dış çemberindeki en yakın güvenli noktaya çek
-  const distEnd = Math.hypot(finalDest.x, finalDest.z);
-  if (distEnd < ISLAND_SAFE_RADIUS) {
-    const ang = distEnd > 0.01 ? Math.atan2(finalDest.z, finalDest.x) : Math.atan2(start.z, start.x);
-    finalDest.x = Math.cos(ang) * (ISLAND_SAFE_RADIUS + 5);
-    finalDest.z = Math.sin(ang) * (ISLAND_SAFE_RADIUS + 5);
-  }
-
-  // 2. Doğrudan gidiş yolu adayı kesmiyorsa direkt hedefi döndür
-  if (!isLineIntersectingCircle(start, finalDest, ISLAND_SAFE_RADIUS - 15)) {
-    return [finalDest];
-  }
-
-  // 3. Yol adayı kesiyorsa, adanın etrafından dolaşan çok noktalı (yay) rota oluştur
-  const orbitR = ISLAND_SAFE_RADIUS + 18;
-  const startAngle = Math.atan2(start.z, start.x);
-  const endAngle = Math.atan2(finalDest.z, finalDest.x);
-
-  // En kısa açısal yönü bul (-PI ile +PI arası)
-  let angleDiff = endAngle - startAngle;
-  while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
-  while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
-
-  const stepSize = Math.PI / 6; // Her 30 derecede bir ara geçiş noktası (yay)
-  const steps = Math.max(1, Math.ceil(Math.abs(angleDiff) / stepSize));
-  const path = [];
-
-  for (let i = 1; i <= steps; i++) {
-    const t = i / steps;
-    const curAng = startAngle + angleDiff * t;
-    path.push({
-      x: Math.cos(curAng) * orbitR,
-      z: Math.sin(curAng) * orbitR
-    });
-  }
-
-  path.push(finalDest);
-  return path;
-}
 
 function setupPlayerShipVisual() {
   const users = loadUsers();
@@ -1222,7 +1153,7 @@ function setupPlayerShipVisual() {
 }
 
 function startGameLogic() {
-  isGameOver = false; navigationQueue = []; selectedEnemyId = null; selectedTowerId = null; isAttacking = false;
+  isGameOver = false; targetDestination = null; selectedEnemyId = null; selectedTowerId = null; isAttacking = false;
   gameOverEl.style.display = 'none';
 
   player = {
@@ -1249,7 +1180,7 @@ function startGameLogic() {
 function changeMap(mapIdx, entrySide = 'center') {
   currentMapIndex = mapIdx;
   radarTitleEl.textContent = MAP_DATA[mapIdx].name;
-  navigationQueue = [];
+  targetDestination = null;
   hideTransitButton();
 
   const BOUND = (WORLD_SIZE / 2) - 350;
@@ -1466,27 +1397,6 @@ function fireCastleProjectile(startX, startZ, targetX, targetZ, onHit) {
   castleProjectiles.push({ mesh, x: startX, z: startZ, targetX, targetZ, speed: 320, onHit });
 }
 
-function checkCastleCollision(nx, nz) {
-  for (const col of castleColliders) {
-    if (col.type === 'tower') {
-      const dist = Math.hypot(nx - col.x, nz - col.z);
-      if (dist < col.radius + 15) return true;
-    } else if (col.type === 'wall') {
-      const relX = nx - col.x;
-      const relZ = nz - col.z;
-      const cosA = Math.cos(-col.angle);
-      const sinA = Math.sin(-col.angle);
-      const localX = relX * cosA - relZ * sinA;
-      const localZ = relX * sinA + relZ * cosA;
-      const halfLen = col.dist / 2;
-      if (Math.abs(localX) <= halfLen + 5 && Math.abs(localZ) <= col.radius + 10) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
 function animate3D() {
   requestAnimationFrame(animate3D);
 
@@ -1520,48 +1430,25 @@ function animate3D() {
     }
   }
 
-  // Çok Noktalı Akıllı Rota Takibi
-  if (navigationQueue.length > 0) {
-    const currentTarget = navigationQueue[0];
-    const dx = currentTarget.x - player.x;
-    const dz = currentTarget.z - player.z;
+  // Doğrudan Hedefe Hareket (Engel yok, serbest geçiş)
+  if (targetDestination) {
+    const dx = targetDestination.x - player.x;
+    const dz = targetDestination.z - player.z;
     const dist = Math.hypot(dx, dz);
 
-    // Ara noktalarda geniş tolerans (28), son hedefte hassas duruş (10)
-    const arrivalThreshold = navigationQueue.length > 1 ? 28 : 10;
-
-    if (dist > arrivalThreshold) {
+    if (dist > 10) {
       player.a = Math.atan2(dz, dx);
       player.speed = player.maxSpeed;
     } else {
-      navigationQueue.shift(); // Bir sonraki nokta
-      if (navigationQueue.length === 0) {
-        player.speed = 0;
-      }
+      player.speed = 0;
+      targetDestination = null;
     }
   } else {
     player.speed = 0;
   }
 
-  const vx = Math.cos(player.a) * player.speed * dt;
-  const vz = Math.sin(player.a) * player.speed * dt;
-  const nextX = player.x + vx;
-  const nextZ = player.z + vz;
-
-  if (!checkCastleCollision(nextX, nextZ)) {
-    player.x = nextX;
-    player.z = nextZ;
-  } else {
-    // Sura çok yaklaşıldıysa duvara paralel kayma (Sliding) yap, takılıp kalma!
-    if (!checkCastleCollision(player.x + vx, player.z)) {
-      player.x += vx;
-    } else if (!checkCastleCollision(player.x, player.z + vz)) {
-      player.z += vz;
-    } else {
-      navigationQueue = [];
-      player.speed = 0;
-    }
-  }
+  player.x += Math.cos(player.a) * player.speed * dt;
+  player.z += Math.sin(player.a) * player.speed * dt;
 
   const HALF_WORLD = WORLD_SIZE / 2;
   const HARD_LIMIT = HALF_WORLD - 120;
