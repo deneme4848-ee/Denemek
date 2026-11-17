@@ -43,7 +43,6 @@
       .tool-icon-btn span.ico { font-size: 20px !important; }
       .tool-icon-btn span.lbl { font-size: 8px !important; }
       .ammo-slot { width: 62px !important; height: 66px !important; border-radius: 12px !important; }
-      /* Ana slot gülle görselleri büyütüldü */
       .ammo-slot .ammo-ico img { width: 40px !important; height: 40px !important; }
       .ammo-slot .ammo-qty { font-size: 12px !important; }
       .ammo-slot .key-hint { font-size: 10px !important; top: 3px !important; left: 5px !important; }
@@ -366,7 +365,6 @@
     .market-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(6, 16, 24, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 9px; padding: 8px 10px; margin-bottom: 7px; }
     .market-item-info { display: flex; flex-direction: column; gap: 2px; }
     .market-item-title { font-size: 12px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
-    /* Market içindeki gülle görselleri belirgin ve büyük hale getirildi */
     .market-item-title img { width: 26px; height: 26px; object-fit: contain; }
     .market-item-sub { font-size: 10px; color: #94a3b8; }
     
@@ -713,10 +711,10 @@ function formatShortNumber(num) {
 
 const AMMO_TYPES = {
   iron:   { id: 'iron',   name: 'Demir Gülle',    damage: 180, slow: 1.0,  isHeal: false, bonusNpc: 1.0, desc: '180 Hasar', color: 0x555555 },
-  chain:  { id: 'chain',  name: 'Zincirli Gülle', damage: 140, slow: 0.6,  isHeal: false, bonusNpc: 1.0, desc: '140 Hasar + %40 Yavaşlatma', color: 0x888888 },
-  fire:   { id: 'fire',   name: 'Alevli Gülle',   damage: 30000, slow: 1.0, isHeal: false, bonusNpc: 1.2, desc: '30.000 Hasar (NPC\'lere +%20 Ekstra)', color: 0xff3300 },
-  amiral: { id: 'amiral', name: 'Amiral Güllesi', damage: 40000, slow: 0.85,isHeal: false, bonusNpc: 1.0, desc: '40.000 Yıkıcı Hasar', color: 0x3b82f6 },
-  snow:   { id: 'snow',   name: 'Kar Güllesi',    damage: 25000, slow: 1.0,  isHeal: true,  bonusNpc: 1.0, desc: '+25.000 Can Doldurur', color: 0xffffff }
+  chain:  { id: 'chain',  name: 'Zincirli Gülle', damage: 140, slow: 0.6,  isHeal: false, bonusNpc: 1.0, desc: '140 Hasar + %40 Yavaşlatma', color: 0x888888, img: 'zincir.png' },
+  fire:   { id: 'fire',   name: 'Alevli Gülle',   damage: 30000, slow: 1.0, isHeal: false, bonusNpc: 1.2, desc: '30.000 Hasar (NPC\'lere +%20 Ekstra)', color: 0xff3300, img: 'alev.png' },
+  amiral: { id: 'amiral', name: 'Amiral Güllesi', damage: 40000, slow: 0.85,isHeal: false, bonusNpc: 1.0, desc: '40.000 Yıkıcı Hasar', color: 0x3b82f6, img: 'amiral.png' },
+  snow:   { id: 'snow',   name: 'Kar Güllesi',    damage: 25000, slow: 1.0,  isHeal: true,  bonusNpc: 1.0, desc: '+25.000 Can Doldurur', color: 0xffffff, img: 'kar.png' }
 };
 
 const SHIP_MODELS = {
@@ -737,8 +735,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v74';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v74';
+const USERS_STORAGE_KEY = 'pirate3d_users_v75';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v75';
 let authMode = 'login';
 let currentUser = null;
 
@@ -809,6 +807,8 @@ let raycaster, planeGeo, mouse;
 let selectedRingMesh = null;
 let borderFrameMesh = null;
 let activeShipyardPreviews = [];
+let textureLoader;
+const loadedAmmoTextures = {};
 
 let cameraLookOffset = { x: 0, z: 0 };
 let isDraggingCamera = false;
@@ -958,6 +958,15 @@ function initThreeGame() {
   document.getElementById('game').appendChild(renderer.domElement);
 
   gltfLoader = new THREE.GLTFLoader();
+  textureLoader = new THREE.TextureLoader();
+
+  ['zincir.png', 'alev.png', 'amiral.png', 'kar.png'].forEach(imgName => {
+    textureLoader.load(imgName, (tex) => {
+      tex.generateMipmaps = true;
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      loadedAmmoTextures[imgName] = tex;
+    }, undefined, (err) => { console.warn("Gülle dokusu yüklenemedi:", imgName); });
+  });
 
   const ambientLight = new THREE.AmbientLight(0x93c5fd, 0.85);
   scene.add(ambientLight);
@@ -1339,12 +1348,23 @@ function triggerCannonFireEffect(shipX, shipZ, targetX, targetZ, ammoKey) {
 function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
   triggerCannonFireEffect(startX, startZ, targetX, targetZ, ammoKey);
   const ammoSpec = AMMO_TYPES[ammoKey];
-  const pGeo = new THREE.SphereGeometry(7, 16, 16);
-  const pMat = new THREE.MeshStandardMaterial({ color: ammoSpec.color, emissive: ammoSpec.color, emissiveIntensity: 1.2, roughness: 0.15 });
-  const mesh = new THREE.Mesh(pGeo, pMat);
-  mesh.position.set(startX, SHIP_Y_POS - 50, startZ);
+  
+  let mesh;
+  const tex = ammoSpec.img ? loadedAmmoTextures[ammoSpec.img] : null;
+
+  if (tex) {
+    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+    mesh = new THREE.Sprite(mat);
+    mesh.scale.set(32, 32, 1);
+  } else {
+    const pGeo = new THREE.SphereGeometry(10, 16, 16);
+    const pMat = new THREE.MeshStandardMaterial({ color: ammoSpec.color, roughness: 0.2, metalness: 0.8 });
+    mesh = new THREE.Mesh(pGeo, pMat);
+  }
+
+  mesh.position.set(startX, SHIP_Y_POS - 40, startZ);
   scene.add(mesh);
-  activeProjectiles.push({ mesh, x: startX, z: startZ, targetX, targetZ, speed: 380, ammoKey, onHit, yOffset: 50, lastSparkDist: 0 });
+  activeProjectiles.push({ mesh, x: startX, z: startZ, targetX, targetZ, speed: 360, ammoKey, onHit, yOffset: 40, lastSparkDist: 0 });
 }
 
 function animate3D() {
@@ -1502,27 +1522,15 @@ function animate3D() {
     const dist = Math.hypot(dx, dz);
     const step = p.speed * dt;
 
-    if (p.ammoKey === 'fire' || p.ammoKey === 'amiral' || p.ammoKey === 'snow') {
-      if (!p.lastSparkDist || p.lastSparkDist - dist > 18) {
-        p.lastSparkDist = dist;
-        const sparkGeo = new THREE.SphereGeometry(2.0, 6, 6);
-        const sparkColor = p.ammoKey === 'fire' ? 0xf97316 : p.ammoKey === 'amiral' ? 0x38bdf8 : 0xffffff;
-        const sparkMat = new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 0.9 });
-        const sparkMesh = new THREE.Mesh(sparkGeo, sparkMat);
-        sparkMesh.position.copy(p.mesh.position);
-        scene.add(sparkMesh);
-        particleSystems.push({ mesh: sparkMesh, life: 18, scaleDecay: 0.85 });
-      }
-    }
-
     if (dist < step) {
-      scene.remove(p.mesh); p.mesh.geometry.dispose(); p.mesh.material.dispose();
+      scene.remove(p.mesh); 
+      if (p.mesh.geometry) p.mesh.geometry.dispose(); 
+      if (p.mesh.material) p.mesh.material.dispose();
       activeProjectiles.splice(i, 1);
       if (p.onHit) p.onHit();
     } else {
       p.x += (dx / dist) * step; p.z += (dz / dist) * step;
       p.mesh.position.set(p.x, SHIP_Y_POS - p.yOffset, p.z);
-      p.mesh.rotation.x += (12 * dt); p.mesh.rotation.y += (12 * dt);
 
       for (let s = 0; s < 2; s++) {
         let sparkColor = p.ammoKey === 'fire' ? (Math.random() > 0.4 ? 0xf97316 : 0xffaa00) :
