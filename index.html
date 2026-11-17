@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Pürüzsüz Serbest Kamera</title>
+  <title>Korsan Dünyası - Kar Güllesi Destek Sistemi</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -102,7 +102,7 @@
       .active-ammo-banner { font-size: 9px !important; padding: 2px 6px !important; margin-bottom: 4px; }
       .ammo-slots-row { gap: 5px !important; }
       .ammo-slot { width: 44px !important; height: 48px !important; border-radius: 8px !important; }
-      .ammo-slot .ammo-ico { font-size: 16px !important; }
+      .ammo-slot .ammo-ico img { width: 18px !important; height: 18px !important; }
       .ammo-slot .ammo-qty { font-size: 9px !important; }
       .ammo-slot .key-hint { display: none !important; }
       #attack-btn { width: 64px !important; height: 64px !important; font-size: 10px !important; }
@@ -241,6 +241,7 @@
       box-shadow: 0 0 14px rgba(148, 163, 184, 0.4); transform: translateY(-2px);
     }
     .ammo-slot .key-hint { position: absolute; font-weight: 800; color: #94a3b8; }
+    .ammo-slot .ammo-ico img { width: 22px; height: 22px; object-fit: contain; }
     .ammo-slot .ammo-qty {
       font-weight: 900; color: #fff; margin-top: 1px;
       background: rgba(0,0,0,0.55); padding: 1px 6px; border-radius: 4px;
@@ -361,7 +362,8 @@
 
     .market-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(6, 16, 24, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 9px; padding: 8px 10px; margin-bottom: 7px; }
     .market-item-info { display: flex; flex-direction: column; gap: 2px; }
-    .market-item-title { font-size: 12px; font-weight: 700; color: #fff; }
+    .market-item-title { font-size: 12px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px; }
+    .market-item-title img { width: 18px; height: 18px; object-fit: contain; }
     .market-item-sub { font-size: 10px; color: #94a3b8; }
     
     .buy-btn { width: 100%; padding: 7px 12px; border-radius: 8px; border: 1px solid #94a3b8; background: linear-gradient(135deg, #334155, #1e293b); color: #fff; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap; margin-top: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
@@ -455,10 +457,11 @@
     <div class="ammo-dock-container">
       <div class="active-ammo-banner" id="active-ammo-info">Seçili: Demir Gülle (180 Hasar)</div>
       <div class="ammo-slots-row" id="ammo-slots-row">
-        <div class="ammo-slot selected" data-type="iron"><span class="key-hint">1</span><span class="ammo-ico">⚫</span><span class="ammo-qty" id="qty-iron">1m</span></div>
+        <div class="ammo-slot selected" data-type="iron"><span class="key-hint">1</span><span class="ammo-ico"><object data="kar.png" type="image/png" style="pointer-events:none;"><img src="kar.png" style="width:22px;height:22px;object-fit:contain;" alt="Kar Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%23555\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';"></object></span><span class="ammo-qty" id="qty-iron">1m</span></div>
         <div class="ammo-slot" data-type="chain"><span class="key-hint">2</span><span class="ammo-ico">⛓️</span><span class="ammo-qty" id="qty-chain">1m</span></div>
         <div class="ammo-slot" data-type="fire"><span class="key-hint">3</span><span class="ammo-ico">🔥</span><span class="ammo-qty" id="qty-fire">1m</span></div>
         <div class="ammo-slot" data-type="dragon"><span class="key-hint">4</span><span class="ammo-ico">🐉</span><span class="ammo-qty" id="qty-dragon">1m</span></div>
+        <div class="ammo-slot" data-type="snow"><span class="key-hint">5</span><span class="ammo-ico"><img src="kar.png" style="width:22px;height:22px;object-fit:contain;" alt="Kar Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%23fff\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';"></span><span class="ammo-qty" id="qty-snow">1m</span></div>
       </div>
     </div>
 
@@ -513,6 +516,16 @@
           <div class="market-item">
             <div class="market-item-info"><span class="market-item-title">🐉 10x Ejderha Nefesi</span><span class="market-item-sub">40.000 Hasar · Efsanevi yıkım güllesi</span></div>
             <button class="buy-btn ammo-buy-btn" type="button" data-type="dragon" data-amount="10" data-cost="120" style="width:auto;">120 Altın</button>
+          </div>
+          <div class="market-item">
+            <div class="market-item-info">
+              <span class="market-item-title">
+                <img src="kar.png" style="width:18px;height:18px;object-fit:contain;" alt="Kar Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%23fff\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">
+                20x Kar Güllesi
+              </span>
+              <span class="market-item-sub">+25.000 Can Doldurur (NPC hariç)</span>
+            </div>
+            <button class="buy-btn ammo-buy-btn" type="button" data-type="snow" data-amount="20" data-cost="50" style="width:auto;">50 Altın</button>
           </div>
         </div>
 
@@ -604,7 +617,8 @@ const qtyEls = {
   iron: document.querySelector('#qty-iron'),
   chain: document.querySelector('#qty-chain'),
   fire: document.querySelector('#qty-fire'),
-  dragon: document.querySelector('#qty-dragon')
+  dragon: document.querySelector('#qty-dragon'),
+  snow: document.querySelector('#qty-snow')
 };
 
 const gameOverEl = document.querySelector('#gameover');
@@ -676,10 +690,11 @@ function formatShortNumber(num) {
 }
 
 const AMMO_TYPES = {
-  iron:   { id: 'iron',   name: 'Demir Gülle',    damage: 180, slow: 1.0,  desc: '180 Hasar', color: 0x555555 },
-  chain:  { id: 'chain',  name: 'Zincirli Gülle', damage: 140, slow: 0.5,  desc: '140 Hasar + Yavaşlatma', color: 0x888888 },
-  fire:   { id: 'fire',   name: 'Alevli Gülle',   damage: 30000, slow: 1.0,  desc: '30.000 Patlayıcı Hasar', color: 0xff3300 },
-  dragon: { id: 'dragon', name: 'Ejderha Nefesi', damage: 40000, slow: 0.85, desc: '40.000 Efsanevi Hasar', color: 0x3b82f6 }
+  iron:   { id: 'iron',   name: 'Demir Gülle',    damage: 180, slow: 1.0,  isHeal: false, desc: '180 Hasar', color: 0x555555 },
+  chain:  { id: 'chain',  name: 'Zincirli Gülle', damage: 140, slow: 0.5,  isHeal: false, desc: '140 Hasar + Yavaşlatma', color: 0x888888 },
+  fire:   { id: 'fire',   name: 'Alevli Gülle',   damage: 30000, slow: 1.0, isHeal: false, desc: '30.000 Patlayıcı Hasar', color: 0xff3300 },
+  dragon: { id: 'dragon', name: 'Ejderha Nefesi', damage: 40000, slow: 0.85,isHeal: false, desc: '40.000 Efsanevi Hasar', color: 0x3b82f6 },
+  snow:   { id: 'snow',   name: 'Kar Güllesi',    damage: 25000, slow: 1.0,  isHeal: true,  desc: '+25.000 Can Doldurur', color: 0xffffff }
 };
 
 const SHIP_MODELS = {
@@ -773,7 +788,6 @@ let selectedRingMesh = null;
 let borderFrameMesh = null;
 let activeShipyardPreviews = [];
 
-// Kamera serbest gezinme / sürükleme değişkenleri
 let cameraLookOffset = { x: 0, z: 0 };
 let isDraggingCamera = false;
 let dragStartX = 0, dragStartY = 0;
@@ -999,7 +1013,6 @@ function initThreeGame() {
     }
 
     if (hasDragged) {
-      // Kamerayı x ve z düzleminde pürüzsüz kaydır (zoom veya açı değişimi yok)
       cameraLookOffset.x -= deltaX * 1.8;
       cameraLookOffset.z -= deltaY * 1.8;
 
@@ -1012,7 +1025,6 @@ function initThreeGame() {
     if (!isDraggingCamera) return;
     isDraggingCamera = false;
 
-    // Eğer hiç sürükleme yapılmadıysa (tek tık / dokunma) -> Düşman seçimi veya gemi rotası belirle
     if (!hasDragged) {
       const rect = renderer.domElement.getBoundingClientRect();
       const clientX = e.clientX - rect.left;
@@ -1089,7 +1101,7 @@ function startGameLogic() {
     expansionRights: { cannon: 1, hp: 1, speed: 1 },
     cannons: 250,
     selectedAmmo: 'iron',
-    ammo: { iron: 1000000, chain: 1000000, fire: 1000000, dragon: 1000000 },
+    ammo: { iron: 1000000, chain: 1000000, fire: 1000000, dragon: 1000000, snow: 1000000 },
     lastDamagedTime: 0
   };
 
@@ -1222,6 +1234,7 @@ window.addEventListener('keydown', e => {
   if (e.key === '2') selectAmmoSlot('chain');
   if (e.key === '3') selectAmmoSlot('fire');
   if (e.key === '4') selectAmmoSlot('dragon');
+  if (e.key === '5') selectAmmoSlot('snow');
   if (e.key.toLowerCase() === 'm') togglePortPanel();
   if (e.key.toLowerCase() === 'h') toggleMapsPanel();
   if (e.key.toLowerCase() === 'q') resetCameraToPlayer();
@@ -1248,7 +1261,7 @@ function syncAttackButton() {
   const currentAmmoQty = player.ammo[player.selectedAmmo] || 0;
   attackBtn.disabled = !selectedEnemyId || currentAmmoQty < player.cannons;
   attackBtn.classList.toggle('firing', isAttacking);
-  attackBtnText.textContent = isAttacking ? 'DURDUR' : 'ATEŞ ET';
+  attackBtnText.textContent = isAttacking ? 'DURDUR' : (AMMO_TYPES[player.selectedAmmo]?.isHeal ? 'İYİLEŞTİR' : 'ATEŞ ET');
 }
 
 attackBtn.addEventListener('click', () => {
@@ -1275,13 +1288,14 @@ function showFloatingDamage(wx, wz, text, colorHex) {
   setTimeout(() => div.remove(), 900);
 }
 
-function triggerCannonFireEffect(shipX, shipZ, targetX, targetZ) {
+function triggerCannonFireEffect(shipX, shipZ, targetX, targetZ, ammoKey) {
   const angleToTarget = Math.atan2(targetZ - shipZ, targetX - shipX);
   const muzzleX = shipX + Math.cos(angleToTarget) * 28;
   const muzzleZ = shipZ + Math.sin(angleToTarget) * 28;
 
+  const flashColor = ammoKey === 'snow' ? 0xa5f3fc : 0xffaa00;
   const flashGeo = new THREE.SphereGeometry(14, 12, 12);
-  const flashMat = new THREE.MeshBasicMaterial({ color: 0xffaa00, transparent: true, opacity: 0.95 });
+  const flashMat = new THREE.MeshBasicMaterial({ color: flashColor, transparent: true, opacity: 0.95 });
   const flashMesh = new THREE.Mesh(flashGeo, flashMat);
   flashMesh.position.set(muzzleX, 24, muzzleZ);
   scene.add(flashMesh);
@@ -1289,7 +1303,7 @@ function triggerCannonFireEffect(shipX, shipZ, targetX, targetZ) {
 
   for (let i = 0; i < 12; i++) {
     const smokeGeo = new THREE.SphereGeometry(6 + Math.random() * 6, 8, 8);
-    const grayTone = 0.75 + Math.random() * 0.2;
+    const grayTone = ammoKey === 'snow' ? 0.9 + Math.random() * 0.1 : 0.75 + Math.random() * 0.2;
     const smokeMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(grayTone, grayTone, grayTone), transparent: true, opacity: 0.75 });
     const smokeMesh = new THREE.Mesh(smokeGeo, smokeMat);
     smokeMesh.position.set(muzzleX + (Math.random() - 0.5) * 14, 22 + Math.random() * 8, muzzleZ + (Math.random() - 0.5) * 14);
@@ -1301,7 +1315,7 @@ function triggerCannonFireEffect(shipX, shipZ, targetX, targetZ) {
 }
 
 function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
-  triggerCannonFireEffect(startX, startZ, targetX, targetZ);
+  triggerCannonFireEffect(startX, startZ, targetX, targetZ, ammoKey);
   const ammoSpec = AMMO_TYPES[ammoKey];
   const pGeo = new THREE.SphereGeometry(7, 16, 16);
   const pMat = new THREE.MeshStandardMaterial({ color: ammoSpec.color, emissive: ammoSpec.color, emissiveIntensity: 1.2, roughness: 0.15 });
@@ -1466,11 +1480,12 @@ function animate3D() {
     const dist = Math.hypot(dx, dz);
     const step = p.speed * dt;
 
-    if (p.ammoKey === 'fire' || p.ammoKey === 'dragon') {
+    if (p.ammoKey === 'fire' || p.ammoKey === 'dragon' || p.ammoKey === 'snow') {
       if (!p.lastSparkDist || p.lastSparkDist - dist > 18) {
         p.lastSparkDist = dist;
         const sparkGeo = new THREE.SphereGeometry(2.0, 6, 6);
-        const sparkMat = new THREE.MeshBasicMaterial({ color: p.ammoKey === 'fire' ? 0xff5500 : 0x38bdf8, transparent: true, opacity: 0.9 });
+        const sparkColor = p.ammoKey === 'fire' ? 0xff5500 : p.ammoKey === 'dragon' ? 0x38bdf8 : 0xffffff;
+        const sparkMat = new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 0.9 });
         const sparkMesh = new THREE.Mesh(sparkGeo, sparkMat);
         sparkMesh.position.copy(p.mesh.position);
         scene.add(sparkMesh);
@@ -1490,6 +1505,7 @@ function animate3D() {
       for (let s = 0; s < 2; s++) {
         let sparkColor = p.ammoKey === 'fire' ? (Math.random() > 0.4 ? 0xff3300 : 0xffaa00) :
                          p.ammoKey === 'dragon' ? [0x38bdf8, 0xa855f7, 0x34d399, 0xffffff][Math.floor(Math.random()*4)] :
+                         p.ammoKey === 'snow' ? 0xffffff :
                          p.ammoKey === 'chain' ? 0x94a3b8 : 0xffa500;
         const sparkGeo = new THREE.SphereGeometry(3.0 + Math.random() * 2.0, 8, 8);
         const sparkMat = new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 0.9 });
@@ -1571,12 +1587,22 @@ function animate3D() {
 
         target.isAggro = true;
         fireProjectile(player.x, player.z, target.x, target.z, ammoKey, () => {
-          target.hp -= ammoSpec.damage;
-          if (ammoSpec.slow < 1.0) target.slowTimer = 240;
-          showFloatingDamage(target.x, target.z, '-' + ammoSpec.damage.toLocaleString(), '#f97316');
+          if (ammoSpec.isHeal) {
+            if (target.hp >= target.maxHp) {
+              showFloatingDamage(target.x, target.z, 'CAN DOLU!', '#94a3b8');
+            } else {
+              target.hp = Math.min(target.maxHp, target.hp + ammoSpec.damage);
+              showFloatingDamage(target.x, target.z, '+' + ammoSpec.damage.toLocaleString(), '#38bdf8');
+            }
+          } else {
+            target.hp -= ammoSpec.damage;
+            if (ammoSpec.slow < 1.0) target.slowTimer = 240;
+            showFloatingDamage(target.x, target.z, '-' + ammoSpec.damage.toLocaleString(), '#f97316');
+          }
+
           updateTargetCard(); updateHUD(); syncAttackButton();
 
-          if (target.hp <= 0) {
+          if (!ammoSpec.isHeal && target.hp <= 0) {
             if (target.mesh) scene.remove(target.mesh);
             target.labelEl.remove();
             enemies = enemies.filter(e => e.id !== target.id);
@@ -1662,7 +1688,7 @@ function updateHUD() {
 
   Object.keys(qtyEls).forEach(type => {
     const count = player.ammo[type] || 0;
-    qtyEls[type].textContent = formatShortNumber(count);
+    if (qtyEls[type]) qtyEls[type].textContent = formatShortNumber(count);
     const slotEl = document.querySelector(`.ammo-slot[data-type="${type}"]`);
     if (slotEl) slotEl.classList.toggle('empty', count < player.cannons);
   });
