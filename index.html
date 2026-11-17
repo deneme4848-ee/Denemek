@@ -43,7 +43,8 @@
       .tool-icon-btn span.ico { font-size: 20px !important; }
       .tool-icon-btn span.lbl { font-size: 8px !important; }
       .ammo-slot { width: 62px !important; height: 66px !important; border-radius: 12px !important; }
-      .ammo-slot .ammo-ico img { width: 28px !important; height: 28px !important; }
+      /* Ana slot gülle görselleri büyütüldü */
+      .ammo-slot .ammo-ico img { width: 40px !important; height: 40px !important; }
       .ammo-slot .ammo-qty { font-size: 12px !important; }
       .ammo-slot .key-hint { font-size: 10px !important; top: 3px !important; left: 5px !important; }
       #attack-btn { width: 90px !important; height: 90px !important; font-size: 13px !important; }
@@ -68,7 +69,7 @@
       #minimap { width: 72px; height: 72px; border-radius: 5px; }
       .tool-icon-btn { width: 38px; height: 38px; border-radius: 9px; }
       .ammo-slot { width: 50px; height: 54px; border-radius: 10px; }
-      .ammo-slot .ammo-ico img { width: 22px; height: 22px; }
+      .ammo-slot .ammo-ico img { width: 32px; height: 32px; }
       #attack-btn { width: 72px; height: 72px; font-size: 11px; }
     }
 
@@ -103,7 +104,7 @@
       .active-ammo-banner { font-size: 9px !important; padding: 2px 6px !important; margin-bottom: 4px; }
       .ammo-slots-row { gap: 5px !important; }
       .ammo-slot { width: 44px !important; height: 48px !important; border-radius: 8px !important; }
-      .ammo-slot .ammo-ico img { width: 18px !important; height: 18px !important; }
+      .ammo-slot .ammo-ico img { width: 26px !important; height: 26px !important; }
       .ammo-slot .ammo-qty { font-size: 9px !important; }
       .ammo-slot .key-hint { display: none !important; }
       #attack-btn { width: 64px !important; height: 64px !important; font-size: 10px !important; }
@@ -241,8 +242,9 @@
       border-color: #cbd5e1; background: linear-gradient(165deg, #1e293b, #0f172a);
       box-shadow: 0 0 14px rgba(148, 163, 184, 0.4); transform: translateY(-2px);
     }
-    .ammo-slot .key-hint { position: absolute; font-weight: 800; color: #94a3b8; }
-    .ammo-slot .ammo-ico img { object-fit: contain; width: 24px; height: 24px; }
+    .ammo-slot .key-hint { position: absolute; font-weight: 800; color: #94a3b8; z-index: 2; }
+    .ammo-slot .ammo-ico { display: flex; align-items: center; justify-content: center; width: 100%; height: 36px; margin-top: 6px; }
+    .ammo-slot .ammo-ico img { object-fit: contain; width: 38px; height: 38px; }
     .ammo-slot .ammo-qty {
       font-weight: 900; color: #fff; margin-top: 1px;
       background: rgba(0,0,0,0.55); padding: 1px 6px; border-radius: 4px;
@@ -363,8 +365,9 @@
 
     .market-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(6, 16, 24, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 9px; padding: 8px 10px; margin-bottom: 7px; }
     .market-item-info { display: flex; flex-direction: column; gap: 2px; }
-    .market-item-title { font-size: 12px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px; }
-    .market-item-title img { width: 18px; height: 18px; object-fit: contain; }
+    .market-item-title { font-size: 12px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
+    /* Market içindeki gülle görselleri belirgin ve büyük hale getirildi */
+    .market-item-title img { width: 26px; height: 26px; object-fit: contain; }
     .market-item-sub { font-size: 10px; color: #94a3b8; }
     
     .buy-btn { width: 100%; padding: 7px 12px; border-radius: 8px; border: 1px solid #94a3b8; background: linear-gradient(135deg, #334155, #1e293b); color: #fff; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap; margin-top: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
@@ -436,8 +439,8 @@
     </div>
     <div class="side-tool-col">
       <button id="focus-player-btn" class="tool-icon-btn" type="button" title="Gemiye Dön (Q)">
-        
-      <span class="lbl">Q</span>
+        <span class="ico">🎯</span>
+        <span class="lbl">Q</span>
       </button>
       <button id="maps-toggle-btn" class="tool-icon-btn" type="button" title="Haritalar">
         <span class="ico">🗺️</span>
@@ -459,10 +462,10 @@
       <div class="active-ammo-banner" id="active-ammo-info">Seçili: Demir Gülle (180 Hasar)</div>
       <div class="ammo-slots-row" id="ammo-slots-row">
         <div class="ammo-slot selected" data-type="iron"><span class="key-hint">1</span><span class="ammo-ico">⚫</span><span class="ammo-qty" id="qty-iron">1m</span></div>
-        <div class="ammo-slot" data-type="chain"><span class="key-hint">2</span><span class="ammo-ico">⛓️</span><span class="ammo-qty" id="qty-chain">1m</span></div>
-        <div class="ammo-slot" data-type="fire"><span class="key-hint">3</span><span class="ammo-ico"><img src="alev.png" alt="Alev Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%23f97316\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';"></span><span class="ammo-qty" id="qty-fire">1m</span></div>
-        <div class="ammo-slot" data-type="amiral"><span class="key-hint">4</span><span class="ammo-ico"><img src="amiral.png" alt="Amiral Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%2338bdf8\'><path d=\'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z\' fill=\'%2338bdf8\'/></svg>';"></span><span class="ammo-qty" id="qty-amiral">1m</span></div>
-        <div class="ammo-slot" data-type="snow"><span class="key-hint">5</span><span class="ammo-ico"><img src="kar.png" alt="Kar Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%23ffffff\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';"></span><span class="ammo-qty" id="qty-snow">1m</span></div>
+        <div class="ammo-slot" data-type="chain"><span class="key-hint">2</span><span class="ammo-ico"><img src="zincir.png" alt="Zincirli Gülle" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\' viewBox=\'0 0 24 24\' fill=\'%2394a3b8\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';"></span><span class="ammo-qty" id="qty-chain">1m</span></div>
+        <div class="ammo-slot" data-type="fire"><span class="key-hint">3</span><span class="ammo-ico"><img src="alev.png" alt="Alev Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\' viewBox=\'0 0 24 24\' fill=\'%23f97316\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';"></span><span class="ammo-qty" id="qty-fire">1m</span></div>
+        <div class="ammo-slot" data-type="amiral"><span class="key-hint">4</span><span class="ammo-ico"><img src="amiral.png" alt="Amiral Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\' viewBox=\'0 0 24 24\' fill=\'%2338bdf8\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';"></span><span class="ammo-qty" id="qty-amiral">1m</span></div>
+        <div class="ammo-slot" data-type="snow"><span class="key-hint">5</span><span class="ammo-ico"><img src="kar.png" alt="Kar Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\' viewBox=\'0 0 24 24\' fill=\'%23ffffff\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';"></span><span class="ammo-qty" id="qty-snow">1m</span></div>
       </div>
     </div>
 
@@ -507,13 +510,19 @@
             <button class="buy-btn ammo-buy-btn" type="button" data-type="iron" data-amount="25" data-cost="20" style="width:auto;">20 Altın</button>
           </div>
           <div class="market-item">
-            <div class="market-item-info"><span class="market-item-title">⛓️ 15x Zincirli Gülle</span><span class="market-item-sub">140 Hasar · Düşmanı %40 yavaşlatır</span></div>
+            <div class="market-item-info">
+              <span class="market-item-title">
+                <img src="zincir.png" alt="Zincirli Gülle" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%2394a3b8\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">
+                15x Zincirli Gülle
+              </span>
+              <span class="market-item-sub">140 Hasar · Düşmanı %40 yavaşlatır</span>
+            </div>
             <button class="buy-btn ammo-buy-btn" type="button" data-type="chain" data-amount="15" data-cost="35" style="width:auto;">35 Altın</button>
           </div>
           <div class="market-item">
             <div class="market-item-info">
               <span class="market-item-title">
-                <img src="alev.png" style="width:18px;height:18px;object-fit:contain;" alt="Alev Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%23f97316\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">
+                <img src="alev.png" alt="Alev Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%23f97316\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">
                 15x Alevli Gülle
               </span>
               <span class="market-item-sub">30.000 Hasar · NPC'lere %20 Ekstra Hasar</span>
@@ -523,7 +532,7 @@
           <div class="market-item">
             <div class="market-item-info">
               <span class="market-item-title">
-                <img src="amiral.png" style="width:18px;height:18px;object-fit:contain;" alt="Amiral Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%2338bdf8\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">
+                <img src="amiral.png" alt="Amiral Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%2338bdf8\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">
                 10x Amiral Güllesi
               </span>
               <span class="market-item-sub">40.000 Hasar · Gerçek oyunculara özel yıkım</span>
@@ -533,7 +542,7 @@
           <div class="market-item">
             <div class="market-item-info">
               <span class="market-item-title">
-                <img src="kar.png" style="width:18px;height:18px;object-fit:contain;" alt="Kar Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%23ffffff\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">
+                <img src="kar.png" alt="Kar Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%23ffffff\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">
                 20x Kar Güllesi
               </span>
               <span class="market-item-sub">+25.000 Can Doldurur (NPC hariç)</span>
@@ -551,21 +560,21 @@
           </div>
           <div class="market-item">
             <div class="market-item-info">
-              <span class="market-item-title"> TOP GENİŞLETMESİ</span>
+              <span class="market-item-title">🎯 TOP GENİŞLETMESİ</span>
               <span class="market-item-sub">Kapasite: <strong id="stat-cannons" style="color:#38bdf8;">250</strong> Top (+20 Top artırır)</span>
             </div>
             <button class="buy-btn" id="btn-expand-cannon" type="button" style="width:auto; background: linear-gradient(135deg, #b45309, #78350f); border-color: #f59e0b;">5 Elmas</button>
           </div>
           <div class="market-item">
             <div class="market-item-info">
-              <span class="market-item-title"> CAN GENİŞLETMESİ</span>
+              <span class="market-item-title">❤️ CAN GENİŞLETMESİ</span>
               <span class="market-item-sub">Toplam Can: <strong id="stat-hp" style="color:#f87171;">1.000.000</strong> (+50.000 Can artırır)</span>
             </div>
             <button class="buy-btn" id="btn-expand-hp" type="button" style="width:auto; background: linear-gradient(135deg, #991b1b, #7f1d1d); border-color: #f87171;">5 Elmas</button>
           </div>
           <div class="market-item">
             <div class="market-item-info">
-              <span class="market-item-title"> HIZ GENİŞLETMESİ</span>
+              <span class="market-item-title">⚡ HIZ GENİŞLETMESİ</span>
               <span class="market-item-sub">Gemi Hızı: <strong id="stat-speed" style="color:#4ade80;">180</strong> (%2 Hız artırır)</span>
             </div>
             <button class="buy-btn" id="btn-expand-speed" type="button" style="width:auto; background: linear-gradient(166deg, #166534, #14532d); border-color: #4ade80;">5 Elmas</button>
@@ -703,11 +712,11 @@ function formatShortNumber(num) {
 }
 
 const AMMO_TYPES = {
-  iron:   { id: 'iron',   name: 'Demir Gülle',    damage: 5000, slow: 1.0,  isHeal: false, bonusNpc: 1.0, desc: '180 Hasar', color: 0x555555 },
-  chain:  { id: 'chain',  name: 'Zincirli Gülle', damage: 25000, slow: 1.0,  isHeal: false, bonusNpc: 1.0, desc: '140 Hasar + %40 Yavaşlatma', color: 0x888888 },
+  iron:   { id: 'iron',   name: 'Demir Gülle',    damage: 180, slow: 1.0,  isHeal: false, bonusNpc: 1.0, desc: '180 Hasar', color: 0x555555 },
+  chain:  { id: 'chain',  name: 'Zincirli Gülle', damage: 140, slow: 0.6,  isHeal: false, bonusNpc: 1.0, desc: '140 Hasar + %40 Yavaşlatma', color: 0x888888 },
   fire:   { id: 'fire',   name: 'Alevli Gülle',   damage: 30000, slow: 1.0, isHeal: false, bonusNpc: 1.2, desc: '30.000 Hasar (NPC\'lere +%20 Ekstra)', color: 0xff3300 },
-  amiral: { id: 'amiral', name: 'Amiral Güllesi', damage: 40000, slow: 1.0,isHeal: false, bonusNpc: 1.0, desc: '40.000 Yıkıcı Hasar', color: 0x3b82f6 },
-  snow:   { id: 'snow',   name: 'Kar Güllesi',    damage: 20000, slow: 1.0,  isHeal: true,  bonusNpc: 1.0, desc: '+25.000 Can Doldurur', color: 0xffffff }
+  amiral: { id: 'amiral', name: 'Amiral Güllesi', damage: 40000, slow: 0.85,isHeal: false, bonusNpc: 1.0, desc: '40.000 Yıkıcı Hasar', color: 0x3b82f6 },
+  snow:   { id: 'snow',   name: 'Kar Güllesi',    damage: 25000, slow: 1.0,  isHeal: true,  bonusNpc: 1.0, desc: '+25.000 Can Doldurur', color: 0xffffff }
 };
 
 const SHIP_MODELS = {
@@ -728,8 +737,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v73';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v73';
+const USERS_STORAGE_KEY = 'pirate3d_users_v74';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v74';
 let authMode = 'login';
 let currentUser = null;
 
