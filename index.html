@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Kale Savunma Sistemi</title>
+  <title>Korsan Dünyası - Kale Çemberi Savunması</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -735,8 +735,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v76';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v76';
+const USERS_STORAGE_KEY = 'pirate3d_users_v77';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v77';
 let authMode = 'login';
 let currentUser = null;
 
@@ -801,7 +801,7 @@ if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeIt
 
 let scene, camera, renderer;
 let oceanTexture = null;
-let activeGlbShip = null, playerNeonRing, enemies = [], defenseTower = null, rangeRingMesh;
+let activeGlbShip = null, playerNeonRing, enemies = [], defenseTowers = [], rangeRingMesh;
 let activeProjectiles = [], particleSystems = [], cannonEffects = [];
 let raycaster, planeGeo, mouse;
 let selectedRingMesh = null;
@@ -1066,14 +1066,16 @@ function initThreeGame() {
       
       raycaster.setFromCamera(mouse, camera);
 
-      // Savunma kulesi tıklama kontrolü
-      if (defenseTower && defenseTower.mesh) {
-        const intersectsTower = raycaster.intersectObject(defenseTower.mesh, true);
-        if (intersectsTower.length > 0) {
-          selectedEnemyId = defenseTower.id;
-          updateTargetCard();
-          syncAttackButton();
-          return;
+      // Savunma kuleleri tıklama kontrolü
+      for (const t of defenseTowers) {
+        if (t.mesh) {
+          const intersectsTower = raycaster.intersectObject(t.mesh, true);
+          if (intersectsTower.length > 0) {
+            selectedEnemyId = t.id;
+            updateTargetCard();
+            syncAttackButton();
+            return;
+          }
         }
       }
 
@@ -1157,44 +1159,67 @@ function startGameLogic() {
   renderMapsGrid();
 }
 
-function spawnDefenseTower() {
-  if (defenseTower) {
-    if (defenseTower.mesh) scene.remove(defenseTower.mesh);
-    if (defenseTower.labelEl) defenseTower.labelEl.remove();
-    defenseTower = null;
+function spawnDefenseTowersRing() {
+  defenseTowers.forEach(t => {
+    if (t.mesh) scene.remove(t.mesh);
+    if (t.labelEl) t.labelEl.remove();
+  });
+  defenseTowers = [];
+
+  const totalTowers = 15;
+  const radius = 200;
+  // Giriş boşluğu için ön taraftaki (örneğin açının belirli bir aralığındaki) kuleleri atlıyoruz veya daraltıyoruz.
+  // 15 kule tam çemberde 2*PI / 15 radyan arayla dizilir. Ön tarafta (örn: -0.4 ile +0.4 radyan arası) boşluk bırakalım.
+  const startId = 9000;
+
+  for (let i = 0; i < totalTowers; i++) {
+    // Açı hesabı
+    const angle = (i / totalTowers) * Math.PI * 2;
+
+    // Ön tarafta (giriş kapısı için) yaklaşık -0.35 ile +0.35 radyan arasındaki açıyı boş bırakıyoruz
+    if (angle > Math.PI * 0.15 && angle < Math.PI * 0.85) {
+      // Bu aralıktaki kuleleri pas geçerek geniş bir giriş kapısı oluşturuyoruz
+      continue;
+    }
+
+    const tx = Math.cos(angle) * radius;
+    const tz = Math.sin(angle) * radius;
+    const towerId = startId + i;
+
+    const labelEl = document.createElement('div');
+    labelEl.className = 'enemy-label';
+    labelEl.innerHTML = `
+      <div class="enemy-hp-track"><div class="enemy-hp-fill" id="tower-hp-fill-${towerId}"></div></div>
+      <div class="enemy-name-tag" style="color: #f59e0b;">Savunma Kulesi #${i+1}</div>
+    `;
+    document.body.appendChild(labelEl);
+
+    const towerObj = {
+      id: towerId, name: `Savunma Kulesi #${i+1}`, mesh: null, labelEl,
+      hpFillEl: labelEl.querySelector(`#tower-hp-fill-${towerId}`),
+      x: tx, z: tz,
+      hp: 10000000, maxHp: 10000000,
+      lastAttackTime: 0, isAggro: false
+    };
+
+    defenseTowers.push(towerObj);
+
+    gltfLoader.load('defence_tower.glb', (gltf) => {
+      const model = gltf.scene || gltf.scenes[0];
+      const box = new THREE.Box3().setFromObject(model);
+      const size = new THREE.Vector3();
+      box.getSize(size);
+      let scaleFactor = (140 / Math.max(size.x, size.y, size.z));
+      model.scale.set(scaleFactor, scaleFactor, scaleFactor);
+
+      model.position.set(tx, SHIP_Y_POS - 70, tz);
+      model.userData = { enemyId: towerId };
+      model.traverse(child => { child.userData = { enemyId: towerId }; });
+
+      scene.add(model);
+      towerObj.mesh = model;
+    }, undefined, (err) => { console.warn("defence_tower.glb yüklenemedi:", err); });
   }
-
-  const labelEl = document.createElement('div');
-  labelEl.className = 'enemy-label';
-  labelEl.innerHTML = `
-    <div class="enemy-hp-track"><div class="enemy-hp-fill" id="tower-hp-fill"></div></div>
-    <div class="enemy-name-tag" style="color: #f59e0b;">Savunma Kulesi</div>
-  `;
-  document.body.appendChild(labelEl);
-
-  defenseTower = {
-    id: 9999, name: 'Savunma Kulesi', mesh: null, labelEl,
-    hpFillEl: labelEl.querySelector('#tower-hp-fill'),
-    x: 0, z: 0, // Haritanın tam ortası
-    hp: 10000000, maxHp: 10000000,
-    lastAttackTime: 0, isAggro: false
-  };
-
-  gltfLoader.load('defence_tower.glb', (gltf) => {
-    const model = gltf.scene || gltf.scenes[0];
-    const box = new THREE.Box3().setFromObject(model);
-    const size = new THREE.Vector3();
-    box.getSize(size);
-    let scaleFactor = (180 / Math.max(size.x, size.y, size.z));
-    model.scale.set(scaleFactor, scaleFactor, scaleFactor);
-
-    model.position.set(0, SHIP_Y_POS - 80, 0);
-    model.userData = { enemyId: 9999 };
-    model.traverse(child => { child.userData = { enemyId: 9999 }; });
-
-    scene.add(model);
-    defenseTower.mesh = model;
-  }, undefined, (err) => { console.warn("defence_tower.glb yüklenemedi:", err); });
 }
 
 function changeMap(mapIdx, entrySide = 'center') {
@@ -1224,8 +1249,8 @@ function changeMap(mapIdx, entrySide = 'center') {
   });
   enemies = [];
 
-  // Harita ortasına sabit savunma kulesini yerleştir
-  spawnDefenseTower();
+  // Çember şeklindeki savunma kulelerini harita ortasına yerleştir
+  spawnDefenseTowersRing();
 
   const count = 22 + (mapIdx % 4);
   for (let i = 0; i < count; i++) spawnEnemyGlb(i + 1);
@@ -1326,7 +1351,8 @@ window.addEventListener('keydown', e => {
 });
 
 function getTargetById(id) {
-  if (id === 9999) return defenseTower;
+  const tower = defenseTowers.find(t => t.id === id);
+  if (tower) return tower;
   return enemies.find(e => e.id === id);
 }
 
@@ -1616,23 +1642,25 @@ function animate3D() {
     }
   }
 
-  // Savunma Kulesi Mantığı (Hareketsiz ama menzile girerse oyuncuya ateş eder)
-  if (defenseTower && defenseTower.mesh) {
-    const distToPlayer = Math.hypot(player.x - defenseTower.x, player.z - defenseTower.z);
-    if (distToPlayer <= ATTACK_RANGE && (now - defenseTower.lastAttackTime >= 1200)) {
-      defenseTower.lastAttackTime = now;
-      player.hp = Math.max(0, player.hp - 150);
-      player.lastDamagedTime = now;
-      lastRegenTime = now;
-      showFloatingDamage(player.x, player.z, '-150 (Kule)', '#ef4444');
-      updateHUD();
-      if (player.hp <= 0) { isGameOver = true; isAttacking = false; gameOverEl.style.display = 'flex'; finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString(); }
-    }
+  // Savunma Kuleleri Çemberi Mantığı
+  for (const t of defenseTowers) {
+    if (t.mesh) {
+      const distToPlayer = Math.hypot(player.x - t.x, player.z - t.z);
+      if (distToPlayer <= ATTACK_RANGE && (now - t.lastAttackTime >= 1200)) {
+        t.lastAttackTime = now;
+        player.hp = Math.max(0, player.hp - 120);
+        player.lastDamagedTime = now;
+        lastRegenTime = now;
+        showFloatingDamage(player.x, player.z, '-120 (Kule)', '#ef4444');
+        updateHUD();
+        if (player.hp <= 0) { isGameOver = true; isAttacking = false; gameOverEl.style.display = 'flex'; finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString(); }
+      }
 
-    const tempVector = new THREE.Vector3(defenseTower.x, SHIP_Y_POS, defenseTower.z);
-    tempVector.project(camera);
-    defenseTower.labelEl.style.transform = `translate(-50%, 0) translate(${(tempVector.x * .5 + .5) * window.innerWidth}px, ${(tempVector.y * -.5 + .5) * window.innerHeight + 50}px)`;
-    defenseTower.hpFillEl.style.width = Math.max(0, (defenseTower.hp / defenseTower.maxHp) * 100) + '%';
+      const tempVector = new THREE.Vector3(t.x, SHIP_Y_POS, t.z);
+      tempVector.project(camera);
+      t.labelEl.style.transform = `translate(-50%, 0) translate(${(tempVector.x * .5 + .5) * window.innerWidth}px, ${(tempVector.y * -.5 + .5) * window.innerHeight + 50}px)`;
+      t.hpFillEl.style.width = Math.max(0, (t.hp / t.maxHp) * 100) + '%';
+    }
   }
 
   for (const en of enemies) {
@@ -1715,15 +1743,15 @@ function animate3D() {
           updateTargetCard(); updateHUD(); syncAttackButton();
 
           if (!ammoSpec.isHeal && target.hp <= 0) {
-            if (target.id === 9999) {
-              // Savunma kulesi yok edildi
+            if (target.id >= 9000 && target.id < 9100) {
+              // Kule yok edildi
               if (target.mesh) scene.remove(target.mesh);
               target.labelEl.remove();
-              defenseTower = null;
+              defenseTowers = defenseTowers.filter(t => t.id !== target.id);
               selectedEnemyId = null; isAttacking = false;
               if (selectedRingMesh) selectedRingMesh.visible = false;
-              player.score += 50000;
-              showFloatingDamage(player.x, player.z, 'KALE YIKILDI! +50.000 Altın', '#f59e0b');
+              player.score += 25000;
+              showFloatingDamage(player.x, player.z, 'KULE YIKILDI! +25.000 Altın', '#f59e0b');
             } else {
               if (target.mesh) scene.remove(target.mesh);
               target.labelEl.remove();
@@ -1745,7 +1773,7 @@ function animate3D() {
             }
 
             updateTargetCard(); updateHUD(); syncAttackButton();
-            if (target.id !== 9999) {
+            if (!(target.id >= 9000 && target.id < 9100)) {
               setTimeout(() => spawnEnemyGlb(target.id), 3000);
             }
           }
@@ -1775,13 +1803,13 @@ function drawMinimap() {
   const scale = w / WORLD_SIZE;
   const cx = w / 2, cy = h / 2;
 
-  // Savunma kulesi minimap noktası (Sarı)
-  if (defenseTower) {
-    mctx.fillStyle = '#f59e0b';
+  // Savunma kuleleri çemberi minimap noktaları (Sarı)
+  mctx.fillStyle = '#f59e0b';
+  defenseTowers.forEach(t => {
     mctx.beginPath();
-    mctx.arc(cx + defenseTower.x * scale, cy + defenseTower.z * scale, 4.0, 0, Math.PI * 2);
+    mctx.arc(cx + t.x * scale, cy + t.z * scale, 2.5, 0, Math.PI * 2);
     mctx.fill();
-  }
+  });
 
   mctx.fillStyle = '#dc2626';
   enemies.forEach(en => {
@@ -2013,7 +2041,7 @@ function renderShipyardList() {
     btn.addEventListener('click', () => {
       const shipId = btn.dataset.id;
       const users = loadUsers();
-      const uIdx = users.users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
+      const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
       if (uIdx !== -1) { users[uIdx].equippedShip = shipId; saveUsers(users); }
       currentUser.equippedShip = shipId;
       setupPlayerShipVisual(); renderShipyardList();
