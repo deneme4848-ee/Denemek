@@ -82,6 +82,15 @@
       to { transform: translateX(-50%) scale(1.06); box-shadow: 0 0 25px rgba(241, 245, 249, 0.7); }
     }
 
+    #castle-teleport-banner {
+      display: block; position: fixed; top: 135px; left: 50%; transform: translateX(-50%);
+      z-index: 12; background: linear-gradient(135deg, #b45309, #78350f);
+      border: 2px solid #f59e0b; border-radius: 14px; padding: 8px 18px;
+      color: #fef3c7; font-size: 12px; font-weight: 900; cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.85); pointer-events: auto; letter-spacing: 0.5px;
+    }
+    #castle-teleport-banner:hover { background: linear-gradient(135deg, #d97706, #b45309); }
+
     .level-crest {
       width: 46px; height: 46px; flex-shrink: 0; border-radius: 12px;
       background: linear-gradient(145deg, #1e293b, #09131d);
@@ -364,6 +373,7 @@
   <div id="game"></div>
 
   <button id="map-transit-banner" type="button">Harita Değiştir</button>
+  <button id="castle-teleport-banner" type="button">🏰 Kaleye Işınlan</button>
 
   <div id="player-label">
     <div class="ship-hp-track"><div id="player-ship-hp-fill"></div></div>
@@ -571,6 +581,7 @@ const mapsCloseBtn = document.querySelector('#maps-close-btn');
 const mapsGridContainer = document.querySelector('#maps-grid-container');
 
 const mapTransitBanner = document.querySelector('#map-transit-banner');
+const castleTeleportBanner = document.querySelector('#castle-teleport-banner');
 
 const portToggleBtn = document.querySelector('#port-toggle-btn');
 const marketPanel = document.querySelector('#market-panel');
@@ -938,12 +949,11 @@ function buildConnectingWall(x1, z1, x2, z2) {
 
 function buildCastleIsland() {
   castleGroup = new THREE.Group();
-  castleGroup.position.set(0, 0, -2200);
+  castleGroup.position.set(0, 0, 0);
 
   castleTowers = [];
   castleTowerMeshes = [];
 
-  // Kullanıcının verdiği hassas koordinatlar (Ölçek katsayısı: 25)
   const rawCoords = [
     {x: 28, y: -16},
     {x: 33, y: -16},
@@ -1090,6 +1100,7 @@ function initThreeGame() {
       e.target.closest('#market-panel') ||
       e.target.closest('#maps-panel') ||
       e.target.closest('#map-transit-banner') ||
+      e.target.closest('#castle-teleport-banner') ||
       e.target.closest('#auth-overlay')
     ) return;
 
@@ -1174,7 +1185,7 @@ function startGameLogic() {
   gameOverEl.style.display = 'none';
 
   player = {
-    x: 0, z: 0, a: -Math.PI / 2, speed: 0, baseSpeed: 180, maxSpeed: 180,
+    x: 750, z: -550, a: -Math.PI / 2, speed: 0, baseSpeed: 180, maxSpeed: 180,
     hp: 1000000, maxHp: 1000000, score: 100000000, diamonds: 1103,
     level: 1, exp: 0, maxExp: 100,
     expansionRights: { cannon: 1, hp: 1, speed: 1 },
@@ -1194,6 +1205,14 @@ function startGameLogic() {
   renderMapsGrid();
 }
 
+castleTeleportBanner.addEventListener('click', () => {
+  if (!player) return;
+  player.x = 750;
+  player.z = -550;
+  targetPos = null;
+  player.speed = 0;
+});
+
 function changeMap(mapIdx, entrySide = 'center') {
   currentMapIndex = mapIdx;
   radarTitleEl.textContent = MAP_DATA[mapIdx].name;
@@ -1210,7 +1229,7 @@ function changeMap(mapIdx, entrySide = 'center') {
   } else if (entrySide === 'bottom') {
     player.z = -BOUND;
   } else {
-    player.x = 0; player.z = 0;
+    player.x = 750; player.z = -550;
   }
 
   document.querySelectorAll('.enemy-label').forEach(el => el.remove());
@@ -1813,10 +1832,12 @@ function drawMinimap() {
   const scale = w / WORLD_SIZE;
   const cx = w / 2, cy = h / 2;
 
-  mctx.fillStyle = '#94a3b8';
-  mctx.beginPath();
-  mctx.arc(cx + 0, cy + (-2200 * scale), 25 * scale, 0, Math.PI * 2);
-  mctx.fill();
+  mctx.fillStyle = '#f59e0b';
+  castleTowers.forEach(t => {
+    mctx.beginPath();
+    mctx.arc(cx + t.localX * scale, cy + t.localZ * scale, 2.0, 0, Math.PI * 2);
+    mctx.fill();
+  });
 
   mctx.fillStyle = '#dc2626';
   enemies.forEach(en => {
