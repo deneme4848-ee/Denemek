@@ -724,10 +724,14 @@ const SHIP_MODELS = {
   tasarim1:  { id: 'tasarim1',  name: 'Tasarim 1', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim1.glb' },
   tasarim2:  { id: 'tasarim2',  name: 'Tasarim 2', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim2.glb', heightOffset: 45, rotationOffset: Math.PI / 2 },
   tasarim3:  { id: 'tasarim3',  name: 'Tasarim 3', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3 },
+  tasarim4:  { id: 'tasarim4',  name: 'Tasarim 4', desc: 'GLB Savaş Gemisi', cost: 3500, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45 },
   tasarim5:  { id: 'tasarim5',  name: 'Tasarim 5', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim5.glb', heightOffset: 45, scaleMultiplier: 1.5 },
   tasarim6:  { id: 'tasarim6',  name: 'Tasarim 6', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim6.glb', heightOffset: 85 },
   tasarim7:  { id: 'tasarim7',  name: 'Tasarim 7', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim7.glb', heightOffset: 45, rotationOffset: Math.PI },
-  tasarim8:  { id: 'tasarim8',  name: 'Tasarim 8', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim8.glb', heightOffset: 85 }
+  tasarim8:  { id: 'tasarim8',  name: 'Tasarim 8', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim8.glb', heightOffset: 85 },
+  tasarim9:  { id: 'tasarim9',  name: 'Tasarim 9', desc: 'GLB Savaş Gemisi', cost: 4000, type: 'glb', modelPath: 'tasarim9.glb', heightOffset: 45 },
+  tasarim10: { id: 'tasarim10', name: 'Tasarim 10', desc: 'GLB Savaş Gemisi', cost: 4500, type: 'glb', modelPath: 'tasarim10.glb', heightOffset: 45 },
+  tasarim11: { id: 'tasarim11', name: 'Tasarim 11', desc: 'GLB Savaş Gemisi', cost: 5000, type: 'glb', modelPath: 'tasarim11.glb', heightOffset: 45 }
 };
 
 const ENEMY_GLB_MODEL_PATH = 'tasarim2.glb';
@@ -735,8 +739,8 @@ const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v77';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v77';
+const USERS_STORAGE_KEY = 'pirate3d_users_v78';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v78';
 let authMode = 'login';
 let currentUser = null;
 
@@ -1167,18 +1171,14 @@ function spawnDefenseTowersRing() {
   defenseTowers = [];
 
   const totalTowers = 15;
-  const radius = 200;
-  // Giriş boşluğu için ön taraftaki (örneğin açının belirli bir aralığındaki) kuleleri atlıyoruz veya daraltıyoruz.
-  // 15 kule tam çemberde 2*PI / 15 radyan arayla dizilir. Ön tarafta (örn: -0.4 ile +0.4 radyan arası) boşluk bırakalım.
+  const radius = 1200; // Başlangıç noktasından (merkezden) uzaklaştırıldı (eski: 200)
   const startId = 9000;
 
   for (let i = 0; i < totalTowers; i++) {
-    // Açı hesabı
     const angle = (i / totalTowers) * Math.PI * 2;
 
-    // Ön tarafta (giriş kapısı için) yaklaşık -0.35 ile +0.35 radyan arasındaki açıyı boş bırakıyoruz
+    // Ön tarafta giriş koridoru için açık açı bırakıyoruz
     if (angle > Math.PI * 0.15 && angle < Math.PI * 0.85) {
-      // Bu aralıktaki kuleleri pas geçerek geniş bir giriş kapısı oluşturuyoruz
       continue;
     }
 
@@ -1249,7 +1249,6 @@ function changeMap(mapIdx, entrySide = 'center') {
   });
   enemies = [];
 
-  // Çember şeklindeki savunma kulelerini harita ortasına yerleştir
   spawnDefenseTowersRing();
 
   const count = 22 + (mapIdx % 4);
@@ -1744,7 +1743,6 @@ function animate3D() {
 
           if (!ammoSpec.isHeal && target.hp <= 0) {
             if (target.id >= 9000 && target.id < 9100) {
-              // Kule yok edildi
               if (target.mesh) scene.remove(target.mesh);
               target.labelEl.remove();
               defenseTowers = defenseTowers.filter(t => t.id !== target.id);
@@ -1803,7 +1801,6 @@ function drawMinimap() {
   const scale = w / WORLD_SIZE;
   const cx = w / 2, cy = h / 2;
 
-  // Savunma kuleleri çemberi minimap noktaları (Sarı)
   mctx.fillStyle = '#f59e0b';
   defenseTowers.forEach(t => {
     mctx.beginPath();
