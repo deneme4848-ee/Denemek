@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - Akıllı Rota ve Surlar</title>
+  <title>Korsan Dünyası - Gelişmiş Ada Navigasyonu</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -1123,16 +1123,10 @@ function initThreeGame() {
 
     const oceanIntersect = raycaster.intersectObject(ocean);
     if (oceanIntersect.length > 0) {
-      const dest = { x: oceanIntersect[0].point.x, z: oceanIntersect[0].point.z };
+      let dest = { x: oceanIntersect[0].point.x, z: oceanIntersect[0].point.z };
       
-      // Akıllı Rota (Yol Bulma / Etrafından Dolaşma) Kontrolü
-      if (getDirectPathBlocked({ x: player.x, z: player.z }, dest)) {
-        currentWaypoint = calculateWaypoint({ x: player.x, z: player.z }, dest);
-        targetPos = dest;
-      } else {
-        currentWaypoint = null;
-        targetPos = dest;
-      }
+      // Çok Noktalı Akıllı Rota Hesaplama (Adanın içine ve arkasına tıklamaları çözer)
+      navigationQueue = buildSafePath({ x: player.x, z: player.z }, dest);
     }
   });
 
@@ -1143,59 +1137,68 @@ function initThreeGame() {
 }
 
 let player;
-let targetPos = null, currentWaypoint = null, selectedEnemyId = null, selectedTowerId = null, isAttacking = false, isGameOver = false;
+let navigationQueue = [];
+let selectedEnemyId = null, selectedTowerId = null, isAttacking = false, isGameOver = false;
 let lastPlayerAttackTime = 0;
 
-const ISLAND_AVOID_RADIUS = 390;
+// Surlara ve adaya güvenli mesafe yarıçapı (Ada yarıçapı 300 + kule/gemi payı = 395)
+const ISLAND_SAFE_RADIUS = 395;
 
-function getDirectPathBlocked(p1, p2) {
+function isLineIntersectingCircle(p1, p2, r) {
   const dx = p2.x - p1.x;
   const dz = p2.z - p1.z;
-  const len = Math.hypot(dx, dz);
-  if (len === 0) return false;
+  const lenSq = dx * dx + dz * dz;
+  if (lenSq === 0) return Math.hypot(p1.x, p1.z) < r;
   
-  const ux = dx / len;
-  const uz = dz / len;
+  let t = ((-p1.x) * dx + (-p1.z) * dz) / lenSq;
+  t = Math.max(0, Math.min(1, t));
   
-  const proj = (-p1.x) * ux + (-p1.z) * uz;
-  
-  let closestX, closestZ;
-  if (proj < 0) {
-    closestX = p1.x; closestZ = p1.z;
-  } else if (proj > len) {
-    closestX = p2.x; closestZ = p2.z;
-  } else {
-    closestX = p1.x + ux * proj;
-    closestZ = p1.z + uz * proj;
-  }
-  
-  const distToOrigin = Math.hypot(closestX, closestZ);
-  return distToOrigin < ISLAND_AVOID_RADIUS;
+  const closestX = p1.x + t * dx;
+  const closestZ = p1.z + t * dz;
+  return Math.hypot(closestX, closestZ) < r;
 }
 
-function calculateWaypoint(p1, p2) {
-  const r = 425;
-  const candidates = [];
-  for (let ang = 0; ang < Math.PI * 2; ang += Math.PI / 8) {
-    candidates.push({
-      x: Math.cos(ang) * r,
-      z: Math.sin(ang) * r
+function buildSafePath(start, end) {
+  let finalDest = { x: end.x, z: end.z };
+  
+  // 1. Hedef adanın (surların) içindeyse, adanın dış çemberindeki en yakın güvenli noktaya çek
+  const distEnd = Math.hypot(finalDest.x, finalDest.z);
+  if (distEnd < ISLAND_SAFE_RADIUS) {
+    const ang = distEnd > 0.01 ? Math.atan2(finalDest.z, finalDest.x) : Math.atan2(start.z, start.x);
+    finalDest.x = Math.cos(ang) * (ISLAND_SAFE_RADIUS + 5);
+    finalDest.z = Math.sin(ang) * (ISLAND_SAFE_RADIUS + 5);
+  }
+
+  // 2. Doğrudan gidiş yolu adayı kesmiyorsa direkt hedefi döndür
+  if (!isLineIntersectingCircle(start, finalDest, ISLAND_SAFE_RADIUS - 15)) {
+    return [finalDest];
+  }
+
+  // 3. Yol adayı kesiyorsa, adanın etrafından dolaşan çok noktalı (yay) rota oluştur
+  const orbitR = ISLAND_SAFE_RADIUS + 18;
+  const startAngle = Math.atan2(start.z, start.x);
+  const endAngle = Math.atan2(finalDest.z, finalDest.x);
+
+  // En kısa açısal yönü bul (-PI ile +PI arası)
+  let angleDiff = endAngle - startAngle;
+  while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+  while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+
+  const stepSize = Math.PI / 6; // Her 30 derecede bir ara geçiş noktası (yay)
+  const steps = Math.max(1, Math.ceil(Math.abs(angleDiff) / stepSize));
+  const path = [];
+
+  for (let i = 1; i <= steps; i++) {
+    const t = i / steps;
+    const curAng = startAngle + angleDiff * t;
+    path.push({
+      x: Math.cos(curAng) * orbitR,
+      z: Math.sin(curAng) * orbitR
     });
   }
-  
-  let bestWp = null;
-  let minDist = Infinity;
-  
-  for (const cand of candidates) {
-    if (!getDirectPathBlocked(p1, cand) && !getDirectPathBlocked(cand, p2)) {
-      const d = Math.hypot(cand.x - p1.x, cand.z - p1.z) + Math.hypot(p2.x - cand.x, p2.z - cand.z);
-      if (d < minDist) {
-        minDist = d;
-        bestWp = cand;
-      }
-    }
-  }
-  return bestWp || p2;
+
+  path.push(finalDest);
+  return path;
 }
 
 function setupPlayerShipVisual() {
@@ -1219,7 +1222,7 @@ function setupPlayerShipVisual() {
 }
 
 function startGameLogic() {
-  isGameOver = false; targetPos = null; currentWaypoint = null; selectedEnemyId = null; selectedTowerId = null; isAttacking = false;
+  isGameOver = false; navigationQueue = []; selectedEnemyId = null; selectedTowerId = null; isAttacking = false;
   gameOverEl.style.display = 'none';
 
   player = {
@@ -1246,8 +1249,7 @@ function startGameLogic() {
 function changeMap(mapIdx, entrySide = 'center') {
   currentMapIndex = mapIdx;
   radarTitleEl.textContent = MAP_DATA[mapIdx].name;
-  targetPos = null;
-  currentWaypoint = null;
+  navigationQueue = [];
   hideTransitButton();
 
   const BOUND = (WORLD_SIZE / 2) - 350;
@@ -1300,7 +1302,7 @@ function spawnEnemyGlb(id) {
   do {
     ex = (Math.random() - 0.5) * (WORLD_SIZE * 0.7);
     ez = (Math.random() - 0.5) * (WORLD_SIZE * 0.7);
-  } while (Math.hypot(ex, ez) < 400);
+  } while (Math.hypot(ex, ez) < 430);
 
   const labelEl = document.createElement('div');
   labelEl.className = 'enemy-label';
@@ -1518,20 +1520,22 @@ function animate3D() {
     }
   }
 
-  // Akıllı Rota / Waypoint Navigasyon Güncellemesi
-  let destination = currentWaypoint || targetPos;
-  if (destination) {
-    const dx = destination.x - player.x;
-    const dz = destination.z - player.z;
+  // Çok Noktalı Akıllı Rota Takibi
+  if (navigationQueue.length > 0) {
+    const currentTarget = navigationQueue[0];
+    const dx = currentTarget.x - player.x;
+    const dz = currentTarget.z - player.z;
     const dist = Math.hypot(dx, dz);
-    if (dist > 12) {
+
+    // Ara noktalarda geniş tolerans (28), son hedefte hassas duruş (10)
+    const arrivalThreshold = navigationQueue.length > 1 ? 28 : 10;
+
+    if (dist > arrivalThreshold) {
       player.a = Math.atan2(dz, dx);
       player.speed = player.maxSpeed;
     } else {
-      if (currentWaypoint) {
-        currentWaypoint = null; // Ara noktaya varıldı, şimdi asıl hedefe yönel
-      } else {
-        targetPos = null;
+      navigationQueue.shift(); // Bir sonraki nokta
+      if (navigationQueue.length === 0) {
         player.speed = 0;
       }
     }
@@ -1539,16 +1543,24 @@ function animate3D() {
     player.speed = 0;
   }
 
-  const nextX = player.x + Math.cos(player.a) * player.speed * dt;
-  const nextZ = player.z + Math.sin(player.a) * player.speed * dt;
+  const vx = Math.cos(player.a) * player.speed * dt;
+  const vz = Math.sin(player.a) * player.speed * dt;
+  const nextX = player.x + vx;
+  const nextZ = player.z + vz;
 
   if (!checkCastleCollision(nextX, nextZ)) {
     player.x = nextX;
     player.z = nextZ;
   } else {
-    targetPos = null;
-    currentWaypoint = null;
-    player.speed = 0;
+    // Sura çok yaklaşıldıysa duvara paralel kayma (Sliding) yap, takılıp kalma!
+    if (!checkCastleCollision(player.x + vx, player.z)) {
+      player.x += vx;
+    } else if (!checkCastleCollision(player.x, player.z + vz)) {
+      player.z += vz;
+    } else {
+      navigationQueue = [];
+      player.speed = 0;
+    }
   }
 
   const HALF_WORLD = WORLD_SIZE / 2;
