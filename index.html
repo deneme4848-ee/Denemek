@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Korsan Dünyası - kule.glb Zırhlı Kale</title>
+  <title>Korsan Dünyası - Çember Kapılı Kule Sistemi</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -867,33 +867,6 @@ function createBorderFrame() {
   scene.add(borderFrameMesh);
 }
 
-function buildConnectingWall(x1, z1, x2, z2) {
-  const wallGroup = new THREE.Group();
-  const dx = x2 - x1;
-  const dz = z2 - z1;
-  const dist = Math.hypot(dx, dz);
-  const angle = Math.atan2(dz, dx);
-
-  const wallGeo = new THREE.BoxGeometry(dist, 26, 10);
-  const wallMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.85, metalness: 0.1 });
-  const wallMesh = new THREE.Mesh(wallGeo, wallMat);
-  wallMesh.position.set(0, 13, 0);
-  wallMesh.castShadow = true;
-  wallMesh.receiveShadow = true;
-  wallGroup.add(wallMesh);
-
-  const topPlateGeo = new THREE.BoxGeometry(dist, 3.5, 12);
-  const topPlateMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.5, metalness: 0.7 });
-  const topPlateMesh = new THREE.Mesh(topPlateGeo, topPlateMat);
-  topPlateMesh.position.set(0, 27.5, 0);
-  wallGroup.add(topPlateMesh);
-
-  wallGroup.position.set((x1 + x2) / 2, SHIP_Y_POS - 40, (z1 + z2) / 2);
-  wallGroup.rotation.y = -angle;
-
-  return wallGroup;
-}
-
 function buildCastleIsland() {
   castleGroup = new THREE.Group();
   castleGroup.position.set(0, 0, 0);
@@ -901,47 +874,41 @@ function buildCastleIsland() {
   castleTowers = [];
   castleTowerMeshes = [];
 
-  const rawCoords = [
-    {x: 28, y: -16},
-    {x: 33, y: -16},
-    {x: 36, y: -20},
-    {x: 37, y: -23},
-    {x: 36, y: -26},
-    {x: 33, y: -29},
-    {x: 32, y: -29},
-    {x: 30, y: -29},
-    {x: 28, y: -28},
-    {x: 27, y: -26},
-    {x: 27, y: -25},
-    {x: 27, y: -24},
-    {x: 28, y: -22},
-    {x: 28, y: -20}
-  ];
+  // Toplam 15 kule için çembersel açı hesaplama (aralarında 2 birim boşluk / açısal oran ile)
+  const totalTowers = 15;
+  const radius = 750; // Ada yarıçapı
+  
+  for (let i = 0; i < totalTowers; i++) {
+    // Kapı girişi için -25, -26, -27 indekslerini (veya karşılık gelen açı dilimlerini) atlıyoruz
+    // İstediğin gibi sol kule -24'te biter, giriş boş kalır, sağ kule -28'den başlar.
+    // 0'dan 14'e kadar olan 15 kuleyi yerleştirirken kapı boşluğunu (örneğin 6. 7. 8. kuleler yerine) bırakıyoruz.
+    if (i >= 6 && i <= 8) continue; // -25, -26, 27 boşluk (kapı girişi)
 
-  const towerPositions = rawCoords.map(c => ({ x: c.x * 25, z: c.y * 25 }));
+    const angle = (i / totalTowers) * Math.PI * 2;
+    const posX = Math.cos(angle) * radius;
+    const posZ = Math.sin(angle) * radius;
 
-  towerPositions.forEach((pos, i) => {
     const towerId = 100 + i;
 
-    // YEDEK (FALLBACK) KULE GEOMETRİSİ (GLB yüklenene kadar anında görünür)
+    // YEDEK (FALLBACK) KULE GEOMETRİSİ
     const fallbackGeo = new THREE.CylinderGeometry(12, 16, 50, 16);
     const fallbackMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.7, metalness: 0.2 });
     const fallbackTower = new THREE.Mesh(fallbackGeo, fallbackMat);
-    fallbackTower.position.set(pos.x, SHIP_Y_POS - 15, pos.z);
+    fallbackTower.position.set(posX, SHIP_Y_POS - 15, posZ);
     fallbackTower.userData = { towerId: towerId, name: `Zırhlı Kule #${i+1}` };
     castleGroup.add(fallbackTower);
     castleTowerMeshes.push(fallbackTower);
 
-    // KULE.GLB DOSYASINI YÜKLE VE YEDEK GEOMETRİNİN YERİNE GEÇİR
+    // KULE.GLB DOSYASINI YÜKLE
     gltfLoader.load('kule.glb', (gltf) => {
       const towerModel = gltf.scene || gltf.scenes[0];
       const box = new THREE.Box3().setFromObject(towerModel);
       const size = new THREE.Vector3();
       box.getSize(size);
-      let scaleFactor = 120 / Math.max(size.x, size.y, size.z);
+      let scaleFactor = 75 / Math.max(size.x, size.y, size.z);
       towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      towerModel.position.set(pos.x, SHIP_Y_POS + 250, pos.z);
+      towerModel.position.set(posX, SHIP_Y_POS - 40, posZ);
       towerModel.userData = { towerId: towerId, name: `Zırhlı Kule #${i+1}` };
 
       towerModel.traverse(child => { 
@@ -956,7 +923,6 @@ function buildCastleIsland() {
         }
       });
 
-      // Yedek kuleyi sahneden kaldırıp GLB modelini ekle
       castleGroup.remove(fallbackTower);
       const idx = castleTowerMeshes.indexOf(fallbackTower);
       if (idx !== -1) castleTowerMeshes.splice(idx, 1);
@@ -970,19 +936,12 @@ function buildCastleIsland() {
     castleTowers.push({
       id: towerId,
       name: `Zırhlı Kule #${i+1}`,
-      localX: pos.x,
-      localZ: pos.z,
+      localX: posX,
+      localZ: posZ,
       hp: 500000,
       maxHp: 500000,
       lastShotTime: 0
     });
-  });
-
-  for (let i = 0; i < towerPositions.length - 1; i++) {
-    const p1 = towerPositions[i];
-    const p2 = towerPositions[i + 1];
-    const wallSegment = buildConnectingWall(p1.x, p1.z, p2.x, p2.z);
-    castleGroup.add(wallSegment);
   }
 
   scene.add(castleGroup);
