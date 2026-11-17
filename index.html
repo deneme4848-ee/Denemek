@@ -931,7 +931,7 @@ function buildCastleIsland() {
   // 2. Adım: Kuleleri yerleştir (İstediğin gibi sol kule -24'te biter, -25, -26, -27 boş kalır, sağ kule -28'den başlar)
   towerPositions.forEach((pos, i) => {
     const towerId = 100 + i;
-    const isGateOpening = (i >= 4 && i <= 6); // Kapı girişi olan boşluk
+    const isGateOpening = (i >= 6 && i <= 6); // Kapı girişi olan boşluk
 
     if (!isGateOpening) {
       // YEDEK (FALLBACK) SAVAŞÇI KULE GEOMETRİSİ
