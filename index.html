@@ -854,27 +854,21 @@ function getShipThumbnail(modelSpec, callback) {
   });
 }
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v79';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v79';
+const USERS_STORAGE_KEY = 'pirate3d_users_v80';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v80';
 let authMode = 'login';
 let currentUser = null;
 
 function loadUsers() {
   let users = [];
-  try { 
-    users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]'); 
-  } catch { 
-    users = []; 
-  }
+  try { users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]'); } catch { users = []; }
   if (!users.some(u => u.username.toLowerCase() === 'test')) {
     users.push({ id: 'user_test', username: 'Test', password: 'test', ownedShips: ['standard'], equippedShip: 'standard' });
     try { localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users)); } catch(e) {}
   }
   return users;
 }
-function saveUsers(users) { 
-  try { localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users)); } catch(e) {} 
-}
+function saveUsers(users) { try { localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users)); } catch(e) {} }
 
 function setAuthMode(mode) {
   authMode = mode;
@@ -899,9 +893,7 @@ function completeLogin(user) {
     ownedShips: user.ownedShips || ['standard'], 
     equippedShip: user.equippedShip || 'standard' 
   };
-  try {
-    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
-  } catch(e) {}
+  try { localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser)); } catch(e) {}
   tagUsernameEl.textContent = currentUser.username;
   authOverlay.style.display = 'none';
   initThreeGame();
@@ -910,8 +902,7 @@ function completeLogin(user) {
 if (authForm) {
   authForm.addEventListener('submit', e => {
     e.preventDefault();
-    const uname = authUsernameInput.value.trim(); 
-    const pass = authPasswordInput.value;
+    const uname = authUsernameInput.value.trim(); const pass = authPasswordInput.value;
     const users = loadUsers();
     if (authMode === 'register') {
       if (users.some(u => u.username.toLowerCase() === uname.toLowerCase())) { authMsgEl.textContent = 'Bu isim zaten kayıtlı.'; return; }
@@ -1245,6 +1236,9 @@ function startGameLogic() {
   renderMapsGrid();
 }
 
+/**
+ * Görseldeki Düzen Uyarlaması (Merkez Kale + İç Çember Kuleleri + Dış Çember Duvar ve Kuleleri)
+ */
 function spawnDefenseTowersRing() {
   defenseTowers.forEach(t => {
     if (t.mesh) scene.remove(t.mesh);
@@ -1255,32 +1249,55 @@ function spawnDefenseTowersRing() {
   const defenseIslandGroup = new THREE.Group();
   defenseIslandGroup.name = "DefenseIsland_Base";
 
-  const baseGeo = new THREE.CylinderGeometry(420, 480, 24, 16);
+  // 1. Merkez Kale Adacığı
+  const baseGeo = new THREE.CylinderGeometry(280, 320, 20, 24);
   const baseMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8, metalness: 0.2 });
   const islandBase = new THREE.Mesh(baseGeo, baseMat);
   islandBase.position.y = SHIP_Y_POS - 85;
   defenseIslandGroup.add(islandBase);
 
-  const platformGeo = new THREE.CylinderGeometry(360, 390, 10, 16);
-  const platformMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.6, metalness: 0.4 });
-  const platform = new THREE.Mesh(platformGeo, platformMat);
-  platform.position.y = SHIP_Y_POS - 72;
-  defenseIslandGroup.add(platform);
+  // Merkez Bina (Kale Komuta Merkezi)
+  const castleGeo = new THREE.BoxGeometry(110, 70, 110);
+  const castleMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.5, metalness: 0.3 });
+  const castleMesh = new THREE.Mesh(castleGeo, castleMat);
+  castleMesh.position.set(0, SHIP_Y_POS - 40, 0);
+  defenseIslandGroup.add(castleMesh);
+
+  // 2. Dış Çember Duvar Halkası (Görseldeki dairesel sur yapısı)
+  const wallRadius = 380;
+  const wallCount = 8;
+  for (let i = 0; i < wallCount; i++) {
+    const angle = (i / wallCount) * Math.PI * 2;
+    const wx = Math.cos(angle) * wallRadius;
+    const wz = Math.sin(angle) * wallRadius;
+
+    const wallGeo = new THREE.BoxGeometry(140, 35, 30);
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.7, metalness: 0.2 });
+    const wallMesh = new THREE.Mesh(wallGeo, wallMat);
+    wallMesh.position.set(wx, SHIP_Y_POS - 60, wz);
+    wallMesh.rotation.y = -angle;
+    defenseIslandGroup.add(wallMesh);
+  }
+
   scene.add(defenseIslandGroup);
 
   const startId = 9000;
-  const createTowerEntity = (index, x, z, scaleFactor = 1.0) => {
+  let towerCounter = 0;
+
+  const createTowerEntity = (index, x, z, scaleFactor = 1.0, customName = null) => {
     const towerId = startId + index;
+    const towerName = customName || `Savunma Kulesi #${index + 1}`;
+
     const labelEl = document.createElement('div');
     labelEl.className = 'enemy-label';
     labelEl.innerHTML = `
       <div class="enemy-hp-track"><div class="enemy-hp-fill" id="tower-hp-fill-${towerId}"></div></div>
-      <div class="enemy-name-tag" style="color: #f59e0b;">Savunma Kulesi #${index + 1}</div>
+      <div class="enemy-name-tag" style="color: #f59e0b;">${towerName}</div>
     `;
     document.body.appendChild(labelEl);
 
     const towerObj = {
-      id: towerId, name: `Savunma Kulesi #${index + 1}`, mesh: null, labelEl,
+      id: towerId, name: towerName, mesh: null, labelEl,
       hpFillEl: labelEl.querySelector(`#tower-hp-fill-${towerId}`),
       x, z, hp: 15000000, maxHp: 15000000,
       lastAttackTime: 0, isAggro: false
@@ -1303,19 +1320,18 @@ function spawnDefenseTowersRing() {
     });
   };
 
-  let towerCounter = 0;
-  createTowerEntity(towerCounter++, 0, 0, 1.35);
-
-  const innerRadius = 140;
+  // A. Merkez Kale Etrafındaki İç Kuleler (6 Adet - Profesyonel Kuleler)
+  const innerRadius = 130;
   for (let i = 0; i < 6; i++) {
     const angle = (i / 6) * Math.PI * 2;
-    createTowerEntity(towerCounter++, Math.cos(angle) * innerRadius, Math.sin(angle) * innerRadius, 1.1);
+    createTowerEntity(towerCounter++, Math.cos(angle) * innerRadius, Math.sin(angle) * innerRadius, 1.0, 'Profesyonel Kule');
   }
 
-  const outerRadius = 260;
+  // B. Dış Surlar / Çember Üzerindeki Kuleler (8 Adet - Görseldeki Dış Hat Kuleleri)
+  const outerRadius = 380;
   for (let i = 0; i < 8; i++) {
     const angle = (i / 8) * Math.PI * 2 + (Math.PI / 8);
-    createTowerEntity(towerCounter++, Math.cos(angle) * outerRadius, Math.sin(angle) * outerRadius, 1.0);
+    createTowerEntity(towerCounter++, Math.cos(angle) * outerRadius, Math.sin(angle) * outerRadius, 1.15, 'Profesyonel Kule');
   }
 }
 
