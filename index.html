@@ -357,8 +357,9 @@
       background: radial-gradient(circle at 50% 50%, #083344, #031420);
       border: 1.5px solid rgba(56, 189, 248, 0.35); display: flex; align-items: center; justify-content: center;
       overflow: hidden; box-shadow: inset 0 3px 10px rgba(0,0,0,0.9); position: relative;
+      color: #64748b; font-size: 11px; font-weight: 700;
     }
-    .ship-card-img-wrap canvas { width: 100% !important; height: 100% !important; display: block; }
+    .ship-card-img-wrap img { width: 100%; height: 100%; object-fit: contain; display: block; }
     .ship-card-title { font-size: 12px; font-weight: 800; color: #fffbeb; margin-top: 2px; }
     .ship-card-sub { font-size: 10px; color: #94a3b8; line-height: 1.2; margin-bottom: 2px; }
 
@@ -724,7 +725,8 @@ const SHIP_MODELS = {
   tasarim1:  { id: 'tasarim1',  name: 'Tasarim 1', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim1.glb' },
   tasarim2:  { id: 'tasarim2',  name: 'Tasarim 2', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim2.glb', heightOffset: 45, rotationOffset: Math.PI / 2 },
   tasarim3:  { id: 'tasarim3',  name: 'Tasarim 3', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3 },
-  tasarim4:  { id: 'tasarim4',  name: 'Tasarim 4', desc: 'GLB Savaş Gemisi', cost: 3500, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45 },
+  // Tasarım 4 yukarı giderken sola bakma yön düzeltmesi (-Math.PI / 2)
+  tasarim4:  { id: 'tasarim4',  name: 'Tasarim 4', desc: 'GLB Savaş Gemisi', cost: 3500, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2 },
   tasarim5:  { id: 'tasarim5',  name: 'Tasarim 5', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim5.glb', heightOffset: 45, scaleMultiplier: 1.5 },
   tasarim6:  { id: 'tasarim6',  name: 'Tasarim 6', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim6.glb', heightOffset: 85 },
   tasarim7:  { id: 'tasarim7',  name: 'Tasarim 7', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim7.glb', heightOffset: 45, rotationOffset: Math.PI },
@@ -738,6 +740,127 @@ const ENEMY_GLB_MODEL_PATH = 'tasarim2.glb';
 const ENEMY_GLB_HEIGHT_OFFSET = 45;
 const ENEMY_GLB_ROTATION_OFFSET = Math.PI / 2;
 const ENEMY_GLB_SCALE = 1.0;
+
+// =========================================================================
+// GLB ÖNBELLEK & 512x512 DOKU OPTİMİZASYONU + PAYLAŞIMLI GEOMETRİLER
+// =========================================================================
+const GLB_CACHE = {};
+const GLB_LOADING_QUEUE = {};
+const THUMBNAIL_CACHE = {};
+let SHARED_PARTICLE_GEO = null;
+let SHARED_PROJECTILE_GEO = null;
+let thumbnailRenderer = null;
+
+function downscaleTextureTo512(texture) {
+  if (!texture || !texture.image) return;
+  const img = texture.image;
+  const w = img.width || img.videoWidth;
+  const h = img.height || img.videoHeight;
+  if (!w || !h) return;
+
+  const MAX_SIZE = 512;
+  if (w > MAX_SIZE || h > MAX_SIZE) {
+    const scale = Math.min(MAX_SIZE / w, MAX_SIZE / h);
+    const nw = Math.max(1, Math.round(w * scale));
+    const nh = Math.max(1, Math.round(h * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = nw;
+    canvas.height = nh;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, nw, nh);
+    texture.image = canvas;
+  }
+  texture.generateMipmaps = true;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.anisotropy = 2;
+  texture.needsUpdate = true;
+}
+
+function optimizeModelTextures512(rootObject) {
+  const processedTextures = new Set();
+  const texProps = ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'aoMap', 'emissiveMap', 'alphaMap'];
+  rootObject.traverse((child) => {
+    if (child.isMesh && child.material) {
+      const mats = Array.isArray(child.material) ? child.material : [child.material];
+      mats.forEach((mat) => {
+        texProps.forEach((prop) => {
+          const tex = mat[prop];
+          if (tex && !processedTextures.has(tex)) {
+            processedTextures.add(tex);
+            downscaleTextureTo512(tex);
+          }
+        });
+      });
+    }
+  });
+}
+
+function loadCachedGLB(path, onLoaded) {
+  if (GLB_CACHE[path]) {
+    onLoaded(GLB_CACHE[path].clone());
+    return;
+  }
+  if (GLB_LOADING_QUEUE[path]) {
+    GLB_LOADING_QUEUE[path].push(onLoaded);
+    return;
+  }
+  GLB_LOADING_QUEUE[path] = [onLoaded];
+
+  gltfLoader.load(path, (gltf) => {
+    const root = gltf.scene || gltf.scenes[0];
+    // Tüm dokuları VRAM taşmasını önlemek için 512x512'ye sıkıştır
+    optimizeModelTextures512(root);
+    GLB_CACHE[path] = root;
+
+    const callbacks = GLB_LOADING_QUEUE[path] || [];
+    delete GLB_LOADING_QUEUE[path];
+    callbacks.forEach(cb => cb(root.clone()));
+  }, undefined, (err) => {
+    console.warn("GLB yüklenemedi:", path, err);
+    delete GLB_LOADING_QUEUE[path];
+  });
+}
+
+// Tersane için 14 ayrı WebGL context yerine tek bir ortak renderer üzerinden statik önizleme üretir
+function getShipThumbnail(modelSpec, callback) {
+  if (THUMBNAIL_CACHE[modelSpec.id]) {
+    callback(THUMBNAIL_CACHE[modelSpec.id]);
+    return;
+  }
+  loadCachedGLB(modelSpec.modelPath, (clonedModel) => {
+    if (!thumbnailRenderer) {
+      thumbnailRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+      thumbnailRenderer.setSize(220, 140);
+    }
+    const pScene = new THREE.Scene();
+    const pCamera = new THREE.PerspectiveCamera(45, 220 / 140, 0.1, 1000);
+    pCamera.position.set(0, 50, 120);
+    pCamera.lookAt(0, 0, 0);
+
+    pScene.add(new THREE.AmbientLight(0xffffff, 1.3));
+    const pDir = new THREE.DirectionalLight(0xfff08a, 1.5);
+    pDir.position.set(50, 100, 50);
+    pScene.add(pDir);
+
+    const box = new THREE.Box3().setFromObject(clonedModel);
+    const size = new THREE.Vector3();
+    box.getSize(size);
+    const maxDim = Math.max(size.x, size.y, size.z) || 1;
+    const scaleFactor = (65 / maxDim) * (modelSpec.scaleMultiplier || 1.0);
+    clonedModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
+    clonedModel.position.set(0, -10, 0);
+    clonedModel.rotation.y = Math.PI / 5;
+    pScene.add(clonedModel);
+
+    thumbnailRenderer.render(pScene, pCamera);
+    const dataUrl = thumbnailRenderer.domElement.toDataURL('image/png');
+    THUMBNAIL_CACHE[modelSpec.id] = dataUrl;
+    pScene.remove(clonedModel);
+    callback(dataUrl);
+  });
+}
+
+// =========================================================================
 
 const USERS_STORAGE_KEY = 'pirate3d_users_v78';
 const SESSION_STORAGE_KEY = 'pirate3d_session_v78';
@@ -810,7 +933,6 @@ let activeProjectiles = [], particleSystems = [], cannonEffects = [];
 let raycaster, planeGeo, mouse;
 let selectedRingMesh = null;
 let borderFrameMesh = null;
-let activeShipyardPreviews = [];
 let textureLoader;
 const loadedAmmoTextures = {};
 
@@ -852,18 +974,18 @@ let gltfLoader;
 
 function createSeamlessDarkOceanTexture() {
   const canvas = document.createElement('canvas');
-  canvas.width = 2048;
-  canvas.height = 2048;
+  canvas.width = 1024; // 2048 yerine 1024 ile VRAM tasarrufu
+  canvas.height = 1024;
   const ctx = canvas.getContext('2d');
 
   ctx.fillStyle = '#042638';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  for (let i = 0; i < 260; i++) {
+  for (let i = 0; i < 160; i++) {
     const x = Math.random() * canvas.width;
     const y = Math.random() * canvas.height;
-    const rx = 45 + Math.random() * 115;
-    const ry = 30 + Math.random() * 90;
+    const rx = 25 + Math.random() * 60;
+    const ry = 18 + Math.random() * 45;
     const glow = ctx.createRadialGradient(x, y, 0, x, y, Math.max(rx, ry));
     glow.addColorStop(0, 'rgba(18, 119, 143, 0.16)');
     glow.addColorStop(0.55, 'rgba(10, 88, 112, 0.075)');
@@ -878,11 +1000,11 @@ function createSeamlessDarkOceanTexture() {
     ctx.restore();
   }
 
-  for (let i = 0; i < 11500; i++) {
+  for (let i = 0; i < 4500; i++) {
     const x = Math.random() * canvas.width;
     const y = Math.random() * canvas.height;
-    const length = 5 + Math.random() * 24;
-    const bend = (Math.random() - 0.5) * 4;
+    const length = 4 + Math.random() * 14;
+    const bend = (Math.random() - 0.5) * 3;
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.quadraticCurveTo(x + length * 0.5, y + bend, x + length, y + bend * 0.25);
@@ -893,21 +1015,11 @@ function createSeamlessDarkOceanTexture() {
     ctx.stroke();
   }
 
-  for (let i = 0; i < 5200; i++) {
-    const x = Math.random() * canvas.width;
-    const y = Math.random() * canvas.height;
-    const r = 0.35 + Math.random() * 0.85;
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(155, 220, 225, ${0.018 + Math.random() * 0.045})`;
-    ctx.fill();
-  }
-
   const texture = new THREE.CanvasTexture(canvas);
   texture.wrapS = THREE.ClampToEdgeWrapping;
   texture.wrapT = THREE.ClampToEdgeWrapping;
   texture.repeat.set(1, 1);
-  texture.anisotropy = 8;
+  texture.anisotropy = 4;
   texture.needsUpdate = true;
   return texture;
 }
@@ -930,7 +1042,7 @@ function createBorderFrame() {
   holePath.closePath();
   shape.holes.push(holePath);
 
-  const extrudeSettings = { depth: 35, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 4, bevelThickness: 4 };
+  const extrudeSettings = { depth: 35, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 4, bevelThickness: 4 };
   const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
   geometry.rotateX(Math.PI / 2);
 
@@ -956,10 +1068,14 @@ function initThreeGame() {
   camera.position.set(0, CAMERA_HEIGHT, CAMERA_DEPTH);
   camera.lookAt(0, 0, 0);
 
-  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   document.getElementById('game').appendChild(renderer.domElement);
+
+  // Paylaşımlı parçacık geometrileri (Bellek sızıntısını önler)
+  SHARED_PARTICLE_GEO = new THREE.SphereGeometry(1, 8, 8);
+  SHARED_PROJECTILE_GEO = new THREE.SphereGeometry(10, 12, 12);
 
   gltfLoader = new THREE.GLTFLoader();
   textureLoader = new THREE.TextureLoader();
@@ -981,7 +1097,7 @@ function initThreeGame() {
 
   oceanTexture = createSeamlessDarkOceanTexture();
 
-  planeGeo = new THREE.PlaneGeometry(WORLD_SIZE * 2, WORLD_SIZE * 2, 64, 64);
+  planeGeo = new THREE.PlaneGeometry(WORLD_SIZE * 2, WORLD_SIZE * 2, 32, 32);
   const oceanMat = new THREE.MeshStandardMaterial({
     map: oceanTexture,
     color: 0x9acbd2,
@@ -993,7 +1109,6 @@ function initThreeGame() {
   const ocean = new THREE.Mesh(planeGeo, oceanMat);
   ocean.rotation.x = -Math.PI / 2;
   ocean.position.y = -2;
-  ocean.receiveShadow = true;
   scene.add(ocean);
 
   createBorderFrame();
@@ -1070,7 +1185,6 @@ function initThreeGame() {
       
       raycaster.setFromCamera(mouse, camera);
 
-      // Savunma kuleleri tıklama kontrolü
       for (const t of defenseTowers) {
         if (t.mesh) {
           const intersectsTower = raycaster.intersectObject(t.mesh, true);
@@ -1125,16 +1239,17 @@ function setupPlayerShipVisual() {
 
   if (activeGlbShip) { scene.remove(activeGlbShip); activeGlbShip = null; }
 
-  gltfLoader.load(modelSpec.modelPath, (gltf) => {
-    activeGlbShip = gltf.scene || gltf.scenes[0];
+  loadCachedGLB(modelSpec.modelPath, (shipMesh) => {
+    if (activeGlbShip) scene.remove(activeGlbShip);
+    activeGlbShip = shipMesh;
     const box = new THREE.Box3().setFromObject(activeGlbShip);
     const size = new THREE.Vector3();
     box.getSize(size);
-    const maxDim = Math.max(size.x, size.y, size.z);
+    const maxDim = Math.max(size.x, size.y, size.z) || 1;
     let scaleFactor = (120 / maxDim) * (modelSpec.scaleMultiplier || 1.0);
     activeGlbShip.scale.set(scaleFactor, scaleFactor, scaleFactor);
     scene.add(activeGlbShip);
-  }, undefined, (err) => { console.warn("GLB yüklenemedi:", err); });
+  });
 }
 
 function startGameLogic() {
@@ -1171,13 +1286,11 @@ function spawnDefenseTowersRing() {
   defenseTowers = [];
 
   const totalTowers = 15;
-  const radius = 1200; // Başlangıç noktasından (merkezden) uzaklaştırıldı (eski: 200)
+  const radius = 1200;
   const startId = 9000;
 
   for (let i = 0; i < totalTowers; i++) {
     const angle = (i / totalTowers) * Math.PI * 2;
-
-    // Ön tarafta giriş koridoru için açık açı bırakıyoruz
     if (angle > Math.PI * 0.15 && angle < Math.PI * 0.85) {
       continue;
     }
@@ -1204,12 +1317,13 @@ function spawnDefenseTowersRing() {
 
     defenseTowers.push(towerObj);
 
-    gltfLoader.load('defence_tower.glb', (gltf) => {
-      const model = gltf.scene || gltf.scenes[0];
+    loadCachedGLB('defence_tower.glb', (model) => {
+      if (!defenseTowers.includes(towerObj)) return;
       const box = new THREE.Box3().setFromObject(model);
       const size = new THREE.Vector3();
       box.getSize(size);
-      let scaleFactor = (140 / Math.max(size.x, size.y, size.z));
+      const maxDim = Math.max(size.x, size.y, size.z) || 1;
+      let scaleFactor = (140 / maxDim);
       model.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
       model.position.set(tx, SHIP_Y_POS - 70, tz);
@@ -1218,7 +1332,7 @@ function spawnDefenseTowersRing() {
 
       scene.add(model);
       towerObj.mesh = model;
-    }, undefined, (err) => { console.warn("defence_tower.glb yüklenemedi:", err); });
+    });
   }
 }
 
@@ -1230,17 +1344,11 @@ function changeMap(mapIdx, entrySide = 'center') {
   hideTransitButton();
 
   const BOUND = (WORLD_SIZE / 2) - 350;
-  if (entrySide === 'left') {
-    player.x = BOUND;
-  } else if (entrySide === 'right') {
-    player.x = -BOUND;
-  } else if (entrySide === 'top') {
-    player.z = BOUND;
-  } else if (entrySide === 'bottom') {
-    player.z = -BOUND;
-  } else {
-    player.x = 0; player.z = 0;
-  }
+  if (entrySide === 'left') player.x = BOUND;
+  else if (entrySide === 'right') player.x = -BOUND;
+  else if (entrySide === 'top') player.z = BOUND;
+  else if (entrySide === 'bottom') player.z = -BOUND;
+  else { player.x = 0; player.z = 0; }
 
   document.querySelectorAll('.enemy-label').forEach(el => el.remove());
   enemies.forEach(en => {
@@ -1303,12 +1411,13 @@ function spawnEnemyGlb(id) {
 
   enemies.push(enemyData);
 
-  gltfLoader.load(ENEMY_GLB_MODEL_PATH, (gltf) => {
-    const model = gltf.scene || gltf.scenes[0];
+  loadCachedGLB(ENEMY_GLB_MODEL_PATH, (model) => {
+    if (!enemies.includes(enemyData)) return;
     const box = new THREE.Box3().setFromObject(model);
     const size = new THREE.Vector3();
     box.getSize(size);
-    let scaleFactor = (120 / Math.max(size.x, size.y, size.z)) * ENEMY_GLB_SCALE;
+    const maxDim = Math.max(size.x, size.y, size.z) || 1;
+    let scaleFactor = (120 / maxDim) * ENEMY_GLB_SCALE;
     model.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
     model.position.set(ex, SHIP_Y_POS + ENEMY_GLB_HEIGHT_OFFSET - 100, ez);
@@ -1317,7 +1426,7 @@ function spawnEnemyGlb(id) {
 
     scene.add(model);
     enemyData.mesh = model;
-  }, undefined, (err) => { console.warn("NPC GLB yüklenemedi:", err); });
+  });
 }
 
 function selectAmmoSlot(type) {
@@ -1409,23 +1518,23 @@ function triggerCannonFireEffect(shipX, shipZ, targetX, targetZ, ammoKey) {
   const muzzleZ = shipZ + Math.sin(angleToTarget) * 28;
 
   const flashColor = ammoKey === 'snow' ? 0xa5f3fc : ammoKey === 'fire' ? 0xf97316 : 0xffaa00;
-  const flashGeo = new THREE.SphereGeometry(14, 12, 12);
   const flashMat = new THREE.MeshBasicMaterial({ color: flashColor, transparent: true, opacity: 0.95 });
-  const flashMesh = new THREE.Mesh(flashGeo, flashMat);
+  const flashMesh = new THREE.Mesh(SHARED_PARTICLE_GEO, flashMat);
+  flashMesh.scale.setScalar(14);
   flashMesh.position.set(muzzleX, 24, muzzleZ);
   scene.add(flashMesh);
   cannonEffects.push({ mesh: flashMesh, vx: 0, vy: 0.2, vz: 0, grow: 1.08, fade: 0.14, life: 8 });
 
-  for (let i = 0; i < 12; i++) {
-    const smokeGeo = new THREE.SphereGeometry(6 + Math.random() * 6, 8, 8);
+  for (let i = 0; i < 8; i++) {
     const grayTone = ammoKey === 'snow' ? 0.9 + Math.random() * 0.1 : 0.75 + Math.random() * 0.2;
     const smokeMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(grayTone, grayTone, grayTone), transparent: true, opacity: 0.75 });
-    const smokeMesh = new THREE.Mesh(smokeGeo, smokeMat);
+    const smokeMesh = new THREE.Mesh(SHARED_PARTICLE_GEO, smokeMat);
+    smokeMesh.scale.setScalar(6 + Math.random() * 6);
     smokeMesh.position.set(muzzleX + (Math.random() - 0.5) * 14, 22 + Math.random() * 8, muzzleZ + (Math.random() - 0.5) * 14);
     scene.add(smokeMesh);
     const spreadSpeed = 0.6 + Math.random() * 1.1;
     const spreadAngle = angleToTarget + (Math.random() - 0.5) * 0.7;
-    cannonEffects.push({ mesh: smokeMesh, vx: Math.cos(spreadAngle) * spreadSpeed, vy: 0.45 + Math.random() * 0.4, vz: Math.sin(spreadAngle) * spreadSpeed, grow: 1.03, fade: 0.025, life: 32 });
+    cannonEffects.push({ mesh: smokeMesh, vx: Math.cos(spreadAngle) * spreadSpeed, vy: 0.45 + Math.random() * 0.4, vz: Math.sin(spreadAngle) * spreadSpeed, grow: 1.03, fade: 0.025, life: 28 });
   }
 }
 
@@ -1441,14 +1550,13 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
     mesh = new THREE.Sprite(mat);
     mesh.scale.set(32, 32, 1);
   } else {
-    const pGeo = new THREE.SphereGeometry(10, 16, 16);
     const pMat = new THREE.MeshStandardMaterial({ color: ammoSpec.color, roughness: 0.2, metalness: 0.8 });
-    mesh = new THREE.Mesh(pGeo, pMat);
+    mesh = new THREE.Mesh(SHARED_PROJECTILE_GEO, pMat);
   }
 
   mesh.position.set(startX, SHIP_Y_POS - 40, startZ);
   scene.add(mesh);
-  activeProjectiles.push({ mesh, x: startX, z: startZ, targetX, targetZ, speed: 360, ammoKey, onHit, yOffset: 40, lastSparkDist: 0 });
+  activeProjectiles.push({ mesh, x: startX, z: startZ, targetX, targetZ, speed: 360, ammoKey, onHit, yOffset: 40 });
 }
 
 function animate3D() {
@@ -1458,15 +1566,6 @@ function animate3D() {
   let dt = (nowTime - lastClockTime) / 1000;
   lastClockTime = nowTime;
   if (dt > 0.1) dt = 0.1;
-
-  if (activeShipyardPreviews.length > 0) {
-    activeShipyardPreviews.forEach(p => {
-      if (p.renderer && p.scene && p.camera && p.model) {
-        p.model.rotation.y += 0.01;
-        p.renderer.render(p.scene, p.camera);
-      }
-    });
-  }
 
   if (!player || isGameOver) {
     if (scene && camera && renderer) renderer.render(scene, camera);
@@ -1591,11 +1690,14 @@ function animate3D() {
   for (let i = cannonEffects.length - 1; i >= 0; i--) {
     const ce = cannonEffects[i];
     ce.life--;
-    ce.mesh.position.addScaledVector(new THREE.Vector3(ce.vx, ce.vy, ce.vz), 1);
+    ce.mesh.position.x += ce.vx;
+    ce.mesh.position.y += ce.vy;
+    ce.mesh.position.z += ce.vz;
     ce.mesh.scale.multiplyScalar(ce.grow);
     ce.mesh.material.opacity = Math.max(0, ce.mesh.material.opacity - ce.fade);
     if (ce.life <= 0 || ce.mesh.material.opacity <= 0) {
-      scene.remove(ce.mesh); ce.mesh.geometry.dispose(); ce.mesh.material.dispose();
+      scene.remove(ce.mesh);
+      ce.mesh.material.dispose();
       cannonEffects.splice(i, 1);
     }
   }
@@ -1608,7 +1710,6 @@ function animate3D() {
 
     if (dist < step) {
       scene.remove(p.mesh); 
-      if (p.mesh.geometry) p.mesh.geometry.dispose(); 
       if (p.mesh.material) p.mesh.material.dispose();
       activeProjectiles.splice(i, 1);
       if (p.onHit) p.onHit();
@@ -1616,32 +1717,30 @@ function animate3D() {
       p.x += (dx / dist) * step; p.z += (dz / dist) * step;
       p.mesh.position.set(p.x, SHIP_Y_POS - p.yOffset, p.z);
 
-      for (let s = 0; s < 2; s++) {
-        let sparkColor = p.ammoKey === 'fire' ? (Math.random() > 0.4 ? 0xf97316 : 0xffaa00) :
-                         p.ammoKey === 'amiral' ? [0x38bdf8, 0xa855f7, 0x34d399, 0xffffff][Math.floor(Math.random()*4)] :
-                         p.ammoKey === 'snow' ? 0xffffff :
-                         p.ammoKey === 'chain' ? 0x94a3b8 : 0xffa500;
-        const sparkGeo = new THREE.SphereGeometry(3.0 + Math.random() * 2.0, 8, 8);
-        const sparkMat = new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 0.9 });
-        const sparkMesh = new THREE.Mesh(sparkGeo, sparkMat);
-        sparkMesh.position.set(p.x + (Math.random() - 0.5) * 8, (SHIP_Y_POS - p.yOffset) + (Math.random() - 0.5) * 8, p.z + (Math.random() - 0.5) * 8);
-        scene.add(sparkMesh);
-        particleSystems.push({ mesh: sparkMesh, life: 25, scaleDecay: 0.88 });
-      }
+      let sparkColor = p.ammoKey === 'fire' ? (Math.random() > 0.4 ? 0xf97316 : 0xffaa00) :
+                       p.ammoKey === 'amiral' ? [0x38bdf8, 0xa855f7, 0x34d399, 0xffffff][Math.floor(Math.random()*4)] :
+                       p.ammoKey === 'snow' ? 0xffffff :
+                       p.ammoKey === 'chain' ? 0x94a3b8 : 0xffa500;
+      const sparkMat = new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 0.9 });
+      const sparkMesh = new THREE.Mesh(SHARED_PARTICLE_GEO, sparkMat);
+      sparkMesh.scale.setScalar(3.0 + Math.random() * 2.0);
+      sparkMesh.position.set(p.x + (Math.random() - 0.5) * 8, (SHIP_Y_POS - p.yOffset) + (Math.random() - 0.5) * 8, p.z + (Math.random() - 0.5) * 8);
+      scene.add(sparkMesh);
+      particleSystems.push({ mesh: sparkMesh, life: 20, scaleDecay: 0.88 });
     }
   }
 
   for (let i = particleSystems.length - 1; i >= 0; i--) {
     const pt = particleSystems[i];
     pt.life--; pt.mesh.scale.multiplyScalar(pt.scaleDecay || 0.90);
-    pt.mesh.material.opacity = Math.max(0, pt.mesh.material.opacity - (2.0 * dt));
+    pt.mesh.material.opacity = Math.max(0, pt.mesh.material.opacity - (2.2 * dt));
     if (pt.life <= 0 || pt.mesh.material.opacity <= 0) {
-      scene.remove(pt.mesh); pt.mesh.geometry.dispose(); pt.mesh.material.dispose();
+      scene.remove(pt.mesh);
+      pt.mesh.material.dispose();
       particleSystems.splice(i, 1);
     }
   }
 
-  // Savunma Kuleleri Çemberi Mantığı
   for (const t of defenseTowers) {
     if (t.mesh) {
       const distToPlayer = Math.hypot(player.x - t.x, player.z - t.z);
@@ -1955,7 +2054,6 @@ document.querySelectorAll('.ammo-buy-btn').forEach(btn => {
 
 function renderShipyardList() {
   shipyardListEl.innerHTML = '';
-  activeShipyardPreviews = [];
   const users = loadUsers();
   const dbUser = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
   const owned = dbUser.ownedShips || ['standard'], equipped = dbUser.equippedShip || 'standard';
@@ -1970,7 +2068,7 @@ function renderShipyardList() {
                   `<button class="buy-btn ship-buy-btn" type="button" data-id="${model.id}" data-cost="${model.cost}">${model.cost.toLocaleString()} Altın</button>`;
 
     div.innerHTML = `
-      <div class="ship-card-img-wrap" id="preview-wrap-${idx}"></div>
+      <div class="ship-card-img-wrap" id="preview-wrap-${idx}">Yükleniyor...</div>
       <div class="ship-card-title">${model.name}</div>
       <div class="ship-card-sub">${model.desc}</div>
       ${btnHtml}
@@ -1978,38 +2076,11 @@ function renderShipyardList() {
     shipyardListEl.appendChild(div);
 
     const wrapEl = document.getElementById(`preview-wrap-${idx}`);
-    setTimeout(() => {
-      const width = wrapEl.clientWidth || 180;
-      const height = wrapEl.clientHeight || 110;
-
-      const pScene = new THREE.Scene();
-      const pCamera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-      pCamera.position.set(0, 50, 120);
-      pCamera.lookAt(0, 0, 0);
-
-      const pRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      pRenderer.setSize(width, height);
-      wrapEl.appendChild(pRenderer.domElement);
-
-      const pAmbient = new THREE.AmbientLight(0xffffff, 1.2);
-      pScene.add(pAmbient);
-      const pDir = new THREE.DirectionalLight(0xfff08a, 1.5);
-      pDir.position.set(50, 100, 50);
-      pScene.add(pDir);
-
-      gltfLoader.load(model.modelPath, (gltf) => {
-        const pModel = gltf.scene || gltf.scenes[0];
-        const box = new THREE.Box3().setFromObject(pModel);
-        const size = new THREE.Vector3();
-        box.getSize(size);
-        let scaleFactor = (60 / Math.max(size.x, size.y, size.z)) * (model.scaleMultiplier || 1.0);
-        pModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
-        pModel.position.set(0, -10, 0);
-        pScene.add(pModel);
-
-        activeShipyardPreviews.push({ renderer: pRenderer, scene: pScene, camera: pCamera, model: pModel });
-      }, undefined, (err) => { console.warn("Önizleme GLB yüklenemedi:", err); });
-    }, 50);
+    getShipThumbnail(model, (dataUrl) => {
+      if (wrapEl) {
+        wrapEl.innerHTML = `<img src="${dataUrl}" alt="${model.name}">`;
+      }
+    });
   });
 
   shipyardListEl.querySelectorAll('.ship-buy-btn').forEach(btn => {
