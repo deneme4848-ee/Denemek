@@ -1238,9 +1238,9 @@ function startGameLogic() {
 
 /**
  * Kullanıcı Talebine Göre Güncellenmiş Düzen:
- * - Ortadaki komuta binası / kare yapı tamamen kaldırıldı (içi boş).
+ * - Dairesel ada tabanı tamamen kaldırıldı (içi boş deniz).
  * - Surlarda tam olarak 15 adet `defense_tower` (Profesyonel Kule) yerleştirildi.
- * - Surların sol kısmında giriş çıkış boşluğu korundu.
+ * - Sol taraftaki giriş boşluğuna ASLA kule konulmadı, boşluk hesap dışı tutuldu.
  */
 function spawnDefenseTowersRing() {
   defenseTowers.forEach(t => {
@@ -1252,23 +1252,16 @@ function spawnDefenseTowersRing() {
   const defenseIslandGroup = new THREE.Group();
   defenseIslandGroup.name = "DefenseIsland_OpenSeaLayout";
 
-  // 1. Merkez Ada Tabanı (Üstünde yapı yok)
-  const islandGeo = new THREE.CylinderGeometry(240, 280, 24, 32);
-  const islandMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8, metalness: 0.2 });
-  const islandMesh = new THREE.Mesh(islandGeo, islandMat);
-  islandMesh.position.y = SHIP_Y_POS - 85;
-  defenseIslandGroup.add(islandMesh);
-
-  // 2. Dış Surlar ve Sol Taraf Giriş Çıkış Boşluğu
+  // Dış Surlar ve Sol Taraf Giriş Çıkış Boşluğu (Sol açı tamamen açık)
   const wallRadius = 450;
-  const wallSegments = 18;
+  const wallSegments = 20;
   const wallMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.6, metalness: 0.3 });
   
   for (let i = 0; i < wallSegments; i++) {
     const angle = (i / wallSegments) * Math.PI * 2;
     
     // Sol taraftaki açılarda giriş çıkış için boşluk bırakıyoruz
-    if (angle > Math.PI * 0.78 && angle < Math.PI * 1.22) {
+    if (angle > Math.PI * 0.75 && angle < Math.PI * 1.25) {
       continue; 
     }
 
@@ -1329,24 +1322,21 @@ function spawnDefenseTowersRing() {
     });
   };
 
-  // Tam Olarak 15 Adet Kule Tanımlaması (Çember etrafında kusursuz dağılım)
-  const towerCount = 15;
+  // Sadece surların bulunduğu alana tam olarak 15 adet kule yerleştiriyoruz (Giriş boşluğu hariç tutuldu)
   const towerRadius = 450;
-  for (let i = 0; i < towerCount; i++) {
-    const angle = (i / towerCount) * Math.PI * 2;
-    // Sol taraftaki giriş boşluğuna denk gelen kuleleri atlıyoruz veya dışarıda tutuyoruz
-    if (angle > Math.PI * 0.76 && angle < Math.PI * 1.24) continue;
+  const totalTowersNeeded = 15;
+  // Sol tarafın açı aralığı yaklaşık Math.PI * 0.75 ile Math.PI * 1.25 arasıdır (Toplam çemberin ~%25'i)
+  // Geri kalan %75'lik alana 15 kuleyi tam eşit dağıtıyoruz.
+  const startAngle = Math.PI * 1.25;
+  const endAngle = Math.PI * 2.75; // 2pi üzerinden tam tur için
 
-    const tx = Math.cos(angle) * towerRadius;
-    const tz = Math.sin(angle) * towerRadius;
-    createTowerEntity(towerCounter++, tx, tz, 1.15);
-  }
+  for (let i = 0; i < totalTowersNeeded; i++) {
+    const progress = i / (totalTowersNeeded - 1);
+    const angle = startAngle + progress * (endAngle - startAngle);
+    const normalizedAngle = angle % (Math.PI * 2);
 
-  // Eğer 15'e tam tamamlamak gerekirse ek kuleler ekleyelim
-  while (defenseTowers.length < 15) {
-    const angle = (defenseTowers.length / 15) * Math.PI * 2;
-    const tx = Math.cos(angle) * towerRadius;
-    const tz = Math.sin(angle) * towerRadius;
+    const tx = Math.cos(normalizedAngle) * towerRadius;
+    const tz = Math.sin(normalizedAngle) * towerRadius;
     createTowerEntity(towerCounter++, tx, tz, 1.15);
   }
 }
