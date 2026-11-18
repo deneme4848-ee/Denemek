@@ -854,8 +854,8 @@ function getShipThumbnail(modelSpec, callback) {
   });
 }
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v83';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v83';
+const USERS_STORAGE_KEY = 'pirate3d_users_v84';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v84';
 let authMode = 'login';
 let currentUser = null;
 
@@ -1252,7 +1252,6 @@ function spawnDefenseTowersRing() {
   const wallRadius = ATTACK_RANGE; 
   const wallSegments = 20;
   
-  // Surların kulelerin arkasında kalıp görünümünü kapatmaması için renderOrder, depthWrite ve depthTest ayarlandı
   const wallMat = new THREE.MeshStandardMaterial({ 
     color: 0x475569, 
     roughness: 0.6, 
@@ -1260,13 +1259,13 @@ function spawnDefenseTowersRing() {
     depthWrite: true,
     depthTest: true
   });
-  wallMat.renderOrder = 0; // Surlar önce çizilir
+  wallMat.renderOrder = 0;
   
   for (let i = 0; i < wallSegments; i++) {
     const angle = (i / wallSegments) * Math.PI * 2;
     
-    // Sol üstteki ilk kuleyi de kapsayacak şekilde sur açısı genişletildi (sadece çok dar bir giriş bırakıldı)
-    if (angle > Math.PI * 0.92 && angle < Math.PI * 1.08) {
+    // Kapı girişi isteğiniz üzerine daha geniş tutuldu (Sol tarafta uygun bir geçiş boşluğu)
+    if (angle > Math.PI * 0.95 && angle < Math.PI * 1.05) {
       continue; 
     }
 
@@ -1316,7 +1315,6 @@ function spawnDefenseTowersRing() {
     loadCachedGLB('defence_tower.glb', (model) => {
       if (!defenseTowers.includes(towerObj)) return;
       
-      // Kulelerin surların altında kalmaması / görünümünün engellenmemesi için renderOrder üstünlüğü verildi
       model.traverse(child => {
         child.userData = { enemyId: towerId };
         if (child.isMesh && child.material) {
@@ -1324,7 +1322,7 @@ function spawnDefenseTowersRing() {
           mats.forEach(m => {
             m.depthTest = true;
             m.depthWrite = true;
-            m.renderOrder = 999; // Kuleler surlardan sonra en üstte çizilir
+            m.renderOrder = 999;
           });
         }
       });
@@ -1343,8 +1341,8 @@ function spawnDefenseTowersRing() {
   };
 
   const totalTowersNeeded = 15;
-  const startAngle = Math.PI * 1.08;
-  const endAngle = Math.PI * 2.92;
+  const startAngle = Math.PI * 1.05;
+  const endAngle = Math.PI * 2.95;
 
   for (let i = 0; i < totalTowersNeeded; i++) {
     const progress = i / (totalTowersNeeded - 1);
@@ -1572,14 +1570,19 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
   activeProjectiles.push({ mesh, x: startX, z: startZ, targetX, targetZ, speed: 360, ammoKey, onHit, yOffset: 40 });
 }
 
-function checkWallCollision(nx, nz) {
+function resolveWallSlide(nx, nz) {
+  let finalX = nx;
+  let finalZ = nz;
   for (const box of wallCollisionBoxes) {
-    const dist = Math.hypot(nx - box.x, nz - box.z);
+    const dist = Math.hypot(finalX - box.x, finalZ - box.z);
     if (dist < box.radius) {
-      return true;
+      // Sura sürtünme (kayma) mantığı: Geminin duvardan uzaklaşan teğet bileşende kayarak ilerlemesi sağlanır
+      const angleFromCenter = Math.atan2(finalZ - box.z, finalX - box.x);
+      finalX = box.x + Math.cos(angleFromCenter) * box.radius;
+      finalZ = box.z + Math.sin(angleFromCenter) * box.radius;
     }
   }
-  return false;
+  return { x: finalX, z: finalZ };
 }
 
 function animate3D() {
@@ -1624,13 +1627,10 @@ function animate3D() {
   const nextX = player.x + Math.cos(player.a) * player.speed * dt;
   const nextZ = player.z + Math.sin(player.a) * player.speed * dt;
 
-  if (!checkWallCollision(nextX, nextZ)) {
-    player.x = nextX;
-    player.z = nextZ;
-  } else {
-    player.speed = 0;
-    targetDestination = null;
-  }
+  // Sur sürtünme (kayma) entegrasyonu: Gemi surda takılıp kalmaz, sürtünerek hızını korur
+  const slidPos = resolveWallSlide(nextX, nextZ);
+  player.x = slidPos.x;
+  player.z = slidPos.z;
 
   const HALF_WORLD = WORLD_SIZE / 2;
   const HARD_LIMIT = HALF_WORLD - 120;
