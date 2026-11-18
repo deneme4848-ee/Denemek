@@ -854,8 +854,8 @@ function getShipThumbnail(modelSpec, callback) {
   });
 }
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v80';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v80';
+const USERS_STORAGE_KEY = 'pirate3d_users_v81';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v81';
 let authMode = 'login';
 let currentUser = null;
 
@@ -1237,7 +1237,11 @@ function startGameLogic() {
 }
 
 /**
- * Hedef Görsele Birebir Uyumlu Dairesel Ada, Surlar ve Kule Düzenlemesi
+ * Kullanıcı Talebine Göre Güncellenmiş Düzen:
+ * - Ortadaki kare kutu (komuta binası) kaldı.
+ * - Dairesel efekt tamamen silindi.
+ * - Kuleler dış çembere (genişletilmiş ada hatlarına) yerleştirildi.
+ * - Adanın sol kısmında giriş çıkış boşluğu bırakıldı.
  */
 function spawnDefenseTowersRing() {
   defenseTowers.forEach(t => {
@@ -1247,33 +1251,38 @@ function spawnDefenseTowersRing() {
   defenseTowers = [];
 
   const defenseIslandGroup = new THREE.Group();
-  defenseIslandGroup.name = "DefenseIsland_ExactMatch";
+  defenseIslandGroup.name = "DefenseIsland_OpenSeaLayout";
 
-  // 1. Merkez Ada ve Detaylı Ana Kale Yapısı
-  const islandGeo = new THREE.CylinderGeometry(260, 300, 24, 32);
+  // 1. Merkez Ada Tabanı
+  const islandGeo = new THREE.CylinderGeometry(240, 280, 24, 32);
   const islandMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8, metalness: 0.2 });
   const islandMesh = new THREE.Mesh(islandGeo, islandMat);
   islandMesh.position.y = SHIP_Y_POS - 85;
   defenseIslandGroup.add(islandMesh);
 
-  // Ana Komuta Binası (Merkez Hisar)
-  const mainFortGeo = new THREE.BoxGeometry(120, 75, 120);
+  // 2. Ortadaki Kare Komuta Binası (Kaldı)
+  const mainFortGeo = new THREE.BoxGeometry(110, 70, 110);
   const mainFortMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.5, metalness: 0.3 });
   const mainFortMesh = new THREE.Mesh(mainFortGeo, mainFortMat);
   mainFortMesh.position.set(0, SHIP_Y_POS - 38, 0);
   defenseIslandGroup.add(mainFortMesh);
 
-  // 2. Dış Surlar - Kusursuz Dairesel Kavisli Duvar Halkası
-  const wallRadius = 400;
+  // 3. Dış Surlar ve Sol Taraf Giriş Çıkış Boşluğu (Sol açı boş bırakıldı)
+  const wallRadius = 450;
   const wallSegments = 16;
   const wallMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.6, metalness: 0.3 });
   
   for (let i = 0; i < wallSegments; i++) {
     const angle = (i / wallSegments) * Math.PI * 2;
+    
+    // Sol taraftaki açılarda (yaklaşık 160° ile 200° arası) giriş çıkış için boşluk bırakıyoruz
+    if (angle > Math.PI * 0.78 && angle < Math.PI * 1.22) {
+      continue; 
+    }
+
     const nextAngle = ((i + 1) / wallSegments) * Math.PI * 2;
     const midAngle = (angle + nextAngle) / 2;
     
-    // Kavisli segment uzunluğu hesabı
     const segmentWidth = (2 * Math.PI * wallRadius) / wallSegments * 1.05;
     const wallSegGeo = new THREE.BoxGeometry(segmentWidth, 40, 28);
     const wallSegMesh = new THREE.Mesh(wallSegGeo, wallMat);
@@ -1292,9 +1301,9 @@ function spawnDefenseTowersRing() {
   const startId = 9000;
   let towerCounter = 0;
 
-  const createTowerEntity = (index, x, z, scaleFactor = 1.0, customName = null) => {
+  const createTowerEntity = (index, x, z, scaleFactor = 1.0) => {
     const towerId = startId + index;
-    const towerName = customName || `Profesyonel Kule`;
+    const towerName = `Profesyonel Kule`;
 
     const labelEl = document.createElement('div');
     labelEl.className = 'enemy-label';
@@ -1328,18 +1337,20 @@ function spawnDefenseTowersRing() {
     });
   };
 
-  // A. Merkez Ada İçi Çember Kuleleri (6 Adet - Görseldeki iç kule çemberi)
-  const innerRadius = 140;
-  for (let i = 0; i < 6; i++) {
-    const angle = (i / 6) * Math.PI * 2;
-    createTowerEntity(towerCounter++, Math.cos(angle) * innerRadius, Math.sin(angle) * innerRadius, 1.0);
-  }
+  // Kuleler Dış Çembere (Genişletilmiş alana ve kulelerin olduğu yere) yerleştirildi
+  const towerPositions = [
+    { x: 0, z: -450, scale: 1.15 },       // Üst
+    { x: 320, z: -320, scale: 1.15 },     // Sağ Üst
+    { x: 450, z: 0, scale: 1.15 },        // Sağ
+    { x: 320, z: 320, scale: 1.15 },      // Sağ Alt
+    { x: 0, z: 450, scale: 1.15 },        // Alt
+    { x: -320, z: 320, scale: 1.15 },     // Sol Alt (Girişin altı)
+    { x: -320, z: -320, scale: 1.15 }     // Sol Üst (Girişin üstü - sol taraf açık bırakıldı)
+  ];
 
-  // B. Dış Çember / Sur Üstü Kuleleri (8 Adet - Görseldeki dış hat kuleleri)
-  for (let i = 0; i < 8; i++) {
-    const angle = (i / 8) * Math.PI * 2 + (Math.PI / 8);
-    createTowerEntity(towerCounter++, Math.cos(angle) * wallRadius, Math.sin(angle) * wallRadius, 1.15);
-  }
+  towerPositions.forEach((pos, idx) => {
+    createTowerEntity(towerCounter++, pos.x, pos.z, pos.scale);
+  });
 }
 
 function changeMap(mapIdx, entrySide = 'center') {
