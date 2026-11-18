@@ -854,8 +854,8 @@ function getShipThumbnail(modelSpec, callback) {
   });
 }
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v82';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v82';
+const USERS_STORAGE_KEY = 'pirate3d_users_v83';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v83';
 let authMode = 'login';
 let currentUser = null;
 
@@ -934,7 +934,7 @@ let dragStartX = 0, dragStartY = 0;
 let hasDragged = false;
 
 const WORLD_SIZE = 9900; 
-const ATTACK_RANGE = 300; // Menzil (Ada yarıçapı buna eşitlendi)
+const ATTACK_RANGE = 300; 
 const SHIP_Y_POS = 100;
 
 const CAMERA_HEIGHT = 800;
@@ -1236,12 +1236,6 @@ function startGameLogic() {
   renderMapsGrid();
 }
 
-/**
- * Kullanıcı Talebine Göre Güncellenmiş Düzen:
- * - Ada/Surlar menzile (ATTACK_RANGE = 300) eşitlenecek şekilde daraltıldı.
- * - Surlar katı fiziksel engel (çarpışma kutuları) oluşturur, böylece gemiler surların üstünden geçemez.
- * - Surlarda tam olarak 15 adet kule bulunur (Giriş boşluğu hariç).
- */
 const wallCollisionBoxes = [];
 
 function spawnDefenseTowersRing() {
@@ -1255,16 +1249,24 @@ function spawnDefenseTowersRing() {
   const defenseIslandGroup = new THREE.Group();
   defenseIslandGroup.name = "DefenseIsland_RangeMatchLayout";
 
-  // Surlar tam olarak menzil yarıçapında (ATTACK_RANGE = 300) konumlandırıldı
   const wallRadius = ATTACK_RANGE; 
   const wallSegments = 20;
-  const wallMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.6, metalness: 0.3 });
+  
+  // Surların kulelerin arkasında kalıp görünümünü kapatmaması için renderOrder, depthWrite ve depthTest ayarlandı
+  const wallMat = new THREE.MeshStandardMaterial({ 
+    color: 0x475569, 
+    roughness: 0.6, 
+    metalness: 0.3,
+    depthWrite: true,
+    depthTest: true
+  });
+  wallMat.renderOrder = 0; // Surlar önce çizilir
   
   for (let i = 0; i < wallSegments; i++) {
     const angle = (i / wallSegments) * Math.PI * 2;
     
-    // Sol taraftaki açılarda giriş çıkış için boşluk bırakıyoruz
-    if (angle > Math.PI * 0.75 && angle < Math.PI * 1.25) {
+    // Sol üstteki ilk kuleyi de kapsayacak şekilde sur açısı genişletildi (sadece çok dar bir giriş bırakıldı)
+    if (angle > Math.PI * 0.92 && angle < Math.PI * 1.08) {
       continue; 
     }
 
@@ -1274,6 +1276,7 @@ function spawnDefenseTowersRing() {
     const segmentWidth = (2 * Math.PI * wallRadius) / wallSegments * 1.05;
     const wallSegGeo = new THREE.BoxGeometry(segmentWidth, 40, 24);
     const wallSegMesh = new THREE.Mesh(wallSegGeo, wallMat);
+    wallSegMesh.renderOrder = 0;
     
     const wx = Math.cos(midAngle) * wallRadius;
     const wz = Math.sin(midAngle) * wallRadius;
@@ -1282,7 +1285,6 @@ function spawnDefenseTowersRing() {
     wallSegMesh.rotation.y = -midAngle + Math.PI / 2;
     defenseIslandGroup.add(wallSegMesh);
 
-    // Gemilerin surların içinden/üstünden geçmesini engellemek için çarpışma sınırı ekleniyor
     wallCollisionBoxes.push({ x: wx, z: wz, radius: segmentWidth / 2 + 15 });
   }
 
@@ -1313,6 +1315,20 @@ function spawnDefenseTowersRing() {
 
     loadCachedGLB('defence_tower.glb', (model) => {
       if (!defenseTowers.includes(towerObj)) return;
+      
+      // Kulelerin surların altında kalmaması / görünümünün engellenmemesi için renderOrder üstünlüğü verildi
+      model.traverse(child => {
+        child.userData = { enemyId: towerId };
+        if (child.isMesh && child.material) {
+          const mats = Array.isArray(child.material) ? child.material : [child.material];
+          mats.forEach(m => {
+            m.depthTest = true;
+            m.depthWrite = true;
+            m.renderOrder = 999; // Kuleler surlardan sonra en üstte çizilir
+          });
+        }
+      });
+
       const box = new THREE.Box3().setFromObject(model);
       const size = new THREE.Vector3();
       box.getSize(size);
@@ -1321,16 +1337,14 @@ function spawnDefenseTowersRing() {
       model.scale.set(computedScale, computedScale, computedScale);
       model.position.set(x, SHIP_Y_POS - 65, z);
       model.userData = { enemyId: towerId };
-      model.traverse(child => { child.userData = { enemyId: towerId }; });
       scene.add(model);
       towerObj.mesh = model;
     });
   };
 
-  // Surların üzerine tam olarak 15 adet kule yerleştiriliyor
   const totalTowersNeeded = 15;
-  const startAngle = Math.PI * 1.25;
-  const endAngle = Math.PI * 2.75;
+  const startAngle = Math.PI * 1.08;
+  const endAngle = Math.PI * 2.92;
 
   for (let i = 0; i < totalTowersNeeded; i++) {
     const progress = i / (totalTowersNeeded - 1);
@@ -1355,7 +1369,7 @@ function changeMap(mapIdx, entrySide = 'center') {
   else if (entrySide === 'right') player.x = -BOUND;
   else if (entrySide === 'top') player.z = BOUND;
   else if (entrySide === 'bottom') player.z = -BOUND;
-  else { player.x = 450; player.z = 0; } // Giriş boşluğundan başlat
+  else { player.x = 450; player.z = 0; }
 
   document.querySelectorAll('.enemy-label').forEach(el => el.remove());
   enemies.forEach(en => {
@@ -1562,7 +1576,7 @@ function checkWallCollision(nx, nz) {
   for (const box of wallCollisionBoxes) {
     const dist = Math.hypot(nx - box.x, nz - box.z);
     if (dist < box.radius) {
-      return true; // Sura çarpıyor, geçemez
+      return true;
     }
   }
   return false;
@@ -1610,7 +1624,6 @@ function animate3D() {
   const nextX = player.x + Math.cos(player.a) * player.speed * dt;
   const nextZ = player.z + Math.sin(player.a) * player.speed * dt;
 
-  // Surlardan geçiş kontrolü (Çarpışma engeli)
   if (!checkWallCollision(nextX, nextZ)) {
     player.x = nextX;
     player.z = nextZ;
