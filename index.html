@@ -854,8 +854,8 @@ function getShipThumbnail(modelSpec, callback) {
   });
 }
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v81';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v81';
+const USERS_STORAGE_KEY = 'pirate3d_users_v82';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v82';
 let authMode = 'login';
 let currentUser = null;
 
@@ -934,7 +934,7 @@ let dragStartX = 0, dragStartY = 0;
 let hasDragged = false;
 
 const WORLD_SIZE = 9900; 
-const ATTACK_RANGE = 300;
+const ATTACK_RANGE = 300; // Menzil (Ada yarıçapı buna eşitlendi)
 const SHIP_Y_POS = 100;
 
 const CAMERA_HEIGHT = 800;
@@ -1238,22 +1238,25 @@ function startGameLogic() {
 
 /**
  * Kullanıcı Talebine Göre Güncellenmiş Düzen:
- * - Dairesel ada tabanı tamamen kaldırıldı (içi boş deniz).
- * - Surlarda tam olarak 15 adet `defense_tower` (Profesyonel Kule) yerleştirildi.
- * - Sol taraftaki giriş boşluğuna ASLA kule konulmadı, boşluk hesap dışı tutuldu.
+ * - Ada/Surlar menzile (ATTACK_RANGE = 300) eşitlenecek şekilde daraltıldı.
+ * - Surlar katı fiziksel engel (çarpışma kutuları) oluşturur, böylece gemiler surların üstünden geçemez.
+ * - Surlarda tam olarak 15 adet kule bulunur (Giriş boşluğu hariç).
  */
+const wallCollisionBoxes = [];
+
 function spawnDefenseTowersRing() {
   defenseTowers.forEach(t => {
     if (t.mesh) scene.remove(t.mesh);
     if (t.labelEl) t.labelEl.remove();
   });
   defenseTowers = [];
+  wallCollisionBoxes.length = 0;
 
   const defenseIslandGroup = new THREE.Group();
-  defenseIslandGroup.name = "DefenseIsland_OpenSeaLayout";
+  defenseIslandGroup.name = "DefenseIsland_RangeMatchLayout";
 
-  // Dış Surlar ve Sol Taraf Giriş Çıkış Boşluğu (Sol açı tamamen açık)
-  const wallRadius = 450;
+  // Surlar tam olarak menzil yarıçapında (ATTACK_RANGE = 300) konumlandırıldı
+  const wallRadius = ATTACK_RANGE; 
   const wallSegments = 20;
   const wallMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.6, metalness: 0.3 });
   
@@ -1269,16 +1272,18 @@ function spawnDefenseTowersRing() {
     const midAngle = (angle + nextAngle) / 2;
     
     const segmentWidth = (2 * Math.PI * wallRadius) / wallSegments * 1.05;
-    const wallSegGeo = new THREE.BoxGeometry(segmentWidth, 40, 28);
+    const wallSegGeo = new THREE.BoxGeometry(segmentWidth, 40, 24);
     const wallSegMesh = new THREE.Mesh(wallSegGeo, wallMat);
     
-    wallSegMesh.position.set(
-      Math.cos(midAngle) * wallRadius,
-      SHIP_Y_POS - 60,
-      Math.sin(midAngle) * wallRadius
-    );
+    const wx = Math.cos(midAngle) * wallRadius;
+    const wz = Math.sin(midAngle) * wallRadius;
+    
+    wallSegMesh.position.set(wx, SHIP_Y_POS - 60, wz);
     wallSegMesh.rotation.y = -midAngle + Math.PI / 2;
     defenseIslandGroup.add(wallSegMesh);
+
+    // Gemilerin surların içinden/üstünden geçmesini engellemek için çarpışma sınırı ekleniyor
+    wallCollisionBoxes.push({ x: wx, z: wz, radius: segmentWidth / 2 + 15 });
   }
 
   scene.add(defenseIslandGroup);
@@ -1312,7 +1317,7 @@ function spawnDefenseTowersRing() {
       const size = new THREE.Vector3();
       box.getSize(size);
       const maxDim = Math.max(size.x, size.y, size.z) || 1;
-      let computedScale = (100 / maxDim) * scaleFactor;
+      let computedScale = (85 / maxDim) * scaleFactor;
       model.scale.set(computedScale, computedScale, computedScale);
       model.position.set(x, SHIP_Y_POS - 65, z);
       model.userData = { enemyId: towerId };
@@ -1322,22 +1327,19 @@ function spawnDefenseTowersRing() {
     });
   };
 
-  // Sadece surların bulunduğu alana tam olarak 15 adet kule yerleştiriyoruz (Giriş boşluğu hariç tutuldu)
-  const towerRadius = 450;
+  // Surların üzerine tam olarak 15 adet kule yerleştiriliyor
   const totalTowersNeeded = 15;
-  // Sol tarafın açı aralığı yaklaşık Math.PI * 0.75 ile Math.PI * 1.25 arasıdır (Toplam çemberin ~%25'i)
-  // Geri kalan %75'lik alana 15 kuleyi tam eşit dağıtıyoruz.
   const startAngle = Math.PI * 1.25;
-  const endAngle = Math.PI * 2.75; // 2pi üzerinden tam tur için
+  const endAngle = Math.PI * 2.75;
 
   for (let i = 0; i < totalTowersNeeded; i++) {
     const progress = i / (totalTowersNeeded - 1);
     const angle = startAngle + progress * (endAngle - startAngle);
     const normalizedAngle = angle % (Math.PI * 2);
 
-    const tx = Math.cos(normalizedAngle) * towerRadius;
-    const tz = Math.sin(normalizedAngle) * towerRadius;
-    createTowerEntity(towerCounter++, tx, tz, 1.15);
+    const tx = Math.cos(normalizedAngle) * wallRadius;
+    const tz = Math.sin(normalizedAngle) * wallRadius;
+    createTowerEntity(towerCounter++, tx, tz, 1.0);
   }
 }
 
@@ -1353,7 +1355,7 @@ function changeMap(mapIdx, entrySide = 'center') {
   else if (entrySide === 'right') player.x = -BOUND;
   else if (entrySide === 'top') player.z = BOUND;
   else if (entrySide === 'bottom') player.z = -BOUND;
-  else { player.x = 0; player.z = 0; }
+  else { player.x = 450; player.z = 0; } // Giriş boşluğundan başlat
 
   document.querySelectorAll('.enemy-label').forEach(el => el.remove());
   enemies.forEach(en => {
@@ -1392,7 +1394,7 @@ function spawnEnemyGlb(id) {
   do {
     ex = (Math.random() - 0.5) * (WORLD_SIZE * 0.7);
     ez = (Math.random() - 0.5) * (WORLD_SIZE * 0.7);
-  } while (Math.hypot(ex, ez) < 550);
+  } while (Math.hypot(ex, ez) < ATTACK_RANGE + 100);
 
   const labelEl = document.createElement('div');
   labelEl.className = 'enemy-label';
@@ -1556,6 +1558,16 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
   activeProjectiles.push({ mesh, x: startX, z: startZ, targetX, targetZ, speed: 360, ammoKey, onHit, yOffset: 40 });
 }
 
+function checkWallCollision(nx, nz) {
+  for (const box of wallCollisionBoxes) {
+    const dist = Math.hypot(nx - box.x, nz - box.z);
+    if (dist < box.radius) {
+      return true; // Sura çarpıyor, geçemez
+    }
+  }
+  return false;
+}
+
 function animate3D() {
   requestAnimationFrame(animate3D);
 
@@ -1595,8 +1607,17 @@ function animate3D() {
     player.speed = 0;
   }
 
-  player.x += Math.cos(player.a) * player.speed * dt;
-  player.z += Math.sin(player.a) * player.speed * dt;
+  const nextX = player.x + Math.cos(player.a) * player.speed * dt;
+  const nextZ = player.z + Math.sin(player.a) * player.speed * dt;
+
+  // Surlardan geçiş kontrolü (Çarpışma engeli)
+  if (!checkWallCollision(nextX, nextZ)) {
+    player.x = nextX;
+    player.z = nextZ;
+  } else {
+    player.speed = 0;
+    targetDestination = null;
+  }
 
   const HALF_WORLD = WORLD_SIZE / 2;
   const HARD_LIMIT = HALF_WORLD - 120;
@@ -1714,7 +1735,7 @@ function animate3D() {
                        p.ammoKey === 'snow' ? 0xffffff :
                        p.ammoKey === 'chain' ? 0x94a3b8 : 0xffa500;
       const sparkMat = new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 0.9 });
-      const sparkMesh = new THREE.Mesh(SHARED_PARTICLE_GEO, sparkMat);
+      const sparkMesh = new THREE.Mesh(SHARED_PROJECTILE_GEO, sparkMat);
       sparkMesh.scale.setScalar(3.0 + Math.random() * 2.0);
       sparkMesh.position.set(p.x + (Math.random() - 0.5) * 8, (SHIP_Y_POS - p.yOffset) + (Math.random() - 0.5) * 8, p.z + (Math.random() - 0.5) * 8);
       scene.add(sparkMesh);
