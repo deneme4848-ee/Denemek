@@ -1237,7 +1237,7 @@ function startGameLogic() {
 }
 
 /**
- * Görseldeki Düzen Uyarlaması (Merkez Kale + İç Çember Kuleleri + Dış Çember Duvar ve Kuleleri)
+ * Hedef Görsele Birebir Uyumlu Dairesel Ada, Surlar ve Kule Düzenlemesi
  */
 function spawnDefenseTowersRing() {
   defenseTowers.forEach(t => {
@@ -1247,36 +1247,44 @@ function spawnDefenseTowersRing() {
   defenseTowers = [];
 
   const defenseIslandGroup = new THREE.Group();
-  defenseIslandGroup.name = "DefenseIsland_Base";
+  defenseIslandGroup.name = "DefenseIsland_ExactMatch";
 
-  // 1. Merkez Kale Adacığı
-  const baseGeo = new THREE.CylinderGeometry(280, 320, 20, 24);
-  const baseMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8, metalness: 0.2 });
-  const islandBase = new THREE.Mesh(baseGeo, baseMat);
-  islandBase.position.y = SHIP_Y_POS - 85;
-  defenseIslandGroup.add(islandBase);
+  // 1. Merkez Ada ve Detaylı Ana Kale Yapısı
+  const islandGeo = new THREE.CylinderGeometry(260, 300, 24, 32);
+  const islandMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8, metalness: 0.2 });
+  const islandMesh = new THREE.Mesh(islandGeo, islandMat);
+  islandMesh.position.y = SHIP_Y_POS - 85;
+  defenseIslandGroup.add(islandMesh);
 
-  // Merkez Bina (Kale Komuta Merkezi)
-  const castleGeo = new THREE.BoxGeometry(110, 70, 110);
-  const castleMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.5, metalness: 0.3 });
-  const castleMesh = new THREE.Mesh(castleGeo, castleMat);
-  castleMesh.position.set(0, SHIP_Y_POS - 40, 0);
-  defenseIslandGroup.add(castleMesh);
+  // Ana Komuta Binası (Merkez Hisar)
+  const mainFortGeo = new THREE.BoxGeometry(120, 75, 120);
+  const mainFortMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.5, metalness: 0.3 });
+  const mainFortMesh = new THREE.Mesh(mainFortGeo, mainFortMat);
+  mainFortMesh.position.set(0, SHIP_Y_POS - 38, 0);
+  defenseIslandGroup.add(mainFortMesh);
 
-  // 2. Dış Çember Duvar Halkası (Görseldeki dairesel sur yapısı)
-  const wallRadius = 380;
-  const wallCount = 8;
-  for (let i = 0; i < wallCount; i++) {
-    const angle = (i / wallCount) * Math.PI * 2;
-    const wx = Math.cos(angle) * wallRadius;
-    const wz = Math.sin(angle) * wallRadius;
-
-    const wallGeo = new THREE.BoxGeometry(140, 35, 30);
-    const wallMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.7, metalness: 0.2 });
-    const wallMesh = new THREE.Mesh(wallGeo, wallMat);
-    wallMesh.position.set(wx, SHIP_Y_POS - 60, wz);
-    wallMesh.rotation.y = -angle;
-    defenseIslandGroup.add(wallMesh);
+  // 2. Dış Surlar - Kusursuz Dairesel Kavisli Duvar Halkası
+  const wallRadius = 400;
+  const wallSegments = 16;
+  const wallMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.6, metalness: 0.3 });
+  
+  for (let i = 0; i < wallSegments; i++) {
+    const angle = (i / wallSegments) * Math.PI * 2;
+    const nextAngle = ((i + 1) / wallSegments) * Math.PI * 2;
+    const midAngle = (angle + nextAngle) / 2;
+    
+    // Kavisli segment uzunluğu hesabı
+    const segmentWidth = (2 * Math.PI * wallRadius) / wallSegments * 1.05;
+    const wallSegGeo = new THREE.BoxGeometry(segmentWidth, 40, 28);
+    const wallSegMesh = new THREE.Mesh(wallSegGeo, wallMat);
+    
+    wallSegMesh.position.set(
+      Math.cos(midAngle) * wallRadius,
+      SHIP_Y_POS - 60,
+      Math.sin(midAngle) * wallRadius
+    );
+    wallSegMesh.rotation.y = -midAngle + Math.PI / 2;
+    defenseIslandGroup.add(wallSegMesh);
   }
 
   scene.add(defenseIslandGroup);
@@ -1286,7 +1294,7 @@ function spawnDefenseTowersRing() {
 
   const createTowerEntity = (index, x, z, scaleFactor = 1.0, customName = null) => {
     const towerId = startId + index;
-    const towerName = customName || `Savunma Kulesi #${index + 1}`;
+    const towerName = customName || `Profesyonel Kule`;
 
     const labelEl = document.createElement('div');
     labelEl.className = 'enemy-label';
@@ -1320,18 +1328,17 @@ function spawnDefenseTowersRing() {
     });
   };
 
-  // A. Merkez Kale Etrafındaki İç Kuleler (6 Adet - Profesyonel Kuleler)
-  const innerRadius = 130;
+  // A. Merkez Ada İçi Çember Kuleleri (6 Adet - Görseldeki iç kule çemberi)
+  const innerRadius = 140;
   for (let i = 0; i < 6; i++) {
     const angle = (i / 6) * Math.PI * 2;
-    createTowerEntity(towerCounter++, Math.cos(angle) * innerRadius, Math.sin(angle) * innerRadius, 1.0, 'Profesyonel Kule');
+    createTowerEntity(towerCounter++, Math.cos(angle) * innerRadius, Math.sin(angle) * innerRadius, 1.0);
   }
 
-  // B. Dış Surlar / Çember Üzerindeki Kuleler (8 Adet - Görseldeki Dış Hat Kuleleri)
-  const outerRadius = 380;
+  // B. Dış Çember / Sur Üstü Kuleleri (8 Adet - Görseldeki dış hat kuleleri)
   for (let i = 0; i < 8; i++) {
     const angle = (i / 8) * Math.PI * 2 + (Math.PI / 8);
-    createTowerEntity(towerCounter++, Math.cos(angle) * outerRadius, Math.sin(angle) * outerRadius, 1.15, 'Profesyonel Kule');
+    createTowerEntity(towerCounter++, Math.cos(angle) * wallRadius, Math.sin(angle) * wallRadius, 1.15);
   }
 }
 
