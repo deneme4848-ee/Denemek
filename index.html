@@ -1046,7 +1046,8 @@ function initThreeGame() {
   document.getElementById('game').appendChild(renderer.domElement);
 
   SHARED_PARTICLE_GEO = new THREE.SphereGeometry(1, 8, 8);
-  SHARED_PROJECTILE_GEO = new THREE.SphereGeometry(10, 12, 12);
+  // Güllelerin aşırı büyük görünmemesi için geometrik ölçeği optimize edildi
+  SHARED_PROJECTILE_GEO = new THREE.SphereGeometry(3.5, 12, 12);
 
   gltfLoader = new THREE.GLTFLoader();
   textureLoader = new THREE.TextureLoader();
@@ -1264,7 +1265,6 @@ function spawnDefenseTowersRing() {
   for (let i = 0; i < wallSegments; i++) {
     const angle = (i / wallSegments) * Math.PI * 2;
     
-    // Kapı girişi isteğiniz üzerine daha geniş tutuldu (Sol tarafta uygun bir geçiş boşluğu)
     if (angle > Math.PI * 0.95 && angle < Math.PI * 1.05) {
       continue; 
     }
@@ -1530,23 +1530,23 @@ function triggerCannonFireEffect(shipX, shipZ, targetX, targetZ, ammoKey) {
   const muzzleZ = shipZ + Math.sin(angleToTarget) * 28;
 
   const flashColor = ammoKey === 'snow' ? 0xa5f3fc : ammoKey === 'fire' ? 0xf97316 : 0xffaa00;
-  const flashMat = new THREE.MeshBasicMaterial({ color: flashColor, transparent: true, opacity: 0.95 });
+  const flashMat = new THREE.MeshBasicMaterial({ color: flashColor, transparent: true, opacity: 0.9 });
   const flashMesh = new THREE.Mesh(SHARED_PARTICLE_GEO, flashMat);
-  flashMesh.scale.setScalar(14);
+  flashMesh.scale.setScalar(6); // Efekt patlama boyutu da küçültüldü
   flashMesh.position.set(muzzleX, 24, muzzleZ);
   scene.add(flashMesh);
-  cannonEffects.push({ mesh: flashMesh, vx: 0, vy: 0.2, vz: 0, grow: 1.08, fade: 0.14, life: 8 });
+  cannonEffects.push({ mesh: flashMesh, vx: 0, vy: 0.2, vz: 0, grow: 1.05, fade: 0.18, life: 6 });
 
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 4; i++) {
     const grayTone = ammoKey === 'snow' ? 0.9 + Math.random() * 0.1 : 0.75 + Math.random() * 0.2;
-    const smokeMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(grayTone, grayTone, grayTone), transparent: true, opacity: 0.75 });
+    const smokeMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(grayTone, grayTone, grayTone), transparent: true, opacity: 0.6 });
     const smokeMesh = new THREE.Mesh(SHARED_PARTICLE_GEO, smokeMat);
-    smokeMesh.scale.setScalar(6 + Math.random() * 6);
-    smokeMesh.position.set(muzzleX + (Math.random() - 0.5) * 14, 22 + Math.random() * 8, muzzleZ + (Math.random() - 0.5) * 14);
+    smokeMesh.scale.setScalar(3 + Math.random() * 4);
+    smokeMesh.position.set(muzzleX + (Math.random() - 0.5) * 10, 22 + Math.random() * 6, muzzleZ + (Math.random() - 0.5) * 10);
     scene.add(smokeMesh);
-    const spreadSpeed = 0.6 + Math.random() * 1.1;
+    const spreadSpeed = 0.5 + Math.random() * 0.8;
     const spreadAngle = angleToTarget + (Math.random() - 0.5) * 0.7;
-    cannonEffects.push({ mesh: smokeMesh, vx: Math.cos(spreadAngle) * spreadSpeed, vy: 0.45 + Math.random() * 0.4, vz: Math.sin(spreadAngle) * spreadSpeed, grow: 1.03, fade: 0.025, life: 28 });
+    cannonEffects.push({ mesh: smokeMesh, vx: Math.cos(spreadAngle) * spreadSpeed, vy: 0.35 + Math.random() * 0.3, vz: Math.sin(spreadAngle) * spreadSpeed, grow: 1.02, fade: 0.04, life: 20 });
   }
 }
 
@@ -1559,7 +1559,8 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
   if (tex) {
     const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
     mesh = new THREE.Sprite(mat);
-    mesh.scale.set(32, 32, 1);
+    // Sprite güllelerin boyutu normal ve şık bir seviyeye getirildi (14x14)
+    mesh.scale.set(14, 14, 1);
   } else {
     const pMat = new THREE.MeshStandardMaterial({ color: ammoSpec.color, roughness: 0.2, metalness: 0.8 });
     mesh = new THREE.Mesh(SHARED_PROJECTILE_GEO, pMat);
@@ -1576,7 +1577,6 @@ function resolveWallSlide(nx, nz) {
   for (const box of wallCollisionBoxes) {
     const dist = Math.hypot(finalX - box.x, finalZ - box.z);
     if (dist < box.radius) {
-      // Sura sürtünme (kayma) mantığı: Geminin duvardan uzaklaşan teğet bileşende kayarak ilerlemesi sağlanır
       const angleFromCenter = Math.atan2(finalZ - box.z, finalX - box.x);
       finalX = box.x + Math.cos(angleFromCenter) * box.radius;
       finalZ = box.z + Math.sin(angleFromCenter) * box.radius;
@@ -1627,7 +1627,6 @@ function animate3D() {
   const nextX = player.x + Math.cos(player.a) * player.speed * dt;
   const nextZ = player.z + Math.sin(player.a) * player.speed * dt;
 
-  // Sur sürtünme (kayma) entegrasyonu: Gemi surda takılıp kalmaz, sürtünerek hızını korur
   const slidPos = resolveWallSlide(nextX, nextZ);
   player.x = slidPos.x;
   player.z = slidPos.z;
@@ -1747,19 +1746,19 @@ function animate3D() {
                        p.ammoKey === 'amiral' ? [0x38bdf8, 0xa855f7, 0x34d399, 0xffffff][Math.floor(Math.random()*4)] :
                        p.ammoKey === 'snow' ? 0xffffff :
                        p.ammoKey === 'chain' ? 0x94a3b8 : 0xffa500;
-      const sparkMat = new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 0.9 });
+      const sparkMat = new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 0.8 });
       const sparkMesh = new THREE.Mesh(SHARED_PROJECTILE_GEO, sparkMat);
-      sparkMesh.scale.setScalar(3.0 + Math.random() * 2.0);
-      sparkMesh.position.set(p.x + (Math.random() - 0.5) * 8, (SHIP_Y_POS - p.yOffset) + (Math.random() - 0.5) * 8, p.z + (Math.random() - 0.5) * 8);
+      sparkMesh.scale.setScalar(1.2 + Math.random() * 0.8);
+      sparkMesh.position.set(p.x + (Math.random() - 0.5) * 6, (SHIP_Y_POS - p.yOffset) + (Math.random() - 0.5) * 6, p.z + (Math.random() - 0.5) * 6);
       scene.add(sparkMesh);
-      particleSystems.push({ mesh: sparkMesh, life: 20, scaleDecay: 0.88 });
+      particleSystems.push({ mesh: sparkMesh, life: 15, scaleDecay: 0.85 });
     }
   }
 
   for (let i = particleSystems.length - 1; i >= 0; i--) {
     const pt = particleSystems[i];
     pt.life--; pt.mesh.scale.multiplyScalar(pt.scaleDecay || 0.90);
-    pt.mesh.material.opacity = Math.max(0, pt.mesh.material.opacity - (2.2 * dt));
+    pt.mesh.material.opacity = Math.max(0, pt.mesh.material.opacity - (2.5 * dt));
     if (pt.life <= 0 || pt.mesh.material.opacity <= 0) {
       scene.remove(pt.mesh);
       pt.mesh.material.dispose();
