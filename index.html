@@ -866,7 +866,7 @@ function sanitizeOwnedShips(list) {
   return filtered;
 }
 
-function preserveOriginalModelLighting(rootObj) {
+function preserveTowerLighting(rootObj) {
   if (!rootObj || typeof THREE === 'undefined') return;
   rootObj.traverse((child) => {
     if (child.isMesh && child.material) {
@@ -1312,8 +1312,6 @@ function getShipThumbnail(modelSpec, callback) {
       applyDenemeShipStyling(clonedModel, modelSpec.denemeStyle, { with3DProps: true });
     } else if (modelSpec.phantomStyle) {
       applyPhantomShipStyling(clonedModel, modelSpec.phantomStyle);
-    } else {
-      preserveOriginalModelLighting(clonedModel);
     }
     if (!thumbnailRenderer) {
       thumbnailRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
@@ -1324,8 +1322,8 @@ function getShipThumbnail(modelSpec, callback) {
     pCamera.position.set(0, 50, 120);
     pCamera.lookAt(0, 0, 0);
 
-    pScene.add(new THREE.AmbientLight(0xffffff, 1.55));
-    const pDir = new THREE.DirectionalLight(0xfff5cc, 1.65);
+    pScene.add(new THREE.AmbientLight(0xffffff, 1.0));
+    const pDir = new THREE.DirectionalLight(0xfff5cc, 1.0);
     pDir.position.set(50, 100, 50);
     pScene.add(pDir);
 
@@ -1869,7 +1867,7 @@ function initThreeGame() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.18;
+  renderer.toneMappingExposure = 1.05;
   document.getElementById('game').appendChild(renderer.domElement);
 
   SHARED_PARTICLE_GEO = new THREE.SphereGeometry(1, 8, 8);
@@ -1886,14 +1884,14 @@ function initThreeGame() {
     }, undefined, (err) => {});
   });
 
-  const ambientLight = new THREE.AmbientLight(0xdbeafe, 1.35);
+  const ambientLight = new THREE.AmbientLight(0xcbd5e1, 0.85);
   scene.add(ambientLight);
 
-  const sunLight = new THREE.DirectionalLight(0xfff6d1, 1.75);
+  const sunLight = new THREE.DirectionalLight(0xfff5cc, 1.15);
   sunLight.position.set(2000, 3000, 1500);
   scene.add(sunLight);
 
-  const rimLight = new THREE.DirectionalLight(0x7dd3fc, 0.85);
+  const rimLight = new THREE.DirectionalLight(0x7dd3fc, 0.5);
   rimLight.position.set(-1800, 1600, -1600);
   scene.add(rimLight);
 
@@ -1904,11 +1902,11 @@ function initThreeGame() {
     map: oceanTexture,
     bumpMap: oceanBumpTexture,
     bumpScale: 1.4,
-    color: 0x86bed0,
-    roughness: 0.56,
-    metalness: 0.22,
-    emissive: 0x041926,
-    emissiveIntensity: 0.16
+    color: 0x73a8ba,
+    roughness: 0.62,
+    metalness: 0.18,
+    emissive: 0x03131d,
+    emissiveIntensity: 0.12
   });
   const ocean = new THREE.Mesh(planeGeo, oceanMat);
   ocean.rotation.x = -Math.PI / 2;
@@ -2050,8 +2048,6 @@ function setupPlayerShipVisual() {
       applyDenemeShipStyling(activeGlbShip, modelSpec.denemeStyle, { with3DProps: true });
     } else if (modelSpec.phantomStyle) {
       applyPhantomShipStyling(activeGlbShip, modelSpec.phantomStyle);
-    } else {
-      preserveOriginalModelLighting(activeGlbShip);
     }
     scene.add(activeGlbShip);
   });
@@ -2549,7 +2545,7 @@ function spawnDefenseTowersRing() {
     loadCachedGLB('defence_tower.glb', (model) => {
       if (!defenseTowers.includes(towerObj)) return;
 
-      preserveOriginalModelLighting(model);
+      preserveTowerLighting(model);
 
       model.traverse(child => {
         child.userData = { enemyId: towerId };
@@ -2662,7 +2658,6 @@ function spawnEnemyGlb(id) {
 
   loadCachedGLB(ENEMY_GLB_MODEL_PATH, (model) => {
     if (!enemies.includes(enemyData)) return;
-    preserveOriginalModelLighting(model);
     const box = new THREE.Box3().setFromObject(model);
     const size = new THREE.Vector3();
     box.getSize(size);
