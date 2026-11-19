@@ -1300,7 +1300,8 @@ if (logoutBtn) logoutBtn.addEventListener('click', () => { try { localStorage.re
 let scene, camera, renderer;
 let oceanTexture = null;
 let activeGlbShip = null, playerNeonRing, enemies = [], defenseTowers = [], rangeRingMesh;
-let activeProjectiles = [], particleSystems = [], cannonEffects = [];
+let activeProjectiles = [], particleSystems = [], cannonEffects = [], castleFlameSystems = [];
+let activeDefenseIslandGroup = null;
 let raycaster, planeGeo, mouse;
 let selectedRingMesh = null;
 let borderFrameMesh = null;
@@ -1715,6 +1716,167 @@ function startGameLogic() {
 
 const wallCollisionBoxes = [];
 
+function addCastleFlameCluster(parentGroup, x, y, z, scale = 1.0, phaseOffset = 0) {
+  const clusterGroup = new THREE.Group();
+  clusterGroup.position.set(x, y, z);
+
+  const brazierMat = new THREE.MeshStandardMaterial({
+    color: 0x292524,
+    roughness: 0.7,
+    metalness: 0.75
+  });
+  const brazierBowl = new THREE.Mesh(new THREE.CylinderGeometry(7.5 * scale, 5.2 * scale, 5.5 * scale, 10), brazierMat);
+  brazierBowl.position.y = -2.5 * scale;
+  clusterGroup.add(brazierBowl);
+
+  const flameColors = [0xff2a00, 0xff6a00, 0xffaa00, 0xfff078];
+  const tongues = [];
+  const tongueCount = 7;
+
+  for (let i = 0; i < tongueCount; i++) {
+    const tMat = new THREE.MeshBasicMaterial({
+      color: flameColors[i % flameColors.length],
+      transparent: true,
+      opacity: 0.88
+    });
+    const tGeo = new THREE.ConeGeometry(3.8 * scale, 18 * scale, 7);
+    const tMesh = new THREE.Mesh(tGeo, tMat);
+    const ang = (i / tongueCount) * Math.PI * 2;
+    const rad = 2.4 * scale;
+    tMesh.position.set(Math.cos(ang) * rad, 8 * scale, Math.sin(ang) * rad);
+    tMesh.rotation.z = -Math.cos(ang) * 0.22;
+    tMesh.rotation.x = Math.sin(ang) * 0.22;
+    clusterGroup.add(tMesh);
+
+    tongues.push({
+      mesh: tMesh,
+      baseY: 8 * scale,
+      baseScaleY: 1.0,
+      phase: phaseOffset + i * 0.85,
+      speed: 7.5 + (i % 3) * 1.4
+    });
+  }
+
+  const flameLight = new THREE.PointLight(0xff6a00, 1.3 * scale, 130 * scale);
+  flameLight.position.set(0, 12 * scale, 0);
+  clusterGroup.add(flameLight);
+
+  parentGroup.add(clusterGroup);
+  castleFlameSystems.push({
+    group: clusterGroup,
+    tongues,
+    light: flameLight,
+    baseIntensity: 1.3 * scale,
+    phase: phaseOffset
+  });
+}
+
+function buildCastleKeepAndIsland(parentGroup, wallRadius) {
+  const stoneMainMat = new THREE.MeshStandardMaterial({
+    color: 0x57534e,
+    roughness: 0.82,
+    metalness: 0.14,
+    depthWrite: true,
+    depthTest: true
+  });
+  const stoneTrimMat = new THREE.MeshStandardMaterial({
+    color: 0x78716c,
+    roughness: 0.75,
+    metalness: 0.2,
+    depthWrite: true,
+    depthTest: true
+  });
+  const roofDarkMat = new THREE.MeshStandardMaterial({
+    color: 0x292524,
+    roughness: 0.65,
+    metalness: 0.35,
+    depthWrite: true,
+    depthTest: true
+  });
+  const sandShoreMat = new THREE.MeshStandardMaterial({
+    color: 0xb59b6d,
+    roughness: 0.92,
+    metalness: 0.04,
+    depthWrite: true,
+    depthTest: true
+  });
+  const islandRockMat = new THREE.MeshStandardMaterial({
+    color: 0x44403c,
+    roughness: 0.88,
+    metalness: 0.1,
+    depthWrite: true,
+    depthTest: true
+  });
+
+  const keepBaseY = SHIP_Y_POS - 62;
+
+  const sandShoal = new THREE.Mesh(
+    new THREE.CylinderGeometry(wallRadius * 0.96, wallRadius * 1.02, 8, 36),
+    sandShoreMat
+  );
+  sandShoal.position.set(0, keepBaseY - 12, 0);
+  parentGroup.add(sandShoal);
+
+  const centralIsland = new THREE.Mesh(
+    new THREE.CylinderGeometry(58, 76, 18, 24),
+    islandRockMat
+  );
+  centralIsland.position.set(0, keepBaseY - 4, 0);
+  parentGroup.add(centralIsland);
+
+  const centralSandPad = new THREE.Mesh(
+    new THREE.CylinderGeometry(52, 56, 4, 24),
+    sandShoreMat
+  );
+  centralSandPad.position.set(0, keepBaseY + 5, 0);
+  parentGroup.add(centralSandPad);
+
+  const citadelGroup = new THREE.Group();
+  citadelGroup.position.set(0, keepBaseY + 6, 0);
+
+  const lowerHall = new THREE.Mesh(new THREE.BoxGeometry(46, 22, 38), stoneMainMat);
+  lowerHall.position.set(0, 11, 0);
+  citadelGroup.add(lowerHall);
+
+  const upperKeep = new THREE.Mesh(new THREE.BoxGeometry(30, 20, 26), stoneTrimMat);
+  upperKeep.position.set(0, 32, -2);
+  citadelGroup.add(upperKeep);
+
+  const mainRoof = new THREE.Mesh(new THREE.ConeGeometry(24, 16, 4), roofDarkMat);
+  mainRoof.position.set(0, 50, -2);
+  mainRoof.rotation.y = Math.PI / 4;
+  citadelGroup.add(mainRoof);
+
+  const lowerRoof = new THREE.Mesh(new THREE.ConeGeometry(34, 10, 4), roofDarkMat);
+  lowerRoof.position.set(0, 27, 0);
+  lowerRoof.rotation.y = Math.PI / 4;
+  citadelGroup.add(lowerRoof);
+
+  const towerPositions = [
+    [-22, -18], [22, -18], [-22, 18], [22, 18]
+  ];
+  towerPositions.forEach(([tx, tz]) => {
+    const tBody = new THREE.Mesh(new THREE.CylinderGeometry(5.5, 6.6, 36, 12), stoneMainMat);
+    tBody.position.set(tx, 18, tz);
+    citadelGroup.add(tBody);
+
+    const tCap = new THREE.Mesh(new THREE.ConeGeometry(7.2, 11, 12), roofDarkMat);
+    tCap.position.set(tx, 41.5, tz);
+    citadelGroup.add(tCap);
+  });
+
+  const gateArch = new THREE.Mesh(new THREE.BoxGeometry(14, 14, 8), stoneTrimMat);
+  gateArch.position.set(0, 7, 19);
+  citadelGroup.add(gateArch);
+
+  parentGroup.add(citadelGroup);
+
+  addCastleFlameCluster(parentGroup, 0, keepBaseY + 66, -2, 1.35, 0.0);
+  addCastleFlameCluster(parentGroup, 95, keepBaseY + 12, 55, 1.25, 1.7);
+  addCastleFlameCluster(parentGroup, -110, keepBaseY + 12, 95, 1.15, 3.1);
+  addCastleFlameCluster(parentGroup, 145, keepBaseY + 12, -115, 1.1, 4.4);
+}
+
 function spawnDefenseTowersRing() {
   defenseTowers.forEach(t => {
     if (t.mesh) scene.remove(t.mesh);
@@ -1723,8 +1885,15 @@ function spawnDefenseTowersRing() {
   defenseTowers = [];
   wallCollisionBoxes.length = 0;
 
+  if (activeDefenseIslandGroup) {
+    scene.remove(activeDefenseIslandGroup);
+    activeDefenseIslandGroup = null;
+  }
+  castleFlameSystems = [];
+
   const defenseIslandGroup = new THREE.Group();
   defenseIslandGroup.name = "DefenseIsland_RangeMatchLayout";
+  activeDefenseIslandGroup = defenseIslandGroup;
 
   const wallRadius = WALL_RADIUS; 
   const wallSegments = 20;
@@ -1761,6 +1930,8 @@ function spawnDefenseTowersRing() {
 
     wallCollisionBoxes.push({ x: wx, z: wz, radius: segmentWidth / 2 + 6 });
   }
+
+  buildCastleKeepAndIsland(defenseIslandGroup, wallRadius);
 
   scene.add(defenseIslandGroup);
 
@@ -2077,6 +2248,26 @@ function animate3D() {
   }
 
   const now = Date.now();
+  const animTimeSec = now * 0.001;
+
+  if (castleFlameSystems.length > 0) {
+    for (let i = 0; i < castleFlameSystems.length; i++) {
+      const sys = castleFlameSystems[i];
+      for (let j = 0; j < sys.tongues.length; j++) {
+        const t = sys.tongues[j];
+        const wave = Math.sin(animTimeSec * t.speed + t.phase);
+        const flicker = Math.cos(animTimeSec * (t.speed * 1.37) + t.phase * 0.7);
+        const scaleY = Math.max(0.55, t.baseScaleY + wave * 0.35 + flicker * 0.12);
+        const scaleXZ = Math.max(0.65, 1.0 - wave * 0.16);
+        t.mesh.scale.set(scaleXZ, scaleY, scaleXZ);
+        t.mesh.position.y = t.baseY + (scaleY - 1.0) * 6.5;
+        t.mesh.rotation.z = (-Math.cos((j / sys.tongues.length) * Math.PI * 2) * 0.22) + flicker * 0.14;
+      }
+      if (sys.light) {
+        sys.light.intensity = sys.baseIntensity * (0.85 + 0.3 * Math.sin(animTimeSec * 9.0 + sys.phase));
+      }
+    }
+  }
 
   if (player.hp < player.maxHp && (now - player.lastDamagedTime >= 5000)) {
     if (now - lastRegenTime >= 5000) {
