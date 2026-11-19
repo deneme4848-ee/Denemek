@@ -436,10 +436,10 @@
       border: 1px solid var(--brass-accent); background: rgba(34, 42, 54, 0.95); color: var(--text-main); cursor: pointer;
     }
 
-    /* Sinematik Arkaplan Katmanlı Giriş & Kayıt Ekranı */
+    /* Sinematik Arkaplan Katmanlı Giriş & Kayıt Ekranı (Biraz daha aydınlık ve net) */
     #auth-overlay {
       position: fixed; inset: 0; z-index: 999999;
-      background-color: #050b12;
+      background-color: #071019;
       background-image: url('korsan.png');
       background-size: cover;
       background-position: center;
@@ -448,23 +448,23 @@
       overflow: hidden;
     }
 
-    /* 1. Katman: Göz yormayan derin gece laciverti / kömür atmosfer perdesi */
+    /* 1. Katman: Hafifçe açılmış gece laciverti / kömür atmosfer perdesi */
     #auth-overlay::before {
       content: "";
       position: absolute; inset: 0; z-index: 0;
       background:
-        linear-gradient(180deg, rgba(5, 10, 16, 0.76) 0%, rgba(7, 13, 21, 0.62) 48%, rgba(4, 8, 13, 0.86) 100%),
-        rgba(5, 11, 18, 0.42);
-      backdrop-filter: blur(2.5px);
+        linear-gradient(180deg, rgba(6, 12, 20, 0.56) 0%, rgba(8, 15, 25, 0.42) 50%, rgba(5, 10, 16, 0.66) 100%),
+        rgba(6, 13, 21, 0.24);
+      backdrop-filter: blur(1.5px);
       pointer-events: none;
     }
 
-    /* 2. Katman: Kenarları yumuşak karartan sinematik vignette + hafif sisli odak */
+    /* 2. Katman: Kenarları yumuşakça karartan hafif vignette */
     #auth-overlay::after {
       content: "";
       position: absolute; inset: 0; z-index: 1;
       background:
-        radial-gradient(circle at 50% 48%, rgba(12, 20, 30, 0.12) 0%, rgba(4, 8, 13, 0.68) 76%, rgba(2, 5, 9, 0.92) 100%);
+        radial-gradient(circle at 50% 48%, rgba(14, 24, 36, 0.04) 0%, rgba(5, 10, 16, 0.46) 78%, rgba(3, 6, 11, 0.72) 100%);
       pointer-events: none;
     }
 
@@ -843,7 +843,7 @@ const BASE_SHIP_MODELS = {
   tasarim3:         { id: 'tasarim3',         name: 'Tasarim 3', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3 },
   tasarim3_hayalet: { id: 'tasarim3_hayalet', name: 'Tasarim 3 · Hayalet', desc: 'Sakin Hayalet Işıltı', cost: 0, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3, phantomStyle: 'specter_teal' },
   tasarim4:         { id: 'tasarim4',         name: 'Tasarim 4', desc: 'GLB Savaş Gemisi', cost: 3500, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2 },
-  tasarim4_hayalet: { id: 'tasarim4_hayalet', name: 'Tasarim 4 · Hayalet', desc: 'Sakin Mor Ruhani Işıltı', cost: 0, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2, phantomStyle: 'specter_violet' },
+  tasarim4_hayalet: { id: 'tasarim4_hayalet', name: 'Tasarim 4 · Hayalet', desc: 'Güçlendirilmiş Ruhani Mor Işıltı', cost: 0, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2, phantomStyle: 'specter_violet' },
   tasarim6:         { id: 'tasarim6',         name: 'Tasarim 6', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim6.glb', heightOffset: 85 },
   tasarim7:         { id: 'tasarim7',         name: 'Tasarim 7', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim7.glb', heightOffset: 45, rotationOffset: Math.PI },
   tasarim8:         { id: 'tasarim8',         name: 'Tasarim 8', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim8.glb', heightOffset: 85 },
@@ -864,16 +864,16 @@ const PHANTOM_THEMES = {
     pulseSpeed: 2.2
   },
   specter_violet: {
-    color: 0xb094cf,
-    emissive: 0x674188,
-    baseEmissive: 0.2,
-    peakEmissive: 0.75,
-    minOpacity: 0.38,
-    maxOpacity: 0.84,
-    lightColor: 0x9675bd,
-    baseLight: 0.18,
-    peakLight: 0.6,
-    pulseSpeed: 2.2
+    color: 0xc29ef0,
+    emissive: 0x7a42b8,
+    baseEmissive: 0.32,
+    peakEmissive: 0.96,
+    minOpacity: 0.46,
+    maxOpacity: 0.88,
+    lightColor: 0xa575e3,
+    baseLight: 0.32,
+    peakLight: 0.92,
+    pulseSpeed: 2.65
   }
 };
 
@@ -1000,10 +1000,14 @@ let activeDenemeStyleKey = null;
 let denemeMaterialsList = [];
 
 let activePhantomLight = null;
+let activePhantomAuraMesh = null;
 let activePhantomStyleKey = null;
 let phantomMaterialsList = [];
 
 let mainTowerGlowState = null;
+
+const MAX_TRAIL_PARTICLES = 160;
+const MAX_SPARK_PARTICLES = 140;
 
 function clearAllEnemyAggro() {
   enemies.forEach((en) => {
@@ -1045,6 +1049,15 @@ function clearDenemeShipStyling() {
     activePhantomLight.parent.remove(activePhantomLight);
   }
   activePhantomLight = null;
+
+  if (activePhantomAuraMesh) {
+    if (activePhantomAuraMesh.parent) {
+      activePhantomAuraMesh.parent.remove(activePhantomAuraMesh);
+    }
+    if (activePhantomAuraMesh.geometry) activePhantomAuraMesh.geometry.dispose();
+    if (activePhantomAuraMesh.material) activePhantomAuraMesh.material.dispose();
+  }
+  activePhantomAuraMesh = null;
   activePhantomStyleKey = null;
 
   phantomMaterialsList.forEach((mat) => {
@@ -1082,8 +1095,23 @@ function applyPhantomShipStyling(shipMesh, phantomKey = 'specter_teal') {
     }
   });
 
-  activePhantomLight = new THREE.PointLight(theme.lightColor, theme.baseLight, 50);
-  activePhantomLight.position.set(0, 14, 0);
+  if (phantomKey === 'specter_violet') {
+    const auraGeo = new THREE.RingGeometry(24, 34, 36);
+    auraGeo.rotateX(-Math.PI / 2);
+    const auraMat = new THREE.MeshBasicMaterial({
+      color: 0xa575e3,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.34,
+      depthWrite: false
+    });
+    activePhantomAuraMesh = new THREE.Mesh(auraGeo, auraMat);
+    activePhantomAuraMesh.position.y = 4;
+    shipMesh.add(activePhantomAuraMesh);
+  }
+
+  activePhantomLight = new THREE.PointLight(theme.lightColor, theme.baseLight, phantomKey === 'specter_violet' ? 95 : 50);
+  activePhantomLight.position.set(0, 16, 0);
   shipMesh.add(activePhantomLight);
 }
 
@@ -1235,6 +1263,7 @@ const GLB_LOADING_QUEUE = {};
 const THUMBNAIL_CACHE = {};
 let SHARED_PARTICLE_GEO = null;
 let SHARED_PROJECTILE_GEO = null;
+let SHARED_SPARK_GEO = null;
 let thumbnailRenderer = null;
 
 function downscaleTextureTo512(texture) {
@@ -1440,6 +1469,7 @@ let hasDragged = false;
 
 const WORLD_SIZE = 9900;
 const ATTACK_RANGE = 300;
+const TOWER_ATTACK_RANGE = ATTACK_RANGE * 2;
 const SHIP_Y_POS = 100;
 
 const CAMERA_HEIGHT = 800;
@@ -1601,17 +1631,24 @@ function triggerSinkSparks(wx, wz, scale = 1.0) {
   if (!scene || typeof THREE === 'undefined') return;
   const baseY = 12;
 
-  const sparkGeo = new THREE.BoxGeometry(0.65 * scale, 2.4 * scale, 0.65 * scale);
   const sparkColors = [0xffc86b, 0xff9d3b, 0xe87a24, 0xfff1cc];
-  const sparkCount = 26;
+  const sparkCount = 16;
 
   for (let i = 0; i < sparkCount; i++) {
+    if (sinkSparks.length >= MAX_SPARK_PARTICLES) {
+      const oldest = sinkSparks.shift();
+      if (oldest && !oldest.isLight && oldest.mesh) {
+        scene.remove(oldest.mesh);
+        oldest.mat.dispose();
+      }
+    }
     const sMat = new THREE.MeshBasicMaterial({
       color: sparkColors[i % sparkColors.length],
       transparent: true,
       opacity: 0.92
     });
-    const mesh = new THREE.Mesh(sparkGeo, sMat);
+    const mesh = new THREE.Mesh(SHARED_SPARK_GEO, sMat);
+    mesh.scale.setScalar(scale);
     mesh.position.set(
       wx + (Math.random() - 0.5) * 14 * scale,
       baseY + Math.random() * 8 * scale,
@@ -1638,20 +1675,20 @@ function triggerSinkSparks(wx, wz, scale = 1.0) {
       vy,
       vz,
       age: 0,
-      maxAge: 28 + Math.floor(Math.random() * 16)
+      maxAge: 24 + Math.floor(Math.random() * 12)
     });
   }
 
-  const sparkLight = new THREE.PointLight(0xffa94d, 1.15 * scale, 110 * scale);
+  const sparkLight = new THREE.PointLight(0xffa94d, 1.05 * scale, 100 * scale);
   sparkLight.position.set(wx, baseY + 14 * scale, wz);
   scene.add(sparkLight);
 
   sinkSparks.push({
     isLight: true,
     light: sparkLight,
-    baseIntensity: 1.15 * scale,
+    baseIntensity: 1.05 * scale,
     age: 0,
-    maxAge: 18
+    maxAge: 16
   });
 }
 
@@ -1858,6 +1895,7 @@ function initThreeGame() {
 
   SHARED_PARTICLE_GEO = new THREE.SphereGeometry(1, 8, 8);
   SHARED_PROJECTILE_GEO = new THREE.SphereGeometry(3.2, 12, 12);
+  SHARED_SPARK_GEO = new THREE.BoxGeometry(0.75, 2.8, 0.75);
 
   gltfLoader = new THREE.GLTFLoader();
   textureLoader = new THREE.TextureLoader();
@@ -2171,7 +2209,7 @@ function addCastleFlameCluster(parentGroup, x, y, z, scale = 1.0, phaseOffset = 
 }
 
 function spawnFlameEmber(wx, wy, wz, scale = 1.0) {
-  if (flameEmberParticles.length > 70) return;
+  if (flameEmberParticles.length > 60) return;
   const mat = new THREE.MeshBasicMaterial({
     color: Math.random() > 0.4 ? 0xd98a3c : 0xb85328,
     transparent: true,
@@ -2734,50 +2772,124 @@ function showFloatingDamage(wx, wz, text, colorHex) {
   setTimeout(() => div.remove(), 850);
 }
 
-function triggerCannonFireEffect(shipX, shipZ, targetX, targetZ, ammoKey) {
+function triggerCannonFireEffect(shipX, shipZ, targetX, targetZ, ammoKey, yBase = 24) {
   const angleToTarget = Math.atan2(targetZ - shipZ, targetX - shipX);
   const muzzleX = shipX + Math.cos(angleToTarget) * 28;
   const muzzleZ = shipZ + Math.sin(angleToTarget) * 28;
 
-  const flashColor = ammoKey === 'snow' ? 0xa5d4e8 : ammoKey === 'fire' ? 0xd97736 : 0xd99b43;
-  const flashMat = new THREE.MeshBasicMaterial({ color: flashColor, transparent: true, opacity: 0.75 });
+  const flashColor = ammoKey === 'snow' ? 0xa5d4e8 : ammoKey === 'fire' ? 0xff7b29 : 0xd99b43;
+  const flashMat = new THREE.MeshBasicMaterial({ color: flashColor, transparent: true, opacity: 0.85 });
   const flashMesh = new THREE.Mesh(SHARED_PARTICLE_GEO, flashMat);
-  flashMesh.scale.setScalar(5);
-  flashMesh.position.set(muzzleX, 24, muzzleZ);
+  flashMesh.scale.setScalar(ammoKey === 'fire' ? 6.5 : 5);
+  flashMesh.position.set(muzzleX, yBase, muzzleZ);
   scene.add(flashMesh);
-  cannonEffects.push({ mesh: flashMesh, vx: 0, vy: 0.2, vz: 0, grow: 1.04, fade: 0.18, life: 6 });
+  cannonEffects.push({ mesh: flashMesh, vx: 0, vy: 0.25, vz: 0, grow: 1.05, fade: 0.18, life: 6 });
 
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 3; i++) {
     const grayTone = ammoKey === 'snow' ? 0.85 + Math.random() * 0.1 : 0.7 + Math.random() * 0.18;
-    const smokeMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(grayTone, grayTone, grayTone), transparent: true, opacity: 0.5 });
+    const smokeMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(grayTone, grayTone, grayTone), transparent: true, opacity: 0.48 });
     const smokeMesh = new THREE.Mesh(SHARED_PARTICLE_GEO, smokeMat);
-    smokeMesh.scale.setScalar(2.8 + Math.random() * 3.5);
-    smokeMesh.position.set(muzzleX + (Math.random() - 0.5) * 10, 22 + Math.random() * 6, muzzleZ + (Math.random() - 0.5) * 10);
+    smokeMesh.scale.setScalar(2.6 + Math.random() * 3.0);
+    smokeMesh.position.set(muzzleX + (Math.random() - 0.5) * 9, yBase - 2 + Math.random() * 5, muzzleZ + (Math.random() - 0.5) * 9);
     scene.add(smokeMesh);
     const spreadSpeed = 0.5 + Math.random() * 0.75;
     const spreadAngle = angleToTarget + (Math.random() - 0.5) * 0.7;
-    cannonEffects.push({ mesh: smokeMesh, vx: Math.cos(spreadAngle) * spreadSpeed, vy: 0.3 + Math.random() * 0.25, vz: Math.sin(spreadAngle) * spreadSpeed, grow: 1.02, fade: 0.04, life: 18 });
+    cannonEffects.push({ mesh: smokeMesh, vx: Math.cos(spreadAngle) * spreadSpeed, vy: 0.3 + Math.random() * 0.25, vz: Math.sin(spreadAngle) * spreadSpeed, grow: 1.02, fade: 0.045, life: 16 });
   }
 }
 
-function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
-  triggerCannonFireEffect(startX, startZ, targetX, targetZ, ammoKey);
-  const ammoSpec = AMMO_TYPES[ammoKey];
+function spawnProjectileTrailSparks(px, py, pz, ammoKey) {
+  if (particleSystems.length >= MAX_TRAIL_PARTICLES) {
+    const oldest = particleSystems.shift();
+    if (oldest && oldest.mesh) {
+      scene.remove(oldest.mesh);
+      oldest.mesh.material.dispose();
+    }
+  }
+
+  let sparkColor = 0xffb84d;
+  let sparkCount = 2;
+  let scaleBase = 1.45;
+
+  if (ammoKey === 'fire') {
+    sparkColor = Math.random() > 0.35 ? 0xff7b29 : 0xffd166;
+    sparkCount = 3;
+    scaleBase = 1.85;
+  } else if (ammoKey === 'amiral') {
+    sparkColor = [0x7cc4e8, 0xb896e8, 0x82d4ab, 0xeef5fc][Math.floor(Math.random() * 4)];
+    sparkCount = 2;
+    scaleBase = 1.65;
+  } else if (ammoKey === 'snow') {
+    sparkColor = 0xe4f1fa;
+    sparkCount = 2;
+    scaleBase = 1.5;
+  } else if (ammoKey === 'chain') {
+    sparkColor = 0xc8d4e0;
+    sparkCount = 2;
+    scaleBase = 1.4;
+  }
+
+  for (let i = 0; i < sparkCount; i++) {
+    if (particleSystems.length >= MAX_TRAIL_PARTICLES) break;
+    const sparkMat = new THREE.MeshBasicMaterial({
+      color: sparkColor,
+      transparent: true,
+      opacity: 0.88
+    });
+    const sparkMesh = new THREE.Mesh(SHARED_PARTICLE_GEO, sparkMat);
+    sparkMesh.scale.setScalar(scaleBase + Math.random() * 0.75);
+    sparkMesh.position.set(
+      px + (Math.random() - 0.5) * 8,
+      py + (Math.random() - 0.5) * 6,
+      pz + (Math.random() - 0.5) * 8
+    );
+    scene.add(sparkMesh);
+    particleSystems.push({
+      mesh: sparkMesh,
+      vx: (Math.random() - 0.5) * 18,
+      vy: 8 + Math.random() * 14,
+      vz: (Math.random() - 0.5) * 18,
+      life: 16,
+      scaleDecay: 0.88
+    });
+  }
+}
+
+function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit, options = {}) {
+  const yOffset = options.yOffset || 40;
+  const speed = options.speed || 360;
+  const muzzleY = options.muzzleY || 24;
+
+  triggerCannonFireEffect(startX, startZ, targetX, targetZ, ammoKey, muzzleY);
+  const ammoSpec = AMMO_TYPES[ammoKey] || AMMO_TYPES.iron;
   let mesh;
   const tex = ammoSpec.img ? loadedAmmoTextures[ammoSpec.img] : null;
 
   if (tex) {
     const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
     mesh = new THREE.Sprite(mat);
-    mesh.scale.set(13, 13, 1);
+    const spriteScale = options.spriteScale || 13;
+    mesh.scale.set(spriteScale, spriteScale, 1);
   } else {
     const pMat = new THREE.MeshStandardMaterial({ color: ammoSpec.color, roughness: 0.3, metalness: 0.7 });
     mesh = new THREE.Mesh(SHARED_PROJECTILE_GEO, pMat);
   }
 
-  mesh.position.set(startX, SHIP_Y_POS - 40, startZ);
+  const py = SHIP_Y_POS - yOffset;
+  mesh.position.set(startX, py, startZ);
   scene.add(mesh);
-  activeProjectiles.push({ mesh, x: startX, z: startZ, targetX, targetZ, speed: 360, ammoKey, onHit, yOffset: 40 });
+  activeProjectiles.push({
+    mesh,
+    x: startX,
+    z: startZ,
+    targetX,
+    targetZ,
+    speed,
+    ammoKey,
+    onHit,
+    yOffset,
+    trailTimer: 0
+  });
 }
 
 function resolveWallSlide(nx, nz) {
@@ -2883,7 +2995,7 @@ function animate3D() {
         sys.light.intensity = sys.baseIntensity * (0.88 + 0.22 * Math.sin(animTimeSec * 8.0 + sys.phase));
       }
       sys.emberTimer += dt;
-      if (sys.emberTimer >= 0.22) {
+      if (sys.emberTimer >= 0.25) {
         sys.emberTimer = 0;
         spawnFlameEmber(sys.group.position.x, sys.group.position.y + 9 * sys.scale, sys.group.position.z, sys.scale);
       }
@@ -3001,6 +3113,13 @@ function animate3D() {
       if (activePhantomLight) {
         activePhantomLight.intensity = pTheme.baseLight + (pTheme.peakLight - pTheme.baseLight) * pulseWave;
       }
+
+      if (activePhantomAuraMesh) {
+        activePhantomAuraMesh.rotation.z += 1.4 * dt;
+        const auraScale = 0.94 + pulseWave * 0.14;
+        activePhantomAuraMesh.scale.set(auraScale, 1, auraScale);
+        activePhantomAuraMesh.material.opacity = 0.22 + pulseWave * 0.24;
+      }
     } else if (modelSpec.denemeStyle) {
       const dTheme = DENEME_THEMES[modelSpec.denemeStyle] || DENEME_THEMES.gold;
       const pulseWave = 0.5 + 0.5 * Math.sin(timeSec * dTheme.pulseSpeed);
@@ -3042,7 +3161,7 @@ function animate3D() {
       }
     }
 
-    const phantomFloatY = modelSpec.phantomStyle ? (2.0 + Math.sin(animTimeSec * 1.8) * 1.4) : 0;
+    const phantomFloatY = modelSpec.phantomStyle ? (2.6 + Math.sin(animTimeSec * 2.1) * 1.6) : 0;
     activeGlbShip.position.set(player.x, SHIP_Y_POS + hOffset + waveBobY + phantomFloatY - 100, player.z);
     activeGlbShip.rotation.order = 'YXZ';
     activeGlbShip.rotation.y = (-player.a + Math.PI / 2) + rotOffset;
@@ -3099,6 +3218,7 @@ function animate3D() {
     const dx = p.targetX - p.x, dz = p.targetZ - p.z;
     const dist = Math.hypot(dx, dz);
     const step = p.speed * dt;
+    const py = SHIP_Y_POS - p.yOffset;
 
     if (dist < step) {
       scene.remove(p.mesh);
@@ -3107,25 +3227,24 @@ function animate3D() {
       if (p.onHit) p.onHit();
     } else {
       p.x += (dx / dist) * step; p.z += (dz / dist) * step;
-      p.mesh.position.set(p.x, SHIP_Y_POS - p.yOffset, p.z);
+      p.mesh.position.set(p.x, py, p.z);
 
-      let sparkColor = p.ammoKey === 'fire' ? (Math.random() > 0.4 ? 0xd97736 : 0xc8963e) :
-                       p.ammoKey === 'amiral' ? [0x6da4c4, 0x9b82bd, 0x72b092, 0xdce4ec][Math.floor(Math.random()*4)] :
-                       p.ammoKey === 'snow' ? 0xdbe6ef :
-                       p.ammoKey === 'chain' ? 0x8d99a6 : 0xc8963e;
-      const sparkMat = new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 0.7 });
-      const sparkMesh = new THREE.Mesh(SHARED_PROJECTILE_GEO, sparkMat);
-      sparkMesh.scale.setScalar(1.0 + Math.random() * 0.6);
-      sparkMesh.position.set(p.x + (Math.random() - 0.5) * 6, (SHIP_Y_POS - p.yOffset) + (Math.random() - 0.5) * 6, p.z + (Math.random() - 0.5) * 6);
-      scene.add(sparkMesh);
-      particleSystems.push({ mesh: sparkMesh, life: 14, scaleDecay: 0.85 });
+      p.trailTimer += dt;
+      if (p.trailTimer >= 0.035) {
+        p.trailTimer = 0;
+        spawnProjectileTrailSparks(p.x, py, p.z, p.ammoKey);
+      }
     }
   }
 
   for (let i = particleSystems.length - 1; i >= 0; i--) {
     const pt = particleSystems[i];
-    pt.life--; pt.mesh.scale.multiplyScalar(pt.scaleDecay || 0.90);
-    pt.mesh.material.opacity = Math.max(0, pt.mesh.material.opacity - (2.5 * dt));
+    pt.life--;
+    if (pt.vx) pt.mesh.position.x += pt.vx * dt;
+    if (pt.vy) pt.mesh.position.y += pt.vy * dt;
+    if (pt.vz) pt.mesh.position.z += pt.vz * dt;
+    pt.mesh.scale.multiplyScalar(pt.scaleDecay || 0.90);
+    pt.mesh.material.opacity = Math.max(0, pt.mesh.material.opacity - (2.6 * dt));
     if (pt.life <= 0 || pt.mesh.material.opacity <= 0) {
       scene.remove(pt.mesh);
       pt.mesh.material.dispose();
@@ -3136,18 +3255,22 @@ function animate3D() {
   for (const t of defenseTowers) {
     if (t.mesh) {
       const distToPlayer = Math.hypot(player.x - t.x, player.z - t.z);
-      if (distToPlayer <= ATTACK_RANGE && (now - t.lastAttackTime >= 1200)) {
+      if (distToPlayer <= TOWER_ATTACK_RANGE && (now - t.lastAttackTime >= 1200)) {
         t.lastAttackTime = now;
-        player.hp = Math.max(0, player.hp - 120);
-        player.lastDamagedTime = now;
-        lastRegenTime = now;
-        showFloatingDamage(player.x, player.z, '-120 (Kule)', '#d48a8a');
-        updateHUD();
-        if (player.hp <= 0) {
-          triggerSinkSparks(player.x, player.z, 1.35);
-          isGameOver = true; isAttacking = false; gameOverEl.style.display = 'flex';
-          finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString();
-        }
+        const aimX = player.x;
+        const aimZ = player.z;
+        fireProjectile(t.x, t.z, aimX, aimZ, 'fire', () => {
+          player.hp = Math.max(0, player.hp - 120);
+          player.lastDamagedTime = Date.now();
+          lastRegenTime = Date.now();
+          showFloatingDamage(aimX, aimZ, '-120 (Alev Kulesi)', '#ff944d');
+          updateHUD();
+          if (player.hp <= 0) {
+            triggerSinkSparks(player.x, player.z, 1.35);
+            isGameOver = true; isAttacking = false; gameOverEl.style.display = 'flex';
+            finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString();
+          }
+        }, { speed: 430, yOffset: 36, muzzleY: 42, spriteScale: 15 });
       }
       const tempVector = new THREE.Vector3(t.x, SHIP_Y_POS, t.z);
       tempVector.project(camera);
