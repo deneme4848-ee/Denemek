@@ -13,10 +13,8 @@
     #game { display: block; width: 100%; height: 100%; position: fixed; inset: 0; z-index: 0; cursor: grab; }
     #game:active { cursor: grabbing; }
 
-    /* Sinematik & Göz Yormayan Palet */
     :root {
       --panel-bg: linear-gradient(170deg, rgba(16, 22, 30, 0.90), rgba(9, 13, 19, 0.94));
-      --panel-soft: rgba(20, 28, 38, 0.72);
       --brass-border: rgba(186, 152, 92, 0.36);
       --brass-accent: #c8a262;
       --text-main: #e6decb;
@@ -25,15 +23,12 @@
       --exp-fill: linear-gradient(90deg, #7c5823, #b08238);
     }
 
-    /* Masaüstü ve Geniş Ekranlar */
     @media (min-width: 1024px) {
-      body { zoom: 1.0; }
       #top-vital-hud {
         position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
         width: 640px; z-index: 6; pointer-events: none;
         display: flex; flex-direction: row; align-items: center; gap: 14px;
-        background: var(--panel-bg);
-        backdrop-filter: blur(10px);
+        background: var(--panel-bg); backdrop-filter: blur(10px);
         border: 1px solid var(--brass-border); border-radius: 14px;
         padding: 9px 18px; box-shadow: 0 14px 36px rgba(0,0,0,0.65);
       }
@@ -63,21 +58,14 @@
       #attack-btn .crosshair { font-size: 22px !important; }
     }
 
-    /* Mobil Dikey Ekranlar */
     @media (max-width: 1023px) and (orientation: portrait) {
       #top-vital-hud {
         position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
         width: min(92vw, 520px); display: flex; align-items: center; gap: 6px; z-index: 6; pointer-events: none;
-        background: var(--panel-bg);
-        padding: 5px 8px; border-radius: 10px; border: 1px solid var(--brass-border);
+        background: var(--panel-bg); padding: 5px 8px; border-radius: 10px; border: 1px solid var(--brass-border);
       }
-      #top-left-hud {
-        position: fixed; top: 58px; left: 8px; display: flex; align-items: flex-start; gap: 6px; z-index: 6; pointer-events: none;
-      }
-      #bottom-dock {
-        position: fixed; bottom: 10px; left: 8px; right: 8px;
-        display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; z-index: 6; pointer-events: none;
-      }
+      #top-left-hud { position: fixed; top: 58px; left: 8px; display: flex; align-items: flex-start; gap: 6px; z-index: 6; pointer-events: none; }
+      #bottom-dock { position: fixed; bottom: 10px; left: 8px; right: 8px; display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; z-index: 6; pointer-events: none; }
       .radar-card { padding: 4px; }
       #minimap { width: 70px; height: 70px; border-radius: 5px; }
       .tool-icon-btn { width: 38px; height: 38px; border-radius: 8px; }
@@ -86,22 +74,17 @@
       #attack-btn { width: 70px; height: 70px; font-size: 10.5px; }
     }
 
-    /* Mobil Yatay (Landscape) Ekranlar */
     @media (max-width: 1023px) and (orientation: landscape) {
       #top-vital-hud {
         position: fixed; top: 6px; left: 50%; transform: translateX(-50%);
         width: min(70vw, 460px); display: flex; align-items: center; gap: 6px; z-index: 6; pointer-events: none;
-        background: var(--panel-bg);
-        padding: 3px 10px; border-radius: 10px; border: 1px solid var(--brass-border);
+        background: var(--panel-bg); padding: 3px 10px; border-radius: 10px; border: 1px solid var(--brass-border);
       }
       .level-crest { width: 34px !important; height: 34px !important; border-radius: 8px !important; }
       .level-crest strong { font-size: 12.5px !important; }
       .vital-track { height: 12px !important; border-radius: 4px !important; }
       .vital-label { font-size: 9px !important; }
-
-      #top-left-hud {
-        position: fixed; top: 8px; left: 10px; display: flex; align-items: flex-start; gap: 8px; z-index: 6; pointer-events: none;
-      }
+      #top-left-hud { position: fixed; top: 8px; left: 10px; display: flex; align-items: flex-start; gap: 8px; z-index: 6; pointer-events: none; }
       .radar-card { padding: 3px !important; border-radius: 8px !important; }
       #minimap { width: 60px !important; height: 60px !important; border-radius: 4px !important; }
       .coord-pill { font-size: 9px !important; padding: 1px 4px !important; }
@@ -110,11 +93,7 @@
       .tool-icon-btn { width: 32px !important; height: 32px !important; border-radius: 6px !important; }
       .tool-icon-btn span.ico { font-size: 13px !important; }
       .tool-icon-btn span.lbl { display: none; }
-
-      #bottom-dock {
-        position: fixed; bottom: 8px; left: 10px; right: 10px;
-        display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; z-index: 6; pointer-events: none;
-      }
+      #bottom-dock { position: fixed; bottom: 8px; left: 10px; right: 10px; display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; z-index: 6; pointer-events: none; }
       .active-ammo-banner { font-size: 9px !important; padding: 2px 6px !important; margin-bottom: 4px; }
       .ammo-slots-row { gap: 5px !important; }
       .ammo-slot { width: 44px !important; height: 48px !important; border-radius: 8px !important; }
@@ -129,9 +108,8 @@
 
     #map-transit-banner {
       display: none; position: fixed; top: 82px; left: 50%; transform: translateX(-50%);
-      z-index: 12; background: var(--panel-bg);
-      border: 1px solid var(--brass-border); border-radius: 12px; padding: 9px 20px;
-      color: var(--text-main); font-size: 12.5px; font-weight: 700; cursor: pointer;
+      z-index: 12; background: var(--panel-bg); border: 1px solid var(--brass-border); border-radius: 12px;
+      padding: 9px 20px; color: var(--text-main); font-size: 12.5px; font-weight: 700; cursor: pointer;
       box-shadow: 0 10px 24px rgba(0,0,0,0.65); transition: border-color 0.2s, transform 0.2s;
       pointer-events: auto; letter-spacing: 0.4px;
     }
@@ -149,9 +127,8 @@
 
     .vital-bars-wrap { flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 200px; }
     .vital-track {
-      position: relative; width: 100%; height: 15px;
-      background: rgba(8, 12, 18, 0.88); border-radius: 5px; overflow: hidden;
-      border: 1px solid rgba(186, 152, 92, 0.2);
+      position: relative; width: 100%; height: 15px; background: rgba(8, 12, 18, 0.88);
+      border-radius: 5px; overflow: hidden; border: 1px solid rgba(186, 152, 92, 0.2);
     }
     #hp-bar { width: 100%; height: 100%; background: var(--hp-fill); transition: width 0.2s ease; }
     #exp-bar { width: 0%; height: 100%; background: var(--exp-fill); transition: width 0.25s ease; }
@@ -161,29 +138,22 @@
     }
 
     .radar-card {
-      pointer-events: auto;
-      background: var(--panel-bg);
-      backdrop-filter: blur(10px);
+      pointer-events: auto; background: var(--panel-bg); backdrop-filter: blur(10px);
       border: 1px solid var(--brass-border); border-radius: 12px;
-      box-shadow: 0 10px 26px rgba(0,0,0,0.65);
-      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      box-shadow: 0 10px 26px rgba(0,0,0,0.65); display: flex; flex-direction: column; align-items: center; gap: 3px;
     }
     .radar-title { font-size: 9px; font-weight: 700; color: var(--brass-accent); letter-spacing: 0.6px; text-transform: uppercase; }
     #minimap { background: #07121c; border: 1px solid rgba(186, 152, 92, 0.28); display: block; }
     .coord-pill {
-      width: 100%; text-align: center; font-weight: 600;
-      background: rgba(8, 12, 18, 0.85); color: var(--text-muted);
-      border-radius: 4px; border: 1px solid rgba(186, 152, 92, 0.18);
+      width: 100%; text-align: center; font-weight: 600; background: rgba(8, 12, 18, 0.85);
+      color: var(--text-muted); border-radius: 4px; border: 1px solid rgba(186, 152, 92, 0.18);
     }
 
     .side-tool-col { pointer-events: auto; display: flex; flex-direction: column; }
     .tool-icon-btn {
-      background: var(--panel-bg);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--brass-border); color: var(--text-main);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,0.55);
-      transition: transform 0.15s, border-color 0.15s, background 0.15s;
+      background: var(--panel-bg); backdrop-filter: blur(8px); border: 1px solid var(--brass-border);
+      color: var(--text-main); display: flex; flex-direction: column; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,0.55); transition: transform 0.15s, border-color 0.15s, background 0.15s;
     }
     .tool-icon-btn:hover { border-color: var(--brass-accent); transform: translateY(-1px); background: rgba(25, 34, 46, 0.95); }
     .tool-icon-btn:active { transform: scale(0.96); }
@@ -191,44 +161,25 @@
     .tool-icon-btn span.lbl { font-weight: 600; color: var(--text-muted); }
 
     .ship-level-badge {
-      background: rgba(34, 42, 54, 0.92);
-      border: 1px solid rgba(186, 152, 92, 0.45); color: var(--brass-accent);
-      font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 4px;
-      display: inline-flex; align-items: center; white-space: nowrap;
+      background: rgba(34, 42, 54, 0.92); border: 1px solid rgba(186, 152, 92, 0.45); color: var(--brass-accent);
+      font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 4px; display: inline-flex; align-items: center; white-space: nowrap;
     }
 
-    #player-label {
-      position: fixed; z-index: 5; pointer-events: none;
-      transform: translate(-50%, -10px);
-      display: flex; flex-direction: column; align-items: center; gap: 2px;
-      will-change: transform;
+    #player-label, .enemy-label {
+      position: fixed; z-index: 5; pointer-events: none; transform: translate(-50%, -10px);
+      display: flex; flex-direction: column; align-items: center; gap: 2px; will-change: transform;
     }
-    .ship-hp-track {
-      width: 50px; height: 4px; background: rgba(0, 0, 0, 0.65);
-      border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 2px; overflow: hidden;
-    }
+    .ship-hp-track { width: 50px; height: 4px; background: rgba(0, 0, 0, 0.65); border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 2px; overflow: hidden; }
     #player-ship-hp-fill { width: 100%; height: 100%; background: #4d9b6a; transition: width 0.15s, background-color 0.2s; }
     .ship-name-tag { font-size: 10px; font-weight: 700; color: #ece4d4; text-shadow: 0 1px 3px rgba(0,0,0,0.9); white-space: nowrap; }
     .ship-fleet-tag { font-size: 8.5px; font-weight: 600; color: var(--text-muted); text-shadow: 0 1px 2px rgba(0,0,0,0.9); white-space: nowrap; }
-
-    .enemy-label {
-      position: fixed; z-index: 5; pointer-events: none;
-      transform: translate(-50%, -10px);
-      display: flex; flex-direction: column; align-items: center; gap: 2px;
-      will-change: transform;
-    }
-    .enemy-hp-track {
-      width: 42px; height: 3.5px; background: rgba(0, 0, 0, 0.65);
-      border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 2px; overflow: hidden;
-    }
+    .enemy-hp-track { width: 42px; height: 3.5px; background: rgba(0, 0, 0, 0.65); border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 2px; overflow: hidden; }
     .enemy-hp-fill { width: 100%; height: 100%; background: #b84a4a; transition: width 0.15s; }
     .enemy-name-tag { font-size: 8.5px; font-weight: 700; color: #d5b4b4; text-shadow: 0 1px 2px rgba(0,0,0,0.9); white-space: nowrap; }
 
     .floating-dmg {
-      position: fixed; z-index: 10; pointer-events: none;
-      font-weight: 700; font-size: 14px; text-shadow: 0 1px 3px rgba(0,0,0,0.9);
-      animation: floatUpAndFade 0.85s ease-out forwards;
-      transform: translate(-50%, -50%);
+      position: fixed; z-index: 10; pointer-events: none; font-weight: 700; font-size: 14px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.9); animation: floatUpAndFade 0.85s ease-out forwards; transform: translate(-50%, -50%);
     }
     @keyframes floatUpAndFade {
       0% { opacity: 0.95; transform: translate(-50%, 0) scale(1.05); }
@@ -237,40 +188,29 @@
 
     .ammo-dock-container { pointer-events: auto; display: flex; flex-direction: column; gap: 4px; }
     .active-ammo-banner {
-      background: var(--panel-bg);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(186, 152, 92, 0.28); border-radius: 7px;
-      padding: 4px 10px; font-size: 10.5px; color: var(--text-muted); font-weight: 600;
+      background: var(--panel-bg); backdrop-filter: blur(8px); border: 1px solid rgba(186, 152, 92, 0.28);
+      border-radius: 7px; padding: 4px 10px; font-size: 10.5px; color: var(--text-muted); font-weight: 600;
     }
     .ammo-slots-row { display: flex; gap: 7px; padding-bottom: 2px; }
     .ammo-slot {
-      position: relative; flex-shrink: 0;
-      background: var(--panel-bg);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(186, 152, 92, 0.28);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      position: relative; flex-shrink: 0; background: var(--panel-bg); backdrop-filter: blur(8px);
+      border: 1px solid rgba(186, 152, 92, 0.28); display: flex; flex-direction: column; align-items: center; justify-content: center;
       cursor: pointer; transition: all 0.15s ease; box-shadow: 0 6px 16px rgba(0,0,0,0.6);
     }
     .ammo-slot.selected {
-      border-color: var(--brass-accent);
-      background: linear-gradient(170deg, rgba(36, 44, 56, 0.95), rgba(16, 21, 29, 0.98));
+      border-color: var(--brass-accent); background: linear-gradient(170deg, rgba(36, 44, 56, 0.95), rgba(16, 21, 29, 0.98));
       box-shadow: 0 6px 18px rgba(0,0,0,0.75); transform: translateY(-2px);
     }
     .ammo-slot .key-hint { position: absolute; font-weight: 700; color: var(--brass-accent); z-index: 2; }
     .ammo-slot .ammo-ico { display: flex; align-items: center; justify-content: center; width: 100%; height: 34px; margin-top: 6px; }
     .ammo-slot .ammo-ico img { object-fit: contain; width: 34px; height: 34px; opacity: 0.92; }
-    .ammo-slot .ammo-qty {
-      font-weight: 700; color: var(--text-main); margin-top: 1px;
-      background: rgba(8, 12, 18, 0.72); padding: 1px 6px; border-radius: 4px;
-    }
+    .ammo-slot .ammo-qty { font-weight: 700; color: var(--text-main); margin-top: 1px; background: rgba(8, 12, 18, 0.72); padding: 1px 6px; border-radius: 4px; }
     .ammo-slot.empty { opacity: 0.4; }
 
     .right-combat-cluster { pointer-events: auto; display: flex; flex-direction: column; align-items: center; gap: 6px; }
     #target-card {
-      display: none; background: var(--panel-bg);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--brass-border); border-radius: 10px;
-      padding: 6px 10px; min-width: 140px; box-shadow: 0 8px 20px rgba(0,0,0,0.65);
+      display: none; background: var(--panel-bg); backdrop-filter: blur(8px); border: 1px solid var(--brass-border);
+      border-radius: 10px; padding: 6px 10px; min-width: 140px; box-shadow: 0 8px 20px rgba(0,0,0,0.65);
     }
     #target-card.visible { display: block; }
     .target-header { display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 700; color: var(--text-main); margin-bottom: 3px; }
@@ -278,36 +218,25 @@
     #target-hp-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #7f2424, #b84444); transition: width 0.15s; }
 
     #attack-btn {
-      border-radius: 50%;
-      border: 1.5px solid var(--brass-border);
+      border-radius: 50%; border: 1.5px solid var(--brass-border);
       background: radial-gradient(circle at 35% 30%, rgba(44, 34, 28, 0.95), rgba(14, 18, 25, 0.98) 80%);
-      color: var(--text-main); font-weight: 700; letter-spacing: 0.5px;
-      box-shadow: 0 10px 26px rgba(0,0,0,0.75);
-      cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-      transition: all 0.18s ease;
+      color: var(--text-main); font-weight: 700; letter-spacing: 0.5px; box-shadow: 0 10px 26px rgba(0,0,0,0.75);
+      cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; transition: all 0.18s ease;
     }
     #attack-btn:hover:not(:disabled) { border-color: var(--brass-accent); transform: scale(1.02); }
-    #attack-btn.firing {
-      border-color: #c95648;
-      background: radial-gradient(circle at 35% 30%, rgba(88, 32, 28, 0.95), rgba(22, 14, 16, 0.98) 85%);
-    }
+    #attack-btn.firing { border-color: #c95648; background: radial-gradient(circle at 35% 30%, rgba(88, 32, 28, 0.95), rgba(22, 14, 16, 0.98) 85%); }
     #attack-btn:disabled { opacity: 0.4; filter: grayscale(0.6); cursor: not-allowed; }
 
-    /* Sinematik Büyütülmüş Harita Penceresi */
     #maps-panel {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: min(96vw, 760px); max-height: 88vh;
-      background: var(--panel-bg);
-      backdrop-filter: blur(14px);
+      width: min(96vw, 760px); max-height: 88vh; background: var(--panel-bg); backdrop-filter: blur(14px);
       border: 1px solid var(--brass-border); border-radius: 16px; padding: 20px; z-index: 25;
-      box-shadow: 0 28px 70px rgba(0,0,0,0.82);
-      pointer-events: auto; overflow-y: auto;
+      box-shadow: 0 28px 70px rgba(0,0,0,0.82); pointer-events: auto; overflow-y: auto;
     }
     #maps-panel.open { display: block; }
     .maps-header {
-      display: flex; justify-content: space-between; align-items: center;
-      background: rgba(10, 14, 20, 0.72); border: 1px solid rgba(186, 152, 92, 0.24);
-      padding: 10px 15px; border-radius: 10px; margin-bottom: 14px;
+      display: flex; justify-content: space-between; align-items: center; background: rgba(10, 14, 20, 0.72);
+      border: 1px solid rgba(186, 152, 92, 0.24); padding: 10px 15px; border-radius: 10px; margin-bottom: 14px;
     }
     .maps-header strong { color: var(--text-main); font-size: 14.5px; font-weight: 700; letter-spacing: 0.6px; }
     .maps-close {
@@ -318,42 +247,29 @@
 
     .maps-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
     .map-box {
-      min-height: 96px; border-radius: 10px;
-      background: rgba(11, 16, 23, 0.85);
-      border: 1px solid rgba(186, 152, 92, 0.22);
-      display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 6px;
-      cursor: default; text-align: center;
-      transition: transform 0.15s, border-color 0.15s, background 0.15s;
+      min-height: 96px; border-radius: 10px; background: rgba(11, 16, 23, 0.85);
+      border: 1px solid rgba(186, 152, 92, 0.22); display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 8px 6px; cursor: default; text-align: center; transition: transform 0.15s, border-color 0.15s;
     }
     .map-box:hover { transform: translateY(-1px); border-color: rgba(186, 152, 92, 0.5); }
-    .map-box.current {
-      background: linear-gradient(160deg, rgba(44, 36, 24, 0.92), rgba(18, 22, 29, 0.96));
-      border: 1.5px solid var(--brass-accent);
-    }
-    .map-box.captured {
-      border-color: rgba(196, 164, 96, 0.65);
-      background: rgba(26, 24, 18, 0.9);
-    }
+    .map-box.current { background: linear-gradient(160deg, rgba(44, 36, 24, 0.92), rgba(18, 22, 29, 0.96)); border: 1.5px solid var(--brass-accent); }
+    .map-box.captured { border-color: rgba(196, 164, 96, 0.65); background: rgba(26, 24, 18, 0.9); }
     .map-box .m-num { font-size: 13.5px; font-weight: 700; color: var(--text-main); line-height: 1.1; }
     .map-box .m-name { font-size: 10px; font-weight: 600; color: var(--brass-accent); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
     .map-box .m-owner { font-size: 9px; font-weight: 600; color: var(--text-muted); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
     .map-box.captured .m-owner { color: #dcc38a; }
 
-    /* Sinematik Liman / Market Penceresi */
     #market-panel {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: min(94vw, 590px); max-height: 86vh;
-      background: var(--panel-bg);
-      backdrop-filter: blur(14px); border: 1px solid var(--brass-border); border-radius: 16px;
-      z-index: 15; box-shadow: 0 28px 70px rgba(0,0,0,0.82); pointer-events: auto;
-      display: flex; flex-direction: column; overflow: hidden;
+      width: min(94vw, 590px); max-height: 86vh; background: var(--panel-bg); backdrop-filter: blur(14px);
+      border: 1px solid var(--brass-border); border-radius: 16px; z-index: 15;
+      box-shadow: 0 28px 70px rgba(0,0,0,0.82); pointer-events: auto; display: flex; flex-direction: column; overflow: hidden;
     }
     #market-panel:not(.open) { display: none !important; }
     .market-panel-inner { display: flex; flex-direction: column; height: 100%; padding: 16px; overflow: hidden; }
     .market-header {
-      display: flex; justify-content: space-between; align-items: center;
-      background: rgba(10, 14, 20, 0.72); border: 1px solid rgba(186, 152, 92, 0.24);
-      padding: 9px 14px; border-radius: 10px; margin-bottom: 10px; flex-shrink: 0;
+      display: flex; justify-content: space-between; align-items: center; background: rgba(10, 14, 20, 0.72);
+      border: 1px solid rgba(186, 152, 92, 0.24); padding: 9px 14px; border-radius: 10px; margin-bottom: 10px; flex-shrink: 0;
     }
     .market-header strong { color: var(--text-main); font-size: 13px; font-weight: 700; letter-spacing: 0.6px; }
     .market-close {
@@ -365,18 +281,13 @@
     .port-tabs-scroll { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 10px; flex-shrink: 0; }
     .market-tab-btn {
       background: rgba(12, 17, 24, 0.75); border: 1px solid rgba(186, 152, 92, 0.22); color: var(--text-muted);
-      padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0;
-      transition: all 0.15s;
+      padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: all 0.15s;
     }
-    .market-tab-btn.active {
-      background: rgba(42, 36, 26, 0.92);
-      color: var(--text-main); border-color: var(--brass-accent);
-    }
+    .market-tab-btn.active { background: rgba(42, 36, 26, 0.92); color: var(--text-main); border-color: var(--brass-accent); }
 
     .market-balance {
-      display: flex; justify-content: space-around; font-size: 11.5px;
-      background: rgba(9, 13, 19, 0.8); border: 1px solid rgba(186, 152, 92, 0.22);
-      padding: 7px 10px; border-radius: 8px; margin-bottom: 10px; color: var(--text-muted); font-weight: 600; flex-shrink: 0;
+      display: flex; justify-content: space-around; font-size: 11.5px; background: rgba(9, 13, 19, 0.8);
+      border: 1px solid rgba(186, 152, 92, 0.22); padding: 7px 10px; border-radius: 8px; margin-bottom: 10px; color: var(--text-muted); font-weight: 600; flex-shrink: 0;
     }
 
     .market-scroll-body { flex: 1; overflow-y: auto; padding-right: 4px; max-height: 52vh; }
@@ -385,26 +296,21 @@
 
     .shipyard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 11px; padding-bottom: 10px; }
     .ship-card-item {
-      background: rgba(11, 16, 23, 0.85);
-      border: 1px solid rgba(186, 152, 92, 0.24); border-radius: 12px;
-      padding: 11px; display: flex; flex-direction: column; align-items: center; gap: 7px; text-align: center;
-      transition: transform 0.15s, border-color 0.15s;
+      background: rgba(11, 16, 23, 0.85); border: 1px solid rgba(186, 152, 92, 0.24); border-radius: 12px;
+      padding: 11px; display: flex; flex-direction: column; align-items: center; gap: 7px; text-align: center; transition: transform 0.15s, border-color 0.15s;
     }
     .ship-card-item:hover { border-color: rgba(186, 152, 92, 0.55); transform: translateY(-1px); }
     .ship-card-img-wrap {
-      width: 100%; height: 108px; border-radius: 9px;
-      background: radial-gradient(circle at 50% 50%, #142636, #071018);
+      width: 100%; height: 108px; border-radius: 9px; background: radial-gradient(circle at 50% 50%, #142636, #071018);
       border: 1px solid rgba(186, 152, 92, 0.24); display: flex; align-items: center; justify-content: center;
-      overflow: hidden; position: relative;
-      color: var(--text-muted); font-size: 11px; font-weight: 600;
+      overflow: hidden; color: var(--text-muted); font-size: 11px; font-weight: 600;
     }
     .ship-card-img-wrap img { width: 100%; height: 100%; object-fit: contain; display: block; }
     .ship-card-title { font-size: 11.5px; font-weight: 700; color: var(--text-main); margin-top: 2px; }
     .ship-card-sub { font-size: 10px; color: var(--text-muted); line-height: 1.25; }
 
     .market-item {
-      display: flex; justify-content: space-between; align-items: center; gap: 8px;
-      background: rgba(11, 16, 23, 0.82);
+      display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(11, 16, 23, 0.82);
       border: 1px solid rgba(186, 152, 92, 0.2); border-radius: 9px; padding: 8px 10px; margin-bottom: 7px;
     }
     .market-item-info { display: flex; flex-direction: column; gap: 2px; }
@@ -413,10 +319,9 @@
     .market-item-sub { font-size: 10px; color: var(--text-muted); }
 
     .buy-btn {
-      width: 100%; padding: 7px 12px; border-radius: 8px;
-      border: 1px solid rgba(186, 152, 92, 0.45); background: rgba(34, 42, 54, 0.9);
-      color: var(--text-main); font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; margin-top: 3px;
-      transition: background 0.15s, border-color 0.15s;
+      width: 100%; padding: 7px 12px; border-radius: 8px; border: 1px solid rgba(186, 152, 92, 0.45);
+      background: rgba(34, 42, 54, 0.9); color: var(--text-main); font-size: 11px; font-weight: 700;
+      cursor: pointer; white-space: nowrap; margin-top: 3px; transition: background 0.15s, border-color 0.15s;
     }
     .buy-btn:hover:not(:disabled) { background: rgba(54, 48, 36, 0.95); border-color: var(--brass-accent); }
     .buy-btn:disabled { opacity: 0.4; background: rgba(16, 20, 27, 0.7); cursor: not-allowed; }
@@ -425,8 +330,7 @@
     .generic-tab-content { text-align: center; padding: 40px 10px; color: var(--text-muted); font-size: 12.5px; font-weight: 600; }
 
     #gameover {
-      display: none; position: fixed; inset: 0; background: rgba(6, 10, 15, 0.88);
-      backdrop-filter: blur(6px);
+      display: none; position: fixed; inset: 0; background: rgba(6, 10, 15, 0.88); backdrop-filter: blur(6px);
       flex-direction: column; align-items: center; justify-content: center; z-index: 30; text-align: center; padding: 20px;
     }
     #gameover h1 { color: var(--text-main); margin: 0 0 10px; font-size: 28px; font-weight: 700; letter-spacing: 1px; }
@@ -436,49 +340,26 @@
       border: 1px solid var(--brass-accent); background: rgba(34, 42, 54, 0.95); color: var(--text-main); cursor: pointer;
     }
 
-    /* Sinematik Arkaplan Katmanlı Giriş & Kayıt Ekranı */
     #auth-overlay {
-      position: fixed; inset: 0; z-index: 999999;
-      background-color: #071019;
-      background-image: url('korsan.png');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      display: flex; align-items: center; justify-content: center; padding: 18px;
-      overflow: hidden;
+      position: fixed; inset: 0; z-index: 999999; background-color: #071019;
+      background-image: url('korsan.png'); background-size: cover; background-position: center; background-repeat: no-repeat;
+      display: flex; align-items: center; justify-content: center; padding: 18px; overflow: hidden;
     }
-
-    /* 1. Katman: Hafifçe açılmış gece laciverti / kömür atmosfer perdesi */
     #auth-overlay::before {
-      content: "";
-      position: absolute; inset: 0; z-index: 0;
-      background:
-        linear-gradient(180deg, rgba(6, 12, 20, 0.56) 0%, rgba(8, 15, 25, 0.42) 50%, rgba(5, 10, 16, 0.66) 100%),
-        rgba(6, 13, 21, 0.24);
-      backdrop-filter: blur(1.5px);
-      pointer-events: none;
+      content: ""; position: absolute; inset: 0; z-index: 0;
+      background: linear-gradient(180deg, rgba(6, 12, 20, 0.56) 0%, rgba(8, 15, 25, 0.42) 50%, rgba(5, 10, 16, 0.66) 100%), rgba(6, 13, 21, 0.24);
+      backdrop-filter: blur(1.5px); pointer-events: none;
     }
-
-    /* 2. Katman: Kenarları yumuşakça karartan hafif vignette */
     #auth-overlay::after {
-      content: "";
-      position: absolute; inset: 0; z-index: 1;
-      background:
-        radial-gradient(circle at 50% 48%, rgba(14, 24, 36, 0.04) 0%, rgba(5, 10, 16, 0.46) 78%, rgba(3, 6, 11, 0.72) 100%);
+      content: ""; position: absolute; inset: 0; z-index: 1;
+      background: radial-gradient(circle at 50% 48%, rgba(14, 24, 36, 0.04) 0%, rgba(5, 10, 16, 0.46) 78%, rgba(3, 6, 11, 0.72) 100%);
       pointer-events: none;
     }
-
     .auth-card {
-      position: relative; z-index: 2;
-      width: 100%; max-width: 410px;
+      position: relative; z-index: 2; width: 100%; max-width: 410px;
       background: linear-gradient(168deg, rgba(14, 20, 28, 0.92), rgba(8, 12, 18, 0.96));
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(200, 162, 98, 0.42);
-      border-radius: 18px; padding: 26px 22px;
-      box-shadow:
-        0 28px 75px rgba(0, 0, 0, 0.88),
-        0 0 0 1px rgba(255, 255, 255, 0.04) inset,
-        0 0 42px rgba(4, 10, 18, 0.75);
+      backdrop-filter: blur(16px); border: 1px solid rgba(200, 162, 98, 0.42); border-radius: 18px; padding: 26px 22px;
+      box-shadow: 0 28px 75px rgba(0, 0, 0, 0.88), 0 0 0 1px rgba(255, 255, 255, 0.04) inset, 0 0 42px rgba(4, 10, 18, 0.75);
     }
     .auth-brand { text-align: center; margin-bottom: 18px; }
     .auth-brand h1 { margin: 0; font-size: 23px; color: #f0e8d8; font-weight: 700; letter-spacing: 0.4px; }
@@ -491,7 +372,6 @@
     .auth-field input {
       width: 100%; height: 44px; padding: 0 13px; border-radius: 10px;
       border: 1px solid rgba(186, 152, 92, 0.3); background: rgba(7, 11, 17, 0.92); color: #f0e8d8; font-size: 15px; outline: none;
-      transition: border-color 0.15s;
     }
     .auth-field input:focus { border-color: var(--brass-accent); }
     .auth-msg { min-height: 18px; font-size: 12px; margin: 4px 0 10px; color: #dc8a8a; }
@@ -499,8 +379,7 @@
       width: 100%; height: 46px; border-radius: 11px; border: 1px solid var(--brass-accent);
       background: linear-gradient(170deg, rgba(46, 42, 34, 0.96), rgba(22, 27, 35, 0.98));
       color: #f4ece0; font-size: 14px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.45);
-      transition: transform 0.15s, border-color 0.15s;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.45); transition: transform 0.15s, border-color 0.15s;
     }
     .auth-submit:hover { border-color: #dab878; transform: translateY(-1px); }
     .quick-test-box { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(186, 152, 92, 0.2); display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; color: var(--text-muted); }
@@ -517,7 +396,6 @@
 <body>
 
   <div id="game"></div>
-
   <button id="map-transit-banner" type="button">Harita Değiştir</button>
 
   <div id="player-label">
@@ -544,22 +422,10 @@
       <div class="coord-pill" id="coord-display">X: 0 · Y: 0</div>
     </div>
     <div class="side-tool-col">
-      <button id="focus-player-btn" class="tool-icon-btn" type="button" title="Gemiye Dön (Q)">
-        <span class="ico">🎯</span>
-        <span class="lbl">Q</span>
-      </button>
-      <button id="maps-toggle-btn" class="tool-icon-btn" type="button" title="Haritalar">
-        <span class="ico">🗺️</span>
-        <span class="lbl">Haritalar</span>
-      </button>
-      <button id="port-toggle-btn" class="tool-icon-btn" type="button" title="Liman (M)">
-        <span class="ico">⚓</span>
-        <span class="lbl">Liman</span>
-      </button>
-      <button id="logout-btn" class="tool-icon-btn" type="button" title="Çıkış Yap" style="background: rgba(34, 18, 20, 0.9); border-color: rgba(185, 92, 92, 0.35);">
-        <span class="ico">🚪</span>
-        <span class="lbl">Çıkış</span>
-      </button>
+      <button id="focus-player-btn" class="tool-icon-btn" type="button" title="Gemiye Dön (Q)"><span class="ico">🎯</span><span class="lbl">Q</span></button>
+      <button id="maps-toggle-btn" class="tool-icon-btn" type="button" title="Haritalar"><span class="ico">🗺️</span><span class="lbl">Haritalar</span></button>
+      <button id="port-toggle-btn" class="tool-icon-btn" type="button" title="Liman (M)"><span class="ico">⚓</span><span class="lbl">Liman</span></button>
+      <button id="logout-btn" class="tool-icon-btn" type="button" title="Çıkış Yap" style="background: rgba(34, 18, 20, 0.9); border-color: rgba(185, 92, 92, 0.35);"><span class="ico">🚪</span><span class="lbl">Çıkış</span></button>
     </div>
   </div>
 
@@ -616,43 +482,19 @@
             <button class="buy-btn ammo-buy-btn" type="button" data-type="iron" data-amount="25" data-cost="20" style="width:auto;">20 Altın</button>
           </div>
           <div class="market-item">
-            <div class="market-item-info">
-              <span class="market-item-title">
-                <img src="zincir.png" alt="Zincirli Gülle" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%2394a3b8\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">
-                15x Zincirli Gülle
-              </span>
-              <span class="market-item-sub">140 Hasar · Düşmanı %40 yavaşlatır</span>
-            </div>
+            <div class="market-item-info"><span class="market-item-title"><img src="zincir.png" alt="Zincirli Gülle" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%2394a3b8\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">15x Zincirli Gülle</span><span class="market-item-sub">140 Hasar · Düşmanı %40 yavaşlatır</span></div>
             <button class="buy-btn ammo-buy-btn" type="button" data-type="chain" data-amount="15" data-cost="35" style="width:auto;">35 Altın</button>
           </div>
           <div class="market-item">
-            <div class="market-item-info">
-              <span class="market-item-title">
-                <img src="alev.png" alt="Alev Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%23c87d4b\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">
-                15x Alevli Gülle
-              </span>
-              <span class="market-item-sub">30.000 Hasar · NPC'lere %20 Ekstra Hasar</span>
-            </div>
+            <div class="market-item-info"><span class="market-item-title"><img src="alev.png" alt="Alev Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%23c87d4b\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">15x Alevli Gülle</span><span class="market-item-sub">30.000 Hasar · NPC'lere %20 Ekstra Hasar</span></div>
             <button class="buy-btn ammo-buy-btn" type="button" data-type="fire" data-amount="15" data-cost="60" style="width:auto;">60 Altın</button>
           </div>
           <div class="market-item">
-            <div class="market-item-info">
-              <span class="market-item-title">
-                <img src="amiral.png" alt="Amiral Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%236ba3c7\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">
-                10x Amiral Güllesi
-              </span>
-              <span class="market-item-sub">40.000 Hasar · Gerçek oyunculara özel yıkım</span>
-            </div>
+            <div class="market-item-info"><span class="market-item-title"><img src="amiral.png" alt="Amiral Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%236ba3c7\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">10x Amiral Güllesi</span><span class="market-item-sub">40.000 Hasar · Gerçek oyunculara özel yıkım</span></div>
             <button class="buy-btn ammo-buy-btn" type="button" data-type="amiral" data-amount="10" data-cost="120" style="width:auto;">120 Altın</button>
           </div>
           <div class="market-item">
-            <div class="market-item-info">
-              <span class="market-item-title">
-                <img src="kar.png" alt="Kar Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%23d8e2eb\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">
-                20x Kar Güllesi
-              </span>
-              <span class="market-item-sub">+25.000 Can Doldurur (NPC hariç)</span>
-            </div>
+            <div class="market-item-info"><span class="market-item-title"><img src="kar.png" alt="Kar Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%23d8e2eb\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">20x Kar Güllesi</span><span class="market-item-sub">+25.000 Can Doldurur (NPC hariç)</span></div>
             <button class="buy-btn ammo-buy-btn" type="button" data-type="snow" data-amount="20" data-cost="50" style="width:auto;">50 Altın</button>
           </div>
         </div>
@@ -665,24 +507,15 @@
             Top Hak: <strong id="rights-cannon" style="color:#dfc07d;">1</strong> | Can Hak: <strong id="rights-hp" style="color:#d48a8a;">1</strong> | Hız Hak: <strong id="rights-speed" style="color:#8fd1ab;">1</strong>
           </div>
           <div class="market-item">
-            <div class="market-item-info">
-              <span class="market-item-title">🎯 TOP GENİŞLETMESİ</span>
-              <span class="market-item-sub">Kapasite: <strong id="stat-cannons" style="color:#dfc07d;">250</strong> Top (+20 Top artırır)</span>
-            </div>
+            <div class="market-item-info"><span class="market-item-title">🎯 TOP GENİŞLETMESİ</span><span class="market-item-sub">Kapasite: <strong id="stat-cannons" style="color:#dfc07d;">250</strong> Top (+20 Top artırır)</span></div>
             <button class="buy-btn" id="btn-expand-cannon" type="button" style="width:auto;">5 Elmas</button>
           </div>
           <div class="market-item">
-            <div class="market-item-info">
-              <span class="market-item-title">❤️ CAN GENİŞLETMESİ</span>
-              <span class="market-item-sub">Toplam Can: <strong id="stat-hp" style="color:#d48a8a;">1.000.000</strong> (+50.000 Can artırır)</span>
-            </div>
+            <div class="market-item-info"><span class="market-item-title">❤️ CAN GENİŞLETMESİ</span><span class="market-item-sub">Toplam Can: <strong id="stat-hp" style="color:#d48a8a;">1.000.000</strong> (+50.000 Can artırır)</span></div>
             <button class="buy-btn" id="btn-expand-hp" type="button" style="width:auto;">5 Elmas</button>
           </div>
           <div class="market-item">
-            <div class="market-item-info">
-              <span class="market-item-title">⚡ HIZ GENİŞLETMESİ</span>
-              <span class="market-item-sub">Gemi Hızı: <strong id="stat-speed" style="color:#8fd1ab;">180</strong> (%2 Hız artırır)</span>
-            </div>
+            <div class="market-item-info"><span class="market-item-title">⚡ HIZ GENİŞLETMESİ</span><span class="market-item-sub">Gemi Hızı: <strong id="stat-speed" style="color:#8fd1ab;">180</strong> (%2 Hız artırır)</span></div>
             <button class="buy-btn" id="btn-expand-speed" type="button" style="width:auto;">5 Elmas</button>
           </div>
         </div>
@@ -702,10 +535,7 @@
 
   <div id="auth-overlay">
     <div class="auth-card">
-      <div class="auth-brand">
-        <h1>⚓ Korsan Dünyası</h1>
-        <p>Açık Deniz ve Gemi Savaşları</p>
-      </div>
+      <div class="auth-brand"><h1>⚓ Korsan Dünyası</h1><p>Açık Deniz ve Gemi Savaşları</p></div>
       <div class="auth-tabs">
         <button id="tab-login" class="auth-tab active" type="button">Giriş Yap</button>
         <button id="tab-register" class="auth-tab" type="button">Kayıt Ol</button>
@@ -759,7 +589,6 @@ const focusPlayerBtn = document.querySelector('#focus-player-btn');
 const mapsPanel = document.querySelector('#maps-panel');
 const mapsCloseBtn = document.querySelector('#maps-close-btn');
 const mapsGridContainer = document.querySelector('#maps-grid-container');
-
 const mapTransitBanner = document.querySelector('#map-transit-banner');
 
 const portToggleBtn = document.querySelector('#port-toggle-btn');
@@ -775,7 +604,6 @@ const tabAmmo = document.querySelector('#tab-ammo');
 const tabShipyard = document.querySelector('#tab-shipyard');
 const tabExpand = document.querySelector('#tab-expand');
 const tabCrew = document.querySelector('#tab-crew');
-
 const sectionAmmo = document.querySelector('#section-ammo');
 const sectionShipyard = document.querySelector('#section-shipyard');
 const sectionExpand = document.querySelector('#section-expand');
@@ -813,29 +641,29 @@ const playerLabelLevelBadgeEl = document.querySelector('#player-label-level-badg
 const PLAYER_FLEET_TAG = 'TST';
 
 function formatShortNumber(num) {
-  if (num >= 1000000000) return (num / 1000000000).toFixed(num % 1000000000 !== 0 ? 1 : 0) + 't';
-  if (num >= 1000000)    return (num / 1000000).toFixed(num % 1000000 !== 0 ? 1 : 0) + 'm';
-  if (num >= 1000)       return (num / 1000).toFixed(num % 1000 !== 0 ? 1 : 0) + 'k';
+  if (num >= 1e9) return (num / 1e9).toFixed(num % 1e9 !== 0 ? 1 : 0) + 't';
+  if (num >= 1e6) return (num / 1e6).toFixed(num % 1e6 !== 0 ? 1 : 0) + 'm';
+  if (num >= 1e3) return (num / 1e3).toFixed(num % 1e3 !== 0 ? 1 : 0) + 'k';
   return num.toString();
 }
 
 const AMMO_TYPES = {
-  iron:   { id: 'iron',   name: 'Demir Gülle',    damage: 180, slow: 1.0,  isHeal: false, bonusNpc: 1.0, desc: '180 Hasar', color: 0x555555 },
-  chain:  { id: 'chain',  name: 'Zincirli Gülle', damage: 140, slow: 0.6,  isHeal: false, bonusNpc: 1.0, desc: '140 Hasar + %40 Yavaşlatma', color: 0x888888, img: 'zincir.png' },
-  fire:   { id: 'fire',   name: 'Alev Güllesi',   damage: 30000, slow: 1.0, isHeal: false, bonusNpc: 1.2, desc: '30.000 Hasar (NPC\'lere +%20 Ekstra)', color: 0xd96b27, img: 'alev.png' },
-  amiral: { id: 'amiral', name: 'Amiral Güllesi', damage: 40000, slow: 0.85,isHeal: false, bonusNpc: 1.0, desc: '40.000 Yıkıcı Hasar', color: 0x4f86b8, img: 'amiral.png' },
+  iron:   { id: 'iron',   name: 'Demir Gülle',    damage: 180,   slow: 1.0,  isHeal: false, bonusNpc: 1.0, desc: '180 Hasar', color: 0x555555 },
+  chain:  { id: 'chain',  name: 'Zincirli Gülle', damage: 140,   slow: 0.6,  isHeal: false, bonusNpc: 1.0, desc: '140 Hasar + %40 Yavaşlatma', color: 0x888888, img: 'zincir.png' },
+  fire:   { id: 'fire',   name: 'Alev Güllesi',   damage: 30000, slow: 1.0,  isHeal: false, bonusNpc: 1.2, desc: "30.000 Hasar (NPC'lere +%20 Ekstra)", color: 0xd96b27, img: 'alev.png' },
+  amiral: { id: 'amiral', name: 'Amiral Güllesi', damage: 40000, slow: 0.85, isHeal: false, bonusNpc: 1.0, desc: '40.000 Yıkıcı Hasar', color: 0x4f86b8, img: 'amiral.png' },
   snow:   { id: 'snow',   name: 'Kar Güllesi',    damage: 25000, slow: 1.0,  isHeal: true,  bonusNpc: 1.0, desc: '+25.000 Can Doldurur', color: 0xdbe6ef, img: 'kar.png' }
 };
 
-const REMOVED_SHIP_IDS = [
+const BLOCKED_SHIP_IDS = new Set([
   'ghost', 'tasarim1', 'gold', 'tasarim5', 'tasarim9', 'tasarim10', 'tasarim10_kraliyet_susu',
   'tasarim4_burun_topu', 'tasarim6_yan_toplar'
-];
+]);
 
-const BASE_SHIP_MODELS = {
+const SHIP_MODELS = {
   standard:         { id: 'standard',         name: 'Ejderha Kalyonu', desc: 'Başlangıç 3D Savaş Gemisi', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45 },
-  ejder_alevli:     { id: 'ejder_alevli',     name: 'Alevli Ejderha Kalyonu', desc: 'Gövde & Yelkenleri Saran Gerçekçi Alevler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, scaleMultiplier: 1.08, denemeStyle: 'inferno_flame', flameAura: true },
-  deneme1:          { id: 'deneme1',          name: 'Deneme 1 · Dragon Yeşil Duman', desc: 'Yoğun Zümrüt Duman & Gerçekçi Sis Efekti', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'dragon_green', greenSmoke: true },
+  ejder_alevli:     { id: 'ejder_alevli',     name: 'Alevli Ejderha Kalyonu', desc: 'Keskin Alev Dilleri & Gövde Yangını', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, scaleMultiplier: 1.08, denemeStyle: 'inferno_flame', flameAura: true },
+  deneme1:          { id: 'deneme1',          name: 'Deneme 1 · Dragon Yeşil Duman', desc: 'Tam Yeşil Gemi & Kaliteli Yeşil Duman', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'dragon_green', greenSmoke: true },
   deneme2:          { id: 'deneme2',          name: 'Deneme 2 · Zümrüt Leviathan', desc: 'Sakin Zümrüt Işıltı · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'emerald' },
   deneme3:          { id: 'deneme3',          name: 'Deneme 3 · Mor Gölge', desc: 'Sakin Mor Işıltı · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'violet' },
   deneme4:          { id: 'deneme4',          name: 'Deneme 4 · Kızıl Cehennem', desc: 'Sakin Kızıl Işıltı · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'crimson' },
@@ -851,150 +679,65 @@ const BASE_SHIP_MODELS = {
   tasarim11:        { id: 'tasarim11',        name: 'Tasarim 11', desc: 'GLB Savaş Gemisi', cost: 5000, type: 'glb', modelPath: 'tasarim11.glb', heightOffset: 45 }
 };
 
+const ALL_UNLOCKED_SHIP_IDS = Object.keys(SHIP_MODELS);
+
+function isBlockedShipId(id) {
+  return !id || BLOCKED_SHIP_IDS.has(id) || /kopya|tasarim10|kraliyet|topu|toplar/i.test(id) || !SHIP_MODELS[id];
+}
+
+function sanitizeShipId(shipId) {
+  return isBlockedShipId(shipId) ? 'standard' : shipId;
+}
+
+function sanitizeOwnedShips(list) {
+  const owned = new Set(Array.isArray(list) ? list.filter(id => !isBlockedShipId(id)) : []);
+  ALL_UNLOCKED_SHIP_IDS.forEach(id => owned.add(id));
+  return Array.from(owned);
+}
+
 const PHANTOM_THEMES = {
   specter_teal: {
-    color: 0x7cc6d4,
-    emissive: 0x2b7a8b,
-    baseEmissive: 0.16,
-    peakEmissive: 0.65,
-    minOpacity: 0.36,
-    maxOpacity: 0.82,
-    lightColor: 0x5ab8c9,
-    baseLight: 0.15,
-    peakLight: 0.55,
-    pulseSpeed: 2.2
+    color: 0x7cc6d4, emissive: 0x2b7a8b, baseEmissive: 0.16, peakEmissive: 0.65,
+    minOpacity: 0.36, maxOpacity: 0.82, lightColor: 0x5ab8c9, baseLight: 0.15, peakLight: 0.55, pulseSpeed: 2.2
   },
   specter_violet: {
-    color: 0xc69eff,
-    emissive: 0x8e44ec,
-    baseEmissive: 0.42,
-    peakEmissive: 1.05,
-    minOpacity: 0.56,
-    maxOpacity: 0.88,
-    lightColor: 0xb185f2,
-    baseLight: 0.45,
-    peakLight: 1.05,
-    pulseSpeed: 2.4
+    color: 0xc69eff, emissive: 0x8e44ec, baseEmissive: 0.42, peakEmissive: 1.05,
+    minOpacity: 0.56, maxOpacity: 0.88, lightColor: 0xb185f2, baseLight: 0.45, peakLight: 1.05, pulseSpeed: 2.4
   }
 };
 
 const DENEME_THEMES = {
   dragon_green: {
-    color: 0x8ef5ad,
-    emissive: 0x16c95c,
-    emissiveIntensity: 0.52,
-    metalnessAdd: 0.18,
-    roughnessSub: 0.16,
-    lightColor: 0x29ff70,
-    lightIntensity: 1.35,
-    crystalColor: 0x66ff99,
-    lanternColor: 0x1ee066,
-    pulseSpeed: 2.5
+    color: 0x4df584, emissive: 0x12b84c, emissiveIntensity: 0.68,
+    metalnessAdd: 0.18, roughnessSub: 0.16, lightColor: 0x22f068, lightIntensity: 1.55,
+    crystalColor: 0x5eff92, lanternColor: 0x16d458, pulseSpeed: 2.6, tintAllGreen: true
   },
   inferno_flame: {
-    color: 0xffa866,
-    emissive: 0xff4500,
-    emissiveIntensity: 0.78,
-    metalnessAdd: 0.22,
-    roughnessSub: 0.2,
-    lightColor: 0xff621a,
-    lightIntensity: 2.1,
-    crystalColor: 0xffc252,
-    lanternColor: 0xff4d00,
-    pulseSpeed: 3.8
-  },
-  gold: {
-    color: 0xe8d59e,
-    emissive: 0xb88934,
-    emissiveIntensity: 0.24,
-    metalnessAdd: 0.18,
-    roughnessSub: 0.14,
-    lightColor: 0xe0b55b,
-    lightIntensity: 0.45,
-    crystalColor: 0xd9b35f,
-    lanternColor: 0xc9963b,
-    pulseSpeed: 1.8
+    color: 0xffa866, emissive: 0xff4500, emissiveIntensity: 0.78,
+    metalnessAdd: 0.22, roughnessSub: 0.2, lightColor: 0xff621a, lightIntensity: 2.1,
+    crystalColor: 0xffc252, lanternColor: 0xff4d00, pulseSpeed: 3.8, tintAllGreen: false
   },
   emerald: {
-    color: 0xa5cfb8,
-    emissive: 0x2e7d5b,
-    emissiveIntensity: 0.24,
-    metalnessAdd: 0.16,
-    roughnessSub: 0.14,
-    lightColor: 0x5da887,
-    lightIntensity: 0.45,
-    crystalColor: 0x7db89d,
-    lanternColor: 0x3b8c6a,
-    pulseSpeed: 1.8
+    color: 0xa5cfb8, emissive: 0x2e7d5b, emissiveIntensity: 0.24,
+    metalnessAdd: 0.16, roughnessSub: 0.14, lightColor: 0x5da887, lightIntensity: 0.45,
+    crystalColor: 0x7db89d, lanternColor: 0x3b8c6a, pulseSpeed: 1.8, tintAllGreen: false
   },
   violet: {
-    color: 0xc7bce0,
-    emissive: 0x5b468c,
-    emissiveIntensity: 0.25,
-    metalnessAdd: 0.18,
-    roughnessSub: 0.14,
-    lightColor: 0x8e79bd,
-    lightIntensity: 0.45,
-    crystalColor: 0xa794cf,
-    lanternColor: 0x6c559e,
-    pulseSpeed: 1.7
+    color: 0xc7bce0, emissive: 0x5b468c, emissiveIntensity: 0.25,
+    metalnessAdd: 0.18, roughnessSub: 0.14, lightColor: 0x8e79bd, lightIntensity: 0.45,
+    crystalColor: 0xa794cf, lanternColor: 0x6c559e, pulseSpeed: 1.7, tintAllGreen: false
   },
   crimson: {
-    color: 0xdfb0a8,
-    emissive: 0x9c382c,
-    emissiveIntensity: 0.26,
-    metalnessAdd: 0.16,
-    roughnessSub: 0.14,
-    lightColor: 0xc96457,
-    lightIntensity: 0.48,
-    crystalColor: 0xd4857a,
-    lanternColor: 0xad4437,
-    pulseSpeed: 1.9
+    color: 0xdfb0a8, emissive: 0x9c382c, emissiveIntensity: 0.26,
+    metalnessAdd: 0.16, roughnessSub: 0.14, lightColor: 0xc96457, lightIntensity: 0.48,
+    crystalColor: 0xd4857a, lanternColor: 0xad4437, pulseSpeed: 1.9, tintAllGreen: false
   },
   frost: {
-    color: 0xbdd5e3,
-    emissive: 0x3b7699,
-    emissiveIntensity: 0.24,
-    metalnessAdd: 0.14,
-    roughnessSub: 0.16,
-    lightColor: 0x73a8c7,
-    lightIntensity: 0.45,
-    crystalColor: 0x95c2db,
-    lanternColor: 0x4b89ad,
-    pulseSpeed: 1.8
+    color: 0xbdd5e3, emissive: 0x3b7699, emissiveIntensity: 0.24,
+    metalnessAdd: 0.14, roughnessSub: 0.16, lightColor: 0x73a8c7, lightIntensity: 0.45,
+    crystalColor: 0x95c2db, lanternColor: 0x4b89ad, pulseSpeed: 1.8, tintAllGreen: false
   }
 };
-
-function sanitizeShipModels(modelsMap) {
-  const clean = {};
-  Object.keys(modelsMap).forEach((key) => {
-    const spec = modelsMap[key];
-    const nameHasCopy = /kopya|tasarim10|kraliyet|topu|toplar/i.test(spec.name || '') || /kopya|tasarim10|kraliyet|topu|toplar/i.test(key);
-    if (!REMOVED_SHIP_IDS.includes(key) && !nameHasCopy) {
-      clean[key] = spec;
-    }
-  });
-  return clean;
-}
-
-const SHIP_MODELS = sanitizeShipModels(BASE_SHIP_MODELS);
-const ALL_UNLOCKED_SHIP_IDS = Object.keys(SHIP_MODELS);
-
-function sanitizeShipId(shipId) {
-  if (!shipId || REMOVED_SHIP_IDS.includes(shipId) || /kopya|tasarim10|kraliyet|topu|toplar/i.test(shipId) || !SHIP_MODELS[shipId]) {
-    return 'standard';
-  }
-  return shipId;
-}
-
-function sanitizeOwnedShips(list) {
-  const base = Array.isArray(list) ? list : ['standard'];
-  const filtered = base.filter(id => !REMOVED_SHIP_IDS.includes(id) && !/kopya|tasarim10|kraliyet|topu|toplar/i.test(id) && Boolean(SHIP_MODELS[id]));
-  ALL_UNLOCKED_SHIP_IDS.forEach((id) => {
-    if (!filtered.includes(id)) filtered.push(id);
-  });
-  return filtered;
-}
 
 function preserveTowerLighting(rootObj) {
   if (!rootObj || typeof THREE === 'undefined') return;
@@ -1002,15 +745,9 @@ function preserveTowerLighting(rootObj) {
     if (child.isMesh && child.material) {
       const mats = Array.isArray(child.material) ? child.material : [child.material];
       mats.forEach((m) => {
-        if (m.color && m.color.getHex() < 0x1a1a1a && !m.map) {
-          m.color.setHex(0x8892a0);
-        }
-        if (typeof m.metalness === 'number' && m.metalness > 0.65 && !m.metalnessMap) {
-          m.metalness = 0.28;
-        }
-        if (typeof m.roughness === 'number' && m.roughness < 0.25 && !m.roughnessMap) {
-          m.roughness = 0.55;
-        }
+        if (m.color && m.color.getHex() < 0x1a1a1a && !m.map) m.color.setHex(0x8892a0);
+        if (typeof m.metalness === 'number' && m.metalness > 0.65 && !m.metalnessMap) m.metalness = 0.28;
+        if (typeof m.roughness === 'number' && m.roughness < 0.25 && !m.roughnessMap) m.roughness = 0.55;
         m.needsUpdate = true;
       });
     }
@@ -1028,36 +765,47 @@ let activePhantomLight = null;
 let activePhantomAuraMesh = null;
 let activePhantomStyleKey = null;
 let phantomMaterialsList = [];
-
 let mainTowerGlowState = null;
 
 const MAX_TRAIL_PARTICLES = 160;
 const MAX_SPARK_PARTICLES = 140;
+const MAX_DRAGON_SMOKE_PARTICLES = 130;
+const MAX_INFERNO_PARTICLES = 220;
 
-const MAX_DRAGON_SMOKE_PARTICLES = 110;
 let dragonSmokeParticles = [];
 let dragonSmokeSpawnTimer = 0;
-let SOFT_SMOKE_TEXTURE = null;
-let REALISTIC_FLAME_TEXTURE = null;
-
-const MAX_INFERNO_PARTICLES = 210;
 let infernoFlameParticles = [];
 let infernoSpawnTimer = 0;
+
+let SOFT_SMOKE_TEXTURE = null;
+let SHARP_FLAME_TEXTURE = null;
 
 function getSoftSmokeTexture() {
   if (SOFT_SMOKE_TEXTURE) return SOFT_SMOKE_TEXTURE;
   const canvas = document.createElement('canvas');
-  canvas.width = 128;
-  canvas.height = 128;
+  canvas.width = 256;
+  canvas.height = 256;
   const ctx = canvas.getContext('2d');
 
-  const grad = ctx.createRadialGradient(64, 64, 4, 64, 64, 62);
-  grad.addColorStop(0.0, 'rgba(255, 255, 255, 0.92)');
-  grad.addColorStop(0.32, 'rgba(240, 255, 246, 0.62)');
-  grad.addColorStop(0.68, 'rgba(210, 250, 224, 0.22)');
-  grad.addColorStop(1.0, 'rgba(210, 250, 224, 0.0)');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 128, 128);
+  const blobs = [
+    { x: 128, y: 128, r: 108, a: 0.72 },
+    { x: 102, y: 112, r: 74,  a: 0.45 },
+    { x: 154, y: 118, r: 70,  a: 0.42 },
+    { x: 124, y: 152, r: 78,  a: 0.38 },
+    { x: 136, y: 98,  r: 62,  a: 0.34 }
+  ];
+
+  blobs.forEach((b) => {
+    const grad = ctx.createRadialGradient(b.x, b.y, 4, b.x, b.y, b.r);
+    grad.addColorStop(0.0, `rgba(255, 255, 255, ${b.a})`);
+    grad.addColorStop(0.45, `rgba(235, 255, 242, ${(b.a * 0.55).toFixed(3)})`);
+    grad.addColorStop(0.78, `rgba(205, 250, 222, ${(b.a * 0.16).toFixed(3)})`);
+    grad.addColorStop(1.0, 'rgba(205, 250, 222, 0.0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    ctx.fill();
+  });
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.needsUpdate = true;
@@ -1065,54 +813,78 @@ function getSoftSmokeTexture() {
   return tex;
 }
 
-function getRealisticFlameTexture() {
-  if (REALISTIC_FLAME_TEXTURE) return REALISTIC_FLAME_TEXTURE;
+function getSharpFlameTexture() {
+  if (SHARP_FLAME_TEXTURE) return SHARP_FLAME_TEXTURE;
   const canvas = document.createElement('canvas');
-  canvas.width = 128;
-  canvas.height = 128;
+  canvas.width = 256;
+  canvas.height = 256;
   const ctx = canvas.getContext('2d');
 
-  const baseGrad = ctx.createRadialGradient(64, 72, 4, 64, 64, 60);
-  baseGrad.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
-  baseGrad.addColorStop(0.35, 'rgba(255, 245, 220, 0.82)');
-  baseGrad.addColorStop(0.7, 'rgba(255, 220, 180, 0.32)');
-  baseGrad.addColorStop(1.0, 'rgba(255, 200, 150, 0.0)');
-  ctx.fillStyle = baseGrad;
-  ctx.fillRect(0, 0, 128, 128);
+  // Keskin, sivri uçlu yalaz dili (yuvarlak değil, yukarı doğru sivrilen alev formu)
+  ctx.save();
+  const outerGrad = ctx.createLinearGradient(128, 242, 128, 12);
+  outerGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0.98)');
+  outerGrad.addColorStop(0.48, 'rgba(255, 255, 255, 0.88)');
+  outerGrad.addColorStop(0.85, 'rgba(255, 255, 255, 0.42)');
+  outerGrad.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)');
 
-  for (let i = 0; i < 14; i++) {
-    const ang = (i / 14) * Math.PI * 2;
-    const lobeX = 64 + Math.cos(ang) * 18;
-    const lobeY = 64 + Math.sin(ang) * 20;
-    const lobeGrad = ctx.createRadialGradient(lobeX, lobeY, 2, lobeX, lobeY, 28);
-    lobeGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0.45)');
-    lobeGrad.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)');
-    ctx.fillStyle = lobeGrad;
-    ctx.beginPath();
-    ctx.arc(lobeX, lobeY, 28, 0, Math.PI * 2);
-    ctx.fill();
-  }
+  ctx.fillStyle = outerGrad;
+  ctx.beginPath();
+  ctx.moveTo(128, 12);
+  ctx.bezierCurveTo(156, 74, 198, 134, 184, 198);
+  ctx.bezierCurveTo(176, 228, 152, 244, 128, 244);
+  ctx.bezierCurveTo(104, 244, 80, 228, 72, 198);
+  ctx.bezierCurveTo(58, 134, 100, 74, 128, 12);
+  ctx.closePath();
+  ctx.fill();
+
+  // İkinci yan sivri yalaz kıvrımı (dinamik alev silüeti için)
+  const sideGrad = ctx.createLinearGradient(168, 236, 176, 56);
+  sideGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0.85)');
+  sideGrad.addColorStop(0.75, 'rgba(255, 255, 255, 0.35)');
+  sideGrad.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)');
+  ctx.fillStyle = sideGrad;
+  ctx.beginPath();
+  ctx.moveTo(176, 58);
+  ctx.quadraticCurveTo(212, 126, 194, 206);
+  ctx.quadraticCurveTo(172, 234, 148, 236);
+  ctx.quadraticCurveTo(168, 162, 176, 58);
+  ctx.closePath();
+  ctx.fill();
+
+  // İç parlak öz (keskin çekirdek)
+  const coreGrad = ctx.createLinearGradient(128, 238, 128, 86);
+  coreGrad.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
+  coreGrad.addColorStop(0.7, 'rgba(255, 255, 255, 0.72)');
+  coreGrad.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)');
+  ctx.fillStyle = coreGrad;
+  ctx.beginPath();
+  ctx.moveTo(128, 86);
+  ctx.quadraticCurveTo(154, 154, 144, 214);
+  ctx.quadraticCurveTo(128, 238, 112, 214);
+  ctx.quadraticCurveTo(102, 154, 128, 86);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.needsUpdate = true;
-  REALISTIC_FLAME_TEXTURE = tex;
+  SHARP_FLAME_TEXTURE = tex;
   return tex;
 }
 
 function clearDragonSmokeParticles() {
-  for (let i = dragonSmokeParticles.length - 1; i >= 0; i--) {
-    const sp = dragonSmokeParticles[i];
+  dragonSmokeParticles.forEach((sp) => {
     if (sp.mesh && scene) scene.remove(sp.mesh);
     if (sp.mat) sp.mat.dispose();
-  }
+  });
   dragonSmokeParticles = [];
   dragonSmokeSpawnTimer = 0;
 
-  for (let i = infernoFlameParticles.length - 1; i >= 0; i--) {
-    const fp = infernoFlameParticles[i];
+  infernoFlameParticles.forEach((fp) => {
     if (fp.mesh && scene) scene.remove(fp.mesh);
     if (fp.mat) fp.mat.dispose();
-  }
+  });
   infernoFlameParticles = [];
   infernoSpawnTimer = 0;
 }
@@ -1126,10 +898,9 @@ function spawnDragonGreenSmoke(wx, wz) {
   }
 
   const smokeTex = getSoftSmokeTexture();
-  const smokeColors = [0x1be368, 0x45ff88, 0x0eb852, 0x8cffb3, 0x26d468];
+  const smokeColors = [0x15d95c, 0x3bf57c, 0x0db048, 0x6effa1, 0x1ec95b];
   const colorHex = smokeColors[Math.floor(Math.random() * smokeColors.length)];
-  const isWisp = Math.random() > 0.55;
-  const baseOpacity = isWisp ? 0.44 : 0.34;
+  const baseOpacity = 0.42;
 
   const mat = new THREE.SpriteMaterial({
     map: smokeTex,
@@ -1137,37 +908,30 @@ function spawnDragonGreenSmoke(wx, wz) {
     transparent: true,
     opacity: baseOpacity,
     depthWrite: false,
-    blending: isWisp ? THREE.AdditiveBlending : THREE.NormalBlending
+    blending: THREE.NormalBlending
   });
 
   const mesh = new THREE.Sprite(mat);
   const ang = Math.random() * Math.PI * 2;
-  const spreadR = Math.pow(Math.random(), 0.65) * 34;
-  const startY = SHIP_Y_POS - 28 + Math.random() * 34;
+  const spreadR = Math.pow(Math.random(), 0.7) * 32;
+  const startY = SHIP_Y_POS - 24 + Math.random() * 28;
 
-  mesh.position.set(
-    wx + Math.cos(ang) * spreadR,
-    startY,
-    wz + Math.sin(ang) * spreadR
-  );
-
-  const initSize = isWisp ? (18 + Math.random() * 14) : (24 + Math.random() * 18);
-  mesh.scale.set(initSize, initSize * (0.85 + Math.random() * 0.35), 1);
+  mesh.position.set(wx + Math.cos(ang) * spreadR, startY, wz + Math.sin(ang) * spreadR);
+  const initSize = 22 + Math.random() * 18;
+  mesh.scale.set(initSize, initSize * 0.92, 1);
   scene.add(mesh);
 
-  const swirlDir = Math.random() > 0.5 ? 1 : -1;
   dragonSmokeParticles.push({
     mesh,
     mat,
-    vx: Math.cos(ang) * (8 + Math.random() * 14),
-    vy: 16 + Math.random() * 18,
-    vz: Math.sin(ang) * (8 + Math.random() * 14),
-    swirlDir,
-    swirlSpeed: (1.4 + Math.random() * 1.8) * swirlDir,
-    rotSpeed: (Math.random() - 0.5) * 1.4,
-    growRate: 14 + Math.random() * 12,
+    vx: Math.cos(ang) * (7 + Math.random() * 11),
+    vy: 15 + Math.random() * 14,
+    vz: Math.sin(ang) * (7 + Math.random() * 11),
+    swirlDir: Math.random() > 0.5 ? 1 : -1,
+    rotSpeed: (Math.random() - 0.5) * 1.1,
+    growRate: 15 + Math.random() * 11,
     life: 0,
-    maxLife: 46 + Math.floor(Math.random() * 26),
+    maxLife: 48 + Math.floor(Math.random() * 24),
     baseOpacity
   });
 }
@@ -1180,47 +944,43 @@ function spawnInfernoFlameParticle(wx, wz, shipYaw = 0) {
     if (oldest && oldest.mat) oldest.mat.dispose();
   }
 
-  const flameTex = getRealisticFlameTexture();
+  const flameTex = getSharpFlameTexture();
   const roll = Math.random();
-  const isSpark = roll > 0.84;
-  const isCore = !isSpark && roll < 0.28;
+  const isSpark = roll > 0.85;
+  const isCore = !isSpark && roll < 0.34;
 
-  const zoneAlongShip = (Math.random() - 0.5) * 66;
+  const zoneAlongShip = (Math.random() - 0.5) * 68;
   const zoneAcrossShip = (Math.random() - 0.5) * 34;
   const cosY = Math.cos(shipYaw);
   const sinY = Math.sin(shipYaw);
+  const worldOffsetX = zoneAcrossShip * cosY + zoneAlongShip * sinY;
+  const worldOffsetZ = -zoneAcrossShip * sinY + zoneAlongShip * cosY;
 
-  const localX = zoneAcrossShip;
-  const localZ = zoneAlongShip;
-  const worldOffsetX = localX * cosY + localZ * sinY;
-  const worldOffsetZ = -localX * sinY + localZ * cosY;
+  const isUpper = Math.random() > 0.45;
+  const startY = isUpper
+    ? (SHIP_Y_POS - 6 + Math.random() * 38)
+    : (SHIP_Y_POS - 22 + Math.random() * 20);
 
-  const isMastOrSail = Math.random() > 0.52;
-  const startY = isMastOrSail
-    ? (SHIP_Y_POS - 8 + Math.random() * 44)
-    : (SHIP_Y_POS - 24 + Math.random() * 22);
-
-  let colorHex;
-  let baseOpacity;
-  let initSize;
-  let vy;
-
+  let colorHex, baseOpacity, widthSize, heightSize, vy;
   if (isSpark) {
-    colorHex = Math.random() > 0.4 ? 0xffc857 : 0xff6a1a;
-    baseOpacity = 0.92;
-    initSize = 6 + Math.random() * 6.5;
-    vy = 42 + Math.random() * 34;
+    colorHex = Math.random() > 0.4 ? 0xffd166 : 0xff7b1c;
+    baseOpacity = 0.95;
+    widthSize = 5 + Math.random() * 4;
+    heightSize = 18 + Math.random() * 14;
+    vy = 48 + Math.random() * 32;
   } else if (isCore) {
-    colorHex = Math.random() > 0.45 ? 0xffe07d : 0xffa42b;
-    baseOpacity = 0.72;
-    initSize = 18 + Math.random() * 13;
-    vy = 26 + Math.random() * 18;
+    colorHex = Math.random() > 0.45 ? 0xffe680 : 0xffaa2b;
+    baseOpacity = 0.86;
+    widthSize = 15 + Math.random() * 10;
+    heightSize = 36 + Math.random() * 22;
+    vy = 30 + Math.random() * 18;
   } else {
-    const outerPalette = [0xd92b04, 0xf2580c, 0xff7b1c, 0xc41e00];
+    const outerPalette = [0xe62e00, 0xff5500, 0xff7714, 0xcc2200];
     colorHex = outerPalette[Math.floor(Math.random() * outerPalette.length)];
-    baseOpacity = 0.64;
-    initSize = 26 + Math.random() * 20;
-    vy = 20 + Math.random() * 18;
+    baseOpacity = 0.78;
+    widthSize = 20 + Math.random() * 14;
+    heightSize = 44 + Math.random() * 28;
+    vy = 24 + Math.random() * 16;
   }
 
   const mat = new THREE.SpriteMaterial({
@@ -1233,50 +993,38 @@ function spawnInfernoFlameParticle(wx, wz, shipYaw = 0) {
   });
 
   const mesh = new THREE.Sprite(mat);
-  mesh.position.set(
-    wx + worldOffsetX,
-    startY,
-    wz + worldOffsetZ
-  );
-
-  const aspectY = isSpark ? 1.55 : (1.18 + Math.random() * 0.35);
-  mesh.scale.set(initSize * (0.9 + Math.random() * 0.25), initSize * aspectY, 1);
-  mat.rotation = (Math.random() - 0.5) * 0.5;
+  mesh.position.set(wx + worldOffsetX, startY, wz + worldOffsetZ);
+  mesh.scale.set(widthSize, heightSize, 1);
+  mat.rotation = (Math.random() - 0.5) * 0.42;
   scene.add(mesh);
 
   infernoFlameParticles.push({
     mesh,
     mat,
-    vx: (Math.random() - 0.5) * 14,
+    vx: (Math.random() - 0.5) * 12,
     vy,
-    vz: (Math.random() - 0.5) * 14,
+    vz: (Math.random() - 0.5) * 12,
     isSpark,
-    isCore,
-    growRate: isSpark ? -1.5 : (12 + Math.random() * 10),
+    growRate: isSpark ? 0.6 : (10 + Math.random() * 9),
     swirlPhase: Math.random() * Math.PI * 2,
     life: 0,
-    maxLife: isSpark ? (22 + Math.floor(Math.random() * 12)) : (30 + Math.floor(Math.random() * 16)),
+    maxLife: isSpark ? (20 + Math.floor(Math.random() * 10)) : (26 + Math.floor(Math.random() * 14)),
     baseOpacity
   });
 }
 
 function clearAllEnemyAggro() {
-  enemies.forEach((en) => {
-    en.isAggro = false;
-  });
+  enemies.forEach((en) => { en.isAggro = false; });
 }
 
 function clearDenemeShipStyling() {
   clearDragonSmokeParticles();
-  if (activeDenemeLight && activeDenemeLight.parent) {
-    activeDenemeLight.parent.remove(activeDenemeLight);
-  }
+
+  if (activeDenemeLight?.parent) activeDenemeLight.parent.remove(activeDenemeLight);
   activeDenemeLight = null;
 
   if (activeDenemePropsGroup) {
-    if (activeDenemePropsGroup.parent) {
-      activeDenemePropsGroup.parent.remove(activeDenemePropsGroup);
-    }
+    if (activeDenemePropsGroup.parent) activeDenemePropsGroup.parent.remove(activeDenemePropsGroup);
     activeDenemePropsGroup.traverse((obj) => {
       if (obj.geometry) obj.geometry.dispose();
       if (obj.material) {
@@ -1290,33 +1038,21 @@ function clearDenemeShipStyling() {
   denemeLanternCores = [];
   activeDenemeStyleKey = null;
 
-  denemeMaterialsList.forEach((mat) => {
-    if (mat && typeof mat.dispose === 'function') {
-      mat.dispose();
-    }
-  });
+  denemeMaterialsList.forEach(mat => mat?.dispose && mat.dispose());
   denemeMaterialsList = [];
 
-  if (activePhantomLight && activePhantomLight.parent) {
-    activePhantomLight.parent.remove(activePhantomLight);
-  }
+  if (activePhantomLight?.parent) activePhantomLight.parent.remove(activePhantomLight);
   activePhantomLight = null;
 
   if (activePhantomAuraMesh) {
-    if (activePhantomAuraMesh.parent) {
-      activePhantomAuraMesh.parent.remove(activePhantomAuraMesh);
-    }
-    if (activePhantomAuraMesh.geometry) activePhantomAuraMesh.geometry.dispose();
-    if (activePhantomAuraMesh.material) activePhantomAuraMesh.material.dispose();
+    if (activePhantomAuraMesh.parent) activePhantomAuraMesh.parent.remove(activePhantomAuraMesh);
+    activePhantomAuraMesh.geometry?.dispose();
+    activePhantomAuraMesh.material?.dispose();
   }
   activePhantomAuraMesh = null;
   activePhantomStyleKey = null;
 
-  phantomMaterialsList.forEach((mat) => {
-    if (mat && typeof mat.dispose === 'function') {
-      mat.dispose();
-    }
-  });
+  phantomMaterialsList.forEach(mat => mat?.dispose && mat.dispose());
   phantomMaterialsList = [];
 }
 
@@ -1350,13 +1086,7 @@ function applyPhantomShipStyling(shipMesh, phantomKey = 'specter_teal') {
   if (phantomKey === 'specter_violet') {
     const auraGeo = new THREE.RingGeometry(24, 34, 36);
     auraGeo.rotateX(-Math.PI / 2);
-    const auraMat = new THREE.MeshBasicMaterial({
-      color: 0xb185f2,
-      side: THREE.DoubleSide,
-      transparent: true,
-      opacity: 0.42,
-      depthWrite: false
-    });
+    const auraMat = new THREE.MeshBasicMaterial({ color: 0xb185f2, side: THREE.DoubleSide, transparent: true, opacity: 0.42, depthWrite: false });
     activePhantomAuraMesh = new THREE.Mesh(auraGeo, auraMat);
     activePhantomAuraMesh.position.y = 4;
     shipMesh.add(activePhantomAuraMesh);
@@ -1369,19 +1099,8 @@ function applyPhantomShipStyling(shipMesh, phantomKey = 'specter_teal') {
 
 function createLanternAssembly(theme, scale = 1) {
   const lantern = new THREE.Group();
-
-  const capMat = new THREE.MeshStandardMaterial({
-    color: 0x262f3b,
-    metalness: 0.7,
-    roughness: 0.35
-  });
-  const coreMat = new THREE.MeshStandardMaterial({
-    color: theme.lanternColor,
-    emissive: theme.lanternColor,
-    emissiveIntensity: 0.55,
-    roughness: 0.3,
-    metalness: 0.25
-  });
+  const capMat = new THREE.MeshStandardMaterial({ color: 0x262f3b, metalness: 0.7, roughness: 0.35 });
+  const coreMat = new THREE.MeshStandardMaterial({ color: theme.lanternColor, emissive: theme.lanternColor, emissiveIntensity: 0.55, roughness: 0.3, metalness: 0.25 });
 
   const baseMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.14 * scale, 0.18 * scale, 0.08 * scale, 8), capMat);
   baseMesh.position.y = -0.16 * scale;
@@ -1415,10 +1134,7 @@ function attachDeneme3DProps(shipMesh, theme, bounds, shipSize) {
     const built = createLanternAssembly(theme, cfg.s);
     built.lantern.position.set(cfg.x, cfg.y, cfg.z);
     propsGroup.add(built.lantern);
-    denemeLanternCores.push({
-      coreMat: built.coreMat,
-      coreMesh: built.coreMesh
-    });
+    denemeLanternCores.push({ coreMat: built.coreMat, coreMesh: built.coreMesh });
   });
 
   const crystalCount = 5;
@@ -1426,13 +1142,7 @@ function attachDeneme3DProps(shipMesh, theme, bounds, shipSize) {
   const orbitRz = Math.max(0.5, shipSize.z * 0.16);
   const crystalY = center.y + shipSize.y * 0.12;
   const crystalGeo = new THREE.OctahedronGeometry(0.12 * unitScale, 0);
-  const crystalMat = new THREE.MeshStandardMaterial({
-    color: theme.crystalColor,
-    emissive: theme.lanternColor,
-    emissiveIntensity: 0.45,
-    metalness: 0.55,
-    roughness: 0.28
-  });
+  const crystalMat = new THREE.MeshStandardMaterial({ color: theme.crystalColor, emissive: theme.lanternColor, emissiveIntensity: 0.45, metalness: 0.55, roughness: 0.28 });
 
   denemeCrystalsMeta = [];
   for (let i = 0; i < crystalCount; i++) {
@@ -1443,16 +1153,8 @@ function attachDeneme3DProps(shipMesh, theme, bounds, shipSize) {
     propsGroup.add(cMesh);
 
     denemeCrystalsMeta.push({
-      mesh: cMesh,
-      centerX: center.x,
-      centerZ: center.z,
-      angle,
-      orbitRx,
-      orbitRz,
-      baseY: crystalY,
-      orbitSpeed: 0.75,
-      bobAmp: Math.max(0.03, shipSize.y * 0.008),
-      phase: i * 1.25
+      mesh: cMesh, centerX: center.x, centerZ: center.z, angle, orbitRx, orbitRz, baseY: crystalY,
+      orbitSpeed: 0.75, bobAmp: Math.max(0.03, shipSize.y * 0.008), phase: i * 1.25
     });
   }
 
@@ -1460,9 +1162,9 @@ function attachDeneme3DProps(shipMesh, theme, bounds, shipSize) {
   activeDenemePropsGroup = propsGroup;
 }
 
-function applyDenemeShipStyling(shipMesh, styleKey = 'gold', options = { with3DProps: true }) {
+function applyDenemeShipStyling(shipMesh, styleKey = 'emerald', options = { with3DProps: true }) {
   if (!shipMesh) return;
-  const theme = DENEME_THEMES[styleKey] || DENEME_THEMES.gold;
+  const theme = DENEME_THEMES[styleKey] || DENEME_THEMES.emerald;
   activeDenemeStyleKey = styleKey;
   denemeMaterialsList = [];
 
@@ -1471,17 +1173,20 @@ function applyDenemeShipStyling(shipMesh, styleKey = 'gold', options = { with3DP
       const mats = Array.isArray(child.material) ? child.material : [child.material];
       const styledMats = mats.map((origMat) => {
         const mat = origMat.clone();
-        if (mat.color) mat.color.setHex(theme.color);
+        if (mat.color) {
+          if (theme.tintAllGreen) {
+            const lum = Math.max(0.28, (mat.color.r + mat.color.g + mat.color.b) / 3);
+            mat.color.setRGB(0.08 * lum, Math.min(1, 0.92 * lum + 0.15), 0.26 * lum);
+          } else {
+            mat.color.setHex(theme.color);
+          }
+        }
         if (mat.emissive) {
           mat.emissive.setHex(theme.emissive);
           mat.emissiveIntensity = theme.emissiveIntensity;
         }
-        if (typeof mat.metalness === 'number') {
-          mat.metalness = Math.min(0.65, (mat.metalness || 0.25) + theme.metalnessAdd);
-        }
-        if (typeof mat.roughness === 'number') {
-          mat.roughness = Math.max(0.32, (mat.roughness || 0.6) - theme.roughnessSub);
-        }
+        if (typeof mat.metalness === 'number') mat.metalness = Math.min(0.65, (mat.metalness || 0.25) + theme.metalnessAdd);
+        if (typeof mat.roughness === 'number') mat.roughness = Math.max(0.32, (mat.roughness || 0.6) - theme.roughnessSub);
         mat.needsUpdate = true;
         denemeMaterialsList.push(mat);
         return mat;
@@ -1494,9 +1199,7 @@ function applyDenemeShipStyling(shipMesh, styleKey = 'gold', options = { with3DP
   const shipSize = new THREE.Vector3();
   bounds.getSize(shipSize);
 
-  if (options.with3DProps) {
-    attachDeneme3DProps(shipMesh, theme, bounds, shipSize);
-  }
+  if (options.with3DProps) attachDeneme3DProps(shipMesh, theme, bounds, shipSize);
 
   if (typeof THREE !== 'undefined') {
     const lightRange = (styleKey === 'dragon_green' || styleKey === 'inferno_flame') ? 190 : 70;
@@ -1520,7 +1223,7 @@ let SHARED_SPARK_GEO = null;
 let thumbnailRenderer = null;
 
 function downscaleTextureTo512(texture) {
-  if (!texture || !texture.image) return;
+  if (!texture?.image) return;
   const img = texture.image;
   const w = img.width || img.videoWidth;
   const h = img.height || img.videoHeight;
@@ -1528,12 +1231,10 @@ function downscaleTextureTo512(texture) {
   const MAX_SIZE = 512;
   if (w > MAX_SIZE || h > MAX_SIZE) {
     const scale = Math.min(MAX_SIZE / w, MAX_SIZE / h);
-    const nw = Math.max(1, Math.round(w * scale));
-    const nh = Math.max(1, Math.round(h * scale));
     const canvas = document.createElement('canvas');
-    canvas.width = nw; canvas.height = nh;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0, nw, nh);
+    canvas.width = Math.max(1, Math.round(w * scale));
+    canvas.height = Math.max(1, Math.round(h * scale));
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
     texture.image = canvas;
   }
   texture.generateMipmaps = true;
@@ -1562,14 +1263,8 @@ function optimizeModelTextures512(rootObject) {
 }
 
 function loadCachedGLB(path, onLoaded) {
-  if (GLB_CACHE[path]) {
-    onLoaded(GLB_CACHE[path].clone());
-    return;
-  }
-  if (GLB_LOADING_QUEUE[path]) {
-    GLB_LOADING_QUEUE[path].push(onLoaded);
-    return;
-  }
+  if (GLB_CACHE[path]) { onLoaded(GLB_CACHE[path].clone()); return; }
+  if (GLB_LOADING_QUEUE[path]) { GLB_LOADING_QUEUE[path].push(onLoaded); return; }
   GLB_LOADING_QUEUE[path] = [onLoaded];
 
   gltfLoader.load(path, (gltf) => {
@@ -1580,25 +1275,19 @@ function loadCachedGLB(path, onLoaded) {
     delete GLB_LOADING_QUEUE[path];
     callbacks.forEach(cb => cb(root.clone()));
   }, undefined, (err) => {
-    console.warn("GLB yüklenemedi:", path, err);
+    console.warn('GLB yüklenemedi:', path, err);
     delete GLB_LOADING_QUEUE[path];
   });
 }
 
 function decorateShipModelWithSpec(shipMesh, modelSpec) {
   if (!shipMesh || !modelSpec) return;
-  if (modelSpec.denemeStyle) {
-    applyDenemeShipStyling(shipMesh, modelSpec.denemeStyle, { with3DProps: true });
-  } else if (modelSpec.phantomStyle) {
-    applyPhantomShipStyling(shipMesh, modelSpec.phantomStyle);
-  }
+  if (modelSpec.denemeStyle) applyDenemeShipStyling(shipMesh, modelSpec.denemeStyle, { with3DProps: true });
+  else if (modelSpec.phantomStyle) applyPhantomShipStyling(shipMesh, modelSpec.phantomStyle);
 }
 
 function getShipThumbnail(modelSpec, callback) {
-  if (THUMBNAIL_CACHE[modelSpec.id]) {
-    callback(THUMBNAIL_CACHE[modelSpec.id]);
-    return;
-  }
+  if (THUMBNAIL_CACHE[modelSpec.id]) { callback(THUMBNAIL_CACHE[modelSpec.id]); return; }
   loadCachedGLB(modelSpec.modelPath, (clonedModel) => {
     decorateShipModelWithSpec(clonedModel, modelSpec);
     if (!thumbnailRenderer) {
@@ -1644,16 +1333,16 @@ function loadUsers() {
   try { users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]'); } catch { users = []; }
   if (!users.some(u => u.username.toLowerCase() === 'test')) {
     users.push({ id: 'user_test', username: 'Test', password: 'test', ownedShips: sanitizeOwnedShips(['standard']), equippedShip: 'standard' });
-    try { localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users)); } catch(e) {}
+    try { localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users)); } catch {}
   } else {
-    users.forEach(u => {
+    users.forEach((u) => {
       u.ownedShips = sanitizeOwnedShips(u.ownedShips);
       u.equippedShip = sanitizeShipId(u.equippedShip);
     });
   }
   return users;
 }
-function saveUsers(users) { try { localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users)); } catch(e) {} }
+function saveUsers(users) { try { localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users)); } catch {} }
 
 function setAuthMode(mode) {
   authMode = mode;
@@ -1672,56 +1361,46 @@ if (tabRegister) tabRegister.addEventListener('click', () => setAuthMode('regist
 if (fillTestBtn) fillTestBtn.addEventListener('click', () => { authUsernameInput.value = 'Test'; authPasswordInput.value = 'test'; });
 
 function completeLogin(user) {
-  const owned = sanitizeOwnedShips(user.ownedShips);
-  const equipped = sanitizeShipId(user.equippedShip);
   currentUser = {
     id: user.id,
     username: user.username,
-    ownedShips: owned,
-    equippedShip: equipped
+    ownedShips: sanitizeOwnedShips(user.ownedShips),
+    equippedShip: sanitizeShipId(user.equippedShip)
   };
-  try { localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser)); } catch(e) {}
+  try { localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser)); } catch {}
   if (tagUsernameEl) tagUsernameEl.textContent = currentUser.username;
   if (authOverlay) authOverlay.style.display = 'none';
-  if (!gameInitialized) {
-    gameInitialized = true;
-    initThreeGame();
-  } else if (typeof startGameLogic === 'function') {
-    startGameLogic();
-  }
+  if (!gameInitialized) { gameInitialized = true; initThreeGame(); }
+  else if (typeof startGameLogic === 'function') startGameLogic();
 }
 
 if (authForm) {
-  authForm.addEventListener('submit', e => {
+  authForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    const uname = authUsernameInput.value.trim(); const pass = authPasswordInput.value;
-    if (!uname || !pass) {
-      if (authMsgEl) authMsgEl.textContent = 'Lütfen kaptan adı ve şifre girin.';
-      return;
-    }
+    const uname = authUsernameInput.value.trim();
+    const pass = authPasswordInput.value;
+    if (!uname || !pass) { if (authMsgEl) authMsgEl.textContent = 'Lütfen kaptan adı ve şifre girin.'; return; }
     const users = loadUsers();
     if (authMode === 'register') {
-      if (users.some(u => u.username.toLowerCase() === uname.toLowerCase())) { authMsgEl.textContent = 'Bu isim zaten kayıtlı.'; return; }
+      if (users.some(u => u.username.toLowerCase() === uname.toLowerCase())) { if (authMsgEl) authMsgEl.textContent = 'Bu isim zaten kayıtlı.'; return; }
       const nu = { id: 'u_' + Date.now(), username: uname, password: pass, ownedShips: sanitizeOwnedShips(['standard']), equippedShip: 'standard' };
       users.push(nu); saveUsers(users);
       setTimeout(() => completeLogin(nu), 150);
     } else {
       const found = users.find(u => u.username.toLowerCase() === uname.toLowerCase() && u.password === pass);
-      if (!found) { authMsgEl.textContent = 'Hatalı kullanıcı adı veya şifre.'; return; }
+      if (!found) { if (authMsgEl) authMsgEl.textContent = 'Hatalı kullanıcı adı veya şifre.'; return; }
       completeLogin(found);
     }
   });
 }
-if (logoutBtn) logoutBtn.addEventListener('click', () => { try { localStorage.removeItem(SESSION_STORAGE_KEY); } catch(e){} location.reload(); });
+if (logoutBtn) logoutBtn.addEventListener('click', () => { try { localStorage.removeItem(SESSION_STORAGE_KEY); } catch {} location.reload(); });
 
 window.addEventListener('DOMContentLoaded', () => {
   loadUsers();
   try {
     const savedSession = JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY) || 'null');
-    if (savedSession && savedSession.username) {
-      completeLogin(savedSession);
-    }
-  } catch (e) {}
+    if (savedSession?.username) completeLogin(savedSession);
+  } catch {}
 });
 
 let scene, camera, renderer;
@@ -1730,46 +1409,42 @@ let activeGlbShip = null, playerNeonRing, enemies = [], defenseTowers = [], rang
 let activeProjectiles = [], particleSystems = [], cannonEffects = [], castleFlameSystems = [], flameEmberParticles = [], sinkSparks = [];
 let activeDefenseIslandGroup = null;
 let raycaster, planeGeo, mouse;
-let selectedRingMesh = null;
-let borderFrameMesh = null;
+let selectedRingMesh = null, borderFrameMesh = null;
 let textureLoader;
 const loadedAmmoTextures = {};
 
 let cameraLookOffset = { x: 0, z: 0 };
 let isDraggingCamera = false;
-let dragStartX = 0, dragStartY = 0;
-let hasDragged = false;
+let dragStartX = 0, dragStartY = 0, hasDragged = false;
 
 const WORLD_SIZE = 9900;
 const ATTACK_RANGE = 300;
 const TOWER_ATTACK_RANGE = ATTACK_RANGE * 2;
 const SHIP_Y_POS = 100;
-
 const CAMERA_HEIGHT = 800;
 const CAMERA_DEPTH = 650;
 
 let currentMapIndex = 0;
 const MAP_DATA = [
-  { id: 1, name: "Harita 1", subtitle: "Sığcık Limanı", levelReq: "Seviye 1+", col: 0, row: 0, ownerFleet: null },
-  { id: 2, name: "Harita 2", subtitle: "Martı Kıyıları", levelReq: "Seviye 2+", col: 1, row: 0, ownerFleet: null },
-  { id: 3, name: "Harita 3", subtitle: "Mercan Geçidi", levelReq: "Seviye 3+", col: 2, row: 0, ownerFleet: null },
-  { id: 4, name: "Harita 4", subtitle: "Kaçakçı Koyu", levelReq: "Seviye 4+", col: 3, row: 0, ownerFleet: null },
-  { id: 5, name: "Harita 5", subtitle: "EVD Filosunun İntikamı", levelReq: "Seviye 5+", col: 4, row: 0, ownerFleet: null },
-  { id: 6, name: "Harita 6", subtitle: "Fırtına Denizi", levelReq: "Seviye 6+", col: 0, row: 1, ownerFleet: null },
-  { id: 7, name: "Harita 7", subtitle: "Kara Resif", levelReq: "Seviye 7+", col: 1, row: 1, ownerFleet: null },
-  { id: 8, name: "Harita 8", subtitle: "Ejderha Sığınağı", levelReq: "Seviye 8+", col: 2, row: 1, ownerFleet: null },
-  { id: 9, name: "Harita 9", subtitle: "Devler Hisarı", levelReq: "Seviye 9+", col: 3, row: 1, ownerFleet: null },
-  { id: 10, name: "Harita 10", subtitle: "Ebedi Saltanat", levelReq: "Seviye 10+", col: 4, row: 1, ownerFleet: null },
-  { id: 11, name: "Harita 11", subtitle: "Korsan Tahtı", levelReq: "Seviye 11+", col: 0, row: 2, ownerFleet: null },
-  { id: 12, name: "Harita 12", subtitle: "Cehennem Kapısı", levelReq: "Seviye 12+", col: 1, row: 2, ownerFleet: null },
-  { id: 13, name: "Harita 13", subtitle: "Kıyamet Taşı", levelReq: "Seviye 13+", col: 2, row: 2, ownerFleet: null },
-  { id: 14, name: "Harita 14", subtitle: "Denizlerin Hükümdarı", levelReq: "Seviye 14+", col: 3, row: 2, ownerFleet: null },
-  { id: 15, name: "Harita 15", subtitle: "Son Ufuk", levelReq: "Seviye 15+", col: 4, row: 2, ownerFleet: null }
+  { id: 1,  name: 'Harita 1',  col: 0, row: 0, ownerFleet: null },
+  { id: 2,  name: 'Harita 2',  col: 1, row: 0, ownerFleet: null },
+  { id: 3,  name: 'Harita 3',  col: 2, row: 0, ownerFleet: null },
+  { id: 4,  name: 'Harita 4',  col: 3, row: 0, ownerFleet: null },
+  { id: 5,  name: 'Harita 5',  col: 4, row: 0, ownerFleet: null },
+  { id: 6,  name: 'Harita 6',  col: 0, row: 1, ownerFleet: null },
+  { id: 7,  name: 'Harita 7',  col: 1, row: 1, ownerFleet: null },
+  { id: 8,  name: 'Harita 8',  col: 2, row: 1, ownerFleet: null },
+  { id: 9,  name: 'Harita 9',  col: 3, row: 1, ownerFleet: null },
+  { id: 10, name: 'Harita 10', col: 4, row: 1, ownerFleet: null },
+  { id: 11, name: 'Harita 11', col: 0, row: 2, ownerFleet: null },
+  { id: 12, name: 'Harita 12', col: 1, row: 2, ownerFleet: null },
+  { id: 13, name: 'Harita 13', col: 2, row: 2, ownerFleet: null },
+  { id: 14, name: 'Harita 14', col: 3, row: 2, ownerFleet: null },
+  { id: 15, name: 'Harita 15', col: 4, row: 2, ownerFleet: null }
 ];
 
 function getMapIslandLabel(mapObj) {
-  if (!mapObj || !mapObj.ownerFleet) return 'Sahipsiz Ada';
-  return `${mapObj.ownerFleet} Filosu`;
+  return mapObj?.ownerFleet ? `${mapObj.ownerFleet} Filosu` : 'Sahipsiz Ada';
 }
 
 let pendingTransitMapIndex = null;
@@ -1781,20 +1456,10 @@ const WALL_RADIUS = ATTACK_RANGE;
 const WALL_GATE_ANGLES = [Math.PI, 0];
 const WALL_GAP_HALF_ARC = 0.21;
 const TOWER_ANGLES = [
-  -2.748893571891069,
-  -2.356194490192345,
-  -1.9634954084936207,
-  -1.5707963267948966,
-  -1.1780972450961724,
-  -0.7853981633974483,
-  -0.39269908169872414,
-  0.39269908169872414,
-  0.7853981633974483,
-  1.1780972450961724,
-  1.5707963267948966,
-  1.9634954084936207,
-  2.356194490192345,
-  2.748893571891069
+  -2.748893571891069, -2.356194490192345, -1.9634954084936207, -1.5707963267948966,
+  -1.1780972450961724, -0.7853981633974483, -0.39269908169872414, 0.39269908169872414,
+  0.7853981633974483, 1.1780972450961724, 1.5707963267948966, 1.9634954084936207,
+  2.356194490192345, 2.748893571891069
 ];
 const TOWER_MOUNT_Y = SHIP_Y_POS - 23.5;
 let navigationQueue = [];
@@ -1811,41 +1476,9 @@ function getNearestGateAngle(fromX, fromZ) {
   let bestDist = Infinity;
   for (const g of WALL_GATE_ANGLES) {
     const d = Math.abs(normalizeAngle(g - ang));
-    if (d < bestDist) {
-      bestDist = d;
-      bestGate = g;
-    }
+    if (d < bestDist) { bestDist = d; bestGate = g; }
   }
   return bestGate;
-}
-
-function segmentIntersectsCircle(x1, z1, x2, z2, cx, cz, r) {
-  const dx = x2 - x1;
-  const dz = z2 - z1;
-  const lenSq = dx * dx + dz * dz;
-  if (lenSq === 0) return Math.hypot(x1 - cx, z1 - cz) < r;
-  let t = ((cx - x1) * dx + (cz - z1) * dz) / lenSq;
-  t = Math.max(0, Math.min(1, t));
-  const closestX = x1 + t * dx;
-  const closestZ = z1 + t * dz;
-  return Math.hypot(closestX - cx, closestZ - cz) < r;
-}
-
-function buildOuterArcWaypoints(fromX, fromZ, toX, toZ, radius) {
-  const points = [];
-  const startAngle = Math.atan2(fromZ, fromX);
-  const endAngle = Math.atan2(toZ, toX);
-  const diff = normalizeAngle(endAngle - startAngle);
-
-  const steps = Math.max(2, Math.ceil(Math.abs(diff) / 0.45));
-  for (let i = 1; i < steps; i++) {
-    const ang = startAngle + diff * (i / steps);
-    points.push({
-      x: Math.cos(ang) * radius,
-      z: Math.sin(ang) * radius
-    });
-  }
-  return points;
 }
 
 function buildNavigationRoute(fromX, fromZ, toX, toZ) {
@@ -1855,39 +1488,14 @@ function buildNavigationRoute(fromX, fromZ, toX, toZ) {
   const outerClearance = WALL_RADIUS + 85;
   const innerClearance = WALL_RADIUS - 85;
 
-  const startOutside = startDist > WALL_RADIUS + 18;
-  const endInside = endDist < WALL_RADIUS - 18;
-  const startInside = startDist < WALL_RADIUS - 18;
-  const endOutside = endDist > WALL_RADIUS + 18;
-
-  if (startOutside && endInside) {
+  if (startDist > WALL_RADIUS + 18 && endDist < WALL_RADIUS - 18) {
     const gateAngle = getNearestGateAngle(fromX, fromZ);
-    const gapOutX = Math.cos(gateAngle) * outerClearance;
-    const gapOutZ = Math.sin(gateAngle) * outerClearance;
-    const gapInX  = Math.cos(gateAngle) * innerClearance;
-    const gapInZ  = Math.sin(gateAngle) * innerClearance;
-
-    if (segmentIntersectsCircle(fromX, fromZ, gapOutX, gapOutZ, 0, 0, WALL_RADIUS + 35)) {
-      queue.push(...buildOuterArcWaypoints(fromX, fromZ, gapOutX, gapOutZ, outerClearance));
-    }
-    queue.push({ x: gapOutX, z: gapOutZ });
-    queue.push({ x: gapInX, z: gapInZ });
-  } else if (startInside && endOutside) {
+    queue.push({ x: Math.cos(gateAngle) * outerClearance, z: Math.sin(gateAngle) * outerClearance });
+    queue.push({ x: Math.cos(gateAngle) * innerClearance, z: Math.sin(gateAngle) * innerClearance });
+  } else if (startDist < WALL_RADIUS - 18 && endDist > WALL_RADIUS + 18) {
     const gateAngle = getNearestGateAngle(toX, toZ);
-    const gapInX  = Math.cos(gateAngle) * innerClearance;
-    const gapInZ  = Math.sin(gateAngle) * innerClearance;
-    const gapOutX = Math.cos(gateAngle) * outerClearance;
-    const gapOutZ = Math.sin(gateAngle) * outerClearance;
-
-    queue.push({ x: gapInX, z: gapInZ });
-    queue.push({ x: gapOutX, z: gapOutZ });
-    if (segmentIntersectsCircle(gapOutX, gapOutZ, toX, toZ, 0, 0, WALL_RADIUS + 35)) {
-      queue.push(...buildOuterArcWaypoints(gapOutX, gapOutZ, toX, toZ, outerClearance));
-    }
-  } else if (startOutside && endOutside) {
-    if (segmentIntersectsCircle(fromX, fromZ, toX, toZ, 0, 0, WALL_RADIUS + 35)) {
-      queue.push(...buildOuterArcWaypoints(fromX, fromZ, toX, toZ, outerClearance));
-    }
+    queue.push({ x: Math.cos(gateAngle) * innerClearance, z: Math.sin(gateAngle) * innerClearance });
+    queue.push({ x: Math.cos(gateAngle) * outerClearance, z: Math.sin(gateAngle) * outerClearance });
   }
 
   queue.push({ x: toX, z: toZ });
@@ -1903,66 +1511,31 @@ function setPlayerDestination(toX, toZ) {
 function triggerSinkSparks(wx, wz, scale = 1.0) {
   if (!scene || typeof THREE === 'undefined') return;
   const baseY = 12;
-
   const sparkColors = [0xffc86b, 0xff9d3b, 0xe87a24, 0xfff1cc];
-  const sparkCount = 16;
 
-  for (let i = 0; i < sparkCount; i++) {
+  for (let i = 0; i < 16; i++) {
     if (sinkSparks.length >= MAX_SPARK_PARTICLES) {
       const oldest = sinkSparks.shift();
-      if (oldest && !oldest.isLight && oldest.mesh) {
-        scene.remove(oldest.mesh);
-        oldest.mat.dispose();
-      }
+      if (oldest && !oldest.isLight && oldest.mesh) { scene.remove(oldest.mesh); oldest.mat.dispose(); }
     }
-    const sMat = new THREE.MeshBasicMaterial({
-      color: sparkColors[i % sparkColors.length],
-      transparent: true,
-      opacity: 0.92
-    });
+    const sMat = new THREE.MeshBasicMaterial({ color: sparkColors[i % sparkColors.length], transparent: true, opacity: 0.92 });
     const mesh = new THREE.Mesh(SHARED_SPARK_GEO, sMat);
     mesh.scale.setScalar(scale);
-    mesh.position.set(
-      wx + (Math.random() - 0.5) * 14 * scale,
-      baseY + Math.random() * 8 * scale,
-      wz + (Math.random() - 0.5) * 14 * scale
-    );
-
+    mesh.position.set(wx + (Math.random() - 0.5) * 14 * scale, baseY + Math.random() * 8 * scale, wz + (Math.random() - 0.5) * 14 * scale);
     const ang = Math.random() * Math.PI * 2;
     const radialSpd = (18 + Math.random() * 44) * scale;
     const vy = (24 + Math.random() * 42) * scale;
     const vx = Math.cos(ang) * radialSpd;
     const vz = Math.sin(ang) * radialSpd;
-
-    mesh.lookAt(
-      mesh.position.x + vx,
-      mesh.position.y + vy,
-      mesh.position.z + vz
-    );
+    mesh.lookAt(mesh.position.x + vx, mesh.position.y + vy, mesh.position.z + vz);
     scene.add(mesh);
-
-    sinkSparks.push({
-      mesh,
-      mat: sMat,
-      vx,
-      vy,
-      vz,
-      age: 0,
-      maxAge: 24 + Math.floor(Math.random() * 12)
-    });
+    sinkSparks.push({ mesh, mat: sMat, vx, vy, vz, age: 0, maxAge: 24 + Math.floor(Math.random() * 12) });
   }
 
   const sparkLight = new THREE.PointLight(0xffa94d, 1.05 * scale, 100 * scale);
   sparkLight.position.set(wx, baseY + 14 * scale, wz);
   scene.add(sparkLight);
-
-  sinkSparks.push({
-    isLight: true,
-    light: sparkLight,
-    baseIntensity: 1.05 * scale,
-    age: 0,
-    maxAge: 16
-  });
+  sinkSparks.push({ isLight: true, light: sparkLight, baseIntensity: 1.05 * scale, age: 0, maxAge: 16 });
 }
 
 function createSeamlessDarkOceanTexture() {
@@ -1974,23 +1547,22 @@ function createSeamlessDarkOceanTexture() {
   baseGrad.addColorStop(0.5, '#031521');
   baseGrad.addColorStop(1, '#020f18');
   ctx.fillStyle = baseGrad;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, 1024, 1024);
 
   for (let i = 0; i < 200; i++) {
-    const x = Math.random() * canvas.width;
-    const y = Math.random() * canvas.height;
-    const rx = 24 + Math.random() * 68;
-    const ry = 14 + Math.random() * 40;
-    const glow = ctx.createRadialGradient(x, y, 0, x, y, Math.max(rx, ry));
+    const x = Math.random() * 1024, y = Math.random() * 1024;
+    const rx = 24 + Math.random() * 68, ry = 14 + Math.random() * 40;
+    const rMax = Math.max(rx, ry);
+    const glow = ctx.createRadialGradient(x, y, 0, x, y, rMax);
     glow.addColorStop(0, 'rgba(18, 92, 118, 0.13)');
     glow.addColorStop(0.5, 'rgba(7, 52, 70, 0.06)');
     glow.addColorStop(1, 'rgba(3, 21, 33, 0)');
     ctx.save();
     ctx.translate(x, y);
-    ctx.scale(rx / Math.max(rx, ry), ry / Math.max(rx, ry));
+    ctx.scale(rx / rMax, ry / rMax);
     ctx.fillStyle = glow;
     ctx.beginPath();
-    ctx.arc(0, 0, Math.max(rx, ry), 0, Math.PI * 2);
+    ctx.arc(0, 0, rMax, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
   }
@@ -1998,9 +1570,7 @@ function createSeamlessDarkOceanTexture() {
   ctx.strokeStyle = 'rgba(130, 185, 210, 0.045)';
   ctx.lineWidth = 1.2;
   for (let s = 0; s < 120; s++) {
-    const sx = Math.random() * canvas.width;
-    const sy = Math.random() * canvas.height;
-    const len = 18 + Math.random() * 42;
+    const sx = Math.random() * 1024, sy = Math.random() * 1024, len = 18 + Math.random() * 42;
     ctx.beginPath();
     ctx.moveTo(sx, sy);
     ctx.quadraticCurveTo(sx + len * 0.5, sy - 3, sx + len, sy);
@@ -2010,7 +1580,6 @@ function createSeamlessDarkOceanTexture() {
   const texture = new THREE.CanvasTexture(canvas);
   texture.wrapS = THREE.ClampToEdgeWrapping;
   texture.wrapT = THREE.ClampToEdgeWrapping;
-  texture.repeat.set(1, 1);
   texture.anisotropy = 4;
   texture.needsUpdate = true;
   return texture;
@@ -2018,16 +1587,13 @@ function createSeamlessDarkOceanTexture() {
 
 function createOceanBumpTexture() {
   const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 512;
+  canvas.width = 512; canvas.height = 512;
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = '#808080';
   ctx.fillRect(0, 0, 512, 512);
 
   for (let i = 0; i < 380; i++) {
-    const x = Math.random() * 512;
-    const y = Math.random() * 512;
-    const r = 6 + Math.random() * 22;
+    const x = Math.random() * 512, y = Math.random() * 512, r = 6 + Math.random() * 22;
     const g = ctx.createRadialGradient(x, y, 1, x, y, r);
     const tone = i % 2 === 0 ? 'rgba(170,170,170,0.14)' : 'rgba(85,85,85,0.14)';
     g.addColorStop(0, tone);
@@ -2048,10 +1614,8 @@ function createOceanBumpTexture() {
 
 function createIslandSandTexture() {
   const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 512;
+  canvas.width = 512; canvas.height = 512;
   const ctx = canvas.getContext('2d');
-
   const grad = ctx.createRadialGradient(256, 256, 20, 256, 256, 256);
   grad.addColorStop(0, '#9c8359');
   grad.addColorStop(0.55, '#7e6844');
@@ -2061,18 +1625,10 @@ function createIslandSandTexture() {
   ctx.fillRect(0, 0, 512, 512);
 
   for (let i = 0; i < 750; i++) {
-    const ang = Math.random() * Math.PI * 2;
-    const dist = Math.pow(Math.random(), 0.7) * 244;
-    const px = 256 + Math.cos(ang) * dist;
-    const py = 256 + Math.sin(ang) * dist;
-    const r = 1.2 + Math.random() * 4.5;
-    ctx.fillStyle = i % 3 === 0
-      ? 'rgba(210, 190, 145, 0.14)'
-      : i % 3 === 1
-      ? 'rgba(45, 35, 24, 0.2)'
-      : 'rgba(100, 86, 66, 0.15)';
+    const ang = Math.random() * Math.PI * 2, dist = Math.pow(Math.random(), 0.7) * 244;
+    ctx.fillStyle = i % 3 === 0 ? 'rgba(210, 190, 145, 0.14)' : i % 3 === 1 ? 'rgba(45, 35, 24, 0.2)' : 'rgba(100, 86, 66, 0.15)';
     ctx.beginPath();
-    ctx.arc(px, py, r, 0, Math.PI * 2);
+    ctx.arc(256 + Math.cos(ang) * dist, 256 + Math.sin(ang) * dist, 1.2 + Math.random() * 4.5, 0, Math.PI * 2);
     ctx.fill();
   }
 
@@ -2084,24 +1640,16 @@ function createIslandSandTexture() {
 
 function createStoneWallTexture() {
   const canvas = document.createElement('canvas');
-  canvas.width = 256;
-  canvas.height = 256;
+  canvas.width = 256; canvas.height = 256;
   const ctx = canvas.getContext('2d');
-
   ctx.fillStyle = '#323842';
   ctx.fillRect(0, 0, 256, 256);
 
-  const rows = 8;
-  const cols = 6;
-  const rh = 256 / rows;
-  const cw = 256 / cols;
-
+  const rows = 8, cols = 6, rh = 256 / rows, cw = 256 / cols;
   for (let r = 0; r < rows; r++) {
     const offset = (r % 2) * (cw * 0.5);
     for (let c = -1; c <= cols; c++) {
-      const x = c * cw + offset;
-      const y = r * rh;
-      const shade = 48 + ((r * 17 + c * 29) % 20);
+      const x = c * cw + offset, y = r * rh, shade = 48 + ((r * 17 + c * 29) % 20);
       ctx.fillStyle = `rgb(${shade}, ${shade + 4}, ${shade + 10})`;
       ctx.fillRect(x + 1, y + 1, cw - 2, rh - 2);
       ctx.strokeStyle = 'rgba(186, 152, 92, 0.16)';
@@ -2121,31 +1669,25 @@ function createStoneWallTexture() {
 function createBorderFrame() {
   const size = WORLD_SIZE - 200;
   const shape = new THREE.Shape();
-  shape.moveTo(-size/2, -size/2);
-  shape.lineTo(size/2, -size/2);
-  shape.lineTo(size/2, size/2);
-  shape.lineTo(-size/2, size/2);
+  shape.moveTo(-size / 2, -size / 2);
+  shape.lineTo(size / 2, -size / 2);
+  shape.lineTo(size / 2, size / 2);
+  shape.lineTo(-size / 2, size / 2);
   shape.closePath();
 
   const holePath = new THREE.Path();
   const innerSize = size - 80;
-  holePath.moveTo(-innerSize/2, -innerSize/2);
-  holePath.lineTo(-innerSize/2, innerSize/2);
-  holePath.lineTo(innerSize/2, innerSize/2);
-  holePath.lineTo(innerSize/2, -innerSize/2);
+  holePath.moveTo(-innerSize / 2, -innerSize / 2);
+  holePath.lineTo(-innerSize / 2, innerSize / 2);
+  holePath.lineTo(innerSize / 2, innerSize / 2);
+  holePath.lineTo(innerSize / 2, -innerSize / 2);
   holePath.closePath();
   shape.holes.push(holePath);
 
-  const extrudeSettings = { depth: 32, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 3, bevelThickness: 3 };
-  const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+  const geometry = new THREE.ExtrudeGeometry(shape, { depth: 32, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 3, bevelThickness: 3 });
   geometry.rotateX(Math.PI / 2);
 
-  const material = new THREE.MeshStandardMaterial({
-    color: 0x262019, roughness: 0.55, metalness: 0.7,
-    emissive: 0x0c0906, emissiveIntensity: 0.15
-  });
-
-  borderFrameMesh = new THREE.Mesh(geometry, material);
+  borderFrameMesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: 0x262019, roughness: 0.55, metalness: 0.7, emissive: 0x0c0906, emissiveIntensity: 0.15 }));
   borderFrameMesh.position.y = 14;
   scene.add(borderFrameMesh);
 }
@@ -2173,17 +1715,15 @@ function initThreeGame() {
   gltfLoader = new THREE.GLTFLoader();
   textureLoader = new THREE.TextureLoader();
 
-  ['zincir.png', 'alev.png', 'amiral.png', 'kar.png'].forEach(imgName => {
+  ['zincir.png', 'alev.png', 'amiral.png', 'kar.png'].forEach((imgName) => {
     textureLoader.load(imgName, (tex) => {
       tex.generateMipmaps = true;
       tex.minFilter = THREE.LinearMipmapLinearFilter;
       loadedAmmoTextures[imgName] = tex;
-    }, undefined, (err) => {});
+    });
   });
 
-  const ambientLight = new THREE.AmbientLight(0xb8c4d0, 0.78);
-  scene.add(ambientLight);
-
+  scene.add(new THREE.AmbientLight(0xb8c4d0, 0.78));
   const sunLight = new THREE.DirectionalLight(0xf5ebd6, 0.95);
   sunLight.position.set(2000, 3000, 1500);
   scene.add(sunLight);
@@ -2195,40 +1735,27 @@ function initThreeGame() {
   oceanTexture = createSeamlessDarkOceanTexture();
   oceanBumpTexture = createOceanBumpTexture();
   planeGeo = new THREE.PlaneGeometry(WORLD_SIZE * 2, WORLD_SIZE * 2, 32, 32);
-  const oceanMat = new THREE.MeshStandardMaterial({
-    map: oceanTexture,
-    bumpMap: oceanBumpTexture,
-    bumpScale: 1.2,
-    color: 0x6290a1,
-    roughness: 0.68,
-    metalness: 0.14,
-    emissive: 0x020d14,
-    emissiveIntensity: 0.08
-  });
-  const ocean = new THREE.Mesh(planeGeo, oceanMat);
+  const ocean = new THREE.Mesh(planeGeo, new THREE.MeshStandardMaterial({
+    map: oceanTexture, bumpMap: oceanBumpTexture, bumpScale: 1.2,
+    color: 0x6290a1, roughness: 0.68, metalness: 0.14, emissive: 0x020d14, emissiveIntensity: 0.08
+  }));
   ocean.rotation.x = -Math.PI / 2;
   ocean.position.y = -2;
   scene.add(ocean);
 
   createBorderFrame();
 
-  const ringGeo = new THREE.RingGeometry(ATTACK_RANGE - 2.5, ATTACK_RANGE, 64);
-  const ringMat = new THREE.MeshBasicMaterial({ color: 0xc8a262, side: THREE.DoubleSide, transparent: true, opacity: 0.42 });
-  rangeRingMesh = new THREE.Mesh(ringGeo, ringMat);
+  rangeRingMesh = new THREE.Mesh(new THREE.RingGeometry(ATTACK_RANGE - 2.5, ATTACK_RANGE, 64), new THREE.MeshBasicMaterial({ color: 0xc8a262, side: THREE.DoubleSide, transparent: true, opacity: 0.42 }));
   rangeRingMesh.rotation.x = -Math.PI / 2;
   rangeRingMesh.position.y = 0.6;
   scene.add(rangeRingMesh);
 
-  const neonGeo = new THREE.RingGeometry(28, 33, 48);
-  const neonMat = new THREE.MeshBasicMaterial({ color: 0xc8a262, side: THREE.DoubleSide, transparent: true, opacity: 0.55 });
-  playerNeonRing = new THREE.Mesh(neonGeo, neonMat);
+  playerNeonRing = new THREE.Mesh(new THREE.RingGeometry(28, 33, 48), new THREE.MeshBasicMaterial({ color: 0xc8a262, side: THREE.DoubleSide, transparent: true, opacity: 0.55 }));
   playerNeonRing.rotation.x = -Math.PI / 2;
   playerNeonRing.position.y = 0.8;
   scene.add(playerNeonRing);
 
-  const selRingGeo = new THREE.RingGeometry(30, 35, 48);
-  const selRingMat = new THREE.MeshBasicMaterial({ color: 0xc45c4e, side: THREE.DoubleSide, transparent: true, opacity: 0.65 });
-  selectedRingMesh = new THREE.Mesh(selRingGeo, selRingMat);
+  selectedRingMesh = new THREE.Mesh(new THREE.RingGeometry(30, 35, 48), new THREE.MeshBasicMaterial({ color: 0xc45c4e, side: THREE.DoubleSide, transparent: true, opacity: 0.65 }));
   selectedRingMesh.rotation.x = -Math.PI / 2;
   selectedRingMesh.position.y = 0.9;
   selectedRingMesh.visible = false;
@@ -2245,46 +1772,37 @@ function initThreeGame() {
 
   const gameCanvasEl = document.getElementById('game');
 
-  gameCanvasEl.addEventListener('pointerdown', e => {
+  gameCanvasEl.addEventListener('pointerdown', (e) => {
     isDraggingCamera = true;
     hasDragged = false;
     dragStartX = e.clientX;
     dragStartY = e.clientY;
   });
 
-  window.addEventListener('pointermove', e => {
+  window.addEventListener('pointermove', (e) => {
     if (!isDraggingCamera) return;
-    const deltaX = e.clientX - dragStartX;
-    const deltaY = e.clientY - dragStartY;
-    if (Math.hypot(deltaX, deltaY) > 6) hasDragged = true;
+    const dx = e.clientX - dragStartX, dy = e.clientY - dragStartY;
+    if (Math.hypot(dx, dy) > 6) hasDragged = true;
     if (hasDragged) {
-      cameraLookOffset.x -= deltaX * 1.8;
-      cameraLookOffset.z -= deltaY * 1.8;
+      cameraLookOffset.x -= dx * 1.8;
+      cameraLookOffset.z -= dy * 1.8;
       dragStartX = e.clientX;
       dragStartY = e.clientY;
     }
   });
 
-  window.addEventListener('pointerup', e => {
+  window.addEventListener('pointerup', (e) => {
     if (!isDraggingCamera) return;
     isDraggingCamera = false;
     if (!hasDragged) {
       const rect = renderer.domElement.getBoundingClientRect();
-      const clientX = e.clientX - rect.left;
-      const clientY = e.clientY - rect.top;
-      mouse.x = (clientX / rect.width) * 2 - 1;
-      mouse.y = -(clientY / rect.height) * 2 + 1;
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
       raycaster.setFromCamera(mouse, camera);
 
       for (const t of defenseTowers) {
-        if (t.mesh) {
-          const intersectsTower = raycaster.intersectObject(t.mesh, true);
-          if (intersectsTower.length > 0) {
-            selectedEnemyId = t.id;
-            updateTargetCard();
-            syncAttackButton();
-            return;
-          }
+        if (t.mesh && raycaster.intersectObject(t.mesh, true).length > 0) {
+          selectedEnemyId = t.id; updateTargetCard(); syncAttackButton(); return;
         }
       }
 
@@ -2292,21 +1810,14 @@ function initThreeGame() {
       const intersectsEnemies = raycaster.intersectObjects(enemyObjects, true);
       if (intersectsEnemies.length > 0) {
         let rootObj = intersectsEnemies[0].object;
-        while (rootObj.parent && !rootObj.userData.enemyId) {
-          rootObj = rootObj.parent;
-        }
+        while (rootObj.parent && !rootObj.userData.enemyId) rootObj = rootObj.parent;
         if (rootObj.userData.enemyId) {
-          selectedEnemyId = rootObj.userData.enemyId;
-          updateTargetCard();
-          syncAttackButton();
-          return;
+          selectedEnemyId = rootObj.userData.enemyId; updateTargetCard(); syncAttackButton(); return;
         }
       }
 
       const oceanIntersect = raycaster.intersectObject(ocean);
-      if (oceanIntersect.length > 0) {
-        setPlayerDestination(oceanIntersect[0].point.x, oceanIntersect[0].point.z);
-      }
+      if (oceanIntersect.length > 0) setPlayerDestination(oceanIntersect[0].point.x, oceanIntersect[0].point.z);
     }
     hasDragged = false;
   });
@@ -2317,17 +1828,17 @@ function initThreeGame() {
   animate3D();
 }
 
-let player;
-let targetDestination = null;
-let selectedEnemyId = null, isAttacking = false, isGameOver = false;
-let lastPlayerAttackTime = 0;
+let player, targetDestination = null, selectedEnemyId = null, isAttacking = false, isGameOver = false, lastPlayerAttackTime = 0;
 
-function setupPlayerShipVisual() {
+function getEquippedModelSpec() {
   const users = loadUsers();
   const dbUser = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
   const equippedId = sanitizeShipId(dbUser.equippedShip);
-  const modelSpec = SHIP_MODELS[equippedId] || SHIP_MODELS.standard;
+  return SHIP_MODELS[equippedId] || SHIP_MODELS.standard;
+}
 
+function setupPlayerShipVisual() {
+  const modelSpec = getEquippedModelSpec();
   clearDenemeShipStyling();
   if (activeGlbShip) { scene.remove(activeGlbShip); activeGlbShip = null; }
 
@@ -2339,8 +1850,7 @@ function setupPlayerShipVisual() {
     const size = new THREE.Vector3();
     box.getSize(size);
     const maxDim = Math.max(size.x, size.y, size.z) || 1;
-    let scaleFactor = (120 / maxDim) * (modelSpec.scaleMultiplier || 1.0);
-    activeGlbShip.scale.set(scaleFactor, scaleFactor, scaleFactor);
+    activeGlbShip.scale.setScalar((120 / maxDim) * (modelSpec.scaleMultiplier || 1.0));
     decorateShipModelWithSpec(activeGlbShip, modelSpec);
     scene.add(activeGlbShip);
   });
@@ -2350,7 +1860,6 @@ function startGameLogic() {
   isGameOver = false; targetDestination = null; navigationQueue = []; selectedEnemyId = null; isAttacking = false;
   cameraLookOffset = { x: 0, z: 0 };
   gameOverEl.style.display = 'none';
-
   MAP_DATA.forEach((m) => { m.ownerFleet = null; });
 
   player = {
@@ -2358,15 +1867,13 @@ function startGameLogic() {
     hp: 1000000, maxHp: 1000000, score: 100000000, diamonds: 1103,
     level: 1, exp: 0, maxExp: 100,
     expansionRights: { cannon: 1, hp: 1, speed: 1 },
-    cannons: 250,
-    selectedAmmo: 'iron',
+    cannons: 250, selectedAmmo: 'iron',
     ammo: { iron: 1000000, chain: 1000000, fire: 1000000, amiral: 1000000, snow: 1000000 },
     lastDamagedTime: 0
   };
 
   setupPlayerShipVisual();
   changeMap(0);
-
   selectAmmoSlot('iron');
   updateTargetCard();
   updateHUD();
@@ -2381,86 +1888,40 @@ function addCastleFlameCluster(parentGroup, x, y, z, scale = 1.0, phaseOffset = 
   clusterGroup.position.set(x, y, z);
 
   if (withStoneBase) {
-    const stonePedestalMat = new THREE.MeshStandardMaterial({
-      color: 0x353b44,
-      roughness: 0.72,
-      metalness: 0.38
-    });
-    const goldTrimPedestalMat = new THREE.MeshStandardMaterial({
-      color: 0xb89452,
-      roughness: 0.38,
-      metalness: 0.75
-    });
-    const pedestal = new THREE.Mesh(
-      new THREE.CylinderGeometry(12.5 * scale, 15.5 * scale, 14 * scale, 12),
-      stonePedestalMat
-    );
+    const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(12.5 * scale, 15.5 * scale, 14 * scale, 12), new THREE.MeshStandardMaterial({ color: 0x353b44, roughness: 0.72, metalness: 0.38 }));
     pedestal.position.y = -11.5 * scale;
     clusterGroup.add(pedestal);
 
-    const pedestalGoldBand = new THREE.Mesh(
-      new THREE.TorusGeometry(13.2 * scale, 0.9 * scale, 10, 20),
-      goldTrimPedestalMat
-    );
+    const pedestalGoldBand = new THREE.Mesh(new THREE.TorusGeometry(13.2 * scale, 0.9 * scale, 10, 20), new THREE.MeshStandardMaterial({ color: 0xb89452, roughness: 0.38, metalness: 0.75 }));
     pedestalGoldBand.rotation.x = Math.PI / 2;
     pedestalGoldBand.position.y = -4.5 * scale;
     clusterGroup.add(pedestalGoldBand);
   }
 
-  const brazierMat = new THREE.MeshStandardMaterial({
-    color: 0x241f1b,
-    roughness: 0.62,
-    metalness: 0.75
-  });
-  const goldTrimMat = new THREE.MeshStandardMaterial({
-    color: 0xc8a262,
-    roughness: 0.35,
-    metalness: 0.78
-  });
-  const brazierBowl = new THREE.Mesh(new THREE.CylinderGeometry(9.8 * scale, 6.2 * scale, 7.5 * scale, 14), brazierMat);
+  const brazierBowl = new THREE.Mesh(new THREE.CylinderGeometry(9.8 * scale, 6.2 * scale, 7.5 * scale, 14), new THREE.MeshStandardMaterial({ color: 0x241f1b, roughness: 0.62, metalness: 0.75 }));
   brazierBowl.position.y = -3.2 * scale;
   clusterGroup.add(brazierBowl);
 
-  const rimRing = new THREE.Mesh(new THREE.TorusGeometry(9.6 * scale, 0.9 * scale, 10, 20), goldTrimMat);
+  const rimRing = new THREE.Mesh(new THREE.TorusGeometry(9.6 * scale, 0.9 * scale, 10, 20), new THREE.MeshStandardMaterial({ color: 0xc8a262, roughness: 0.35, metalness: 0.78 }));
   rimRing.rotation.x = Math.PI / 2;
   rimRing.position.y = 0.4 * scale;
   clusterGroup.add(rimRing);
 
-  const coreMat = new THREE.MeshBasicMaterial({
-    color: 0xf7dca2,
-    transparent: true,
-    opacity: 0.85
-  });
-  const coreFlame = new THREE.Mesh(new THREE.ConeGeometry(3.8 * scale, 16 * scale, 10), coreMat);
+  const coreFlame = new THREE.Mesh(new THREE.ConeGeometry(3.8 * scale, 16 * scale, 10), new THREE.MeshBasicMaterial({ color: 0xf7dca2, transparent: true, opacity: 0.85 }));
   coreFlame.position.set(0, 7.8 * scale, 0);
   clusterGroup.add(coreFlame);
 
   const flameColors = [0xc94a24, 0xd96b27, 0xe08d38, 0xf0be65];
   const tongues = [];
-  const tongueCount = 10;
-
-  for (let i = 0; i < tongueCount; i++) {
-    const tMat = new THREE.MeshBasicMaterial({
-      color: flameColors[i % flameColors.length],
-      transparent: true,
-      opacity: 0.76
-    });
-    const tGeo = new THREE.ConeGeometry(4.5 * scale, 24 * scale, 8);
-    const tMesh = new THREE.Mesh(tGeo, tMat);
-    const ang = (i / tongueCount) * Math.PI * 2;
+  for (let i = 0; i < 10; i++) {
+    const tMesh = new THREE.Mesh(new THREE.ConeGeometry(4.5 * scale, 24 * scale, 8), new THREE.MeshBasicMaterial({ color: flameColors[i % flameColors.length], transparent: true, opacity: 0.76 }));
+    const ang = (i / 10) * Math.PI * 2;
     const rad = (i % 2 === 0 ? 3.2 : 1.4) * scale;
     tMesh.position.set(Math.cos(ang) * rad, 12 * scale, Math.sin(ang) * rad);
     tMesh.rotation.z = -Math.cos(ang) * 0.22;
     tMesh.rotation.x = Math.sin(ang) * 0.22;
     clusterGroup.add(tMesh);
-
-    tongues.push({
-      mesh: tMesh,
-      baseY: 12 * scale,
-      baseScaleY: 1.0,
-      phase: phaseOffset + i * 0.65,
-      speed: 6.5 + (i % 4) * 0.9
-    });
+    tongues.push({ mesh: tMesh, baseY: 12 * scale, baseScaleY: 1.0, phase: phaseOffset + i * 0.65, speed: 6.5 + (i % 4) * 0.9 });
   }
 
   const flameLight = new THREE.PointLight(0xd97736, 1.15 * scale, 150 * scale);
@@ -2468,92 +1929,37 @@ function addCastleFlameCluster(parentGroup, x, y, z, scale = 1.0, phaseOffset = 
   clusterGroup.add(flameLight);
 
   parentGroup.add(clusterGroup);
-  castleFlameSystems.push({
-    group: clusterGroup,
-    coreFlame,
-    coreMat,
-    tongues,
-    light: flameLight,
-    baseIntensity: 1.15 * scale,
-    scale,
-    phase: phaseOffset,
-    emberTimer: 0
-  });
+  castleFlameSystems.push({ group: clusterGroup, coreFlame, tongues, light: flameLight, baseIntensity: 1.15 * scale, scale, phase: phaseOffset, emberTimer: 0 });
 }
 
 function spawnFlameEmber(wx, wy, wz, scale = 1.0) {
   if (flameEmberParticles.length > 60) return;
-  const mat = new THREE.MeshBasicMaterial({
-    color: Math.random() > 0.4 ? 0xd98a3c : 0xb85328,
-    transparent: true,
-    opacity: 0.72
-  });
-  const mesh = new THREE.Mesh(SHARED_PARTICLE_GEO, mat);
+  const mesh = new THREE.Mesh(SHARED_PARTICLE_GEO, new THREE.MeshBasicMaterial({ color: Math.random() > 0.4 ? 0xd98a3c : 0xb85328, transparent: true, opacity: 0.72 }));
   const ang = Math.random() * Math.PI * 2;
   const spd = (6 + Math.random() * 10) * scale;
   mesh.scale.setScalar((0.85 + Math.random() * 1.0) * scale);
-  mesh.position.set(
-    wx + (Math.random() - 0.5) * 5 * scale,
-    wy,
-    wz + (Math.random() - 0.5) * 5 * scale
-  );
+  mesh.position.set(wx + (Math.random() - 0.5) * 5 * scale, wy, wz + (Math.random() - 0.5) * 5 * scale);
   scene.add(mesh);
-  flameEmberParticles.push({
-    mesh,
-    vx: Math.cos(ang) * spd * 0.4,
-    vy: (20 + Math.random() * 16) * scale,
-    vz: Math.sin(ang) * spd * 0.4,
-    life: 24 + Math.floor(Math.random() * 14)
-  });
+  flameEmberParticles.push({ mesh, vx: Math.cos(ang) * spd * 0.4, vy: (20 + Math.random() * 16) * scale, vz: Math.sin(ang) * spd * 0.4, life: 24 + Math.floor(Math.random() * 14) });
 }
 
 function buildCastleKeepAndIsland(parentGroup, wallRadius) {
   const sandTex = createIslandSandTexture();
   const stoneTex = createStoneWallTexture();
-
-  const sandShoreMat = new THREE.MeshStandardMaterial({
-    map: sandTex,
-    bumpMap: sandTex,
-    bumpScale: 1.3,
-    color: 0xb59d74,
-    roughness: 0.92,
-    metalness: 0.04,
-    transparent: true,
-    opacity: 0.92,
-    depthWrite: true,
-    depthTest: true
-  });
-  const islandRockMat = new THREE.MeshStandardMaterial({
-    bumpMap: stoneTex,
-    bumpScale: 1.4,
-    color: 0x343942,
-    roughness: 0.86,
-    metalness: 0.18,
-    depthWrite: true,
-    depthTest: true
-  });
-
+  const sandShoreMat = new THREE.MeshStandardMaterial({ map: sandTex, bumpMap: sandTex, bumpScale: 1.3, color: 0xb59d74, roughness: 0.92, metalness: 0.04, transparent: true, opacity: 0.92 });
+  const islandRockMat = new THREE.MeshStandardMaterial({ bumpMap: stoneTex, bumpScale: 1.4, color: 0x343942, roughness: 0.86, metalness: 0.18 });
   const keepBaseY = SHIP_Y_POS - 62;
 
-  const naturalIslandDisc = new THREE.Mesh(
-    new THREE.CircleGeometry(92, 32),
-    sandShoreMat
-  );
+  const naturalIslandDisc = new THREE.Mesh(new THREE.CircleGeometry(92, 32), sandShoreMat);
   naturalIslandDisc.rotation.x = -Math.PI / 2;
   naturalIslandDisc.position.set(0, keepBaseY - 11, 0);
   parentGroup.add(naturalIslandDisc);
 
-  const centralIsland = new THREE.Mesh(
-    new THREE.CylinderGeometry(64, 86, 18, 28),
-    islandRockMat
-  );
+  const centralIsland = new THREE.Mesh(new THREE.CylinderGeometry(64, 86, 18, 28), islandRockMat);
   centralIsland.position.set(0, keepBaseY - 4, 0);
   parentGroup.add(centralIsland);
 
-  const centralSandPad = new THREE.Mesh(
-    new THREE.CylinderGeometry(58, 66, 4, 28),
-    sandShoreMat
-  );
+  const centralSandPad = new THREE.Mesh(new THREE.CylinderGeometry(58, 66, 4, 28), sandShoreMat);
   centralSandPad.position.set(0, keepBaseY + 5, 0);
   parentGroup.add(centralSandPad);
 
@@ -2563,7 +1969,6 @@ function buildCastleKeepAndIsland(parentGroup, wallRadius) {
 
   const glowMaterials = [];
   const baseEmissiveIntensities = [];
-
   const mainTowerLight = new THREE.PointLight(0xe0be82, 0.95, 300);
   mainTowerLight.position.set(0, 65, 0);
   mainTowerGroup.add(mainTowerLight);
@@ -2572,28 +1977,17 @@ function buildCastleKeepAndIsland(parentGroup, wallRadius) {
   softAuraLight.position.set(0, 28, 0);
   mainTowerGroup.add(softAuraLight);
 
-  mainTowerGlowState = {
-    materials: glowMaterials,
-    baseEmissiveIntensities,
-    light: mainTowerLight,
-    baseLightIntensity: 0.95,
-    auraLight: softAuraLight,
-    baseAuraIntensity: 0.4,
-    pulseSpeed: 1.15
-  };
+  mainTowerGlowState = { materials: glowMaterials, baseEmissiveIntensities, light: mainTowerLight, baseLightIntensity: 0.95, auraLight: softAuraLight, baseAuraIntensity: 0.4, pulseSpeed: 1.15 };
 
   loadCachedGLB('anakule.glb', (towerModel) => {
     if (!activeDefenseIslandGroup || !mainTowerGroup.parent) return;
-
     preserveTowerLighting(towerModel);
 
     const rawBox = new THREE.Box3().setFromObject(towerModel);
     const rawSize = new THREE.Vector3();
     rawBox.getSize(rawSize);
     const maxDim = Math.max(rawSize.x, rawSize.y, rawSize.z) || 1;
-    const targetSize = 148;
-    const scaleFactor = targetSize / maxDim;
-    towerModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
+    towerModel.scale.setScalar(148 / maxDim);
 
     towerModel.traverse((child) => {
       if (child.isMesh && child.material) {
@@ -2604,9 +1998,7 @@ function buildCastleKeepAndIsland(parentGroup, wallRadius) {
           const currentEmissiveHex = m.emissive ? m.emissive.getHex() : 0x000000;
           const baseInt = hasEmissiveMap || currentEmissiveHex > 0x050505 ? 0.35 : 0.1;
           if (m.emissive) {
-            if (!hasEmissiveMap && currentEmissiveHex <= 0x050505) {
-              m.emissive.setHex(0xd4b272);
-            }
+            if (!hasEmissiveMap && currentEmissiveHex <= 0x050505) m.emissive.setHex(0xd4b272);
             m.emissiveIntensity = baseInt;
           }
           m.needsUpdate = true;
@@ -2619,131 +2011,58 @@ function buildCastleKeepAndIsland(parentGroup, wallRadius) {
     });
 
     const scaledBox = new THREE.Box3().setFromObject(towerModel);
-    const bottomOffset = scaledBox.min.y - towerModel.position.y;
-    towerModel.position.set(0, -bottomOffset - 2, 0);
-
+    towerModel.position.set(0, -(scaledBox.min.y - towerModel.position.y) - 2, 0);
     const heightSpan = Math.max(40, scaledBox.max.y - scaledBox.min.y);
     mainTowerLight.position.set(0, heightSpan * 0.68, 0);
     softAuraLight.position.set(0, heightSpan * 0.32, 0);
-
     mainTowerGroup.add(towerModel);
   });
 
   const innerWallFlameRadius = wallRadius - 18;
-  const innerFlameAngles = [-2.25, -0.85, 0.85, 2.25];
-  innerFlameAngles.forEach((ang, idx) => {
-    const fx = Math.cos(ang) * innerWallFlameRadius;
-    const fz = Math.sin(ang) * innerWallFlameRadius;
-    addCastleFlameCluster(parentGroup, fx, keepBaseY + 12, fz, 1.05, idx * 1.35, true);
+  [-2.25, -0.85, 0.85, 2.25].forEach((ang, idx) => {
+    addCastleFlameCluster(parentGroup, Math.cos(ang) * innerWallFlameRadius, keepBaseY + 12, Math.sin(ang) * innerWallFlameRadius, 1.05, idx * 1.35, true);
   });
 }
 
 function isGateAngle(angle) {
-  for (const gateAngle of WALL_GATE_ANGLES) {
-    if (Math.abs(normalizeAngle(angle - gateAngle)) < WALL_GAP_HALF_ARC) {
-      return true;
-    }
-  }
-  return false;
+  return WALL_GATE_ANGLES.some(gateAngle => Math.abs(normalizeAngle(angle - gateAngle)) < WALL_GAP_HALF_ARC);
 }
 
 function isTowerAngle(angle) {
-  for (const tAng of TOWER_ANGLES) {
-    if (Math.abs(normalizeAngle(angle - tAng)) < 0.14) {
-      return true;
-    }
-  }
-  return false;
+  return TOWER_ANGLES.some(tAng => Math.abs(normalizeAngle(angle - tAng)) < 0.14);
 }
 
 function spawnDefenseTowersRing() {
-  defenseTowers.forEach(t => {
-    if (t.mesh) scene.remove(t.mesh);
-    if (t.labelEl) t.labelEl.remove();
-  });
+  defenseTowers.forEach((t) => { if (t.mesh) scene.remove(t.mesh); if (t.labelEl) t.labelEl.remove(); });
   defenseTowers = [];
   wallCollisionBoxes.length = 0;
 
-  if (activeDefenseIslandGroup) {
-    scene.remove(activeDefenseIslandGroup);
-    activeDefenseIslandGroup = null;
-  }
+  if (activeDefenseIslandGroup) { scene.remove(activeDefenseIslandGroup); activeDefenseIslandGroup = null; }
   castleFlameSystems = [];
   mainTowerGlowState = null;
 
   const defenseIslandGroup = new THREE.Group();
-  defenseIslandGroup.name = "DefenseIsland_RangeMatchLayout";
   activeDefenseIslandGroup = defenseIslandGroup;
 
-  const wallRadius = WALL_RADIUS;
   const wallSegments = 32;
   const wallStoneTex = createStoneWallTexture();
-
-  const wallMat = new THREE.MeshStandardMaterial({
-    map: wallStoneTex,
-    bumpMap: wallStoneTex,
-    bumpScale: 1.2,
-    color: 0x3b424d,
-    roughness: 0.58,
-    metalness: 0.42,
-    depthWrite: true,
-    depthTest: true
-  });
-  wallMat.renderOrder = 0;
-
-  const goldTrimMat = new THREE.MeshStandardMaterial({
-    color: 0xb89452,
-    roughness: 0.36,
-    metalness: 0.75,
-    depthWrite: true,
-    depthTest: true
-  });
-
-  const merlonMat = new THREE.MeshStandardMaterial({
-    bumpMap: wallStoneTex,
-    bumpScale: 0.8,
-    color: 0x282e37,
-    roughness: 0.62,
-    metalness: 0.45,
-    depthWrite: true,
-    depthTest: true
-  });
-
-  const towerBaseMat = new THREE.MeshStandardMaterial({
-    map: wallStoneTex,
-    bumpMap: wallStoneTex,
-    bumpScale: 1.1,
-    color: 0x2f353f,
-    roughness: 0.55,
-    metalness: 0.5
-  });
-
-  const gatePillarMat = new THREE.MeshStandardMaterial({
-    color: 0xc8a262,
-    roughness: 0.35,
-    metalness: 0.78
-  });
+  const wallMat = new THREE.MeshStandardMaterial({ map: wallStoneTex, bumpMap: wallStoneTex, bumpScale: 1.2, color: 0x3b424d, roughness: 0.58, metalness: 0.42 });
+  const goldTrimMat = new THREE.MeshStandardMaterial({ color: 0xb89452, roughness: 0.36, metalness: 0.75 });
+  const merlonMat = new THREE.MeshStandardMaterial({ bumpMap: wallStoneTex, bumpScale: 0.8, color: 0x282e37, roughness: 0.62, metalness: 0.45 });
+  const towerBaseMat = new THREE.MeshStandardMaterial({ map: wallStoneTex, bumpMap: wallStoneTex, bumpScale: 1.1, color: 0x2f353f, roughness: 0.55, metalness: 0.5 });
+  const gatePillarMat = new THREE.MeshStandardMaterial({ color: 0xc8a262, roughness: 0.35, metalness: 0.78 });
 
   for (let i = 0; i < wallSegments; i++) {
-    const angle = (i / wallSegments) * Math.PI * 2;
-    const nextAngle = ((i + 1) / wallSegments) * Math.PI * 2;
-    const midAngle = normalizeAngle((angle + nextAngle) / 2);
+    const midAngle = normalizeAngle((((i + 0.5) / wallSegments) * Math.PI * 2));
+    if (isGateAngle(midAngle)) continue;
 
-    if (isGateAngle(midAngle)) {
-      continue;
-    }
-
-    const segmentWidth = (2 * Math.PI * wallRadius) / wallSegments * 1.07;
-    const wallSegGeo = new THREE.BoxGeometry(segmentWidth, 44, 28);
-    const wallSegMesh = new THREE.Mesh(wallSegGeo, wallMat);
-    wallSegMesh.renderOrder = 0;
-
-    const wx = Math.cos(midAngle) * wallRadius;
-    const wz = Math.sin(midAngle) * wallRadius;
+    const segmentWidth = ((2 * Math.PI * WALL_RADIUS) / wallSegments) * 1.07;
+    const wx = Math.cos(midAngle) * WALL_RADIUS;
+    const wz = Math.sin(midAngle) * WALL_RADIUS;
     const rotY = -midAngle + Math.PI / 2;
-    const cosA = Math.cos(rotY);
-    const sinA = Math.sin(rotY);
+    const cosA = Math.cos(rotY), sinA = Math.sin(rotY);
 
+    const wallSegMesh = new THREE.Mesh(new THREE.BoxGeometry(segmentWidth, 44, 28), wallMat);
     wallSegMesh.position.set(wx, SHIP_Y_POS - 59, wz);
     wallSegMesh.rotation.y = rotY;
     defenseIslandGroup.add(wallSegMesh);
@@ -2757,20 +2076,12 @@ function spawnDefenseTowersRing() {
       [-0.26, 0.26].forEach((offsetRatio) => {
         const mLocalX = segmentWidth * offsetRatio;
         const merlon = new THREE.Mesh(new THREE.BoxGeometry(segmentWidth * 0.24, 11, 29), merlonMat);
-        merlon.position.set(
-          wx + mLocalX * cosA,
-          SHIP_Y_POS - 30,
-          wz - mLocalX * sinA
-        );
+        merlon.position.set(wx + mLocalX * cosA, SHIP_Y_POS - 30, wz - mLocalX * sinA);
         merlon.rotation.y = rotY;
         defenseIslandGroup.add(merlon);
 
         const merlonGoldCap = new THREE.Mesh(new THREE.BoxGeometry(segmentWidth * 0.25, 1.4, 30), goldTrimMat);
-        merlonGoldCap.position.set(
-          wx + mLocalX * cosA,
-          SHIP_Y_POS - 24,
-          wz - mLocalX * sinA
-        );
+        merlonGoldCap.position.set(wx + mLocalX * cosA, SHIP_Y_POS - 24, wz - mLocalX * sinA);
         merlonGoldCap.rotation.y = rotY;
         defenseIslandGroup.add(merlonGoldCap);
       });
@@ -2780,8 +2091,7 @@ function spawnDefenseTowersRing() {
   }
 
   TOWER_ANGLES.forEach((tAng) => {
-    const tx = Math.cos(tAng) * wallRadius;
-    const tz = Math.sin(tAng) * wallRadius;
+    const tx = Math.cos(tAng) * WALL_RADIUS, tz = Math.sin(tAng) * WALL_RADIUS;
     const deckPlinth = new THREE.Mesh(new THREE.CylinderGeometry(18, 20, 4.5, 16), towerBaseMat);
     deckPlinth.position.set(tx, SHIP_Y_POS - 25.5, tz);
     defenseIslandGroup.add(deckPlinth);
@@ -2795,55 +2105,39 @@ function spawnDefenseTowersRing() {
   WALL_GATE_ANGLES.forEach((gateAng) => {
     [-WALL_GAP_HALF_ARC, WALL_GAP_HALF_ARC].forEach((edgeOffset) => {
       const pAng = gateAng + edgeOffset;
-      const px = Math.cos(pAng) * wallRadius;
-      const pz = Math.sin(pAng) * wallRadius;
       const pillar = new THREE.Mesh(new THREE.CylinderGeometry(6.0, 7.6, 54, 14), gatePillarMat);
-      pillar.position.set(px, SHIP_Y_POS - 54, pz);
+      pillar.position.set(Math.cos(pAng) * WALL_RADIUS, SHIP_Y_POS - 54, Math.sin(pAng) * WALL_RADIUS);
       defenseIslandGroup.add(pillar);
     });
   });
 
-  buildCastleKeepAndIsland(defenseIslandGroup, wallRadius);
-
+  buildCastleKeepAndIsland(defenseIslandGroup, WALL_RADIUS);
   scene.add(defenseIslandGroup);
 
-  const startId = 9000;
-  let towerCounter = 0;
-
-  const createTowerEntity = (index, x, z, scaleFactor = 1.0) => {
-    const towerId = startId + index;
-    const towerName = `Profesyonel Kule`;
-
+  TOWER_ANGLES.forEach((angle, i) => {
+    const towerId = 9000 + i;
+    const tx = Math.cos(angle) * WALL_RADIUS, tz = Math.sin(angle) * WALL_RADIUS;
     const labelEl = document.createElement('div');
     labelEl.className = 'enemy-label';
-    labelEl.innerHTML = `
-      <div class="enemy-hp-track"><div class="enemy-hp-fill" id="tower-hp-fill-${towerId}"></div></div>
-      <div class="enemy-name-tag" style="color: #dfc07d;">${towerName}</div>
-    `;
+    labelEl.innerHTML = `<div class="enemy-hp-track"><div class="enemy-hp-fill" id="tower-hp-fill-${towerId}"></div></div><div class="enemy-name-tag" style="color: #dfc07d;">Profesyonel Kule</div>`;
     document.body.appendChild(labelEl);
 
     const towerObj = {
-      id: towerId, name: towerName, mesh: null, labelEl,
+      id: towerId, name: 'Profesyonel Kule', mesh: null, labelEl,
       hpFillEl: labelEl.querySelector(`#tower-hp-fill-${towerId}`),
-      x, z, hp: 15000000, maxHp: 15000000,
-      lastAttackTime: 0, isAggro: false
+      x: tx, z: tz, hp: 15000000, maxHp: 15000000, lastAttackTime: 0, isAggro: false
     };
     defenseTowers.push(towerObj);
 
     loadCachedGLB('defence_tower.glb', (model) => {
       if (!defenseTowers.includes(towerObj)) return;
-
       preserveTowerLighting(model);
 
-      model.traverse(child => {
+      model.traverse((child) => {
         child.userData = { enemyId: towerId };
         if (child.isMesh && child.material) {
           const mats = Array.isArray(child.material) ? child.material : [child.material];
-          mats.forEach(m => {
-            m.depthTest = true;
-            m.depthWrite = true;
-            m.renderOrder = 999;
-          });
+          mats.forEach((m) => { m.depthTest = true; m.depthWrite = true; m.renderOrder = 999; });
         }
       });
 
@@ -2851,33 +2145,21 @@ function spawnDefenseTowersRing() {
       const size = new THREE.Vector3();
       box.getSize(size);
       const maxDim = Math.max(size.x, size.y, size.z) || 1;
-      let computedScale = (58 / maxDim) * scaleFactor;
-      model.scale.set(computedScale, computedScale, computedScale);
+      model.scale.setScalar(58 / maxDim);
 
       const scaledBox = new THREE.Box3().setFromObject(model);
-      const bottomOffset = scaledBox.min.y - model.position.y;
-      model.position.set(x, TOWER_MOUNT_Y - bottomOffset, z);
-
+      model.position.set(tx, TOWER_MOUNT_Y - (scaledBox.min.y - model.position.y), tz);
       model.userData = { enemyId: towerId };
       scene.add(model);
       towerObj.mesh = model;
     });
-  };
-
-  for (let i = 0; i < TOWER_ANGLES.length; i++) {
-    const angle = TOWER_ANGLES[i];
-    const tx = Math.cos(angle) * wallRadius;
-    const tz = Math.sin(angle) * wallRadius;
-    createTowerEntity(towerCounter++, tx, tz, 1.0);
-  }
+  });
 }
 
 function changeMap(mapIdx, entrySide = 'center') {
   currentMapIndex = mapIdx;
   radarTitleEl.textContent = MAP_DATA[mapIdx].name;
-  targetDestination = null;
-  navigationQueue = [];
-  cameraLookOffset = { x: 0, z: 0 };
+  targetDestination = null; navigationQueue = []; cameraLookOffset = { x: 0, z: 0 };
   hideTransitButton();
 
   const BOUND = (WORLD_SIZE / 2) - 350;
@@ -2888,10 +2170,7 @@ function changeMap(mapIdx, entrySide = 'center') {
   else { player.x = 450; player.z = 0; }
 
   document.querySelectorAll('.enemy-label').forEach(el => el.remove());
-  enemies.forEach(en => {
-    if (en.mesh) scene.remove(en.mesh);
-    if (en.labelEl) en.labelEl.remove();
-  });
+  enemies.forEach((en) => { if (en.mesh) scene.remove(en.mesh); if (en.labelEl) en.labelEl.remove(); });
   enemies = [];
 
   spawnDefenseTowersRing();
@@ -2902,8 +2181,7 @@ function changeMap(mapIdx, entrySide = 'center') {
 
 function showTransitButton(targetIdx, side) {
   pendingTransitMapIndex = targetIdx;
-  const targetName = MAP_DATA[targetIdx].name;
-  mapTransitBanner.textContent = `${targetName}'ye Geç`;
+  mapTransitBanner.textContent = `${MAP_DATA[targetIdx].name}'ye Geç`;
   mapTransitBanner.classList.add('visible');
   mapTransitBanner.dataset.side = side;
 }
@@ -2914,9 +2192,7 @@ function hideTransitButton() {
 }
 
 mapTransitBanner.addEventListener('click', () => {
-  if (pendingTransitMapIndex !== null) {
-    changeMap(pendingTransitMapIndex, mapTransitBanner.dataset.side);
-  }
+  if (pendingTransitMapIndex !== null) changeMap(pendingTransitMapIndex, mapTransitBanner.dataset.side);
 });
 
 function spawnEnemyGlb(id) {
@@ -2928,10 +2204,7 @@ function spawnEnemyGlb(id) {
 
   const labelEl = document.createElement('div');
   labelEl.className = 'enemy-label';
-  labelEl.innerHTML = `
-    <div class="enemy-hp-track"><div class="enemy-hp-fill" id="enemy-hp-${id}"></div></div>
-    <div class="enemy-name-tag">Korsan #${id}</div>
-  `;
+  labelEl.innerHTML = `<div class="enemy-hp-track"><div class="enemy-hp-fill" id="enemy-hp-${id}"></div></div><div class="enemy-name-tag">Korsan #${id}</div>`;
   document.body.appendChild(labelEl);
 
   const enemyData = {
@@ -2939,8 +2212,7 @@ function spawnEnemyGlb(id) {
     hpFillEl: labelEl.querySelector('.enemy-hp-fill'),
     x: ex, z: ez, hp: 100000, maxHp: 100000,
     baseSpeed: 90, slowTimer: 0, a: 0,
-    wanderAngle: Math.random() * Math.PI * 2, wanderTimer: 0,
-    lastAttackTime: 0, isAggro: false
+    wanderAngle: Math.random() * Math.PI * 2, wanderTimer: 0, lastAttackTime: 0, isAggro: false
   };
   enemies.push(enemyData);
 
@@ -2950,11 +2222,10 @@ function spawnEnemyGlb(id) {
     const size = new THREE.Vector3();
     box.getSize(size);
     const maxDim = Math.max(size.x, size.y, size.z) || 1;
-    let scaleFactor = (120 / maxDim) * ENEMY_GLB_SCALE;
-    model.scale.set(scaleFactor, scaleFactor, scaleFactor);
+    model.scale.setScalar((120 / maxDim) * ENEMY_GLB_SCALE);
     model.position.set(ex, SHIP_Y_POS + ENEMY_GLB_HEIGHT_OFFSET - 100, ez);
     model.userData = { enemyId: id };
-    model.traverse(child => { child.userData = { enemyId: id }; });
+    model.traverse((child) => { child.userData = { enemyId: id }; });
     scene.add(model);
     enemyData.mesh = model;
   });
@@ -2963,22 +2234,18 @@ function spawnEnemyGlb(id) {
 function selectAmmoSlot(type) {
   if (!player || !AMMO_TYPES[type]) return;
   player.selectedAmmo = type;
-  ammoSlots.forEach(slot => { slot.classList.toggle('selected', slot.dataset.type === type); });
+  ammoSlots.forEach(slot => slot.classList.toggle('selected', slot.dataset.type === type));
   const info = AMMO_TYPES[type];
   activeAmmoInfoEl.textContent = `Seçili: ${info.name} (${info.desc})`;
   syncAttackButton();
 }
 
-ammoSlots.forEach(slot => { slot.addEventListener('click', () => selectAmmoSlot(slot.dataset.type)); });
+ammoSlots.forEach(slot => slot.addEventListener('click', () => selectAmmoSlot(slot.dataset.type)));
 
-function resetCameraToPlayer() {
-  cameraLookOffset.x = 0;
-  cameraLookOffset.z = 0;
-}
-
+function resetCameraToPlayer() { cameraLookOffset.x = 0; cameraLookOffset.z = 0; }
 if (focusPlayerBtn) focusPlayerBtn.addEventListener('click', resetCameraToPlayer);
 
-window.addEventListener('keydown', e => {
+window.addEventListener('keydown', (e) => {
   if (e.key === '1') selectAmmoSlot('iron');
   if (e.key === '2') selectAmmoSlot('chain');
   if (e.key === '3') selectAmmoSlot('fire');
@@ -2990,9 +2257,7 @@ window.addEventListener('keydown', e => {
 });
 
 function getTargetById(id) {
-  const tower = defenseTowers.find(t => t.id === id);
-  if (tower) return tower;
-  return enemies.find(e => e.id === id);
+  return defenseTowers.find(t => t.id === id) || enemies.find(e => e.id === id);
 }
 
 function updateTargetCard() {
@@ -3001,9 +2266,13 @@ function updateTargetCard() {
     if (selectedRingMesh) selectedRingMesh.visible = false;
     return;
   }
-  targetCardEl.classList.add('visible');
   const target = getTargetById(selectedEnemyId);
-  if (!target) { targetCardEl.classList.remove('visible'); if (selectedRingMesh) selectedRingMesh.visible = false; return; }
+  if (!target) {
+    targetCardEl.classList.remove('visible');
+    if (selectedRingMesh) selectedRingMesh.visible = false;
+    return;
+  }
+  targetCardEl.classList.add('visible');
   targetNameEl.textContent = target.name;
   targetHpTextEl.textContent = `${Math.ceil(target.hp).toLocaleString()}/${target.maxHp.toLocaleString()}`;
   targetHpBarEl.style.width = Math.max(0, (target.hp / target.maxHp) * 100) + '%';
@@ -3022,9 +2291,7 @@ attackBtn.addEventListener('click', () => {
   if (!selectedEnemyId) return;
   if (!isAttacking && (player.ammo[player.selectedAmmo] || 0) < player.cannons) return;
   isAttacking = !isAttacking;
-  if (!isAttacking) {
-    clearAllEnemyAggro();
-  }
+  if (!isAttacking) clearAllEnemyAggro();
   syncAttackButton();
 });
 
@@ -3041,7 +2308,6 @@ function showFloatingDamage(wx, wz, text, colorHex) {
   tempV.project(camera);
   div.style.left = ((tempV.x * 0.5 + 0.5) * window.innerWidth) + 'px';
   div.style.top = ((tempV.y * -0.5 + 0.5) * window.innerHeight) + 'px';
-
   setTimeout(() => div.remove(), 850);
 }
 
@@ -3051,8 +2317,7 @@ function triggerCannonFireEffect(shipX, shipZ, targetX, targetZ, ammoKey, yBase 
   const muzzleZ = shipZ + Math.sin(angleToTarget) * 28;
 
   const flashColor = ammoKey === 'snow' ? 0xa5d4e8 : ammoKey === 'fire' ? 0xff7b29 : 0xd99b43;
-  const flashMat = new THREE.MeshBasicMaterial({ color: flashColor, transparent: true, opacity: 0.85 });
-  const flashMesh = new THREE.Mesh(SHARED_PARTICLE_GEO, flashMat);
+  const flashMesh = new THREE.Mesh(SHARED_PARTICLE_GEO, new THREE.MeshBasicMaterial({ color: flashColor, transparent: true, opacity: 0.85 }));
   flashMesh.scale.setScalar(ammoKey === 'fire' ? 6.5 : 5);
   flashMesh.position.set(muzzleX, yBase, muzzleZ);
   scene.add(flashMesh);
@@ -3060,8 +2325,7 @@ function triggerCannonFireEffect(shipX, shipZ, targetX, targetZ, ammoKey, yBase 
 
   for (let i = 0; i < 3; i++) {
     const grayTone = ammoKey === 'snow' ? 0.85 + Math.random() * 0.1 : 0.7 + Math.random() * 0.18;
-    const smokeMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(grayTone, grayTone, grayTone), transparent: true, opacity: 0.48 });
-    const smokeMesh = new THREE.Mesh(SHARED_PARTICLE_GEO, smokeMat);
+    const smokeMesh = new THREE.Mesh(SHARED_PARTICLE_GEO, new THREE.MeshBasicMaterial({ color: new THREE.Color(grayTone, grayTone, grayTone), transparent: true, opacity: 0.48 }));
     smokeMesh.scale.setScalar(2.6 + Math.random() * 3.0);
     smokeMesh.position.set(muzzleX + (Math.random() - 0.5) * 9, yBase - 2 + Math.random() * 5, muzzleZ + (Math.random() - 0.5) * 9);
     scene.add(smokeMesh);
@@ -3072,59 +2336,22 @@ function triggerCannonFireEffect(shipX, shipZ, targetX, targetZ, ammoKey, yBase 
 }
 
 function spawnProjectileTrailSparks(px, py, pz, ammoKey) {
-  if (particleSystems.length >= MAX_TRAIL_PARTICLES) {
-    const oldest = particleSystems.shift();
-    if (oldest && oldest.mesh) {
-      scene.remove(oldest.mesh);
-      oldest.mesh.material.dispose();
-    }
-  }
-
-  let sparkColor = 0xffb84d;
-  let sparkCount = 2;
-  let scaleBase = 1.45;
-
-  if (ammoKey === 'fire') {
-    sparkColor = Math.random() > 0.35 ? 0xff7b29 : 0xffd166;
-    sparkCount = 3;
-    scaleBase = 1.85;
-  } else if (ammoKey === 'amiral') {
-    sparkColor = [0x7cc4e8, 0xb896e8, 0x82d4ab, 0xeef5fc][Math.floor(Math.random() * 4)];
-    sparkCount = 2;
-    scaleBase = 1.65;
-  } else if (ammoKey === 'snow') {
-    sparkColor = 0xe4f1fa;
-    sparkCount = 2;
-    scaleBase = 1.5;
-  } else if (ammoKey === 'chain') {
-    sparkColor = 0xc8d4e0;
-    sparkCount = 2;
-    scaleBase = 1.4;
-  }
+  let sparkColor = 0xffb84d, sparkCount = 2, scaleBase = 1.45;
+  if (ammoKey === 'fire') { sparkColor = Math.random() > 0.35 ? 0xff7b29 : 0xffd166; sparkCount = 3; scaleBase = 1.85; }
+  else if (ammoKey === 'amiral') { sparkColor = [0x7cc4e8, 0xb896e8, 0x82d4ab, 0xeef5fc][Math.floor(Math.random() * 4)]; scaleBase = 1.65; }
+  else if (ammoKey === 'snow') { sparkColor = 0xe4f1fa; scaleBase = 1.5; }
+  else if (ammoKey === 'chain') { sparkColor = 0xc8d4e0; scaleBase = 1.4; }
 
   for (let i = 0; i < sparkCount; i++) {
-    if (particleSystems.length >= MAX_TRAIL_PARTICLES) break;
-    const sparkMat = new THREE.MeshBasicMaterial({
-      color: sparkColor,
-      transparent: true,
-      opacity: 0.88
-    });
-    const sparkMesh = new THREE.Mesh(SHARED_PARTICLE_GEO, sparkMat);
+    if (particleSystems.length >= MAX_TRAIL_PARTICLES) {
+      const oldest = particleSystems.shift();
+      if (oldest?.mesh) { scene.remove(oldest.mesh); oldest.mesh.material.dispose(); }
+    }
+    const sparkMesh = new THREE.Mesh(SHARED_PARTICLE_GEO, new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 0.88 }));
     sparkMesh.scale.setScalar(scaleBase + Math.random() * 0.75);
-    sparkMesh.position.set(
-      px + (Math.random() - 0.5) * 8,
-      py + (Math.random() - 0.5) * 6,
-      pz + (Math.random() - 0.5) * 8
-    );
+    sparkMesh.position.set(px + (Math.random() - 0.5) * 8, py + (Math.random() - 0.5) * 6, pz + (Math.random() - 0.5) * 8);
     scene.add(sparkMesh);
-    particleSystems.push({
-      mesh: sparkMesh,
-      vx: (Math.random() - 0.5) * 18,
-      vy: 8 + Math.random() * 14,
-      vz: (Math.random() - 0.5) * 18,
-      life: 16,
-      scaleDecay: 0.88
-    });
+    particleSystems.push({ mesh: sparkMesh, vx: (Math.random() - 0.5) * 18, vy: 8 + Math.random() * 14, vz: (Math.random() - 0.5) * 18, life: 16, scaleDecay: 0.88 });
   }
 }
 
@@ -3132,42 +2359,26 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit, option
   const yOffset = options.yOffset || 40;
   const speed = options.speed || 360;
   const muzzleY = options.muzzleY || 24;
-
   triggerCannonFireEffect(startX, startZ, targetX, targetZ, ammoKey, muzzleY);
-  const ammoSpec = AMMO_TYPES[ammoKey] || AMMO_TYPES.iron;
-  let mesh;
-  const tex = ammoSpec.img ? loadedAmmoTextures[ammoSpec.img] : null;
 
+  const ammoSpec = AMMO_TYPES[ammoKey] || AMMO_TYPES.iron;
+  const tex = ammoSpec.img ? loadedAmmoTextures[ammoSpec.img] : null;
+  let mesh;
   if (tex) {
-    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
-    mesh = new THREE.Sprite(mat);
-    const spriteScale = options.spriteScale || 13;
-    mesh.scale.set(spriteScale, spriteScale, 1);
+    mesh = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true }));
+    const s = options.spriteScale || 13;
+    mesh.scale.set(s, s, 1);
   } else {
-    const pMat = new THREE.MeshStandardMaterial({ color: ammoSpec.color, roughness: 0.3, metalness: 0.7 });
-    mesh = new THREE.Mesh(SHARED_PROJECTILE_GEO, pMat);
+    mesh = new THREE.Mesh(SHARED_PROJECTILE_GEO, new THREE.MeshStandardMaterial({ color: ammoSpec.color, roughness: 0.3, metalness: 0.7 }));
   }
 
-  const py = SHIP_Y_POS - yOffset;
-  mesh.position.set(startX, py, startZ);
+  mesh.position.set(startX, SHIP_Y_POS - yOffset, startZ);
   scene.add(mesh);
-  activeProjectiles.push({
-    mesh,
-    x: startX,
-    z: startZ,
-    targetX,
-    targetZ,
-    speed,
-    ammoKey,
-    onHit,
-    yOffset,
-    trailTimer: 0
-  });
+  activeProjectiles.push({ mesh, x: startX, z: startZ, targetX, targetZ, speed, ammoKey, onHit, yOffset, trailTimer: 0 });
 }
 
 function resolveWallSlide(nx, nz) {
-  let finalX = nx;
-  let finalZ = nz;
+  let finalX = nx, finalZ = nz;
   for (const box of wallCollisionBoxes) {
     const dist = Math.hypot(finalX - box.x, finalZ - box.z);
     if (dist < box.radius) {
@@ -3177,6 +2388,21 @@ function resolveWallSlide(nx, nz) {
     }
   }
   return { x: finalX, z: finalZ };
+}
+
+function projectToScreen(wx, wz, yOffsetScreen = 0) {
+  const v = new THREE.Vector3(wx, SHIP_Y_POS, wz).project(camera);
+  const sx = (v.x * 0.5 + 0.5) * window.innerWidth;
+  const sy = (v.y * -0.5 + 0.5) * window.innerHeight + yOffsetScreen;
+  return `translate(-50%, 0) translate(${sx}px, ${sy}px)`;
+}
+
+function handlePlayerDefeat() {
+  triggerSinkSparks(player.x, player.z, 1.35);
+  isGameOver = true;
+  isAttacking = false;
+  gameOverEl.style.display = 'flex';
+  finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString();
 }
 
 function animate3D() {
@@ -3205,13 +2431,9 @@ function animate3D() {
     const gentleFactor = 0.82 + 0.28 * slowWave;
     for (let i = 0; i < mainTowerGlowState.materials.length; i++) {
       const m = mainTowerGlowState.materials[i];
-      if (m && m.emissive) {
-        m.emissiveIntensity = mainTowerGlowState.baseEmissiveIntensities[i] * gentleFactor;
-      }
+      if (m?.emissive) m.emissiveIntensity = mainTowerGlowState.baseEmissiveIntensities[i] * gentleFactor;
     }
-    if (mainTowerGlowState.light) {
-      mainTowerGlowState.light.intensity = mainTowerGlowState.baseLightIntensity * (0.85 + 0.25 * slowWave);
-    }
+    if (mainTowerGlowState.light) mainTowerGlowState.light.intensity = mainTowerGlowState.baseLightIntensity * (0.85 + 0.25 * slowWave);
     if (mainTowerGlowState.auraLight) {
       const auraWave = 0.5 + 0.5 * Math.cos(animTimeSec * (mainTowerGlowState.pulseSpeed * 0.8));
       mainTowerGlowState.auraLight.intensity = mainTowerGlowState.baseAuraIntensity * (0.85 + 0.25 * auraWave);
@@ -3222,16 +2444,11 @@ function animate3D() {
     const sp = sinkSparks[i];
     sp.age++;
     const progress = sp.age / sp.maxAge;
-
     if (sp.isLight) {
       sp.light.intensity = Math.max(0, sp.baseIntensity * (1 - progress));
-      if (sp.age >= sp.maxAge) {
-        scene.remove(sp.light);
-        sinkSparks.splice(i, 1);
-      }
+      if (sp.age >= sp.maxAge) { scene.remove(sp.light); sinkSparks.splice(i, 1); }
       continue;
     }
-
     sp.mesh.position.x += sp.vx * dt;
     sp.mesh.position.y += sp.vy * dt;
     sp.mesh.position.z += sp.vz * dt;
@@ -3239,106 +2456,82 @@ function animate3D() {
     sp.vx *= 0.985;
     sp.vz *= 0.985;
     sp.mat.opacity = Math.max(0, 0.92 * (1 - progress));
-
-    if (sp.age >= sp.maxAge || sp.mesh.position.y < 1) {
-      scene.remove(sp.mesh);
-      sp.mat.dispose();
-      sinkSparks.splice(i, 1);
-    }
+    if (sp.age >= sp.maxAge || sp.mesh.position.y < 1) { scene.remove(sp.mesh); sp.mat.dispose(); sinkSparks.splice(i, 1); }
   }
 
+  // Yeşil duman partikülleri
   for (let i = dragonSmokeParticles.length - 1; i >= 0; i--) {
     const sm = dragonSmokeParticles[i];
     sm.life++;
     const progress = sm.life / sm.maxLife;
-
-    const curlX = Math.cos(animTimeSec * 2.4 + sm.life * 0.14) * sm.swirlDir * 12;
-    const curlZ = Math.sin(animTimeSec * 2.4 + sm.life * 0.14) * sm.swirlDir * 12;
-
+    const curlX = Math.cos(animTimeSec * 2.2 + sm.life * 0.12) * sm.swirlDir * 10;
+    const curlZ = Math.sin(animTimeSec * 2.2 + sm.life * 0.12) * sm.swirlDir * 10;
     sm.mesh.position.x += (sm.vx + curlX) * dt;
     sm.mesh.position.y += sm.vy * dt;
     sm.mesh.position.z += (sm.vz + curlZ) * dt;
-
-    sm.vx *= 0.962;
-    sm.vz *= 0.962;
-    sm.vy *= 0.988;
+    sm.vx *= 0.965; sm.vz *= 0.965; sm.vy *= 0.99;
 
     const expand = sm.growRate * dt;
-    sm.mesh.scale.x += expand * 1.2;
+    sm.mesh.scale.x += expand * 1.15;
     sm.mesh.scale.y += expand * 1.05;
     sm.mat.rotation += sm.rotSpeed * dt;
 
-    const fadeCurve = progress < 0.2
-      ? (progress / 0.2)
-      : (1 - Math.pow((progress - 0.2) / 0.8, 1.25));
+    const fadeCurve = progress < 0.22 ? (progress / 0.22) : (1 - Math.pow((progress - 0.22) / 0.78, 1.2));
     sm.mat.opacity = Math.max(0, sm.baseOpacity * fadeCurve);
-
     if (sm.life >= sm.maxLife || (progress > 0.25 && sm.mat.opacity <= 0.008)) {
-      scene.remove(sm.mesh);
-      sm.mat.dispose();
-      dragonSmokeParticles.splice(i, 1);
+      scene.remove(sm.mesh); sm.mat.dispose(); dragonSmokeParticles.splice(i, 1);
     }
   }
 
+  // Keskin alev dilleri partikülleri
   for (let i = infernoFlameParticles.length - 1; i >= 0; i--) {
     const fp = infernoFlameParticles[i];
     fp.life++;
     const progress = fp.life / fp.maxLife;
+    const swayX = Math.sin(animTimeSec * 12 + fp.swirlPhase + fp.life * 0.35) * (fp.isSpark ? 18 : 9);
+    const swayZ = Math.cos(animTimeSec * 11 + fp.swirlPhase + fp.life * 0.32) * (fp.isSpark ? 18 : 9);
 
-    const flickerX = Math.sin(animTimeSec * 10.5 + fp.swirlPhase + fp.life * 0.35) * (fp.isSpark ? 22 : 12);
-    const flickerZ = Math.cos(animTimeSec * 9.8 + fp.swirlPhase + fp.life * 0.32) * (fp.isSpark ? 22 : 12);
-
-    fp.mesh.position.x += (fp.vx + flickerX) * dt;
+    fp.mesh.position.x += (fp.vx + swayX) * dt;
     fp.mesh.position.y += fp.vy * dt;
-    fp.mesh.position.z += (fp.vz + flickerZ) * dt;
+    fp.mesh.position.z += (fp.vz + swayZ) * dt;
 
     if (!fp.isSpark) {
       const g = fp.growRate * dt;
-      fp.mesh.scale.x = Math.max(2, fp.mesh.scale.x + g * 0.85);
-      fp.mesh.scale.y = Math.max(2, fp.mesh.scale.y + g * 1.35);
-      fp.mat.rotation = Math.sin(animTimeSec * 7.5 + fp.swirlPhase) * 0.28;
+      fp.mesh.scale.x = Math.max(4, fp.mesh.scale.x - g * 0.35);
+      fp.mesh.scale.y = Math.max(8, fp.mesh.scale.y + g * 1.6);
+      fp.mat.rotation = Math.sin(animTimeSec * 9.5 + fp.swirlPhase) * 0.24;
     } else {
-      fp.mesh.scale.x = Math.max(1.5, fp.mesh.scale.x * 0.96);
-      fp.mesh.scale.y = Math.max(2.5, fp.mesh.scale.y * 0.97);
+      fp.mesh.scale.y = Math.max(4, fp.mesh.scale.y * 0.95);
     }
 
-    const fadeCurve = progress < 0.14
-      ? (progress / 0.14)
-      : (1 - Math.pow((progress - 0.14) / 0.86, 1.15));
+    const fadeCurve = progress < 0.15 ? (progress / 0.15) : (1 - Math.pow((progress - 0.15) / 0.85, 1.2));
     fp.mat.opacity = Math.max(0, fp.baseOpacity * fadeCurve);
-
     if (fp.life >= fp.maxLife || (progress > 0.2 && fp.mat.opacity <= 0.01)) {
-      scene.remove(fp.mesh);
-      fp.mat.dispose();
-      infernoFlameParticles.splice(i, 1);
+      scene.remove(fp.mesh); fp.mat.dispose(); infernoFlameParticles.splice(i, 1);
     }
   }
 
-  if (castleFlameSystems.length > 0) {
-    for (let i = 0; i < castleFlameSystems.length; i++) {
-      const sys = castleFlameSystems[i];
-      for (let j = 0; j < sys.tongues.length; j++) {
-        const t = sys.tongues[j];
-        const wave = Math.sin(animTimeSec * t.speed + t.phase);
-        const flicker = Math.cos(animTimeSec * (t.speed * 1.25) + t.phase * 0.7);
-        const scaleY = Math.max(0.65, t.baseScaleY + wave * 0.26 + flicker * 0.08);
-        const scaleXZ = Math.max(0.72, 1.0 - wave * 0.12);
-        t.mesh.scale.set(scaleXZ, scaleY, scaleXZ);
-        t.mesh.position.y = t.baseY + (scaleY - 1.0) * 5.5;
-        t.mesh.rotation.z = (-Math.cos((j / sys.tongues.length) * Math.PI * 2) * 0.18) + flicker * 0.1;
-      }
-      if (sys.coreFlame) {
-        const cPulse = 0.88 + 0.18 * Math.sin(animTimeSec * 9.5 + sys.phase);
-        sys.coreFlame.scale.set(cPulse, 0.85 + 0.2 * Math.cos(animTimeSec * 11.0 + sys.phase), cPulse);
-      }
-      if (sys.light) {
-        sys.light.intensity = sys.baseIntensity * (0.88 + 0.22 * Math.sin(animTimeSec * 8.0 + sys.phase));
-      }
-      sys.emberTimer += dt;
-      if (sys.emberTimer >= 0.25) {
-        sys.emberTimer = 0;
-        spawnFlameEmber(sys.group.position.x, sys.group.position.y + 9 * sys.scale, sys.group.position.z, sys.scale);
-      }
+  for (let i = 0; i < castleFlameSystems.length; i++) {
+    const sys = castleFlameSystems[i];
+    for (let j = 0; j < sys.tongues.length; j++) {
+      const t = sys.tongues[j];
+      const wave = Math.sin(animTimeSec * t.speed + t.phase);
+      const flicker = Math.cos(animTimeSec * (t.speed * 1.25) + t.phase * 0.7);
+      const scaleY = Math.max(0.65, t.baseScaleY + wave * 0.26 + flicker * 0.08);
+      const scaleXZ = Math.max(0.72, 1.0 - wave * 0.12);
+      t.mesh.scale.set(scaleXZ, scaleY, scaleXZ);
+      t.mesh.position.y = t.baseY + (scaleY - 1.0) * 5.5;
+      t.mesh.rotation.z = (-Math.cos((j / sys.tongues.length) * Math.PI * 2) * 0.18) + flicker * 0.1;
+    }
+    if (sys.coreFlame) {
+      const cPulse = 0.88 + 0.18 * Math.sin(animTimeSec * 9.5 + sys.phase);
+      sys.coreFlame.scale.set(cPulse, 0.85 + 0.2 * Math.cos(animTimeSec * 11.0 + sys.phase), cPulse);
+    }
+    if (sys.light) sys.light.intensity = sys.baseIntensity * (0.88 + 0.22 * Math.sin(animTimeSec * 8.0 + sys.phase));
+    sys.emberTimer += dt;
+    if (sys.emberTimer >= 0.25) {
+      sys.emberTimer = 0;
+      spawnFlameEmber(sys.group.position.x, sys.group.position.y + 9 * sys.scale, sys.group.position.z, sys.scale);
     }
   }
 
@@ -3350,43 +2543,30 @@ function animate3D() {
     em.mesh.position.z += em.vz * dt;
     em.mesh.scale.multiplyScalar(0.95);
     em.mesh.material.opacity = Math.max(0, em.mesh.material.opacity - 0.025);
-    if (em.life <= 0 || em.mesh.material.opacity <= 0) {
-      scene.remove(em.mesh);
-      em.mesh.material.dispose();
-      flameEmberParticles.splice(i, 1);
-    }
+    if (em.life <= 0 || em.mesh.material.opacity <= 0) { scene.remove(em.mesh); em.mesh.material.dispose(); flameEmberParticles.splice(i, 1); }
   }
 
-  if (player.hp < player.maxHp && (now - player.lastDamagedTime >= 5000)) {
-    if (now - lastRegenTime >= 5000) {
-      lastRegenTime = now;
-      player.hp = Math.min(player.maxHp, player.hp + 5000);
-      showFloatingDamage(player.x, player.z, '+5000', '#7ec49c');
-      updateHUD();
-    }
+  if (player.hp < player.maxHp && (now - player.lastDamagedTime >= 5000) && (now - lastRegenTime >= 5000)) {
+    lastRegenTime = now;
+    player.hp = Math.min(player.maxHp, player.hp + 5000);
+    showFloatingDamage(player.x, player.z, '+5000', '#7ec49c');
+    updateHUD();
   }
 
   if (targetDestination) {
-    const dx = targetDestination.x - player.x;
-    const dz = targetDestination.z - player.z;
-    const dist = Math.hypot(dx, dz);
-    if (dist > 18) {
+    const dx = targetDestination.x - player.x, dz = targetDestination.z - player.z;
+    if (Math.hypot(dx, dz) > 18) {
       player.a = Math.atan2(dz, dx);
       player.speed = player.maxSpeed;
     } else {
       targetDestination = navigationQueue.shift() || null;
-      if (!targetDestination) {
-        player.speed = 0;
-      }
+      if (!targetDestination) player.speed = 0;
     }
   } else {
     player.speed = 0;
   }
 
-  const nextX = player.x + Math.cos(player.a) * player.speed * dt;
-  const nextZ = player.z + Math.sin(player.a) * player.speed * dt;
-
-  const slidPos = resolveWallSlide(nextX, nextZ);
+  const slidPos = resolveWallSlide(player.x + Math.cos(player.a) * player.speed * dt, player.z + Math.sin(player.a) * player.speed * dt);
   player.x = slidPos.x;
   player.z = slidPos.z;
 
@@ -3396,45 +2576,30 @@ function animate3D() {
   const curMeta = MAP_DATA[currentMapIndex];
   let nearEdge = false;
 
-  if (player.x > HARD_LIMIT) player.x = HARD_LIMIT;
-  if (player.x < -HARD_LIMIT) player.x = -HARD_LIMIT;
-  if (player.z > HARD_LIMIT) player.z = HARD_LIMIT;
-  if (player.z < -HARD_LIMIT) player.z = -HARD_LIMIT;
+  player.x = Math.max(-HARD_LIMIT, Math.min(HARD_LIMIT, player.x));
+  player.z = Math.max(-HARD_LIMIT, Math.min(HARD_LIMIT, player.z));
 
-  if (player.x > TRIGGER_THRESHOLD) {
-    if (curMeta.col < 4) { showTransitButton(currentMapIndex + 1, 'right'); nearEdge = true; }
-  } else if (player.x < -TRIGGER_THRESHOLD) {
+  if (player.x > TRIGGER_THRESHOLD && curMeta.col < 4) { showTransitButton(currentMapIndex + 1, 'right'); nearEdge = true; }
+  else if (player.x < -TRIGGER_THRESHOLD) {
     if (curMeta.col > 0) { showTransitButton(currentMapIndex - 1, 'left'); nearEdge = true; }
-    else {
-      const targetIdx = currentMapIndex + 4;
-      if (targetIdx < MAP_DATA.length) { showTransitButton(targetIdx, 'left'); nearEdge = true; }
-    }
-  } else if (player.z > TRIGGER_THRESHOLD) {
-    if (curMeta.row < 2) { showTransitButton(currentMapIndex + 5, 'bottom'); nearEdge = true; }
-  } else if (player.z < -TRIGGER_THRESHOLD) {
+    else if (currentMapIndex + 4 < MAP_DATA.length) { showTransitButton(currentMapIndex + 4, 'left'); nearEdge = true; }
+  } else if (player.z > TRIGGER_THRESHOLD && curMeta.row < 2) { showTransitButton(currentMapIndex + 5, 'bottom'); nearEdge = true; }
+  else if (player.z < -TRIGGER_THRESHOLD) {
     if (curMeta.row > 0) { showTransitButton(currentMapIndex - 5, 'top'); nearEdge = true; }
-    else {
-      const targetIdx = currentMapIndex + 10;
-      if (targetIdx < MAP_DATA.length) { showTransitButton(targetIdx, 'top'); nearEdge = true; }
-    }
+    else if (currentMapIndex + 10 < MAP_DATA.length) { showTransitButton(currentMapIndex + 10, 'top'); nearEdge = true; }
   }
 
-  if (!nearEdge && pendingTransitMapIndex !== null) { hideTransitButton(); }
+  if (!nearEdge && pendingTransitMapIndex !== null) hideTransitButton();
 
   coordDisplayEl.textContent = `X: ${Math.round((player.x / HALF_WORLD) * 100)} · Y: ${Math.round((player.z / HALF_WORLD) * 100)}`;
+
+  const modelSpec = getEquippedModelSpec();
 
   if (activeGlbShip) {
     const timeSec = now * 0.0022;
     const waveBobY = Math.sin(timeSec) * 1.3;
     const waveRollZ = Math.cos(timeSec * 0.85) * 0.04;
     const speedPitchX = (player.speed > 0 ? -0.045 : 0) + Math.sin(timeSec * 1.2) * 0.022;
-
-    const users = loadUsers();
-    const dbUser = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
-    const equippedId = sanitizeShipId(dbUser.equippedShip);
-    const modelSpec = SHIP_MODELS[equippedId] || SHIP_MODELS.standard;
-    const hOffset = modelSpec.heightOffset || 0;
-    const rotOffset = modelSpec.rotationOffset || 0;
 
     if (modelSpec.greenSmoke) {
       dragonSmokeSpawnTimer += dt;
@@ -3447,11 +2612,11 @@ function animate3D() {
 
     if (modelSpec.flameAura) {
       infernoSpawnTimer += dt;
-      if (infernoSpawnTimer >= 0.024) {
+      if (infernoSpawnTimer >= 0.022) {
         infernoSpawnTimer = 0;
         spawnInfernoFlameParticle(player.x, player.z, player.a);
         spawnInfernoFlameParticle(player.x, player.z, player.a);
-        if (Math.random() > 0.35) spawnInfernoFlameParticle(player.x, player.z, player.a);
+        if (Math.random() > 0.3) spawnInfernoFlameParticle(player.x, player.z, player.a);
       }
     }
 
@@ -3460,19 +2625,8 @@ function animate3D() {
       const pulseWave = 0.5 + 0.5 * Math.sin(animTimeSec * pTheme.pulseSpeed);
       const nextOpacity = pTheme.minOpacity + (pTheme.maxOpacity - pTheme.minOpacity) * pulseWave;
       const nextEmissive = pTheme.baseEmissive + (pTheme.peakEmissive - pTheme.baseEmissive) * pulseWave;
-
-      for (let i = 0; i < phantomMaterialsList.length; i++) {
-        const mat = phantomMaterialsList[i];
-        mat.opacity = nextOpacity;
-        if (mat.emissive) {
-          mat.emissiveIntensity = nextEmissive;
-        }
-      }
-
-      if (activePhantomLight) {
-        activePhantomLight.intensity = pTheme.baseLight + (pTheme.peakLight - pTheme.baseLight) * pulseWave;
-      }
-
+      phantomMaterialsList.forEach((mat) => { mat.opacity = nextOpacity; if (mat.emissive) mat.emissiveIntensity = nextEmissive; });
+      if (activePhantomLight) activePhantomLight.intensity = pTheme.baseLight + (pTheme.peakLight - pTheme.baseLight) * pulseWave;
       if (activePhantomAuraMesh) {
         activePhantomAuraMesh.rotation.z += 1.4 * dt;
         const auraScale = 0.94 + pulseWave * 0.14;
@@ -3480,78 +2634,44 @@ function animate3D() {
         activePhantomAuraMesh.material.opacity = 0.26 + pulseWave * 0.24;
       }
     } else if (modelSpec.denemeStyle) {
-      const dTheme = DENEME_THEMES[modelSpec.denemeStyle] || DENEME_THEMES.gold;
+      const dTheme = DENEME_THEMES[modelSpec.denemeStyle] || DENEME_THEMES.emerald;
       const pulseWave = 0.5 + 0.5 * Math.sin(timeSec * dTheme.pulseSpeed);
+      denemeMaterialsList.forEach((mat) => { if (mat.emissive) mat.emissiveIntensity = dTheme.emissiveIntensity * (0.78 + 0.48 * pulseWave); });
+      if (activeDenemeLight) activeDenemeLight.intensity = dTheme.lightIntensity * (0.78 + 0.45 * pulseWave);
 
-      for (let i = 0; i < denemeMaterialsList.length; i++) {
-        const mat = denemeMaterialsList[i];
-        if (mat.emissive) {
-          mat.emissiveIntensity = dTheme.emissiveIntensity * (0.78 + 0.48 * pulseWave);
-        }
-      }
+      denemeCrystalsMeta.forEach((c) => {
+        const cAngle = c.angle + timeSec * c.orbitSpeed;
+        c.mesh.position.set(c.centerX + Math.cos(cAngle) * c.orbitRx, c.baseY + Math.sin(timeSec * 1.9 + c.phase) * c.bobAmp, c.centerZ + Math.sin(cAngle) * c.orbitRz);
+        c.mesh.rotation.y += 1.8 * dt;
+        c.mesh.rotation.x = Math.sin(timeSec * 1.4 + c.phase) * 0.2;
+      });
 
-      if (activeDenemeLight) {
-        activeDenemeLight.intensity = dTheme.lightIntensity * (0.78 + 0.45 * pulseWave);
-      }
-
-      if (denemeCrystalsMeta.length > 0) {
-        for (let i = 0; i < denemeCrystalsMeta.length; i++) {
-          const c = denemeCrystalsMeta[i];
-          const cAngle = c.angle + timeSec * c.orbitSpeed;
-          c.mesh.position.set(
-            c.centerX + Math.cos(cAngle) * c.orbitRx,
-            c.baseY + Math.sin(timeSec * 1.9 + c.phase) * c.bobAmp,
-            c.centerZ + Math.sin(cAngle) * c.orbitRz
-          );
-          c.mesh.rotation.y += 1.8 * dt;
-          c.mesh.rotation.x = Math.sin(timeSec * 1.4 + c.phase) * 0.2;
-        }
-      }
-
-      if (denemeLanternCores.length > 0) {
-        for (let i = 0; i < denemeLanternCores.length; i++) {
-          const l = denemeLanternCores[i];
-          l.coreMat.emissiveIntensity = 0.45 + pulseWave * 0.35;
-          if (l.coreMesh) {
-            const s = 0.96 + pulseWave * 0.08;
-            l.coreMesh.scale.set(0.85 * s, 1.2 * s, 0.85 * s);
-          }
-        }
-      }
+      denemeLanternCores.forEach((l) => {
+        l.coreMat.emissiveIntensity = 0.45 + pulseWave * 0.35;
+        if (l.coreMesh) { const s = 0.96 + pulseWave * 0.08; l.coreMesh.scale.set(0.85 * s, 1.2 * s, 0.85 * s); }
+      });
     }
 
     const phantomFloatY = modelSpec.phantomStyle ? (2.6 + Math.sin(animTimeSec * 2.1) * 1.6) : 0;
-    activeGlbShip.position.set(player.x, SHIP_Y_POS + hOffset + waveBobY + phantomFloatY - 100, player.z);
+    activeGlbShip.position.set(player.x, SHIP_Y_POS + (modelSpec.heightOffset || 0) + waveBobY + phantomFloatY - 100, player.z);
     activeGlbShip.rotation.order = 'YXZ';
-    activeGlbShip.rotation.y = (-player.a + Math.PI / 2) + rotOffset;
+    activeGlbShip.rotation.y = (-player.a + Math.PI / 2) + (modelSpec.rotationOffset || 0);
     activeGlbShip.rotation.x = speedPitchX;
     activeGlbShip.rotation.z = waveRollZ;
   }
 
-  if (playerNeonRing) {
-    playerNeonRing.position.set(player.x, 0.8, player.z);
-    playerNeonRing.rotation.z += (1.0 * dt);
-  }
+  if (playerNeonRing) { playerNeonRing.position.set(player.x, 0.8, player.z); playerNeonRing.rotation.z += dt; }
   rangeRingMesh.position.set(player.x, 0.6, player.z);
 
   if (selectedRingMesh && selectedEnemyId) {
     const target = getTargetById(selectedEnemyId);
-    if (target) {
-      selectedRingMesh.visible = true;
-      selectedRingMesh.position.set(target.x, 0.9, target.z);
-      selectedRingMesh.rotation.z += (1.0 * dt);
-    }
+    if (target) { selectedRingMesh.visible = true; selectedRingMesh.position.set(target.x, 0.9, target.z); selectedRingMesh.rotation.z += dt; }
   }
 
-  if (player) {
-    const tempVector = new THREE.Vector3(player.x, SHIP_Y_POS, player.z);
-    tempVector.project(camera);
-    playerLabelEl.style.transform = `translate(-50%, 0) translate(${(tempVector.x * .5 + .5) * window.innerWidth}px, ${(tempVector.y * -.5 + .5) * window.innerHeight + 38}px)`;
-  }
+  playerLabelEl.style.transform = projectToScreen(player.x, player.z, 38);
 
   const targetCamX = player.x + cameraLookOffset.x;
   const targetCamZ = player.z + CAMERA_DEPTH + cameraLookOffset.z;
-
   camera.position.x += (targetCamX - camera.position.x) * (6.0 * dt);
   camera.position.y += (CAMERA_HEIGHT - camera.position.y) * (6.0 * dt);
   camera.position.z += (targetCamZ - camera.position.z) * (6.0 * dt);
@@ -3560,25 +2680,16 @@ function animate3D() {
   for (let i = cannonEffects.length - 1; i >= 0; i--) {
     const ce = cannonEffects[i];
     ce.life--;
-    ce.mesh.position.x += ce.vx;
-    ce.mesh.position.y += ce.vy;
-    ce.mesh.position.z += ce.vz;
+    ce.mesh.position.x += ce.vx; ce.mesh.position.y += ce.vy; ce.mesh.position.z += ce.vz;
     ce.mesh.scale.multiplyScalar(ce.grow);
     ce.mesh.material.opacity = Math.max(0, ce.mesh.material.opacity - ce.fade);
-    if (ce.life <= 0 || ce.mesh.material.opacity <= 0) {
-      scene.remove(ce.mesh);
-      ce.mesh.material.dispose();
-      cannonEffects.splice(i, 1);
-    }
+    if (ce.life <= 0 || ce.mesh.material.opacity <= 0) { scene.remove(ce.mesh); ce.mesh.material.dispose(); cannonEffects.splice(i, 1); }
   }
 
   for (let i = activeProjectiles.length - 1; i >= 0; i--) {
     const p = activeProjectiles[i];
     const dx = p.targetX - p.x, dz = p.targetZ - p.z;
-    const dist = Math.hypot(dx, dz);
-    const step = p.speed * dt;
-    const py = SHIP_Y_POS - p.yOffset;
-
+    const dist = Math.hypot(dx, dz), step = p.speed * dt, py = SHIP_Y_POS - p.yOffset;
     if (dist < step) {
       scene.remove(p.mesh);
       if (p.mesh.material) p.mesh.material.dispose();
@@ -3587,12 +2698,8 @@ function animate3D() {
     } else {
       p.x += (dx / dist) * step; p.z += (dz / dist) * step;
       p.mesh.position.set(p.x, py, p.z);
-
       p.trailTimer += dt;
-      if (p.trailTimer >= 0.035) {
-        p.trailTimer = 0;
-        spawnProjectileTrailSparks(p.x, py, p.z, p.ammoKey);
-      }
+      if (p.trailTimer >= 0.035) { p.trailTimer = 0; spawnProjectileTrailSparks(p.x, py, p.z, p.ammoKey); }
     }
   }
 
@@ -3604,48 +2711,31 @@ function animate3D() {
     if (pt.vz) pt.mesh.position.z += pt.vz * dt;
     pt.mesh.scale.multiplyScalar(pt.scaleDecay || 0.90);
     pt.mesh.material.opacity = Math.max(0, pt.mesh.material.opacity - (2.6 * dt));
-    if (pt.life <= 0 || pt.mesh.material.opacity <= 0) {
-      scene.remove(pt.mesh);
-      pt.mesh.material.dispose();
-      particleSystems.splice(i, 1);
-    }
+    if (pt.life <= 0 || pt.mesh.material.opacity <= 0) { scene.remove(pt.mesh); pt.mesh.material.dispose(); particleSystems.splice(i, 1); }
   }
 
   for (const t of defenseTowers) {
-    if (t.mesh) {
-      const distToPlayer = Math.hypot(player.x - t.x, player.z - t.z);
-      if (distToPlayer <= TOWER_ATTACK_RANGE && (now - t.lastAttackTime >= 1200)) {
-        t.lastAttackTime = now;
-        const aimX = player.x;
-        const aimZ = player.z;
-        fireProjectile(t.x, t.z, aimX, aimZ, 'fire', () => {
-          player.hp = Math.max(0, player.hp - 120);
-          player.lastDamagedTime = Date.now();
-          lastRegenTime = Date.now();
-          showFloatingDamage(aimX, aimZ, '-120 (Alev Kulesi)', '#ff944d');
-          updateHUD();
-          if (player.hp <= 0) {
-            triggerSinkSparks(player.x, player.z, 1.35);
-            isGameOver = true; isAttacking = false; gameOverEl.style.display = 'flex';
-            finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString();
-          }
-        }, { speed: 430, yOffset: 36, muzzleY: 42, spriteScale: 15 });
-      }
-      const tempVector = new THREE.Vector3(t.x, SHIP_Y_POS, t.z);
-      tempVector.project(camera);
-      t.labelEl.style.transform = `translate(-50%, 0) translate(${(tempVector.x * .5 + .5) * window.innerWidth}px, ${(tempVector.y * -.5 + .5) * window.innerHeight + 50}px)`;
-      t.hpFillEl.style.width = Math.max(0, (t.hp / t.maxHp) * 100) + '%';
+    if (!t.mesh) continue;
+    if (Math.hypot(player.x - t.x, player.z - t.z) <= TOWER_ATTACK_RANGE && (now - t.lastAttackTime >= 1200)) {
+      t.lastAttackTime = now;
+      const aimX = player.x, aimZ = player.z;
+      fireProjectile(t.x, t.z, aimX, aimZ, 'fire', () => {
+        player.hp = Math.max(0, player.hp - 120);
+        player.lastDamagedTime = Date.now(); lastRegenTime = Date.now();
+        showFloatingDamage(aimX, aimZ, '-120 (Alev Kulesi)', '#ff944d');
+        updateHUD();
+        if (player.hp <= 0) handlePlayerDefeat();
+      }, { speed: 430, yOffset: 36, muzzleY: 42, spriteScale: 15 });
     }
+    t.labelEl.style.transform = projectToScreen(t.x, t.z, 50);
+    t.hpFillEl.style.width = Math.max(0, (t.hp / t.maxHp) * 100) + '%';
   }
 
   for (const en of enemies) {
     if (en.slowTimer > 0) en.slowTimer -= (dt * 60);
     const activeSpeed = en.slowTimer > 0 ? en.baseSpeed * 0.6 : en.baseSpeed;
     const distToPlayer = Math.hypot(player.x - en.x, player.z - en.z);
-
-    if (!isAttacking) {
-      en.isAggro = false;
-    }
+    if (!isAttacking) en.isAggro = false;
 
     if (en.isAggro && isAttacking) {
       en.a = Math.atan2(player.z - en.z, player.x - en.x);
@@ -3656,15 +2746,10 @@ function animate3D() {
       if (distToPlayer <= ATTACK_RANGE && (now - en.lastAttackTime >= 1000)) {
         en.lastAttackTime = now;
         player.hp = Math.max(0, player.hp - 100);
-        player.lastDamagedTime = now;
-        lastRegenTime = now;
+        player.lastDamagedTime = now; lastRegenTime = now;
         showFloatingDamage(player.x, player.z, '-100', '#d48a8a');
         updateHUD();
-        if (player.hp <= 0) {
-          triggerSinkSparks(player.x, player.z, 1.35);
-          isGameOver = true; isAttacking = false; gameOverEl.style.display = 'flex';
-          finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString();
-        }
+        if (player.hp <= 0) handlePlayerDefeat();
       }
     } else {
       en.wanderTimer -= (dt * 60);
@@ -3682,10 +2767,7 @@ function animate3D() {
       en.mesh.position.set(en.x, SHIP_Y_POS + ENEMY_GLB_HEIGHT_OFFSET + Math.sin(timeSec) * 1.1 - 100, en.z);
       en.mesh.rotation.order = 'YXZ';
       en.mesh.rotation.y = (-en.a + Math.PI / 2) + ENEMY_GLB_ROTATION_OFFSET;
-
-      const tempVector = new THREE.Vector3(en.x, SHIP_Y_POS, en.z);
-      tempVector.project(camera);
-      en.labelEl.style.transform = `translate(-50%, 0) translate(${(tempVector.x * .5 + .5) * window.innerWidth}px, ${(tempVector.y * -.5 + .5) * window.innerHeight + 50}px)`;
+      en.labelEl.style.transform = projectToScreen(en.x, en.z, 50);
       en.hpFillEl.style.width = Math.max(0, (en.hp / en.maxHp) * 100) + '%';
     }
   }
@@ -3694,9 +2776,7 @@ function animate3D() {
     const ammoKey = player.selectedAmmo;
     const ammoSpec = AMMO_TYPES[ammoKey];
     if (player.ammo[ammoKey] < player.cannons) {
-      isAttacking = false;
-      clearAllEnemyAggro();
-      syncAttackButton();
+      isAttacking = false; clearAllEnemyAggro(); syncAttackButton();
       showFloatingDamage(player.x, player.z, 'GÜLLE YETERSİZ!', '#d48a8a');
     } else {
       const target = getTargetById(selectedEnemyId);
@@ -3706,15 +2786,10 @@ function animate3D() {
         target.isAggro = true;
         fireProjectile(player.x, player.z, target.x, target.z, ammoKey, () => {
           if (ammoSpec.isHeal) {
-            if (target.hp >= target.maxHp) {
-              showFloatingDamage(target.x, target.z, 'CAN DOLU!', '#9aa5b1');
-            } else {
-              target.hp = Math.min(target.maxHp, target.hp + ammoSpec.damage);
-              showFloatingDamage(target.x, target.z, '+' + ammoSpec.damage.toLocaleString(), '#7fb8d9');
-            }
+            if (target.hp >= target.maxHp) showFloatingDamage(target.x, target.z, 'CAN DOLU!', '#9aa5b1');
+            else { target.hp = Math.min(target.maxHp, target.hp + ammoSpec.damage); showFloatingDamage(target.x, target.z, '+' + ammoSpec.damage.toLocaleString(), '#7fb8d9'); }
           } else {
-            let finalDmg = ammoSpec.damage;
-            if (ammoSpec.bonusNpc > 1.0) finalDmg = Math.round(finalDmg * ammoSpec.bonusNpc);
+            const finalDmg = ammoSpec.bonusNpc > 1.0 ? Math.round(ammoSpec.damage * ammoSpec.bonusNpc) : ammoSpec.damage;
             target.hp -= finalDmg;
             if (ammoSpec.slow < 1.0) target.slowTimer = 240;
             showFloatingDamage(target.x, target.z, '-' + finalDmg.toLocaleString(), '#e09b56');
@@ -3722,14 +2797,16 @@ function animate3D() {
           updateTargetCard(); updateHUD(); syncAttackButton();
 
           if (!ammoSpec.isHeal && target.hp <= 0) {
-            if (target.id >= 9000 && target.id < 9100) {
-              triggerSinkSparks(target.x, target.z, 1.4);
-              if (target.mesh) scene.remove(target.mesh);
-              target.labelEl.remove();
+            const isTower = target.id >= 9000 && target.id < 9100;
+            triggerSinkSparks(target.x, target.z, isTower ? 1.4 : 1.15);
+            if (target.mesh) scene.remove(target.mesh);
+            target.labelEl.remove();
+            selectedEnemyId = null; isAttacking = false;
+            clearAllEnemyAggro();
+            if (selectedRingMesh) selectedRingMesh.visible = false;
+
+            if (isTower) {
               defenseTowers = defenseTowers.filter(t => t.id !== target.id);
-              selectedEnemyId = null; isAttacking = false;
-              clearAllEnemyAggro();
-              if (selectedRingMesh) selectedRingMesh.visible = false;
               player.score += 25000;
               showFloatingDamage(player.x, player.z, 'KULE YIKILDI! +25.000 Altın', '#dfc07d');
               if (defenseTowers.length === 0) {
@@ -3738,13 +2815,7 @@ function animate3D() {
                 showFloatingDamage(0, 0, `ADA ELE GEÇİRİLDİ! (${PLAYER_FLEET_TAG} Filosu)`, '#dfc07d');
               }
             } else {
-              triggerSinkSparks(target.x, target.z, 1.15);
-              if (target.mesh) scene.remove(target.mesh);
-              target.labelEl.remove();
               enemies = enemies.filter(e => e.id !== target.id);
-              selectedEnemyId = null; isAttacking = false;
-              clearAllEnemyAggro();
-              if (selectedRingMesh) selectedRingMesh.visible = false;
               player.score += 150;
               player.exp += 45;
               if (player.exp >= player.maxExp) {
@@ -3754,13 +2825,11 @@ function animate3D() {
                 player.expansionRights.cannon++;
                 player.expansionRights.hp++;
                 player.expansionRights.speed++;
-                showFloatingDamage(player.x, player.z, `LEVEL UP! +1 Top, +1 Can, +1 Hız Hakkı`, '#7fb8d9');
+                showFloatingDamage(player.x, player.z, 'LEVEL UP! +1 Top, +1 Can, +1 Hız Hakkı', '#7fb8d9');
               }
-            }
-            updateTargetCard(); updateHUD(); syncAttackButton();
-            if (!(target.id >= 9000 && target.id < 9100)) {
               setTimeout(() => spawnEnemyGlb(target.id), 3000);
             }
+            updateTargetCard(); updateHUD(); syncAttackButton();
           }
         });
       }
@@ -3785,27 +2854,18 @@ function drawMinimap() {
   mctx.stroke();
 
   if (!player) return;
-  const scale = w / WORLD_SIZE;
-  const cx = w / 2, cy = h / 2;
+  const scale = w / WORLD_SIZE, cx = w / 2, cy = h / 2;
 
-  mctx.fillStyle = '#c8a262';
-  defenseTowers.forEach(t => {
+  const drawDot = (x, z, r, color) => {
+    mctx.fillStyle = color;
     mctx.beginPath();
-    mctx.arc(cx + t.x * scale, cy + t.z * scale, 2.3, 0, Math.PI * 2);
+    mctx.arc(cx + x * scale, cy + z * scale, r, 0, Math.PI * 2);
     mctx.fill();
-  });
+  };
 
-  mctx.fillStyle = '#b84a4a';
-  enemies.forEach(en => {
-    mctx.beginPath();
-    mctx.arc(cx + en.x * scale, cy + en.z * scale, 2.0, 0, Math.PI * 2);
-    mctx.fill();
-  });
-
-  mctx.fillStyle = '#7fb8d9';
-  mctx.beginPath();
-  mctx.arc(cx + player.x * scale, cy + player.z * scale, 2.8, 0, Math.PI * 2);
-  mctx.fill();
+  defenseTowers.forEach(t => drawDot(t.x, t.z, 2.3, '#c8a262'));
+  enemies.forEach(en => drawDot(en.x, en.z, 2.0, '#b84a4a'));
+  drawDot(player.x, player.z, 2.8, '#7fb8d9');
 }
 
 function updateHUD() {
@@ -3831,7 +2891,7 @@ function updateHUD() {
   playerShipHpFillEl.style.width = hpPercent + '%';
   playerShipHpFillEl.style.backgroundColor = hpPercent > 50 ? '#5a9e74' : hpPercent > 20 ? '#c49b45' : '#b84a4a';
 
-  Object.keys(qtyEls).forEach(type => {
+  Object.keys(qtyEls).forEach((type) => {
     const count = player.ammo[type] || 0;
     if (qtyEls[type]) qtyEls[type].textContent = formatShortNumber(count);
     const slotEl = document.querySelector(`.ammo-slot[data-type="${type}"]`);
@@ -3839,31 +2899,31 @@ function updateHUD() {
   });
 }
 
+function showMarketFeedback(msg, isError = false) {
+  marketFeedbackEl.style.color = isError ? '#d48a8a' : '#8fd1ab';
+  marketFeedbackEl.textContent = msg;
+  setTimeout(() => { if (marketFeedbackEl.textContent === msg) marketFeedbackEl.textContent = ''; }, 2200);
+}
+
 btnExpandCannon.addEventListener('click', () => {
-  if (player.expansionRights.cannon <= 0) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Hak kalmadı!'; return; }
-  if (player.diamonds < 5) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Yetersiz elmas!'; return; }
+  if (player.expansionRights.cannon <= 0) return showMarketFeedback('Hak kalmadı!', true);
+  if (player.diamonds < 5) return showMarketFeedback('Yetersiz elmas!', true);
   player.diamonds -= 5; player.expansionRights.cannon--; player.cannons += 20;
-  updateHUD(); syncAttackButton();
-  marketFeedbackEl.style.color = '#8fd1ab'; marketFeedbackEl.textContent = 'Top kapasitesi +20 artırıldı!';
-  setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+  updateHUD(); syncAttackButton(); showMarketFeedback('Top kapasitesi +20 artırıldı!');
 });
 
 btnExpandHp.addEventListener('click', () => {
-  if (player.expansionRights.hp <= 0) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Hak kalmadı!'; return; }
-  if (player.diamonds < 5) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Yetersiz elmas!'; return; }
+  if (player.expansionRights.hp <= 0) return showMarketFeedback('Hak kalmadı!', true);
+  if (player.diamonds < 5) return showMarketFeedback('Yetersiz elmas!', true);
   player.diamonds -= 5; player.expansionRights.hp--; player.maxHp += 50000; player.hp = Math.min(player.maxHp, player.hp + 50000);
-  updateHUD();
-  marketFeedbackEl.style.color = '#8fd1ab'; marketFeedbackEl.textContent = 'Gemi canı +50.000 artırıldı!';
-  setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+  updateHUD(); showMarketFeedback('Gemi canı +50.000 artırıldı!');
 });
 
 btnExpandSpeed.addEventListener('click', () => {
-  if (player.expansionRights.speed <= 0) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Hak kalmadı!'; return; }
-  if (player.diamonds < 5) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Yetersiz elmas!'; return; }
+  if (player.expansionRights.speed <= 0) return showMarketFeedback('Hak kalmadı!', true);
+  if (player.diamonds < 5) return showMarketFeedback('Yetersiz elmas!', true);
   player.diamonds -= 5; player.expansionRights.speed--; player.maxSpeed *= 1.02;
-  updateHUD();
-  marketFeedbackEl.style.color = '#8fd1ab'; marketFeedbackEl.textContent = 'Gemi hızı %2 artırıldı!';
-  setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+  updateHUD(); showMarketFeedback('Gemi hızı %2 artırıldı!');
 });
 
 function toggleMapsPanel() {
@@ -3876,7 +2936,7 @@ mapsCloseBtn.addEventListener('click', () => mapsPanel.classList.remove('open'))
 function renderMapsGrid() {
   mapsGridContainer.innerHTML = '';
   MAP_DATA.forEach((mapObj, idx) => {
-    const isCurrent = (idx === currentMapIndex);
+    const isCurrent = idx === currentMapIndex;
     const isCaptured = Boolean(mapObj.ownerFleet);
     const box = document.createElement('div');
     box.className = `map-box ${isCurrent ? 'current' : ''} ${isCaptured ? 'captured' : ''}`;
@@ -3904,18 +2964,32 @@ tabShipyard.addEventListener('click', () => { setActiveTab(tabShipyard, sectionS
 tabExpand.addEventListener('click', () => setActiveTab(tabExpand, sectionExpand, '⚓ LİMAN - Genişletme'));
 tabCrew.addEventListener('click', () => setActiveTab(tabCrew, sectionCrew, '⚓ LİMAN - Tayfa'));
 
-document.querySelectorAll('.ammo-buy-btn').forEach(btn => {
+document.querySelectorAll('.ammo-buy-btn').forEach((btn) => {
   btn.addEventListener('click', () => {
     if (!player) return;
     const type = btn.dataset.type, amount = parseInt(btn.dataset.amount, 10), cost = parseInt(btn.dataset.cost, 10);
-    if (player.score < cost) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Yetersiz altın!'; return; }
+    if (player.score < cost) return showMarketFeedback('Yetersiz altın!', true);
     player.score -= cost;
     player.ammo[type] = (player.ammo[type] || 0) + amount;
-    updateHUD(); syncAttackButton();
-    marketFeedbackEl.style.color = '#8fd1ab'; marketFeedbackEl.textContent = `${amount} adet ${AMMO_TYPES[type].name} alındı!`;
-    setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+    updateHUD(); syncAttackButton(); showMarketFeedback(`${amount} adet ${AMMO_TYPES[type].name} alındı!`);
   });
 });
+
+function equipShipForCurrentUser(shipId) {
+  const users = loadUsers();
+  const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
+  if (uIdx !== -1) {
+    users[uIdx].ownedShips = sanitizeOwnedShips(users[uIdx].ownedShips);
+    if (!users[uIdx].ownedShips.includes(shipId)) users[uIdx].ownedShips.push(shipId);
+    users[uIdx].equippedShip = shipId;
+    saveUsers(users);
+  }
+  if (!currentUser.ownedShips.includes(shipId)) currentUser.ownedShips.push(shipId);
+  currentUser.equippedShip = shipId;
+  setupPlayerShipVisual();
+  renderShipyardList();
+  showMarketFeedback(`${SHIP_MODELS[shipId].name} kuşanıldı!`);
+}
 
 function renderShipyardList() {
   shipyardListEl.innerHTML = '';
@@ -3924,55 +2998,34 @@ function renderShipyardList() {
   const owned = sanitizeOwnedShips(dbUser.ownedShips), equipped = sanitizeShipId(dbUser.equippedShip);
 
   Object.values(SHIP_MODELS).forEach((model, idx) => {
-    const isOwned = owned.includes(model.id);
-    const isEquipped = equipped === model.id;
+    const isOwned = owned.includes(model.id), isEquipped = equipped === model.id;
     const div = document.createElement('div');
     div.className = 'ship-card-item';
-    let btnHtml = isEquipped ? `<button class="buy-btn equipped" type="button" disabled>Kullanımda</button>` :
-                  isOwned ? `<button class="buy-btn ship-equip-btn" type="button" data-id="${model.id}">Kullan</button>` :
-                  `<button class="buy-btn ship-buy-btn" type="button" data-id="${model.id}" data-cost="${model.cost}">${model.cost.toLocaleString()} Altın</button>`;
+    const btnHtml = isEquipped
+      ? `<button class="buy-btn equipped" type="button" disabled>Kullanımda</button>`
+      : isOwned
+      ? `<button class="buy-btn ship-equip-btn" type="button" data-id="${model.id}">Kullan</button>`
+      : `<button class="buy-btn ship-buy-btn" type="button" data-id="${model.id}" data-cost="${model.cost}">${model.cost.toLocaleString()} Altın</button>`;
 
     div.innerHTML = `<div class="ship-card-img-wrap" id="preview-wrap-${idx}">Yükleniyor...</div><div class="ship-card-title">${model.name}</div><div class="ship-card-sub">${model.desc}</div>${btnHtml}`;
     shipyardListEl.appendChild(div);
 
     const wrapEl = document.getElementById(`preview-wrap-${idx}`);
-    getShipThumbnail(model, (dataUrl) => {
-      if (wrapEl) wrapEl.innerHTML = `<img src="${dataUrl}" alt="${model.name}">`;
-    });
+    getShipThumbnail(model, (dataUrl) => { if (wrapEl) wrapEl.innerHTML = `<img src="${dataUrl}" alt="${model.name}">`; });
   });
 
-  shipyardListEl.querySelectorAll('.ship-buy-btn').forEach(btn => {
+  shipyardListEl.querySelectorAll('.ship-buy-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       const shipId = btn.dataset.id, cost = parseInt(btn.dataset.cost, 10);
-      if (player.score < cost) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Yetersiz altın!'; return; }
+      if (player.score < cost) return showMarketFeedback('Yetersiz altın!', true);
       player.score -= cost;
-      const users = loadUsers();
-      const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
-      if (uIdx !== -1) {
-        users[uIdx].ownedShips = sanitizeOwnedShips(users[uIdx].ownedShips);
-        if (!users[uIdx].ownedShips.includes(shipId)) users[uIdx].ownedShips.push(shipId);
-        users[uIdx].equippedShip = shipId;
-        saveUsers(users);
-      }
-      if (!currentUser.ownedShips.includes(shipId)) currentUser.ownedShips.push(shipId);
-      currentUser.equippedShip = shipId;
-      updateHUD(); setupPlayerShipVisual(); renderShipyardList();
-      marketFeedbackEl.style.color = '#8fd1ab'; marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} kuşanıldı!`;
-      setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2500);
+      updateHUD();
+      equipShipForCurrentUser(shipId);
     });
   });
 
-  shipyardListEl.querySelectorAll('.ship-equip-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const shipId = btn.dataset.id;
-      const users = loadUsers();
-      const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
-      if (uIdx !== -1) { users[uIdx].equippedShip = shipId; saveUsers(users); }
-      currentUser.equippedShip = shipId;
-      setupPlayerShipVisual(); renderShipyardList();
-      marketFeedbackEl.style.color = '#8fd1ab'; marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} kuşanıldı!`;
-      setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
-    });
+  shipyardListEl.querySelectorAll('.ship-equip-btn').forEach((btn) => {
+    btn.addEventListener('click', () => equipShipForCurrentUser(btn.dataset.id));
   });
 }
 </script>
