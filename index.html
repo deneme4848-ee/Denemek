@@ -713,7 +713,7 @@ function formatShortNumber(num) {
 const AMMO_TYPES = {
   iron:   { id: 'iron',   name: 'Demir Gülle',    damage: 180, slow: 1.0,  isHeal: false, bonusNpc: 1.0, desc: '180 Hasar', color: 0x555555 },
   chain:  { id: 'chain',  name: 'Zincirli Gülle', damage: 140, slow: 0.6,  isHeal: false, bonusNpc: 1.0, desc: '140 Hasar + %40 Yavaşlatma', color: 0x888888, img: 'zincir.png' },
-  fire:   { id: 'fire',   name: 'Alev Güllesi',   damage: 30000, slow: 1.0, isHeal: false, bonusNpc: 1.2, desc: '30.000 Hasar (NPC\'lere +%20 Ekstra)', color: 0xff3300, img: 'alev.png' },
+  fire:   { id: 'fire',   name: 'Alevli Gülle',   damage: 30000, slow: 1.0, isHeal: false, bonusNpc: 1.2, desc: '30.000 Hasar (NPC\'lere +%20 Ekstra)', color: 0xff3300, img: 'alev.png' },
   amiral: { id: 'amiral', name: 'Amiral Güllesi', damage: 40000, slow: 0.85,isHeal: false, bonusNpc: 1.0, desc: '40.000 Yıkıcı Hasar', color: 0x3b82f6, img: 'amiral.png' },
   snow:   { id: 'snow',   name: 'Kar Güllesi',    damage: 25000, slow: 1.0,  isHeal: true,  bonusNpc: 1.0, desc: '+25.000 Can Doldurur', color: 0xffffff, img: 'kar.png' }
 };
@@ -722,11 +722,11 @@ const DENEME_IDS = ['deneme1', 'deneme2', 'deneme3', 'deneme4', 'deneme5'];
 
 const SHIP_MODELS = {
   standard:  { id: 'standard',  name: 'Ejderha Kalyonu', desc: 'Başlangıç 3D Savaş Gemisi', cost: 0,        type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45 },
-  deneme1:   { id: 'deneme1',   name: 'Deneme 1 · Altın Güneş', desc: 'Altın gövde ve yelkenlerde altın parıltılar', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'gold' },
-  deneme2:   { id: 'deneme2',   name: 'Deneme 2 · Zümrüt Leviathan', desc: 'Zümrüt gövde ve yelkenlerde zümrüt parıltılar', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'emerald' },
-  deneme3:   { id: 'deneme3',   name: 'Deneme 3 · Mor Gölge', desc: 'Ametist gövde ve yelkenlerde mor parıltılar', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'violet' },
-  deneme4:   { id: 'deneme4',   name: 'Deneme 4 · Kızıl Cehennem', desc: 'Kızıl gövde ve yelkenlerde kor parıltıları', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'crimson' },
-  deneme5:   { id: 'deneme5',   name: 'Deneme 5 · Buzul Kraliyet', desc: 'Buz mavisi gövde ve yelkenlerde buz parıltıları', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, scaleMultiplier: 1.12, denemeStyle: 'frost' },
+  deneme1:   { id: 'deneme1',   name: 'Deneme 1 · Altın Güneş', desc: 'Altın gövde ve etrafında ince altın nokta parıltılar', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'gold' },
+  deneme2:   { id: 'deneme2',   name: 'Deneme 2 · Zümrüt Leviathan', desc: 'Zümrüt gövde ve etrafında ince zümrüt nokta parıltılar', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'emerald' },
+  deneme3:   { id: 'deneme3',   name: 'Deneme 3 · Mor Gölge', desc: 'Ametist gövde ve etrafında ince mor nokta parıltılar', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'violet' },
+  deneme4:   { id: 'deneme4',   name: 'Deneme 4 · Kızıl Cehennem', desc: 'Kızıl gövde ve etrafında ince kor nokta parıltılar', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'crimson' },
+  deneme5:   { id: 'deneme5',   name: 'Deneme 5 · Buzul Kraliyet', desc: 'Buz mavisi gövde ve etrafında ince buz nokta parıltılar', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, scaleMultiplier: 1.12, denemeStyle: 'frost' },
   ghost:     { id: 'ghost',     name: 'Hayalet Fırkateyn', desc: 'Gizli Sis Gövdesi',     cost: 5000000,  type: 'glb', modelPath: 'tasarim1.glb', heightOffset: 45 },
   gold:      { id: 'gold',      name: 'Altın Korsan',     desc: 'İhtişamlı Altın Kalyon', cost: 15000000, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, scaleMultiplier: 1.3 },
   tasarim1:  { id: 'tasarim1',  name: 'Tasarim 1', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim1.glb' },
@@ -750,7 +750,7 @@ const DENEME_THEMES = {
     metalnessAdd: 0.4,
     roughnessSub: 0.25,
     lightColor: 0xffb703,
-    lightIntensity: 2.4,
+    lightIntensity: 2.2,
     sparkleColor: 0xfff3b0,
     sparkleAccent: 0xfbbf24,
     pulseSpeed: 2.4
@@ -762,7 +762,7 @@ const DENEME_THEMES = {
     metalnessAdd: 0.3,
     roughnessSub: 0.35,
     lightColor: 0x10b981,
-    lightIntensity: 2.5,
+    lightIntensity: 2.3,
     sparkleColor: 0xa7f3d0,
     sparkleAccent: 0x34d399,
     pulseSpeed: 2.9
@@ -774,7 +774,7 @@ const DENEME_THEMES = {
     metalnessAdd: 0.35,
     roughnessSub: 0.3,
     lightColor: 0xa855f7,
-    lightIntensity: 2.6,
+    lightIntensity: 2.4,
     sparkleColor: 0xf3e8ff,
     sparkleAccent: 0xc084fc,
     pulseSpeed: 2.2
@@ -786,7 +786,7 @@ const DENEME_THEMES = {
     metalnessAdd: 0.25,
     roughnessSub: 0.2,
     lightColor: 0xef4444,
-    lightIntensity: 2.8,
+    lightIntensity: 2.6,
     sparkleColor: 0xffedd5,
     sparkleAccent: 0xfb7185,
     pulseSpeed: 4.0
@@ -798,16 +798,34 @@ const DENEME_THEMES = {
     metalnessAdd: 0.2,
     roughnessSub: 0.45,
     lightColor: 0x38bdf8,
-    lightIntensity: 2.4,
+    lightIntensity: 2.2,
     sparkleColor: 0xffffff,
     sparkleAccent: 0x7dd3fc,
     pulseSpeed: 2.7
   }
 };
 
+let roundSparklePointTexture = null;
+function getRoundSparklePointTexture() {
+  if (roundSparklePointTexture) return roundSparklePointTexture;
+  const c = document.createElement('canvas');
+  c.width = 64;
+  c.height = 64;
+  const ctx = c.getContext('2d');
+  const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  grad.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
+  grad.addColorStop(0.28, 'rgba(255, 255, 255, 0.92)');
+  grad.addColorStop(0.6, 'rgba(255, 255, 255, 0.28)');
+  grad.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 64, 64);
+  roundSparklePointTexture = new THREE.CanvasTexture(c);
+  return roundSparklePointTexture;
+}
+
 let activeDenemeLight = null;
-let activeSailSparkleGroup = null;
-let sailSparkleItems = [];
+let activeShipAuraPoints = null;
+let shipAuraMeta = [];
 let activeDenemeStyleKey = null;
 
 function clearDenemeShipStyling() {
@@ -816,29 +834,28 @@ function clearDenemeShipStyling() {
   }
   activeDenemeLight = null;
 
-  if (activeSailSparkleGroup && activeSailSparkleGroup.parent) {
-    activeSailSparkleGroup.parent.remove(activeSailSparkleGroup);
-  }
-  sailSparkleItems.forEach((sp) => {
-    if (sp.mesh && sp.mesh.material) {
-      sp.mesh.material.dispose();
+  if (activeShipAuraPoints) {
+    if (activeShipAuraPoints.parent) {
+      activeShipAuraPoints.parent.remove(activeShipAuraPoints);
     }
-  });
-  sailSparkleItems = [];
-  activeSailSparkleGroup = null;
+    if (activeShipAuraPoints.geometry) activeShipAuraPoints.geometry.dispose();
+    if (activeShipAuraPoints.material) activeShipAuraPoints.material.dispose();
+  }
+  activeShipAuraPoints = null;
+  shipAuraMeta = [];
   activeDenemeStyleKey = null;
 }
 
-function applyDenemeShipStyling(shipMesh, styleKey = 'gold', options = { withSailSparkles: true }) {
+function applyDenemeShipStyling(shipMesh, styleKey = 'gold', options = { withAuraPoints: true }) {
   if (!shipMesh) return;
   const theme = DENEME_THEMES[styleKey] || DENEME_THEMES.gold;
   activeDenemeStyleKey = styleKey;
 
-  const sailBounds = new THREE.Box3().setFromObject(shipMesh);
-  const sailSize = new THREE.Vector3();
-  const sailCenter = new THREE.Vector3();
-  sailBounds.getSize(sailSize);
-  sailBounds.getCenter(sailCenter);
+  const bounds = new THREE.Box3().setFromObject(shipMesh);
+  const shipSize = new THREE.Vector3();
+  const shipCenter = new THREE.Vector3();
+  bounds.getSize(shipSize);
+  bounds.getCenter(shipCenter);
 
   shipMesh.traverse((child) => {
     if (child.isMesh && child.material) {
@@ -860,49 +877,68 @@ function applyDenemeShipStyling(shipMesh, styleKey = 'gold', options = { withSai
     }
   });
 
-  if (options.withSailSparkles && typeof THREE !== 'undefined') {
-    activeDenemeLight = new THREE.PointLight(theme.lightColor, theme.lightIntensity, 260);
-    activeDenemeLight.position.set(0, 75, 0);
+  if (options.withAuraPoints && typeof THREE !== 'undefined') {
+    activeDenemeLight = new THREE.PointLight(theme.lightColor, theme.lightIntensity, 240);
+    activeDenemeLight.position.set(0, 65, 0);
     shipMesh.add(activeDenemeLight);
 
-    activeSailSparkleGroup = new THREE.Group();
-    const sparkleCount = 24;
-    const baseRadius = Math.max(0.45, Math.min(sailSize.x, sailSize.y, sailSize.z) * 0.032);
+    const count = 36;
+    const positions = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
+    const primaryCol = new THREE.Color(theme.sparkleColor);
+    const accentCol = new THREE.Color(theme.sparkleAccent);
 
-    for (let i = 0; i < sparkleCount; i++) {
-      const spGeo = new THREE.OctahedronGeometry(baseRadius, 0);
-      const spMat = new THREE.MeshBasicMaterial({
-        color: i % 2 === 0 ? theme.sparkleColor : theme.sparkleAccent,
-        transparent: true,
-        opacity: 0.9
-      });
-      const spMesh = new THREE.Mesh(spGeo, spMat);
+    const radiusX = Math.max(4.5, shipSize.x * 0.56);
+    const radiusZ = Math.max(4.5, shipSize.z * 0.56);
+    const minY = bounds.min.y + shipSize.y * 0.14;
+    const maxY = bounds.min.y + shipSize.y * 0.72;
 
-      const angle = (i / sparkleCount) * Math.PI * 2;
-      const rx = Math.max(2.5, sailSize.x * 0.32);
-      const rz = Math.max(2.5, sailSize.z * 0.32);
-      const minSailY = sailCenter.y + sailSize.y * 0.05;
-      const maxSailY = sailBounds.max.y * 0.98;
-      const baseY = minSailY + ((i % 5) / 4) * Math.max(2, maxSailY - minSailY);
+    shipAuraMeta = [];
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2 + (i % 3) * 0.18;
+      const radialSpread = 0.88 + (i % 5) * 0.08;
+      const rx = radiusX * radialSpread;
+      const rz = radiusZ * radialSpread;
+      const baseY = minY + ((i * 7) % count) / count * Math.max(1.5, maxY - minY);
 
-      const baseX = Math.cos(angle) * rx * (0.45 + (i % 3) * 0.25);
-      const baseZ = Math.sin(angle) * rz * (0.45 + ((i + 1) % 3) * 0.25);
+      positions[i * 3] = Math.cos(angle) * rx;
+      positions[i * 3 + 1] = baseY;
+      positions[i * 3 + 2] = Math.sin(angle) * rz;
 
-      spMesh.position.set(baseX, baseY, baseZ);
-      activeSailSparkleGroup.add(spMesh);
+      const chosen = i % 2 === 0 ? primaryCol : accentCol;
+      colors[i * 3] = chosen.r;
+      colors[i * 3 + 1] = chosen.g;
+      colors[i * 3 + 2] = chosen.b;
 
-      sailSparkleItems.push({
-        mesh: spMesh,
-        baseX,
+      shipAuraMeta.push({
+        angle,
+        rx,
+        rz,
         baseY,
-        baseZ,
-        phase: i * 0.65,
-        orbitSpeed: (i % 2 === 0 ? 1 : -1) * (1.2 + (i % 4) * 0.35),
-        bobAmp: 0.55 + (i % 3) * 0.35
+        orbitSpeed: (i % 2 === 0 ? 1 : -1) * (0.45 + (i % 4) * 0.14),
+        bobSpeed: 1.4 + (i % 5) * 0.35,
+        bobAmp: Math.max(0.25, shipSize.y * 0.045),
+        phase: i * 0.55
       });
     }
 
-    shipMesh.add(activeSailSparkleGroup);
+    const ptGeo = new THREE.BufferGeometry();
+    ptGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    ptGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    const ptMat = new THREE.PointsMaterial({
+      size: 5.5,
+      sizeAttenuation: true,
+      map: getRoundSparklePointTexture(),
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.92,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
+    });
+
+    activeShipAuraPoints = new THREE.Points(ptGeo, ptMat);
+    shipMesh.add(activeShipAuraPoints);
   }
 }
 
@@ -991,7 +1027,7 @@ function getShipThumbnail(modelSpec, callback) {
   }
   loadCachedGLB(modelSpec.modelPath, (clonedModel) => {
     if (modelSpec.denemeStyle) {
-      applyDenemeShipStyling(clonedModel, modelSpec.denemeStyle, { withSailSparkles: false });
+      applyDenemeShipStyling(clonedModel, modelSpec.denemeStyle, { withAuraPoints: false });
     }
     if (!thumbnailRenderer) {
       thumbnailRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
@@ -1488,7 +1524,7 @@ function setupPlayerShipVisual() {
     let scaleFactor = (120 / maxDim) * (modelSpec.scaleMultiplier || 1.0);
     activeGlbShip.scale.set(scaleFactor, scaleFactor, scaleFactor);
     if (modelSpec.denemeStyle) {
-      applyDenemeShipStyling(activeGlbShip, modelSpec.denemeStyle, { withSailSparkles: true });
+      applyDenemeShipStyling(activeGlbShip, modelSpec.denemeStyle, { withAuraPoints: true });
     }
     scene.add(activeGlbShip);
   });
@@ -1963,23 +1999,23 @@ function animate3D() {
     if (modelSpec.denemeStyle) {
       const dTheme = DENEME_THEMES[modelSpec.denemeStyle] || DENEME_THEMES.gold;
       if (activeDenemeLight) {
-        activeDenemeLight.intensity = dTheme.lightIntensity + Math.sin(timeSec * dTheme.pulseSpeed) * 0.65;
+        activeDenemeLight.intensity = dTheme.lightIntensity + Math.sin(timeSec * dTheme.pulseSpeed) * 0.55;
       }
-      if (sailSparkleItems.length > 0) {
-        sailSparkleItems.forEach((sp) => {
-          const t = timeSec * dTheme.pulseSpeed + sp.phase;
-          const sway = Math.sin(t * sp.orbitSpeed) * 1.6;
-          sp.mesh.position.set(
-            sp.baseX + sway,
-            sp.baseY + Math.cos(t * 1.4) * sp.bobAmp,
-            sp.baseZ + Math.cos(t * sp.orbitSpeed) * 1.2
+      if (activeShipAuraPoints && shipAuraMeta.length > 0) {
+        const posAttr = activeShipAuraPoints.geometry.getAttribute('position');
+        for (let i = 0; i < shipAuraMeta.length; i++) {
+          const m = shipAuraMeta[i];
+          const curAngle = m.angle + timeSec * m.orbitSpeed;
+          const pulseScale = 1.0 + Math.sin(timeSec * 1.8 + m.phase) * 0.06;
+          posAttr.setXYZ(
+            i,
+            Math.cos(curAngle) * m.rx * pulseScale,
+            m.baseY + Math.sin(timeSec * m.bobSpeed + m.phase) * m.bobAmp,
+            Math.sin(curAngle) * m.rz * pulseScale
           );
-          sp.mesh.rotation.y += 4.5 * dt;
-          sp.mesh.rotation.x += 3.2 * dt;
-          const twinkle = 0.55 + 0.45 * Math.sin(t * 2.3);
-          sp.mesh.scale.setScalar(0.65 + 0.65 * twinkle);
-          sp.mesh.material.opacity = Math.max(0.2, Math.min(1, twinkle));
-        });
+        }
+        posAttr.needsUpdate = true;
+        activeShipAuraPoints.material.opacity = 0.72 + 0.25 * Math.sin(timeSec * dTheme.pulseSpeed);
       }
     }
 
