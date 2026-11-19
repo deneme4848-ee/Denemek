@@ -718,7 +718,7 @@ const AMMO_TYPES = {
   snow:   { id: 'snow',   name: 'Kar Güllesi',    damage: 25000, slow: 1.0,  isHeal: true,  bonusNpc: 1.0, desc: '+25.000 Can Doldurur', color: 0xffffff, img: 'kar.png' }
 };
 
-const DENEME_IDS = ['deneme1', 'deneme2', 'deneme3', 'deneme4', 'deneme5'];
+const REMOVED_SHIP_IDS = ['ghost', 'tasarim1', 'gold', 'tasarim5'];
 
 const BASE_SHIP_MODELS = {
   standard:  { id: 'standard',  name: 'Ejderha Kalyonu', desc: 'Başlangıç 3D Savaş Gemisi', cost: 0,        type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45 },
@@ -727,13 +727,9 @@ const BASE_SHIP_MODELS = {
   deneme3:   { id: 'deneme3',   name: 'Deneme 3 · Mor Gölge', desc: 'Minik 3D Detay · Mor Gövde', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'violet' },
   deneme4:   { id: 'deneme4',   name: 'Deneme 4 · Kızıl Cehennem', desc: 'Burunda Ağır Top · Kızıl Gövde', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'crimson' },
   deneme5:   { id: 'deneme5',   name: 'Deneme 5 · Buzul Kraliyet', desc: 'Minik 3D Detay · Buzul Gövde', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, scaleMultiplier: 1.12, denemeStyle: 'frost' },
-  ghost:     { id: 'ghost',     name: 'Hayalet Fırkateyn', desc: 'Gizli Sis Gövdesi',     cost: 5000000,  type: 'glb', modelPath: 'tasarim1.glb', heightOffset: 45 },
-  gold:      { id: 'gold',      name: 'Altın Korsan',     desc: 'İhtişamlı Altın Kalyon', cost: 15000000, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, scaleMultiplier: 1.3 },
-  tasarim1:  { id: 'tasarim1',  name: 'Tasarim 1', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim1.glb' },
   tasarim2:  { id: 'tasarim2',  name: 'Tasarim 2', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim2.glb', heightOffset: 45, rotationOffset: Math.PI / 2 },
   tasarim3:  { id: 'tasarim3',  name: 'Tasarim 3', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3 },
   tasarim4:  { id: 'tasarim4',  name: 'Tasarim 4', desc: 'GLB Savaş Gemisi', cost: 3500, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2 },
-  tasarim5:  { id: 'tasarim5',  name: 'Tasarim 5', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim5.glb', heightOffset: 45, scaleMultiplier: 1.5 },
   tasarim6:  { id: 'tasarim6',  name: 'Tasarim 6', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim6.glb', heightOffset: 85 },
   tasarim7:  { id: 'tasarim7',  name: 'Tasarim 7', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim7.glb', heightOffset: 45, rotationOffset: Math.PI },
   tasarim8:  { id: 'tasarim8',  name: 'Tasarim 8', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim8.glb', heightOffset: 85 },
@@ -741,21 +737,6 @@ const BASE_SHIP_MODELS = {
   tasarim10: { id: 'tasarim10', name: 'Tasarim 10', desc: 'GLB Savaş Gemisi', cost: 4500, type: 'glb', modelPath: 'tasarim10.glb', heightOffset: 45 },
   tasarim11: { id: 'tasarim11', name: 'Tasarim 11', desc: 'GLB Savaş Gemisi', cost: 5000, type: 'glb', modelPath: 'tasarim11.glb', heightOffset: 45 }
 };
-
-const EFFECT_PALETTES = [
-  { label: 'Yakut Kırmızısı Efekt', color: 0xfca5a5, emissive: 0xe11d48, emissiveIntensity: 0.36, metalnessAdd: 0.3, roughnessSub: 0.25, lightColor: 0xf43f5e, lightIntensity: 0.5, crystalColor: 0xfb7185, lanternColor: 0xff2a6d, pulseSpeed: 3.6 },
-  { label: 'Safir Mavisi Efekt',   color: 0x93c5fd, emissive: 0x2563eb, emissiveIntensity: 0.36, metalnessAdd: 0.35, roughnessSub: 0.3,  lightColor: 0x3b82f6, lightIntensity: 0.5, crystalColor: 0x60a5fa, lanternColor: 0x00d9ff, pulseSpeed: 2.9 },
-  { label: 'Zümrüt Yeşili Efekt', color: 0x86efac, emissive: 0x16a34a, emissiveIntensity: 0.35, metalnessAdd: 0.3, roughnessSub: 0.28, lightColor: 0x22c55e, lightIntensity: 0.5, crystalColor: 0x4ade80, lanternColor: 0x10ff88, pulseSpeed: 3.2 },
-  { label: 'Kehribar Turuncu Efekt',color: 0xfdba74, emissive: 0xea580c, emissiveIntensity: 0.36, metalnessAdd: 0.3, roughnessSub: 0.25, lightColor: 0xf97316, lightIntensity: 0.5, crystalColor: 0xfb923c, lanternColor: 0xff7b00, pulseSpeed: 3.8 },
-  { label: 'Ametist Mor Efekt',    color: 0xd8b4fe, emissive: 0x9333ea, emissiveIntensity: 0.36, metalnessAdd: 0.35, roughnessSub: 0.3,  lightColor: 0xa855f7, lightIntensity: 0.5, crystalColor: 0xc084fc, lanternColor: 0xd946ef, pulseSpeed: 2.7 },
-  { label: 'Turkuaz Camgöbeği Efekt',color: 0x67e8f9, emissive: 0x0891b2, emissiveIntensity: 0.35, metalnessAdd: 0.3, roughnessSub: 0.32, lightColor: 0x06b6d4, lightIntensity: 0.5, crystalColor: 0x22d3ee, lanternColor: 0x00f5d4, pulseSpeed: 3.1 },
-  { label: 'Gül Pembe Efekt',      color: 0xf9a8d4, emissive: 0xdb2777, emissiveIntensity: 0.36, metalnessAdd: 0.3, roughnessSub: 0.25, lightColor: 0xec4899, lightIntensity: 0.5, crystalColor: 0xf472b6, lanternColor: 0xff5ca8, pulseSpeed: 3.4 },
-  { label: 'Limon Sarısı Efekt',   color: 0xfef08a, emissive: 0xca8a04, emissiveIntensity: 0.35, metalnessAdd: 0.35, roughnessSub: 0.25, lightColor: 0xeab308, lightIntensity: 0.5, crystalColor: 0xfacc15, lanternColor: 0xffe600, pulseSpeed: 2.8 },
-  { label: 'İndigo Derin Efekt',   color: 0xa5b4fc, emissive: 0x4f46e5, emissiveIntensity: 0.36, metalnessAdd: 0.35, roughnessSub: 0.3,  lightColor: 0x6366f1, lightIntensity: 0.5, crystalColor: 0x818cf8, lanternColor: 0x7c5cff, pulseSpeed: 2.5 },
-  { label: 'Mercan Bakır Efekt',   color: 0xfca5a5, emissive: 0xc2410c, emissiveIntensity: 0.35, metalnessAdd: 0.4, roughnessSub: 0.25,  lightColor: 0xff6b4a, lightIntensity: 0.5, crystalColor: 0xff8a65, lanternColor: 0xff5722, pulseSpeed: 3.5 },
-  { label: 'Nane Yeşili Efekt',    color: 0x99f6e4, emissive: 0x0d9488, emissiveIntensity: 0.35, metalnessAdd: 0.3, roughnessSub: 0.3,  lightColor: 0x14b8a6, lightIntensity: 0.5, crystalColor: 0x2dd4bf, lanternColor: 0x00e5b8, pulseSpeed: 3.0 },
-  { label: 'Kraliyet Altın Efekt', color: 0xfde68a, emissive: 0xd97706, emissiveIntensity: 0.38, metalnessAdd: 0.42, roughnessSub: 0.2,  lightColor: 0xf59e0b, lightIntensity: 0.52, crystalColor: 0xffd166, lanternColor: 0xffb703, pulseSpeed: 2.6 }
-];
 
 const DENEME_THEMES = {
   gold: {
@@ -820,49 +801,36 @@ const DENEME_THEMES = {
   }
 };
 
-function buildShipModelsWithClones() {
-  const result = { ...BASE_SHIP_MODELS };
-  let paletteCursor = 0;
-
-  Object.keys(BASE_SHIP_MODELS).forEach((key) => {
-    if (DENEME_IDS.includes(key)) return;
-    const baseSpec = BASE_SHIP_MODELS[key];
-
-    for (let c = 1; c <= 3; c++) {
-      const palette = EFFECT_PALETTES[paletteCursor % EFFECT_PALETTES.length];
-      paletteCursor++;
-
-      const styleKey = `clone_${key}_${c}`;
-      DENEME_THEMES[styleKey] = {
-        color: palette.color,
-        emissive: palette.emissive,
-        emissiveIntensity: palette.emissiveIntensity,
-        metalnessAdd: palette.metalnessAdd,
-        roughnessSub: palette.roughnessSub,
-        lightColor: palette.lightColor,
-        lightIntensity: palette.lightIntensity,
-        crystalColor: palette.crystalColor,
-        lanternColor: palette.lanternColor,
-        pulseSpeed: palette.pulseSpeed
-      };
-
-      const cloneId = `${key}_kopya${c}`;
-      result[cloneId] = {
-        ...baseSpec,
-        id: cloneId,
-        name: `${baseSpec.name} · Kopya ${c}`,
-        desc: `${palette.label} · Kopya ${c}`,
-        cost: 0,
-        denemeStyle: styleKey
-      };
+function sanitizeShipModels(modelsMap) {
+  const clean = {};
+  Object.keys(modelsMap).forEach((key) => {
+    const spec = modelsMap[key];
+    const nameHasCopy = /kopya/i.test(spec.name || '') || /kopya/i.test(key);
+    if (!REMOVED_SHIP_IDS.includes(key) && !nameHasCopy) {
+      clean[key] = spec;
     }
   });
-
-  return result;
+  return clean;
 }
 
-const SHIP_MODELS = buildShipModelsWithClones();
+const SHIP_MODELS = sanitizeShipModels(BASE_SHIP_MODELS);
 const ALL_UNLOCKED_SHIP_IDS = Object.keys(SHIP_MODELS);
+
+function sanitizeShipId(shipId) {
+  if (!shipId || REMOVED_SHIP_IDS.includes(shipId) || /kopya/i.test(shipId) || !SHIP_MODELS[shipId]) {
+    return 'standard';
+  }
+  return shipId;
+}
+
+function sanitizeOwnedShips(list) {
+  const base = Array.isArray(list) ? list : ['standard'];
+  const filtered = base.filter(id => !REMOVED_SHIP_IDS.includes(id) && !/kopya/i.test(id) && Boolean(SHIP_MODELS[id]));
+  ALL_UNLOCKED_SHIP_IDS.forEach((id) => {
+    if (!filtered.includes(id)) filtered.push(id);
+  });
+  return filtered;
+}
 
 let activeDenemeLight = null;
 let activeDenemePropsGroup = null;
@@ -1258,28 +1226,21 @@ function getShipThumbnail(modelSpec, callback) {
   });
 }
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v84';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v84';
+const USERS_STORAGE_KEY = 'pirate3d_users_v85';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v85';
 let authMode = 'login';
 let currentUser = null;
-
-function ensureAllDenemeOwned(list) {
-  const arr = Array.isArray(list) ? [...list] : ['standard'];
-  ALL_UNLOCKED_SHIP_IDS.forEach((id) => {
-    if (!arr.includes(id)) arr.push(id);
-  });
-  return arr;
-}
 
 function loadUsers() {
   let users = [];
   try { users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]'); } catch { users = []; }
   if (!users.some(u => u.username.toLowerCase() === 'test')) {
-    users.push({ id: 'user_test', username: 'Test', password: 'test', ownedShips: ensureAllDenemeOwned(['standard']), equippedShip: 'standard' });
+    users.push({ id: 'user_test', username: 'Test', password: 'test', ownedShips: sanitizeOwnedShips(['standard']), equippedShip: 'standard' });
     try { localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users)); } catch(e) {}
   } else {
     users.forEach(u => {
-      u.ownedShips = ensureAllDenemeOwned(u.ownedShips);
+      u.ownedShips = sanitizeOwnedShips(u.ownedShips);
+      u.equippedShip = sanitizeShipId(u.equippedShip);
     });
   }
   return users;
@@ -1303,12 +1264,13 @@ if (tabRegister) tabRegister.addEventListener('click', () => setAuthMode('regist
 if (fillTestBtn) fillTestBtn.addEventListener('click', () => { authUsernameInput.value = 'Test'; authPasswordInput.value = 'test'; });
 
 function completeLogin(user) {
-  const owned = ensureAllDenemeOwned(user.ownedShips);
+  const owned = sanitizeOwnedShips(user.ownedShips);
+  const equipped = sanitizeShipId(user.equippedShip);
   currentUser = { 
     id: user.id, 
     username: user.username, 
     ownedShips: owned, 
-    equippedShip: user.equippedShip || 'standard' 
+    equippedShip: equipped 
   };
   try { localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser)); } catch(e) {}
   tagUsernameEl.textContent = currentUser.username;
@@ -1323,7 +1285,7 @@ if (authForm) {
     const users = loadUsers();
     if (authMode === 'register') {
       if (users.some(u => u.username.toLowerCase() === uname.toLowerCase())) { authMsgEl.textContent = 'Bu isim zaten kayıtlı.'; return; }
-      const nu = { id: 'u_' + Date.now(), username: uname, password: pass, ownedShips: ensureAllDenemeOwned(['standard']), equippedShip: 'standard' };
+      const nu = { id: 'u_' + Date.now(), username: uname, password: pass, ownedShips: sanitizeOwnedShips(['standard']), equippedShip: 'standard' };
       users.push(nu); saveUsers(users);
       setTimeout(() => completeLogin(nu), 200);
     } else {
@@ -1702,7 +1664,7 @@ let lastPlayerAttackTime = 0;
 function setupPlayerShipVisual() {
   const users = loadUsers();
   const dbUser = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
-  const equippedId = dbUser.equippedShip || 'standard';
+  const equippedId = sanitizeShipId(dbUser.equippedShip);
   const modelSpec = SHIP_MODELS[equippedId] || SHIP_MODELS.standard;
 
   clearDenemeShipStyling();
@@ -2190,7 +2152,8 @@ function animate3D() {
 
     const users = loadUsers();
     const dbUser = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
-    const modelSpec = SHIP_MODELS[dbUser.equippedShip || 'standard'];
+    const equippedId = sanitizeShipId(dbUser.equippedShip);
+    const modelSpec = SHIP_MODELS[equippedId] || SHIP_MODELS.standard;
     const hOffset = modelSpec.heightOffset || 0;
     const rotOffset = modelSpec.rotationOffset || 0;
 
@@ -2612,7 +2575,7 @@ function renderShipyardList() {
   shipyardListEl.innerHTML = '';
   const users = loadUsers();
   const dbUser = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
-  const owned = ensureAllDenemeOwned(dbUser.ownedShips), equipped = dbUser.equippedShip || 'standard';
+  const owned = sanitizeOwnedShips(dbUser.ownedShips), equipped = sanitizeShipId(dbUser.equippedShip);
 
   Object.values(SHIP_MODELS).forEach((model, idx) => {
     const isOwned = owned.includes(model.id);
@@ -2640,7 +2603,7 @@ function renderShipyardList() {
       const users = loadUsers();
       const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
       if (uIdx !== -1) {
-        users[uIdx].ownedShips = ensureAllDenemeOwned(users[uIdx].ownedShips);
+        users[uIdx].ownedShips = sanitizeOwnedShips(users[uIdx].ownedShips);
         if (!users[uIdx].ownedShips.includes(shipId)) users[uIdx].ownedShips.push(shipId);
         users[uIdx].equippedShip = shipId;
         saveUsers(users);
