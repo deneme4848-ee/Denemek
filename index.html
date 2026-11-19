@@ -718,8 +718,15 @@ const AMMO_TYPES = {
   snow:   { id: 'snow',   name: 'Kar Güllesi',    damage: 25000, slow: 1.0,  isHeal: true,  bonusNpc: 1.0, desc: '+25.000 Can Doldurur', color: 0xffffff, img: 'kar.png' }
 };
 
+const DENEME_IDS = ['deneme1', 'deneme2', 'deneme3', 'deneme4', 'deneme5'];
+
 const SHIP_MODELS = {
   standard:  { id: 'standard',  name: 'Ejderha Kalyonu', desc: 'Başlangıç 3D Savaş Gemisi', cost: 0,        type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45 },
+  deneme1:   { id: 'deneme1',   name: 'Deneme 1 · Altın Güneş', desc: 'Altın gövde, sıcak ışık ve dönen güneş halkası', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'gold' },
+  deneme2:   { id: 'deneme2',   name: 'Deneme 2 · Zümrüt Leviathan', desc: 'Zümrüt parıltı ve çift katmanlı yeşil aura', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'emerald' },
+  deneme3:   { id: 'deneme3',   name: 'Deneme 3 · Mor Gölge', desc: 'Ametist tonları ve gizemli mor enerji çemberi', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'violet' },
+  deneme4:   { id: 'deneme4',   name: 'Deneme 4 · Kızıl Cehennem', desc: 'Alevli kızıl gövde ve nabız atan kor ışığı', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'crimson' },
+  deneme5:   { id: 'deneme5',   name: 'Deneme 5 · Buzul Kraliyet', desc: 'Buz mavisi kristal ışıma ve geniş buz halkası', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, scaleMultiplier: 1.12, denemeStyle: 'frost' },
   ghost:     { id: 'ghost',     name: 'Hayalet Fırkateyn', desc: 'Gizli Sis Gövdesi',     cost: 5000000,  type: 'glb', modelPath: 'tasarim1.glb', heightOffset: 45 },
   gold:      { id: 'gold',      name: 'Altın Korsan',     desc: 'İhtişamlı Altın Kalyon', cost: 15000000, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, scaleMultiplier: 1.3 },
   tasarim1:  { id: 'tasarim1',  name: 'Tasarim 1', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim1.glb' },
@@ -734,6 +741,155 @@ const SHIP_MODELS = {
   tasarim10: { id: 'tasarim10', name: 'Tasarim 10', desc: 'GLB Savaş Gemisi', cost: 4500, type: 'glb', modelPath: 'tasarim10.glb', heightOffset: 45 },
   tasarim11: { id: 'tasarim11', name: 'Tasarim 11', desc: 'GLB Savaş Gemisi', cost: 5000, type: 'glb', modelPath: 'tasarim11.glb', heightOffset: 45 }
 };
+
+const DENEME_THEMES = {
+  gold: {
+    color: 0xffd166,
+    emissive: 0xf59e0b,
+    emissiveIntensity: 0.34,
+    metalnessAdd: 0.4,
+    roughnessSub: 0.25,
+    lightColor: 0xffb703,
+    lightIntensity: 2.4,
+    ringColor: 0xfbbf24,
+    ringInner: 36,
+    ringOuter: 43,
+    outerRingColor: 0xf97316,
+    pulseSpeed: 2.2
+  },
+  emerald: {
+    color: 0x6ee7b7,
+    emissive: 0x059669,
+    emissiveIntensity: 0.36,
+    metalnessAdd: 0.3,
+    roughnessSub: 0.35,
+    lightColor: 0x10b981,
+    lightIntensity: 2.5,
+    ringColor: 0x34d399,
+    ringInner: 35,
+    ringOuter: 42,
+    outerRingColor: 0x047857,
+    pulseSpeed: 2.8
+  },
+  violet: {
+    color: 0xc4b5fd,
+    emissive: 0x7c3aed,
+    emissiveIntensity: 0.38,
+    metalnessAdd: 0.35,
+    roughnessSub: 0.3,
+    lightColor: 0xa855f7,
+    lightIntensity: 2.6,
+    ringColor: 0xc084fc,
+    ringInner: 38,
+    ringOuter: 45,
+    outerRingColor: 0x6d28d9,
+    pulseSpeed: 2.0
+  },
+  crimson: {
+    color: 0xfca5a5,
+    emissive: 0xdc2626,
+    emissiveIntensity: 0.4,
+    metalnessAdd: 0.25,
+    roughnessSub: 0.2,
+    lightColor: 0xef4444,
+    lightIntensity: 2.8,
+    ringColor: 0xf87171,
+    ringInner: 37,
+    ringOuter: 44,
+    outerRingColor: 0xea580c,
+    pulseSpeed: 4.2
+  },
+  frost: {
+    color: 0xbae6fd,
+    emissive: 0x0284c7,
+    emissiveIntensity: 0.35,
+    metalnessAdd: 0.2,
+    roughnessSub: 0.45,
+    lightColor: 0x38bdf8,
+    lightIntensity: 2.4,
+    ringColor: 0x7dd3fc,
+    ringInner: 40,
+    ringOuter: 47,
+    outerRingColor: 0xe0f2fe,
+    pulseSpeed: 2.5
+  }
+};
+
+let activeDenemeLight = null;
+let activeDenemeAuraGroup = null;
+let activeDenemeStyleKey = null;
+
+function clearDenemeShipStyling() {
+  if (activeDenemeLight && activeDenemeLight.parent) {
+    activeDenemeLight.parent.remove(activeDenemeLight);
+  }
+  activeDenemeLight = null;
+
+  if (activeDenemeAuraGroup && activeDenemeAuraGroup.parent) {
+    activeDenemeAuraGroup.parent.remove(activeDenemeAuraGroup);
+  }
+  activeDenemeAuraGroup = null;
+  activeDenemeStyleKey = null;
+}
+
+function applyDenemeShipStyling(shipMesh, styleKey = 'gold', options = { withAura: true }) {
+  if (!shipMesh) return;
+  const theme = DENEME_THEMES[styleKey] || DENEME_THEMES.gold;
+  activeDenemeStyleKey = styleKey;
+
+  shipMesh.traverse((child) => {
+    if (child.isMesh && child.material) {
+      const mats = Array.isArray(child.material) ? child.material : [child.material];
+      mats.forEach((mat) => {
+        if (mat.color) mat.color.setHex(theme.color);
+        if (mat.emissive) {
+          mat.emissive.setHex(theme.emissive);
+          mat.emissiveIntensity = theme.emissiveIntensity;
+        }
+        if (typeof mat.metalness === 'number') {
+          mat.metalness = Math.min(1, (mat.metalness || 0.3) + theme.metalnessAdd);
+        }
+        if (typeof mat.roughness === 'number') {
+          mat.roughness = Math.max(0.12, (mat.roughness || 0.6) - theme.roughnessSub);
+        }
+        mat.needsUpdate = true;
+      });
+    }
+  });
+
+  if (options.withAura && typeof THREE !== 'undefined' && scene) {
+    activeDenemeLight = new THREE.PointLight(theme.lightColor, theme.lightIntensity, 280);
+    activeDenemeLight.position.set(0, 70, 0);
+    shipMesh.add(activeDenemeLight);
+
+    activeDenemeAuraGroup = new THREE.Group();
+    const innerGeo = new THREE.RingGeometry(theme.ringInner, theme.ringOuter, 48);
+    const innerMat = new THREE.MeshBasicMaterial({
+      color: theme.ringColor,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.78
+    });
+    const innerRing = new THREE.Mesh(innerGeo, innerMat);
+    innerRing.rotation.x = -Math.PI / 2;
+    innerRing.position.y = 1.4;
+    activeDenemeAuraGroup.add(innerRing);
+
+    const outerGeo = new THREE.RingGeometry(theme.ringOuter + 6, theme.ringOuter + 10, 48);
+    const outerMat = new THREE.MeshBasicMaterial({
+      color: theme.outerRingColor,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.45
+    });
+    const outerRing = new THREE.Mesh(outerGeo, outerMat);
+    outerRing.rotation.x = -Math.PI / 2;
+    outerRing.position.y = 1.1;
+    activeDenemeAuraGroup.add(outerRing);
+
+    scene.add(activeDenemeAuraGroup);
+  }
+}
 
 const ENEMY_GLB_MODEL_PATH = 'tasarim2.glb';
 const ENEMY_GLB_HEIGHT_OFFSET = 45;
@@ -819,6 +975,9 @@ function getShipThumbnail(modelSpec, callback) {
     return;
   }
   loadCachedGLB(modelSpec.modelPath, (clonedModel) => {
+    if (modelSpec.denemeStyle) {
+      applyDenemeShipStyling(clonedModel, modelSpec.denemeStyle, { withAura: false });
+    }
     if (!thumbnailRenderer) {
       thumbnailRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
       thumbnailRenderer.setSize(220, 140);
@@ -856,12 +1015,25 @@ const SESSION_STORAGE_KEY = 'pirate3d_session_v84';
 let authMode = 'login';
 let currentUser = null;
 
+function ensureAllDenemeOwned(list) {
+  const arr = Array.isArray(list) ? [...list] : ['standard'];
+  if (!arr.includes('standard')) arr.unshift('standard');
+  DENEME_IDS.forEach((id) => {
+    if (!arr.includes(id)) arr.push(id);
+  });
+  return arr;
+}
+
 function loadUsers() {
   let users = [];
   try { users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]'); } catch { users = []; }
   if (!users.some(u => u.username.toLowerCase() === 'test')) {
-    users.push({ id: 'user_test', username: 'Test', password: 'test', ownedShips: ['standard'], equippedShip: 'standard' });
+    users.push({ id: 'user_test', username: 'Test', password: 'test', ownedShips: ensureAllDenemeOwned(['standard']), equippedShip: 'standard' });
     try { localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users)); } catch(e) {}
+  } else {
+    users.forEach(u => {
+      u.ownedShips = ensureAllDenemeOwned(u.ownedShips);
+    });
   }
   return users;
 }
@@ -884,10 +1056,11 @@ if (tabRegister) tabRegister.addEventListener('click', () => setAuthMode('regist
 if (fillTestBtn) fillTestBtn.addEventListener('click', () => { authUsernameInput.value = 'Test'; authPasswordInput.value = 'test'; });
 
 function completeLogin(user) {
+  const owned = ensureAllDenemeOwned(user.ownedShips);
   currentUser = { 
     id: user.id, 
     username: user.username, 
-    ownedShips: user.ownedShips || ['standard'], 
+    ownedShips: owned, 
     equippedShip: user.equippedShip || 'standard' 
   };
   try { localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser)); } catch(e) {}
@@ -903,7 +1076,7 @@ if (authForm) {
     const users = loadUsers();
     if (authMode === 'register') {
       if (users.some(u => u.username.toLowerCase() === uname.toLowerCase())) { authMsgEl.textContent = 'Bu isim zaten kayıtlı.'; return; }
-      const nu = { id: 'u_' + Date.now(), username: uname, password: pass, ownedShips: ['standard'], equippedShip: 'standard' };
+      const nu = { id: 'u_' + Date.now(), username: uname, password: pass, ownedShips: ensureAllDenemeOwned(['standard']), equippedShip: 'standard' };
       users.push(nu); saveUsers(users);
       setTimeout(() => completeLogin(nu), 200);
     } else {
@@ -991,7 +1164,6 @@ function buildOuterArcWaypoints(fromX, fromZ, toX, toZ, radius) {
   let endAngle = Math.atan2(toZ, toX);
   let diff = normalizeAngle(endAngle - startAngle);
 
-  // En kısa yayı seç; eğer tam zıt taraftaysa (diff ~ ±PI), kapı yönüne doğru dön
   if (Math.abs(Math.abs(diff) - Math.PI) < 0.05) {
     const toGapDiff = normalizeAngle(WALL_GAP_ANGLE - startAngle);
     diff = toGapDiff >= 0 ? Math.PI : -Math.PI;
@@ -1026,7 +1198,6 @@ function buildNavigationRoute(fromX, fromZ, toX, toZ) {
   const gapInZ  = Math.sin(WALL_GAP_ANGLE) * innerClearance;
 
   if (startOutside && endInside) {
-    // Dışarıdaki uzak noktadan önce sur çemberinin dışından dolaşarak geçit dışına gel, sonra geçitten içeri gir
     if (segmentIntersectsCircle(fromX, fromZ, gapOutX, gapOutZ, 0, 0, WALL_RADIUS + 35)) {
       const arcPts = buildOuterArcWaypoints(fromX, fromZ, gapOutX, gapOutZ, outerClearance);
       queue.push(...arcPts);
@@ -1034,7 +1205,6 @@ function buildNavigationRoute(fromX, fromZ, toX, toZ) {
     queue.push({ x: gapOutX, z: gapOutZ });
     queue.push({ x: gapInX, z: gapInZ });
   } else if (startInside && endOutside) {
-    // İçeriden dışarıya: önce geçit içine, sonra geçit dışına, gerekirse dış çemberden hedefe dolaş
     queue.push({ x: gapInX, z: gapInZ });
     queue.push({ x: gapOutX, z: gapOutZ });
     if (segmentIntersectsCircle(gapOutX, gapOutZ, toX, toZ, 0, 0, WALL_RADIUS + 35)) {
@@ -1042,7 +1212,6 @@ function buildNavigationRoute(fromX, fromZ, toX, toZ) {
       queue.push(...arcPts);
     }
   } else if (startOutside && endOutside) {
-    // İkisi de dışarıdaysa ve aradaki çizgi sur çemberini kesiyorsa çember dışından dolaş
     if (segmentIntersectsCircle(fromX, fromZ, toX, toZ, 0, 0, WALL_RADIUS + 35)) {
       const arcPts = buildOuterArcWaypoints(fromX, fromZ, toX, toZ, outerClearance);
       queue.push(...arcPts);
@@ -1290,9 +1459,11 @@ function setupPlayerShipVisual() {
   const equippedId = dbUser.equippedShip || 'standard';
   const modelSpec = SHIP_MODELS[equippedId] || SHIP_MODELS.standard;
 
+  clearDenemeShipStyling();
   if (activeGlbShip) { scene.remove(activeGlbShip); activeGlbShip = null; }
 
   loadCachedGLB(modelSpec.modelPath, (shipMesh) => {
+    clearDenemeShipStyling();
     if (activeGlbShip) scene.remove(activeGlbShip);
     activeGlbShip = shipMesh;
     const box = new THREE.Box3().setFromObject(activeGlbShip);
@@ -1301,6 +1472,9 @@ function setupPlayerShipVisual() {
     const maxDim = Math.max(size.x, size.y, size.z) || 1;
     let scaleFactor = (120 / maxDim) * (modelSpec.scaleMultiplier || 1.0);
     activeGlbShip.scale.set(scaleFactor, scaleFactor, scaleFactor);
+    if (modelSpec.denemeStyle) {
+      applyDenemeShipStyling(activeGlbShip, modelSpec.denemeStyle, { withAura: true });
+    }
     scene.add(activeGlbShip);
   });
 }
@@ -1771,6 +1945,17 @@ function animate3D() {
     const hOffset = modelSpec.heightOffset || 0;
     const rotOffset = modelSpec.rotationOffset || 0;
 
+    if (modelSpec.denemeStyle) {
+      const dTheme = DENEME_THEMES[modelSpec.denemeStyle] || DENEME_THEMES.gold;
+      if (activeDenemeLight) {
+        activeDenemeLight.intensity = dTheme.lightIntensity + Math.sin(timeSec * dTheme.pulseSpeed) * 0.65;
+      }
+      if (activeDenemeAuraGroup) {
+        activeDenemeAuraGroup.position.set(player.x, 0, player.z);
+        activeDenemeAuraGroup.rotation.y += (1.1 * dt);
+      }
+    }
+
     activeGlbShip.position.set(player.x, SHIP_Y_POS + hOffset + waveBobY - 100, player.z);
     activeGlbShip.rotation.order = 'YXZ';
     activeGlbShip.rotation.y = (-player.a + Math.PI / 2) + rotOffset;
@@ -2144,10 +2329,11 @@ function renderShipyardList() {
   shipyardListEl.innerHTML = '';
   const users = loadUsers();
   const dbUser = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
-  const owned = dbUser.ownedShips || ['standard'], equipped = dbUser.equippedShip || 'standard';
+  const owned = ensureAllDenemeOwned(dbUser.ownedShips), equipped = dbUser.equippedShip || 'standard';
 
   Object.values(SHIP_MODELS).forEach((model, idx) => {
-    const isOwned = owned.includes(model.id), isEquipped = equipped === model.id;
+    const isOwned = owned.includes(model.id);
+    const isEquipped = equipped === model.id;
     const div = document.createElement('div');
     div.className = 'ship-card-item';
     let btnHtml = isEquipped ? `<button class="buy-btn equipped" type="button" disabled>Kullanımda</button>` :
@@ -2171,12 +2357,13 @@ function renderShipyardList() {
       const users = loadUsers();
       const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
       if (uIdx !== -1) {
-        if (!users[uIdx].ownedShips) users[uIdx].ownedShips = ['standard'];
-        users[uIdx].ownedShips.push(shipId);
+        users[uIdx].ownedShips = ensureAllDenemeOwned(users[uIdx].ownedShips);
+        if (!users[uIdx].ownedShips.includes(shipId)) users[uIdx].ownedShips.push(shipId);
         users[uIdx].equippedShip = shipId;
         saveUsers(users);
       }
-      currentUser.ownedShips.push(shipId); currentUser.equippedShip = shipId;
+      if (!currentUser.ownedShips.includes(shipId)) currentUser.ownedShips.push(shipId);
+      currentUser.equippedShip = shipId;
       updateHUD(); setupPlayerShipVisual(); renderShipyardList();
       marketFeedbackEl.style.color = '#4ade80'; marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} kuşanıldı!`;
       setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2500);
