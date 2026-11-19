@@ -436,37 +436,79 @@
       border: 1px solid var(--brass-accent); background: rgba(34, 42, 54, 0.95); color: var(--text-main); cursor: pointer;
     }
 
+    /* Sinematik Arkaplan Katmanlı Giriş & Kayıt Ekranı */
     #auth-overlay {
       position: fixed; inset: 0; z-index: 999999;
-      background: radial-gradient(circle at 50% 35%, #121d29, #060b10);
-      backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 18px;
+      background-color: #050b12;
+      background-image: url('korsan.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      display: flex; align-items: center; justify-content: center; padding: 18px;
+      overflow: hidden;
     }
+
+    /* 1. Katman: Göz yormayan derin gece laciverti / kömür atmosfer perdesi */
+    #auth-overlay::before {
+      content: "";
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        linear-gradient(180deg, rgba(5, 10, 16, 0.76) 0%, rgba(7, 13, 21, 0.62) 48%, rgba(4, 8, 13, 0.86) 100%),
+        rgba(5, 11, 18, 0.42);
+      backdrop-filter: blur(2.5px);
+      pointer-events: none;
+    }
+
+    /* 2. Katman: Kenarları yumuşak karartan sinematik vignette + hafif sisli odak */
+    #auth-overlay::after {
+      content: "";
+      position: absolute; inset: 0; z-index: 1;
+      background:
+        radial-gradient(circle at 50% 48%, rgba(12, 20, 30, 0.12) 0%, rgba(4, 8, 13, 0.68) 76%, rgba(2, 5, 9, 0.92) 100%);
+      pointer-events: none;
+    }
+
     .auth-card {
-      width: 100%; max-width: 410px; background: var(--panel-bg);
-      border: 1px solid var(--brass-border); border-radius: 18px; padding: 26px 22px; box-shadow: 0 25px 65px rgba(0,0,0,0.8);
+      position: relative; z-index: 2;
+      width: 100%; max-width: 410px;
+      background: linear-gradient(168deg, rgba(14, 20, 28, 0.92), rgba(8, 12, 18, 0.96));
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(200, 162, 98, 0.42);
+      border-radius: 18px; padding: 26px 22px;
+      box-shadow:
+        0 28px 75px rgba(0, 0, 0, 0.88),
+        0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+        0 0 42px rgba(4, 10, 18, 0.75);
     }
     .auth-brand { text-align: center; margin-bottom: 18px; }
-    .auth-brand h1 { margin: 0; font-size: 23px; color: var(--text-main); font-weight: 700; }
-    .auth-brand p { margin: 6px 0 0; font-size: 12px; color: var(--text-muted); }
-    .auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: rgba(8, 12, 18, 0.75); padding: 4px; border-radius: 10px; margin-bottom: 16px; border: 1px solid rgba(186, 152, 92, 0.18); }
-    .auth-tab { border: none; background: transparent; color: var(--text-muted); padding: 9px; border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; }
-    .auth-tab.active { background: rgba(36, 44, 56, 0.95); color: var(--text-main); }
+    .auth-brand h1 { margin: 0; font-size: 23px; color: #f0e8d8; font-weight: 700; letter-spacing: 0.4px; }
+    .auth-brand p { margin: 6px 0 0; font-size: 12px; color: #aab5c2; }
+    .auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: rgba(7, 11, 16, 0.85); padding: 4px; border-radius: 10px; margin-bottom: 16px; border: 1px solid rgba(186, 152, 92, 0.22); }
+    .auth-tab { border: none; background: transparent; color: var(--text-muted); padding: 9px; border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: background 0.15s, color 0.15s; }
+    .auth-tab.active { background: rgba(38, 46, 58, 0.96); color: #f0e8d8; }
     .auth-field { margin-bottom: 13px; }
-    .auth-field label { display: block; font-size: 11.5px; color: var(--text-muted); margin-bottom: 5px; font-weight: 600; }
+    .auth-field label { display: block; font-size: 11.5px; color: #b4bec9; margin-bottom: 5px; font-weight: 600; }
     .auth-field input {
       width: 100%; height: 44px; padding: 0 13px; border-radius: 10px;
-      border: 1px solid rgba(186, 152, 92, 0.28); background: rgba(8, 12, 18, 0.9); color: var(--text-main); font-size: 15px; outline: none;
+      border: 1px solid rgba(186, 152, 92, 0.3); background: rgba(7, 11, 17, 0.92); color: #f0e8d8; font-size: 15px; outline: none;
+      transition: border-color 0.15s;
     }
-    .auth-msg { min-height: 18px; font-size: 12px; margin: 4px 0 10px; color: #d68484; }
+    .auth-field input:focus { border-color: var(--brass-accent); }
+    .auth-msg { min-height: 18px; font-size: 12px; margin: 4px 0 10px; color: #dc8a8a; }
     .auth-submit {
       width: 100%; height: 46px; border-radius: 11px; border: 1px solid var(--brass-accent);
-      background: rgba(36, 44, 56, 0.95); color: var(--text-main); font-size: 14px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px;
+      background: linear-gradient(170deg, rgba(46, 42, 34, 0.96), rgba(22, 27, 35, 0.98));
+      color: #f4ece0; font-size: 14px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.45);
+      transition: transform 0.15s, border-color 0.15s;
     }
-    .quick-test-box { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(186, 152, 92, 0.18); display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; color: var(--text-muted); }
+    .auth-submit:hover { border-color: #dab878; transform: translateY(-1px); }
+    .quick-test-box { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(186, 152, 92, 0.2); display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; color: var(--text-muted); }
     .quick-test-btn {
-      border: 1px solid rgba(186, 152, 92, 0.35); background: rgba(20, 27, 36, 0.9);
-      color: var(--text-main); padding: 5px 10px; border-radius: 7px; font-size: 11px; font-weight: 600; cursor: pointer;
+      border: 1px solid rgba(186, 152, 92, 0.36); background: rgba(18, 25, 34, 0.92);
+      color: #e6decb; padding: 5px 10px; border-radius: 7px; font-size: 11px; font-weight: 600; cursor: pointer;
     }
+    .quick-test-btn:hover { border-color: var(--brass-accent); }
   </style>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -1555,7 +1597,6 @@ function setPlayerDestination(toX, toZ) {
   targetDestination = navigationQueue.shift() || null;
 }
 
-/* Gerçekçi & Ölçülü Batış Kıvılcım Efekti */
 function triggerSinkSparks(wx, wz, scale = 1.0) {
   if (!scene || typeof THREE === 'undefined') return;
   const baseY = 12;
@@ -1601,7 +1642,6 @@ function triggerSinkSparks(wx, wz, scale = 1.0) {
     });
   }
 
-  // Kısa süreli hafif kıvılcım parıltısı
   const sparkLight = new THREE.PointLight(0xffa94d, 1.15 * scale, 110 * scale);
   sparkLight.position.set(wx, baseY + 14 * scale, wz);
   scene.add(sparkLight);
