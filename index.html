@@ -713,7 +713,7 @@ function formatShortNumber(num) {
 const AMMO_TYPES = {
   iron:   { id: 'iron',   name: 'Demir Gülle',    damage: 180, slow: 1.0,  isHeal: false, bonusNpc: 1.0, desc: '180 Hasar', color: 0x555555 },
   chain:  { id: 'chain',  name: 'Zincirli Gülle', damage: 140, slow: 0.6,  isHeal: false, bonusNpc: 1.0, desc: '140 Hasar + %40 Yavaşlatma', color: 0x888888, img: 'zincir.png' },
-  fire:   { id: 'fire',   name: 'Alevli Gülle',   damage: 30000, slow: 1.0, isHeal: false, bonusNpc: 1.2, desc: '30.000 Hasar (NPC\'lere +%20 Ekstra)', color: 0xff3300, img: 'alev.png' },
+  fire:   { id: 'fire',   name: 'Alev Güllesi',   damage: 30000, slow: 1.0, isHeal: false, bonusNpc: 1.2, desc: '30.000 Hasar (NPC\'lere +%20 Ekstra)', color: 0xff3300, img: 'alev.png' },
   amiral: { id: 'amiral', name: 'Amiral Güllesi', damage: 40000, slow: 0.85,isHeal: false, bonusNpc: 1.0, desc: '40.000 Yıkıcı Hasar', color: 0x3b82f6, img: 'amiral.png' },
   snow:   { id: 'snow',   name: 'Kar Güllesi',    damage: 25000, slow: 1.0,  isHeal: true,  bonusNpc: 1.0, desc: '+25.000 Can Doldurur', color: 0xffffff, img: 'kar.png' }
 };
@@ -1298,9 +1298,9 @@ if (authForm) {
 if (logoutBtn) logoutBtn.addEventListener('click', () => { try { localStorage.removeItem(SESSION_STORAGE_KEY); } catch(e){} location.reload(); });
 
 let scene, camera, renderer;
-let oceanTexture = null;
+let oceanTexture = null, oceanBumpTexture = null;
 let activeGlbShip = null, playerNeonRing, enemies = [], defenseTowers = [], rangeRingMesh;
-let activeProjectiles = [], particleSystems = [], cannonEffects = [], castleFlameSystems = [];
+let activeProjectiles = [], particleSystems = [], cannonEffects = [], castleFlameSystems = [], flameEmberParticles = [];
 let activeDefenseIslandGroup = null;
 let raycaster, planeGeo, mouse;
 let selectedRingMesh = null;
@@ -1345,14 +1345,28 @@ let lastRegenTime = performance.now();
 let gltfLoader;
 
 const WALL_RADIUS = ATTACK_RANGE;
-const WALL_GAP_ANGLE = Math.PI;
-const WALL_GAP_HALF_ARC = 0.20;
+const WALL_GATE_ANGLES = [Math.PI, 0];
+const WALL_GAP_HALF_ARC = 0.21;
 let navigationQueue = [];
 
 function normalizeAngle(a) {
   while (a > Math.PI) a -= Math.PI * 2;
   while (a < -Math.PI) a += Math.PI * 2;
   return a;
+}
+
+function getNearestGateAngle(fromX, fromZ) {
+  const ang = Math.atan2(fromZ, fromX);
+  let bestGate = WALL_GATE_ANGLES[0];
+  let bestDist = Infinity;
+  for (const g of WALL_GATE_ANGLES) {
+    const d = Math.abs(normalizeAngle(g - ang));
+    if (d < bestDist) {
+      bestDist = d;
+      bestGate = g;
+    }
+  }
+  return bestGate;
 }
 
 function segmentIntersectsCircle(x1, z1, x2, z2, cx, cz, r) {
@@ -1370,13 +1384,8 @@ function segmentIntersectsCircle(x1, z1, x2, z2, cx, cz, r) {
 function buildOuterArcWaypoints(fromX, fromZ, toX, toZ, radius) {
   const points = [];
   const startAngle = Math.atan2(fromZ, fromX);
-  let endAngle = Math.atan2(toZ, toX);
-  let diff = normalizeAngle(endAngle - startAngle);
-
-  if (Math.abs(Math.abs(diff) - Math.PI) < 0.05) {
-    const toGapDiff = normalizeAngle(WALL_GAP_ANGLE - startAngle);
-    diff = toGapDiff >= 0 ? Math.PI : -Math.PI;
-  }
+  const endAngle = Math.atan2(toZ, toX);
+  const diff = normalizeAngle(endAngle - startAngle);
 
   const steps = Math.max(2, Math.ceil(Math.abs(diff) / 0.45));
   for (let i = 1; i < steps; i++) {
@@ -1401,29 +1410,33 @@ function buildNavigationRoute(fromX, fromZ, toX, toZ) {
   const startInside = startDist < WALL_RADIUS - 18;
   const endOutside = endDist > WALL_RADIUS + 18;
 
-  const gapOutX = Math.cos(WALL_GAP_ANGLE) * outerClearance;
-  const gapOutZ = Math.sin(WALL_GAP_ANGLE) * outerClearance;
-  const gapInX  = Math.cos(WALL_GAP_ANGLE) * innerClearance;
-  const gapInZ  = Math.sin(WALL_GAP_ANGLE) * innerClearance;
-
   if (startOutside && endInside) {
+    const gateAngle = getNearestGateAngle(fromX, fromZ);
+    const gapOutX = Math.cos(gateAngle) * outerClearance;
+    const gapOutZ = Math.sin(gateAngle) * outerClearance;
+    const gapInX  = Math.cos(gateAngle) * innerClearance;
+    const gapInZ  = Math.sin(gateAngle) * innerClearance;
+
     if (segmentIntersectsCircle(fromX, fromZ, gapOutX, gapOutZ, 0, 0, WALL_RADIUS + 35)) {
-      const arcPts = buildOuterArcWaypoints(fromX, fromZ, gapOutX, gapOutZ, outerClearance);
-      queue.push(...arcPts);
+      queue.push(...buildOuterArcWaypoints(fromX, fromZ, gapOutX, gapOutZ, outerClearance));
     }
     queue.push({ x: gapOutX, z: gapOutZ });
     queue.push({ x: gapInX, z: gapInZ });
   } else if (startInside && endOutside) {
+    const gateAngle = getNearestGateAngle(toX, toZ);
+    const gapInX  = Math.cos(gateAngle) * innerClearance;
+    const gapInZ  = Math.sin(gateAngle) * innerClearance;
+    const gapOutX = Math.cos(gateAngle) * outerClearance;
+    const gapOutZ = Math.sin(gateAngle) * outerClearance;
+
     queue.push({ x: gapInX, z: gapInZ });
     queue.push({ x: gapOutX, z: gapOutZ });
     if (segmentIntersectsCircle(gapOutX, gapOutZ, toX, toZ, 0, 0, WALL_RADIUS + 35)) {
-      const arcPts = buildOuterArcWaypoints(gapOutX, gapOutZ, toX, toZ, outerClearance);
-      queue.push(...arcPts);
+      queue.push(...buildOuterArcWaypoints(gapOutX, gapOutZ, toX, toZ, outerClearance));
     }
   } else if (startOutside && endOutside) {
     if (segmentIntersectsCircle(fromX, fromZ, toX, toZ, 0, 0, WALL_RADIUS + 35)) {
-      const arcPts = buildOuterArcWaypoints(fromX, fromZ, toX, toZ, outerClearance);
-      queue.push(...arcPts);
+      queue.push(...buildOuterArcWaypoints(fromX, fromZ, toX, toZ, outerClearance));
     }
   }
 
@@ -1441,18 +1454,22 @@ function createSeamlessDarkOceanTexture() {
   const canvas = document.createElement('canvas');
   canvas.width = 1024; canvas.height = 1024;
   const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#031d2c';
+  const baseGrad = ctx.createLinearGradient(0, 0, 1024, 1024);
+  baseGrad.addColorStop(0, '#042234');
+  baseGrad.addColorStop(0.5, '#031a29');
+  baseGrad.addColorStop(1, '#021320');
+  ctx.fillStyle = baseGrad;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  for (let i = 0; i < 190; i++) {
+  for (let i = 0; i < 240; i++) {
     const x = Math.random() * canvas.width;
     const y = Math.random() * canvas.height;
-    const rx = 28 + Math.random() * 68;
-    const ry = 20 + Math.random() * 48;
+    const rx = 24 + Math.random() * 72;
+    const ry = 14 + Math.random() * 44;
     const glow = ctx.createRadialGradient(x, y, 0, x, y, Math.max(rx, ry));
-    glow.addColorStop(0, 'rgba(13, 88, 114, 0.14)');
-    glow.addColorStop(0.55, 'rgba(7, 58, 78, 0.06)');
-    glow.addColorStop(1, 'rgba(3, 29, 44, 0)');
+    glow.addColorStop(0, 'rgba(20, 112, 142, 0.16)');
+    glow.addColorStop(0.5, 'rgba(8, 66, 88, 0.08)');
+    glow.addColorStop(1, 'rgba(3, 26, 41, 0)');
     ctx.save();
     ctx.translate(x, y);
     ctx.scale(rx / Math.max(rx, ry), ry / Math.max(rx, ry));
@@ -1463,6 +1480,18 @@ function createSeamlessDarkOceanTexture() {
     ctx.restore();
   }
 
+  ctx.strokeStyle = 'rgba(135, 206, 235, 0.06)';
+  ctx.lineWidth = 1.5;
+  for (let s = 0; s < 140; s++) {
+    const sx = Math.random() * canvas.width;
+    const sy = Math.random() * canvas.height;
+    const len = 18 + Math.random() * 45;
+    ctx.beginPath();
+    ctx.moveTo(sx, sy);
+    ctx.quadraticCurveTo(sx + len * 0.5, sy - 4, sx + len, sy);
+    ctx.stroke();
+  }
+
   const texture = new THREE.CanvasTexture(canvas);
   texture.wrapS = THREE.ClampToEdgeWrapping;
   texture.wrapT = THREE.ClampToEdgeWrapping;
@@ -1470,6 +1499,36 @@ function createSeamlessDarkOceanTexture() {
   texture.anisotropy = 4;
   texture.needsUpdate = true;
   return texture;
+}
+
+function createOceanBumpTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#808080';
+  ctx.fillRect(0, 0, 512, 512);
+
+  for (let i = 0; i < 420; i++) {
+    const x = Math.random() * 512;
+    const y = Math.random() * 512;
+    const r = 6 + Math.random() * 24;
+    const g = ctx.createRadialGradient(x, y, 1, x, y, r);
+    const tone = i % 2 === 0 ? 'rgba(175,175,175,0.16)' : 'rgba(85,85,85,0.16)';
+    g.addColorStop(0, tone);
+    g.addColorStop(1, 'rgba(128,128,128,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(28, 28);
+  tex.needsUpdate = true;
+  return tex;
 }
 
 function createIslandSandTexture() {
@@ -1486,16 +1545,16 @@ function createIslandSandTexture() {
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, 512, 512);
 
-  for (let i = 0; i < 650; i++) {
+  for (let i = 0; i < 850; i++) {
     const ang = Math.random() * Math.PI * 2;
-    const dist = Math.pow(Math.random(), 0.7) * 240;
+    const dist = Math.pow(Math.random(), 0.7) * 244;
     const px = 256 + Math.cos(ang) * dist;
     const py = 256 + Math.sin(ang) * dist;
-    const r = 1.5 + Math.random() * 5.5;
+    const r = 1.2 + Math.random() * 5.0;
     ctx.fillStyle = i % 3 === 0
-      ? 'rgba(214, 190, 142, 0.16)'
+      ? 'rgba(224, 200, 150, 0.18)'
       : i % 3 === 1
-      ? 'rgba(58, 46, 32, 0.22)'
+      ? 'rgba(52, 40, 28, 0.24)'
       : 'rgba(110, 95, 72, 0.18)';
     ctx.beginPath();
     ctx.arc(px, py, r, 0, Math.PI * 2);
@@ -1527,10 +1586,10 @@ function createStoneWallTexture() {
     for (let c = -1; c <= cols; c++) {
       const x = c * cw + offset;
       const y = r * rh;
-      const shade = 68 + ((r * 17 + c * 29) % 24);
+      const shade = 66 + ((r * 17 + c * 29) % 26);
       ctx.fillStyle = `rgb(${shade}, ${shade + 4}, ${shade + 10})`;
       ctx.fillRect(x + 1, y + 1, cw - 2, rh - 2);
-      ctx.strokeStyle = 'rgba(20, 26, 34, 0.55)';
+      ctx.strokeStyle = 'rgba(18, 23, 30, 0.62)';
       ctx.lineWidth = 2;
       ctx.strokeRect(x + 1, y + 1, cw - 2, rh - 2);
     }
@@ -1579,7 +1638,7 @@ function createBorderFrame() {
 function initThreeGame() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x020c16);
-  scene.fog = new THREE.FogExp2(0x020c16, 0.00005);
+  scene.fog = new THREE.FogExp2(0x020c16, 0.000045);
 
   camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 50000);
   camera.position.set(0, CAMERA_HEIGHT, CAMERA_DEPTH);
@@ -1588,6 +1647,8 @@ function initThreeGame() {
   renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.08;
   document.getElementById('game').appendChild(renderer.domElement);
 
   SHARED_PARTICLE_GEO = new THREE.SphereGeometry(1, 8, 8);
@@ -1604,18 +1665,29 @@ function initThreeGame() {
     }, undefined, (err) => {});
   });
 
-  const ambientLight = new THREE.AmbientLight(0x93c5fd, 0.85);
+  const ambientLight = new THREE.AmbientLight(0x93c5fd, 0.88);
   scene.add(ambientLight);
 
-  const sunLight = new THREE.DirectionalLight(0xfef08a, 1.35);
+  const sunLight = new THREE.DirectionalLight(0xfff1b8, 1.45);
   sunLight.position.set(2000, 3000, 1500);
   scene.add(sunLight);
 
+  const rimLight = new THREE.DirectionalLight(0x38bdf8, 0.45);
+  rimLight.position.set(-1800, 1200, -1600);
+  scene.add(rimLight);
+
   oceanTexture = createSeamlessDarkOceanTexture();
+  oceanBumpTexture = createOceanBumpTexture();
   planeGeo = new THREE.PlaneGeometry(WORLD_SIZE * 2, WORLD_SIZE * 2, 32, 32);
   const oceanMat = new THREE.MeshStandardMaterial({
-    map: oceanTexture, color: 0x7eb6c4, roughness: 0.68, metalness: 0.14,
-    emissive: 0x041926, emissiveIntensity: 0.14
+    map: oceanTexture,
+    bumpMap: oceanBumpTexture,
+    bumpScale: 1.4,
+    color: 0x86bed0,
+    roughness: 0.56,
+    metalness: 0.22,
+    emissive: 0x041926,
+    emissiveIntensity: 0.16
   });
   const ocean = new THREE.Mesh(planeGeo, oceanMat);
   ocean.rotation.x = -Math.PI / 2;
@@ -1793,17 +1865,36 @@ function addCastleFlameCluster(parentGroup, x, y, z, scale = 1.0, phaseOffset = 
   clusterGroup.position.set(x, y, z);
 
   const brazierMat = new THREE.MeshStandardMaterial({
-    color: 0x26211d,
-    roughness: 0.72,
-    metalness: 0.78
+    color: 0x2a231e,
+    roughness: 0.62,
+    metalness: 0.84
   });
-  const brazierBowl = new THREE.Mesh(new THREE.CylinderGeometry(9.5 * scale, 6.2 * scale, 7 * scale, 12), brazierMat);
-  brazierBowl.position.y = -3 * scale;
+  const ironTrimMat = new THREE.MeshStandardMaterial({
+    color: 0x64748b,
+    roughness: 0.35,
+    metalness: 0.9
+  });
+  const brazierBowl = new THREE.Mesh(new THREE.CylinderGeometry(9.8 * scale, 6.2 * scale, 7.5 * scale, 14), brazierMat);
+  brazierBowl.position.y = -3.2 * scale;
   clusterGroup.add(brazierBowl);
+
+  const rimRing = new THREE.Mesh(new THREE.TorusGeometry(9.6 * scale, 0.9 * scale, 10, 20), ironTrimMat);
+  rimRing.rotation.x = Math.PI / 2;
+  rimRing.position.y = 0.4 * scale;
+  clusterGroup.add(rimRing);
+
+  const coreMat = new THREE.MeshBasicMaterial({
+    color: 0xfff3b0,
+    transparent: true,
+    opacity: 0.96
+  });
+  const coreFlame = new THREE.Mesh(new THREE.ConeGeometry(4.2 * scale, 18 * scale, 10), coreMat);
+  coreFlame.position.set(0, 8.5 * scale, 0);
+  clusterGroup.add(coreFlame);
 
   const flameColors = [0xff1e00, 0xff5500, 0xff9900, 0xffe66d];
   const tongues = [];
-  const tongueCount = 10;
+  const tongueCount = 12;
 
   for (let i = 0; i < tongueCount; i++) {
     const tMat = new THREE.MeshBasicMaterial({
@@ -1811,35 +1902,65 @@ function addCastleFlameCluster(parentGroup, x, y, z, scale = 1.0, phaseOffset = 
       transparent: true,
       opacity: 0.9
     });
-    const tGeo = new THREE.ConeGeometry(5.2 * scale, 28 * scale, 8);
+    const tGeo = new THREE.ConeGeometry(5.0 * scale, 29 * scale, 8);
     const tMesh = new THREE.Mesh(tGeo, tMat);
     const ang = (i / tongueCount) * Math.PI * 2;
-    const rad = (i % 2 === 0 ? 3.2 : 1.3) * scale;
-    tMesh.position.set(Math.cos(ang) * rad, 13 * scale, Math.sin(ang) * rad);
+    const rad = (i % 2 === 0 ? 3.4 : 1.4) * scale;
+    tMesh.position.set(Math.cos(ang) * rad, 13.5 * scale, Math.sin(ang) * rad);
     tMesh.rotation.z = -Math.cos(ang) * 0.25;
     tMesh.rotation.x = Math.sin(ang) * 0.25;
     clusterGroup.add(tMesh);
 
     tongues.push({
       mesh: tMesh,
-      baseY: 13 * scale,
+      baseY: 13.5 * scale,
       baseScaleY: 1.0,
-      phase: phaseOffset + i * 0.72,
-      speed: 7.8 + (i % 4) * 1.25
+      phase: phaseOffset + i * 0.65,
+      speed: 8.0 + (i % 4) * 1.25
     });
   }
 
-  const flameLight = new THREE.PointLight(0xff6200, 1.6 * scale, 170 * scale);
+  const flameLight = new THREE.PointLight(0xff6a00, 1.85 * scale, 185 * scale);
   flameLight.position.set(0, 18 * scale, 0);
   clusterGroup.add(flameLight);
 
   parentGroup.add(clusterGroup);
   castleFlameSystems.push({
     group: clusterGroup,
+    coreFlame,
+    coreMat,
     tongues,
     light: flameLight,
-    baseIntensity: 1.6 * scale,
-    phase: phaseOffset
+    baseIntensity: 1.85 * scale,
+    scale,
+    phase: phaseOffset,
+    emberTimer: 0
+  });
+}
+
+function spawnFlameEmber(wx, wy, wz, scale = 1.0) {
+  if (flameEmberParticles.length > 90) return;
+  const mat = new THREE.MeshBasicMaterial({
+    color: Math.random() > 0.35 ? 0xffae34 : 0xff4d00,
+    transparent: true,
+    opacity: 0.95
+  });
+  const mesh = new THREE.Mesh(SHARED_PARTICLE_GEO, mat);
+  const ang = Math.random() * Math.PI * 2;
+  const spd = (8 + Math.random() * 14) * scale;
+  mesh.scale.setScalar((1.1 + Math.random() * 1.4) * scale);
+  mesh.position.set(
+    wx + (Math.random() - 0.5) * 6 * scale,
+    wy,
+    wz + (Math.random() - 0.5) * 6 * scale
+  );
+  scene.add(mesh);
+  flameEmberParticles.push({
+    mesh,
+    vx: Math.cos(ang) * spd * 0.45,
+    vy: (26 + Math.random() * 22) * scale,
+    vz: Math.sin(ang) * spd * 0.45,
+    life: 28 + Math.floor(Math.random() * 18)
   });
 }
 
@@ -1849,41 +1970,49 @@ function buildCastleKeepAndIsland(parentGroup, wallRadius) {
 
   const stoneMainMat = new THREE.MeshStandardMaterial({
     map: stoneTex,
-    color: 0x6b645c,
-    roughness: 0.82,
-    metalness: 0.16,
+    bumpMap: stoneTex,
+    bumpScale: 1.2,
+    color: 0x736b62,
+    roughness: 0.78,
+    metalness: 0.18,
     depthWrite: true,
     depthTest: true
   });
   const stoneTrimMat = new THREE.MeshStandardMaterial({
     map: stoneTex,
-    color: 0x8a8177,
-    roughness: 0.74,
-    metalness: 0.22,
+    bumpMap: stoneTex,
+    bumpScale: 1.0,
+    color: 0x948a7f,
+    roughness: 0.7,
+    metalness: 0.24,
     depthWrite: true,
     depthTest: true
   });
   const roofDarkMat = new THREE.MeshStandardMaterial({
-    color: 0x24211f,
-    roughness: 0.62,
-    metalness: 0.38,
+    color: 0x262220,
+    roughness: 0.58,
+    metalness: 0.42,
     depthWrite: true,
     depthTest: true
   });
   const sandShoreMat = new THREE.MeshStandardMaterial({
     map: sandTex,
-    color: 0xc2a97e,
-    roughness: 0.92,
-    metalness: 0.04,
+    bumpMap: sandTex,
+    bumpScale: 1.5,
+    color: 0xc7ae82,
+    roughness: 0.9,
+    metalness: 0.05,
     transparent: true,
-    opacity: 0.92,
+    opacity: 0.94,
     depthWrite: true,
     depthTest: true
   });
   const islandRockMat = new THREE.MeshStandardMaterial({
-    color: 0x453e37,
-    roughness: 0.9,
-    metalness: 0.1,
+    bumpMap: stoneTex,
+    bumpScale: 1.6,
+    color: 0x474038,
+    roughness: 0.88,
+    metalness: 0.12,
     depthWrite: true,
     depthTest: true
   });
@@ -1967,6 +2096,15 @@ function buildCastleKeepAndIsland(parentGroup, wallRadius) {
   addCastleFlameCluster(parentGroup, 155, keepBaseY + 14, -125, 1.2, 4.4);
 }
 
+function isGateAngle(angle) {
+  for (const gateAngle of WALL_GATE_ANGLES) {
+    if (Math.abs(normalizeAngle(angle - gateAngle)) < WALL_GAP_HALF_ARC) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function spawnDefenseTowersRing() {
   defenseTowers.forEach(t => {
     if (t.mesh) scene.remove(t.mesh);
@@ -1986,25 +2124,35 @@ function spawnDefenseTowersRing() {
   activeDefenseIslandGroup = defenseIslandGroup;
 
   const wallRadius = WALL_RADIUS; 
-  const wallSegments = 20;
+  const wallSegments = 24;
   const wallStoneTex = createStoneWallTexture();
   
   const wallMat = new THREE.MeshStandardMaterial({ 
     map: wallStoneTex,
-    color: 0x626a73, 
-    roughness: 0.68, 
-    metalness: 0.28,
+    bumpMap: wallStoneTex,
+    bumpScale: 1.25,
+    color: 0x67707a, 
+    roughness: 0.64, 
+    metalness: 0.32,
     depthWrite: true,
     depthTest: true
   });
   wallMat.renderOrder = 0;
 
   const merlonMat = new THREE.MeshStandardMaterial({
-    color: 0x3f464e,
-    roughness: 0.72,
-    metalness: 0.32,
+    bumpMap: wallStoneTex,
+    bumpScale: 0.8,
+    color: 0x434b54,
+    roughness: 0.68,
+    metalness: 0.36,
     depthWrite: true,
     depthTest: true
+  });
+
+  const gatePillarMat = new THREE.MeshStandardMaterial({
+    color: 0x94a3b8,
+    roughness: 0.35,
+    metalness: 0.85
   });
   
   for (let i = 0; i < wallSegments; i++) {
@@ -2012,7 +2160,7 @@ function spawnDefenseTowersRing() {
     const nextAngle = ((i + 1) / wallSegments) * Math.PI * 2;
     const midAngle = normalizeAngle((angle + nextAngle) / 2);
 
-    if (Math.abs(normalizeAngle(midAngle - WALL_GAP_ANGLE)) < WALL_GAP_HALF_ARC) {
+    if (isGateAngle(midAngle)) {
       continue;
     }
     
@@ -2044,6 +2192,17 @@ function spawnDefenseTowersRing() {
 
     wallCollisionBoxes.push({ x: wx, z: wz, radius: segmentWidth / 2 + 6 });
   }
+
+  WALL_GATE_ANGLES.forEach((gateAng) => {
+    [-WALL_GAP_HALF_ARC, WALL_GAP_HALF_ARC].forEach((edgeOffset) => {
+      const pAng = gateAng + edgeOffset;
+      const px = Math.cos(pAng) * wallRadius;
+      const pz = Math.sin(pAng) * wallRadius;
+      const pillar = new THREE.Mesh(new THREE.CylinderGeometry(5.5, 7.0, 50, 12), gatePillarMat);
+      pillar.position.set(px, SHIP_Y_POS - 56, pz);
+      defenseIslandGroup.add(pillar);
+    });
+  });
 
   buildCastleKeepAndIsland(defenseIslandGroup, wallRadius);
 
@@ -2100,17 +2259,13 @@ function spawnDefenseTowersRing() {
     });
   };
 
-  const totalTowersNeeded = 15;
-  const startAngle = Math.PI * 1.05;
-  const endAngle = Math.PI * 2.95;
-
+  const totalTowersNeeded = 16;
   for (let i = 0; i < totalTowersNeeded; i++) {
-    const progress = i / (totalTowersNeeded - 1);
-    const angle = startAngle + progress * (endAngle - startAngle);
-    const normalizedAngle = angle % (Math.PI * 2);
+    const angle = (i / totalTowersNeeded) * Math.PI * 2;
+    if (isGateAngle(angle)) continue;
 
-    const tx = Math.cos(normalizedAngle) * wallRadius;
-    const tz = Math.sin(normalizedAngle) * wallRadius;
+    const tx = Math.cos(angle) * wallRadius;
+    const tz = Math.sin(angle) * wallRadius;
     createTowerEntity(towerCounter++, tx, tz, 1.0);
   }
 }
@@ -2364,6 +2519,11 @@ function animate3D() {
   const now = Date.now();
   const animTimeSec = now * 0.001;
 
+  if (oceanBumpTexture) {
+    oceanBumpTexture.offset.x = (animTimeSec * 0.015) % 1;
+    oceanBumpTexture.offset.y = (animTimeSec * 0.01) % 1;
+  }
+
   if (castleFlameSystems.length > 0) {
     for (let i = 0; i < castleFlameSystems.length; i++) {
       const sys = castleFlameSystems[i];
@@ -2377,9 +2537,33 @@ function animate3D() {
         t.mesh.position.y = t.baseY + (scaleY - 1.0) * 6.5;
         t.mesh.rotation.z = (-Math.cos((j / sys.tongues.length) * Math.PI * 2) * 0.22) + flicker * 0.14;
       }
-      if (sys.light) {
-        sys.light.intensity = sys.baseIntensity * (0.85 + 0.3 * Math.sin(animTimeSec * 9.0 + sys.phase));
+      if (sys.coreFlame) {
+        const cPulse = 0.85 + 0.25 * Math.sin(animTimeSec * 11.5 + sys.phase);
+        sys.coreFlame.scale.set(cPulse, 0.8 + 0.3 * Math.cos(animTimeSec * 13.0 + sys.phase), cPulse);
       }
+      if (sys.light) {
+        sys.light.intensity = sys.baseIntensity * (0.85 + 0.32 * Math.sin(animTimeSec * 9.5 + sys.phase));
+      }
+      sys.emberTimer += dt;
+      if (sys.emberTimer >= 0.16) {
+        sys.emberTimer = 0;
+        spawnFlameEmber(sys.group.position.x, sys.group.position.y + 10 * sys.scale, sys.group.position.z, sys.scale);
+      }
+    }
+  }
+
+  for (let i = flameEmberParticles.length - 1; i >= 0; i--) {
+    const em = flameEmberParticles[i];
+    em.life--;
+    em.mesh.position.x += em.vx * dt;
+    em.mesh.position.y += em.vy * dt;
+    em.mesh.position.z += em.vz * dt;
+    em.mesh.scale.multiplyScalar(0.95);
+    em.mesh.material.opacity = Math.max(0, em.mesh.material.opacity - 0.025);
+    if (em.life <= 0 || em.mesh.material.opacity <= 0) {
+      scene.remove(em.mesh);
+      em.mesh.material.dispose();
+      flameEmberParticles.splice(i, 1);
     }
   }
 
