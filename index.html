@@ -720,7 +720,7 @@ const AMMO_TYPES = {
 
 const DENEME_IDS = ['deneme1', 'deneme2', 'deneme3', 'deneme4', 'deneme5'];
 
-const SHIP_MODELS = {
+const BASE_SHIP_MODELS = {
   standard:  { id: 'standard',  name: 'Ejderha Kalyonu', desc: 'Başlangıç 3D Savaş Gemisi', cost: 0,        type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45 },
   deneme1:   { id: 'deneme1',   name: 'Deneme 1 · Altın Güneş', desc: 'Minik 3D Detay · Altın Gövde', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'gold' },
   deneme2:   { id: 'deneme2',   name: 'Deneme 2 · Zümrüt Leviathan', desc: 'Minik 3D Detay · Zümrüt Gövde', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'emerald' },
@@ -741,6 +741,21 @@ const SHIP_MODELS = {
   tasarim10: { id: 'tasarim10', name: 'Tasarim 10', desc: 'GLB Savaş Gemisi', cost: 4500, type: 'glb', modelPath: 'tasarim10.glb', heightOffset: 45 },
   tasarim11: { id: 'tasarim11', name: 'Tasarim 11', desc: 'GLB Savaş Gemisi', cost: 5000, type: 'glb', modelPath: 'tasarim11.glb', heightOffset: 45 }
 };
+
+const EFFECT_PALETTES = [
+  { label: 'Yakut Kırmızısı Efekt', color: 0xfca5a5, emissive: 0xe11d48, emissiveIntensity: 0.36, metalnessAdd: 0.3, roughnessSub: 0.25, lightColor: 0xf43f5e, lightIntensity: 0.5, crystalColor: 0xfb7185, lanternColor: 0xff2a6d, pulseSpeed: 3.6 },
+  { label: 'Safir Mavisi Efekt',   color: 0x93c5fd, emissive: 0x2563eb, emissiveIntensity: 0.36, metalnessAdd: 0.35, roughnessSub: 0.3,  lightColor: 0x3b82f6, lightIntensity: 0.5, crystalColor: 0x60a5fa, lanternColor: 0x00d9ff, pulseSpeed: 2.9 },
+  { label: 'Zümrüt Yeşili Efekt', color: 0x86efac, emissive: 0x16a34a, emissiveIntensity: 0.35, metalnessAdd: 0.3, roughnessSub: 0.28, lightColor: 0x22c55e, lightIntensity: 0.5, crystalColor: 0x4ade80, lanternColor: 0x10ff88, pulseSpeed: 3.2 },
+  { label: 'Kehribar Turuncu Efekt',color: 0xfdba74, emissive: 0xea580c, emissiveIntensity: 0.36, metalnessAdd: 0.3, roughnessSub: 0.25, lightColor: 0xf97316, lightIntensity: 0.5, crystalColor: 0xfb923c, lanternColor: 0xff7b00, pulseSpeed: 3.8 },
+  { label: 'Ametist Mor Efekt',    color: 0xd8b4fe, emissive: 0x9333ea, emissiveIntensity: 0.36, metalnessAdd: 0.35, roughnessSub: 0.3,  lightColor: 0xa855f7, lightIntensity: 0.5, crystalColor: 0xc084fc, lanternColor: 0xd946ef, pulseSpeed: 2.7 },
+  { label: 'Turkuaz Camgöbeği Efekt',color: 0x67e8f9, emissive: 0x0891b2, emissiveIntensity: 0.35, metalnessAdd: 0.3, roughnessSub: 0.32, lightColor: 0x06b6d4, lightIntensity: 0.5, crystalColor: 0x22d3ee, lanternColor: 0x00f5d4, pulseSpeed: 3.1 },
+  { label: 'Gül Pembe Efekt',      color: 0xf9a8d4, emissive: 0xdb2777, emissiveIntensity: 0.36, metalnessAdd: 0.3, roughnessSub: 0.25, lightColor: 0xec4899, lightIntensity: 0.5, crystalColor: 0xf472b6, lanternColor: 0xff5ca8, pulseSpeed: 3.4 },
+  { label: 'Limon Sarısı Efekt',   color: 0xfef08a, emissive: 0xca8a04, emissiveIntensity: 0.35, metalnessAdd: 0.35, roughnessSub: 0.25, lightColor: 0xeab308, lightIntensity: 0.5, crystalColor: 0xfacc15, lanternColor: 0xffe600, pulseSpeed: 2.8 },
+  { label: 'İndigo Derin Efekt',   color: 0xa5b4fc, emissive: 0x4f46e5, emissiveIntensity: 0.36, metalnessAdd: 0.35, roughnessSub: 0.3,  lightColor: 0x6366f1, lightIntensity: 0.5, crystalColor: 0x818cf8, lanternColor: 0x7c5cff, pulseSpeed: 2.5 },
+  { label: 'Mercan Bakır Efekt',   color: 0xfca5a5, emissive: 0xc2410c, emissiveIntensity: 0.35, metalnessAdd: 0.4, roughnessSub: 0.25,  lightColor: 0xff6b4a, lightIntensity: 0.5, crystalColor: 0xff8a65, lanternColor: 0xff5722, pulseSpeed: 3.5 },
+  { label: 'Nane Yeşili Efekt',    color: 0x99f6e4, emissive: 0x0d9488, emissiveIntensity: 0.35, metalnessAdd: 0.3, roughnessSub: 0.3,  lightColor: 0x14b8a6, lightIntensity: 0.5, crystalColor: 0x2dd4bf, lanternColor: 0x00e5b8, pulseSpeed: 3.0 },
+  { label: 'Kraliyet Altın Efekt', color: 0xfde68a, emissive: 0xd97706, emissiveIntensity: 0.38, metalnessAdd: 0.42, roughnessSub: 0.2,  lightColor: 0xf59e0b, lightIntensity: 0.52, crystalColor: 0xffd166, lanternColor: 0xffb703, pulseSpeed: 2.6 }
+];
 
 const DENEME_THEMES = {
   gold: {
@@ -804,6 +819,50 @@ const DENEME_THEMES = {
     pulseSpeed: 2.8
   }
 };
+
+function buildShipModelsWithClones() {
+  const result = { ...BASE_SHIP_MODELS };
+  let paletteCursor = 0;
+
+  Object.keys(BASE_SHIP_MODELS).forEach((key) => {
+    if (DENEME_IDS.includes(key)) return;
+    const baseSpec = BASE_SHIP_MODELS[key];
+
+    for (let c = 1; c <= 3; c++) {
+      const palette = EFFECT_PALETTES[paletteCursor % EFFECT_PALETTES.length];
+      paletteCursor++;
+
+      const styleKey = `clone_${key}_${c}`;
+      DENEME_THEMES[styleKey] = {
+        color: palette.color,
+        emissive: palette.emissive,
+        emissiveIntensity: palette.emissiveIntensity,
+        metalnessAdd: palette.metalnessAdd,
+        roughnessSub: palette.roughnessSub,
+        lightColor: palette.lightColor,
+        lightIntensity: palette.lightIntensity,
+        crystalColor: palette.crystalColor,
+        lanternColor: palette.lanternColor,
+        pulseSpeed: palette.pulseSpeed
+      };
+
+      const cloneId = `${key}_kopya${c}`;
+      result[cloneId] = {
+        ...baseSpec,
+        id: cloneId,
+        name: `${baseSpec.name} · Kopya ${c}`,
+        desc: `${palette.label} · Kopya ${c}`,
+        cost: 0,
+        denemeStyle: styleKey
+      };
+    }
+  });
+
+  return result;
+}
+
+const SHIP_MODELS = buildShipModelsWithClones();
+const ALL_UNLOCKED_SHIP_IDS = Object.keys(SHIP_MODELS);
 
 let activeDenemeLight = null;
 let activeDenemePropsGroup = null;
@@ -874,11 +933,10 @@ function createLanternAssembly(theme, scale = 1) {
   return { lantern, coreMat, coreMesh };
 }
 
-// Görseldeki gibi kalın namlulu, altın/sarı bantlı ve hafif yukarı-öne eğimli baş topu
 function createCinematicBowCannon(scale = 1) {
   const cannonGroup = new THREE.Group();
   const pitchGroup = new THREE.Group();
-  pitchGroup.rotation.x = -0.26; // Burundan ileri ve hafif yukarı doğru eğim
+  pitchGroup.rotation.x = -0.26;
 
   const gunmetalMat = new THREE.MeshStandardMaterial({
     color: 0x3f464e,
@@ -910,7 +968,6 @@ function createCinematicBowCannon(scale = 1) {
     metalness: 0.1
   });
 
-  // Alt kızak / kaide ve yan destek levhaları
   const basePlate = new THREE.Mesh(new THREE.BoxGeometry(0.95 * scale, 0.24 * scale, 1.15 * scale), gunmetalMat);
   basePlate.position.set(0, -0.24 * scale, 0.05 * scale);
   pitchGroup.add(basePlate);
@@ -921,12 +978,10 @@ function createCinematicBowCannon(scale = 1) {
     pitchGroup.add(cheek);
   });
 
-  // Arka küre (cascabel)
   const cascabel = new THREE.Mesh(new THREE.SphereGeometry(0.24 * scale, 14, 14), silverFinMat);
   cascabel.position.set(0, 0.06 * scale, -0.82 * scale);
   pitchGroup.add(cascabel);
 
-  // Kuyruk ve gövde namlusu (kalın konik/silindirik yapı, lokal +Z yönüne uzanır)
   const breech = new THREE.Mesh(new THREE.CylinderGeometry(0.36 * scale, 0.39 * scale, 0.65 * scale, 18), gunmetalMat);
   breech.rotation.x = Math.PI / 2;
   breech.position.set(0, 0.06 * scale, -0.42 * scale);
@@ -942,7 +997,6 @@ function createCinematicBowCannon(scale = 1) {
   chaseBarrel.position.set(0, 0.06 * scale, 0.92 * scale);
   pitchGroup.add(chaseBarrel);
 
-  // Görseldeki belirgin altın/sarı kuşak halkaları
   [-0.68, -0.12, 0.56].forEach((rz, idx) => {
     const rad = (0.38 - idx * 0.04) * scale;
     const band = new THREE.Mesh(new THREE.TorusGeometry(rad, 0.045 * scale, 10, 20), goldBandMat);
@@ -950,7 +1004,6 @@ function createCinematicBowCannon(scale = 1) {
     pitchGroup.add(band);
   });
 
-  // Dışa taşan kalın ağız çemberi ve namlu içi karanlık/kor
   const muzzleFlare = new THREE.Mesh(new THREE.CylinderGeometry(0.36 * scale, 0.28 * scale, 0.24 * scale, 18), gunmetalMat);
   muzzleFlare.rotation.x = Math.PI / 2;
   muzzleFlare.position.set(0, 0.06 * scale, 1.32 * scale);
@@ -1027,7 +1080,6 @@ function attachDeneme3DProps(shipMesh, theme, bounds, shipSize, styleKey) {
     });
   }
 
-  // Deneme 4'e özel görseldeki gibi burun kısmında ağır baş topu
   if (styleKey === 'crimson') {
     const bowCannonScale = Math.max(1.5, Math.min(2.4, Math.max(shipSize.x, shipSize.z) * 0.24));
     const bowBuilt = createCinematicBowCannon(bowCannonScale);
@@ -1213,8 +1265,7 @@ let currentUser = null;
 
 function ensureAllDenemeOwned(list) {
   const arr = Array.isArray(list) ? [...list] : ['standard'];
-  if (!arr.includes('standard')) arr.unshift('standard');
-  DENEME_IDS.forEach((id) => {
+  ALL_UNLOCKED_SHIP_IDS.forEach((id) => {
     if (!arr.includes(id)) arr.push(id);
   });
   return arr;
