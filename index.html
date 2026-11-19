@@ -731,7 +731,7 @@ const BASE_SHIP_MODELS = {
   tasarim3:         { id: 'tasarim3',         name: 'Tasarim 3', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3 },
   tasarim3_hayalet: { id: 'tasarim3_hayalet', name: 'Tasarim 3 · Hayalet', desc: 'Sürekli Parlayıp Sönen Hayalet Kopya', cost: 0, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3, phantomStyle: 'specter_teal' },
   tasarim4:         { id: 'tasarim4',         name: 'Tasarim 4', desc: 'GLB Savaş Gemisi', cost: 3500, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2 },
-  tasarim4_hayalet: { id: 'tasarim4_hayalet', name: 'Tasarim 4 · Hayalet', desc: 'Sürekli Parlayıp Sönen Hayalet Kopya', cost: 0, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2, phantomStyle: 'specter_violet' },
+  tasarim4_hayalet: { id: 'tasarim4_hayalet', name: 'Tasarim 4 · Hayalet', desc: 'Mor Ruhani Parlayıp Sönen Hayalet', cost: 0, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2, phantomStyle: 'specter_violet' },
   tasarim6:         { id: 'tasarim6',         name: 'Tasarim 6', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim6.glb', heightOffset: 85 },
   tasarim7:         { id: 'tasarim7',         name: 'Tasarim 7', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim7.glb', heightOffset: 45, rotationOffset: Math.PI },
   tasarim8:         { id: 'tasarim8',         name: 'Tasarim 8', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim8.glb', heightOffset: 85 },
@@ -744,8 +744,8 @@ const PHANTOM_THEMES = {
   specter_teal: {
     color: 0x67e8f9,
     emissive: 0x0891b2,
-    baseEmissive: 0.25,
-    peakEmissive: 1.45,
+    baseEmissive: 0.28,
+    peakEmissive: 1.5,
     minOpacity: 0.28,
     maxOpacity: 0.88,
     lightColor: 0x22d3ee,
@@ -754,16 +754,16 @@ const PHANTOM_THEMES = {
     pulseSpeed: 3.4
   },
   specter_violet: {
-    color: 0xd8b4fe,
-    emissive: 0x7e22ce,
-    baseEmissive: 0.25,
-    peakEmissive: 1.5,
-    minOpacity: 0.28,
-    maxOpacity: 0.88,
-    lightColor: 0xc084fc,
-    baseLight: 0.25,
-    peakLight: 1.25,
-    pulseSpeed: 3.4
+    color: 0xc084fc,
+    emissive: 0x9333ea,
+    baseEmissive: 0.45,
+    peakEmissive: 1.85,
+    minOpacity: 0.32,
+    maxOpacity: 0.9,
+    lightColor: 0xa855f7,
+    baseLight: 0.45,
+    peakLight: 1.65,
+    pulseSpeed: 3.5
   }
 };
 
@@ -943,7 +943,7 @@ function applyPhantomShipStyling(shipMesh, phantomKey = 'specter_teal') {
     }
   });
 
-  activePhantomLight = new THREE.PointLight(theme.lightColor, theme.baseLight, 55);
+  activePhantomLight = new THREE.PointLight(theme.lightColor, theme.baseLight, 60);
   activePhantomLight.position.set(0, 14, 0);
   shipMesh.add(activePhantomLight);
 }
@@ -1731,7 +1731,7 @@ function createStoneWallTexture() {
   canvas.height = 256;
   const ctx = canvas.getContext('2d');
 
-  ctx.fillStyle = '#4e555e';
+  ctx.fillStyle = '#383f4a';
   ctx.fillRect(0, 0, 256, 256);
 
   const rows = 8;
@@ -1744,11 +1744,11 @@ function createStoneWallTexture() {
     for (let c = -1; c <= cols; c++) {
       const x = c * cw + offset;
       const y = r * rh;
-      const shade = 66 + ((r * 17 + c * 29) % 26);
-      ctx.fillStyle = `rgb(${shade}, ${shade + 4}, ${shade + 10})`;
+      const shade = 52 + ((r * 17 + c * 29) % 22);
+      ctx.fillStyle = `rgb(${shade}, ${shade + 4}, ${shade + 11})`;
       ctx.fillRect(x + 1, y + 1, cw - 2, rh - 2);
-      ctx.strokeStyle = 'rgba(18, 23, 30, 0.62)';
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.22)';
+      ctx.lineWidth = 1.5;
       ctx.strokeRect(x + 1, y + 1, cw - 2, rh - 2);
     }
   }
@@ -2020,25 +2020,52 @@ function startGameLogic() {
 
 const wallCollisionBoxes = [];
 
-function addCastleFlameCluster(parentGroup, x, y, z, scale = 1.0, phaseOffset = 0) {
+function addCastleFlameCluster(parentGroup, x, y, z, scale = 1.0, phaseOffset = 0, withStoneBase = false) {
   const clusterGroup = new THREE.Group();
   clusterGroup.position.set(x, y, z);
 
+  if (withStoneBase) {
+    const stonePedestalMat = new THREE.MeshStandardMaterial({
+      color: 0x3b424c,
+      roughness: 0.68,
+      metalness: 0.45
+    });
+    const goldTrimPedestalMat = new THREE.MeshStandardMaterial({
+      color: 0xd4af37,
+      roughness: 0.28,
+      metalness: 0.9
+    });
+    const pedestal = new THREE.Mesh(
+      new THREE.CylinderGeometry(12.5 * scale, 15.5 * scale, 14 * scale, 12),
+      stonePedestalMat
+    );
+    pedestal.position.y = -11.5 * scale;
+    clusterGroup.add(pedestal);
+
+    const pedestalGoldBand = new THREE.Mesh(
+      new THREE.TorusGeometry(13.2 * scale, 0.95 * scale, 10, 20),
+      goldTrimPedestalMat
+    );
+    pedestalGoldBand.rotation.x = Math.PI / 2;
+    pedestalGoldBand.position.y = -4.5 * scale;
+    clusterGroup.add(pedestalGoldBand);
+  }
+
   const brazierMat = new THREE.MeshStandardMaterial({
     color: 0x2a231e,
-    roughness: 0.62,
-    metalness: 0.84
+    roughness: 0.58,
+    metalness: 0.86
   });
-  const ironTrimMat = new THREE.MeshStandardMaterial({
-    color: 0x64748b,
-    roughness: 0.35,
-    metalness: 0.9
+  const goldTrimMat = new THREE.MeshStandardMaterial({
+    color: 0xeab308,
+    roughness: 0.25,
+    metalness: 0.92
   });
   const brazierBowl = new THREE.Mesh(new THREE.CylinderGeometry(9.8 * scale, 6.2 * scale, 7.5 * scale, 14), brazierMat);
   brazierBowl.position.y = -3.2 * scale;
   clusterGroup.add(brazierBowl);
 
-  const rimRing = new THREE.Mesh(new THREE.TorusGeometry(9.6 * scale, 0.9 * scale, 10, 20), ironTrimMat);
+  const rimRing = new THREE.Mesh(new THREE.TorusGeometry(9.6 * scale, 0.95 * scale, 10, 20), goldTrimMat);
   rimRing.rotation.x = Math.PI / 2;
   rimRing.position.y = 0.4 * scale;
   clusterGroup.add(rimRing);
@@ -2131,10 +2158,10 @@ function buildCastleKeepAndIsland(parentGroup, wallRadius) {
   const stoneMainMat = new THREE.MeshStandardMaterial({
     map: stoneTex,
     bumpMap: stoneTex,
-    bumpScale: 1.2,
-    color: 0x736b62,
-    roughness: 0.78,
-    metalness: 0.18,
+    bumpScale: 1.3,
+    color: 0x565d68,
+    roughness: 0.65,
+    metalness: 0.35,
     depthWrite: true,
     depthTest: true
   });
@@ -2142,16 +2169,16 @@ function buildCastleKeepAndIsland(parentGroup, wallRadius) {
     map: stoneTex,
     bumpMap: stoneTex,
     bumpScale: 1.0,
-    color: 0x948a7f,
-    roughness: 0.7,
-    metalness: 0.24,
+    color: 0xd4af37,
+    roughness: 0.32,
+    metalness: 0.85,
     depthWrite: true,
     depthTest: true
   });
   const roofDarkMat = new THREE.MeshStandardMaterial({
-    color: 0x262220,
-    roughness: 0.58,
-    metalness: 0.42,
+    color: 0x1e242b,
+    roughness: 0.48,
+    metalness: 0.62,
     depthWrite: true,
     depthTest: true
   });
@@ -2170,9 +2197,9 @@ function buildCastleKeepAndIsland(parentGroup, wallRadius) {
   const islandRockMat = new THREE.MeshStandardMaterial({
     bumpMap: stoneTex,
     bumpScale: 1.6,
-    color: 0x474038,
-    roughness: 0.88,
-    metalness: 0.12,
+    color: 0x3b4048,
+    roughness: 0.85,
+    metalness: 0.22,
     depthWrite: true,
     depthTest: true
   });
@@ -2222,7 +2249,7 @@ function buildCastleKeepAndIsland(parentGroup, wallRadius) {
   mainRoof.rotation.y = Math.PI / 4;
   citadelGroup.add(mainRoof);
 
-  const spire = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 3.2, 16, 8), roofDarkMat);
+  const spire = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 3.2, 16, 8), stoneTrimMat);
   spire.position.set(0, 81, -2);
   citadelGroup.add(spire);
 
@@ -2250,10 +2277,15 @@ function buildCastleKeepAndIsland(parentGroup, wallRadius) {
 
   parentGroup.add(citadelGroup);
 
-  addCastleFlameCluster(parentGroup, 0, keepBaseY + 94, -2, 1.85, 0.0);
-  addCastleFlameCluster(parentGroup, 105, keepBaseY + 14, 65, 1.35, 1.7);
-  addCastleFlameCluster(parentGroup, -120, keepBaseY + 14, 105, 1.25, 3.1);
-  addCastleFlameCluster(parentGroup, 155, keepBaseY + 14, -125, 1.2, 4.4);
+  addCastleFlameCluster(parentGroup, 0, keepBaseY + 94, -2, 1.85, 0.0, false);
+
+  const innerWallFlameRadius = wallRadius - 18;
+  const innerFlameAngles = [-2.25, -0.85, 0.85, 2.25];
+  innerFlameAngles.forEach((ang, idx) => {
+    const fx = Math.cos(ang) * innerWallFlameRadius;
+    const fz = Math.sin(ang) * innerWallFlameRadius;
+    addCastleFlameCluster(parentGroup, fx, keepBaseY + 12, fz, 1.15, idx * 1.35, true);
+  });
 }
 
 function isGateAngle(angle) {
@@ -2290,29 +2322,37 @@ function spawnDefenseTowersRing() {
   const wallMat = new THREE.MeshStandardMaterial({ 
     map: wallStoneTex,
     bumpMap: wallStoneTex,
-    bumpScale: 1.25,
-    color: 0x67707a, 
-    roughness: 0.64, 
-    metalness: 0.32,
+    bumpScale: 1.4,
+    color: 0x434b57, 
+    roughness: 0.52, 
+    metalness: 0.48,
     depthWrite: true,
     depthTest: true
   });
   wallMat.renderOrder = 0;
 
+  const goldTrimMat = new THREE.MeshStandardMaterial({
+    color: 0xd4af37,
+    roughness: 0.28,
+    metalness: 0.88,
+    depthWrite: true,
+    depthTest: true
+  });
+
   const merlonMat = new THREE.MeshStandardMaterial({
     bumpMap: wallStoneTex,
-    bumpScale: 0.8,
-    color: 0x434b54,
-    roughness: 0.68,
-    metalness: 0.36,
+    bumpScale: 0.9,
+    color: 0x2c333d,
+    roughness: 0.56,
+    metalness: 0.52,
     depthWrite: true,
     depthTest: true
   });
 
   const gatePillarMat = new THREE.MeshStandardMaterial({
-    color: 0x94a3b8,
-    roughness: 0.35,
-    metalness: 0.85
+    color: 0xeab308,
+    roughness: 0.25,
+    metalness: 0.92
   });
   
   for (let i = 0; i < wallSegments; i++) {
@@ -2325,29 +2365,44 @@ function spawnDefenseTowersRing() {
     }
     
     const segmentWidth = (2 * Math.PI * wallRadius) / wallSegments * 1.06;
-    const wallSegGeo = new THREE.BoxGeometry(segmentWidth, 42, 26);
+    const wallSegGeo = new THREE.BoxGeometry(segmentWidth, 44, 28);
     const wallSegMesh = new THREE.Mesh(wallSegGeo, wallMat);
     wallSegMesh.renderOrder = 0;
     
     const wx = Math.cos(midAngle) * wallRadius;
     const wz = Math.sin(midAngle) * wallRadius;
+    const rotY = -midAngle + Math.PI / 2;
+    const cosA = Math.cos(rotY);
+    const sinA = Math.sin(rotY);
     
-    wallSegMesh.position.set(wx, SHIP_Y_POS - 60, wz);
-    wallSegMesh.rotation.y = -midAngle + Math.PI / 2;
+    wallSegMesh.position.set(wx, SHIP_Y_POS - 59, wz);
+    wallSegMesh.rotation.y = rotY;
     defenseIslandGroup.add(wallSegMesh);
 
-    [-0.26, 0.26].forEach((offsetRatio) => {
-      const merlon = new THREE.Mesh(new THREE.BoxGeometry(segmentWidth * 0.22, 10, 28), merlonMat);
+    const topGoldCornice = new THREE.Mesh(new THREE.BoxGeometry(segmentWidth * 1.02, 3.2, 30.5), goldTrimMat);
+    topGoldCornice.position.set(wx, SHIP_Y_POS - 36.5, wz);
+    topGoldCornice.rotation.y = rotY;
+    defenseIslandGroup.add(topGoldCornice);
+
+    [-0.28, 0.28].forEach((offsetRatio) => {
       const mLocalX = segmentWidth * offsetRatio;
-      const cosA = Math.cos(-midAngle + Math.PI / 2);
-      const sinA = Math.sin(-midAngle + Math.PI / 2);
+      const merlon = new THREE.Mesh(new THREE.BoxGeometry(segmentWidth * 0.24, 12, 29), merlonMat);
       merlon.position.set(
         wx + mLocalX * cosA,
-        SHIP_Y_POS - 36,
+        SHIP_Y_POS - 29.5,
         wz - mLocalX * sinA
       );
-      merlon.rotation.y = -midAngle + Math.PI / 2;
+      merlon.rotation.y = rotY;
       defenseIslandGroup.add(merlon);
+
+      const merlonGoldCap = new THREE.Mesh(new THREE.BoxGeometry(segmentWidth * 0.25, 1.6, 30), goldTrimMat);
+      merlonGoldCap.position.set(
+        wx + mLocalX * cosA,
+        SHIP_Y_POS - 23.2,
+        wz - mLocalX * sinA
+      );
+      merlonGoldCap.rotation.y = rotY;
+      defenseIslandGroup.add(merlonGoldCap);
     });
 
     wallCollisionBoxes.push({ x: wx, z: wz, radius: segmentWidth / 2 + 6 });
@@ -2358,8 +2413,8 @@ function spawnDefenseTowersRing() {
       const pAng = gateAng + edgeOffset;
       const px = Math.cos(pAng) * wallRadius;
       const pz = Math.sin(pAng) * wallRadius;
-      const pillar = new THREE.Mesh(new THREE.CylinderGeometry(5.5, 7.0, 50, 12), gatePillarMat);
-      pillar.position.set(px, SHIP_Y_POS - 56, pz);
+      const pillar = new THREE.Mesh(new THREE.CylinderGeometry(6.0, 7.6, 54, 14), gatePillarMat);
+      pillar.position.set(px, SHIP_Y_POS - 54, pz);
       defenseIslandGroup.add(pillar);
     });
   });
