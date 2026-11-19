@@ -721,21 +721,46 @@ const AMMO_TYPES = {
 const REMOVED_SHIP_IDS = ['ghost', 'tasarim1', 'gold', 'tasarim5'];
 
 const BASE_SHIP_MODELS = {
-  standard:  { id: 'standard',  name: 'Ejderha Kalyonu', desc: 'Başlangıç 3D Savaş Gemisi', cost: 0,        type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45 },
-  deneme1:   { id: 'deneme1',   name: 'Deneme 1 · Altın Güneş', desc: 'Minik 3D Detay · Altın Gövde', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'gold' },
-  deneme2:   { id: 'deneme2',   name: 'Deneme 2 · Zümrüt Leviathan', desc: 'Minik 3D Detay · Zümrüt Gövde', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'emerald' },
-  deneme3:   { id: 'deneme3',   name: 'Deneme 3 · Mor Gölge', desc: 'Minik 3D Detay · Mor Gövde', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'violet' },
-  deneme4:   { id: 'deneme4',   name: 'Deneme 4 · Kızıl Cehennem', desc: 'Burunda Ağır Top · Kızıl Gövde', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'crimson' },
-  deneme5:   { id: 'deneme5',   name: 'Deneme 5 · Buzul Kraliyet', desc: 'Minik 3D Detay · Buzul Gövde', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, scaleMultiplier: 1.12, denemeStyle: 'frost' },
-  tasarim2:  { id: 'tasarim2',  name: 'Tasarim 2', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim2.glb', heightOffset: 45, rotationOffset: Math.PI / 2 },
-  tasarim3:  { id: 'tasarim3',  name: 'Tasarim 3', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3 },
-  tasarim4:  { id: 'tasarim4',  name: 'Tasarim 4', desc: 'GLB Savaş Gemisi', cost: 3500, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2 },
-  tasarim6:  { id: 'tasarim6',  name: 'Tasarim 6', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim6.glb', heightOffset: 85 },
-  tasarim7:  { id: 'tasarim7',  name: 'Tasarim 7', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim7.glb', heightOffset: 45, rotationOffset: Math.PI },
-  tasarim8:  { id: 'tasarim8',  name: 'Tasarim 8', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim8.glb', heightOffset: 85 },
-  tasarim9:  { id: 'tasarim9',  name: 'Tasarim 9', desc: 'GLB Savaş Gemisi', cost: 4000, type: 'glb', modelPath: 'tasarim9.glb', heightOffset: 45 },
-  tasarim10: { id: 'tasarim10', name: 'Tasarim 10', desc: 'GLB Savaş Gemisi', cost: 4500, type: 'glb', modelPath: 'tasarim10.glb', heightOffset: 45 },
-  tasarim11: { id: 'tasarim11', name: 'Tasarim 11', desc: 'GLB Savaş Gemisi', cost: 5000, type: 'glb', modelPath: 'tasarim11.glb', heightOffset: 45 }
+  standard:         { id: 'standard',         name: 'Ejderha Kalyonu', desc: 'Başlangıç 3D Savaş Gemisi', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45 },
+  deneme1:          { id: 'deneme1',          name: 'Deneme 1 · Altın Güneş', desc: 'Minik 3D Detay · Altın Gövde', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'gold' },
+  deneme2:          { id: 'deneme2',          name: 'Deneme 2 · Zümrüt Leviathan', desc: 'Minik 3D Detay · Zümrüt Gövde', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'emerald' },
+  deneme3:          { id: 'deneme3',          name: 'Deneme 3 · Mor Gölge', desc: 'Minik 3D Detay · Mor Gövde', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'violet' },
+  deneme4:          { id: 'deneme4',          name: 'Deneme 4 · Kızıl Cehennem', desc: 'Burunda Ağır Top · Kızıl Gövde', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'crimson' },
+  deneme5:          { id: 'deneme5',          name: 'Deneme 5 · Buzul Kraliyet', desc: 'Minik 3D Detay · Buzul Gövde', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, scaleMultiplier: 1.12, denemeStyle: 'frost' },
+  tasarim2:         { id: 'tasarim2',         name: 'Tasarim 2', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim2.glb', heightOffset: 45, rotationOffset: Math.PI / 2 },
+  tasarim3:         { id: 'tasarim3',         name: 'Tasarim 3', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3 },
+  tasarim3_hayalet: { id: 'tasarim3_hayalet', name: 'Tasarim 3 · Hayalet', desc: 'Ruhani Sis · Hayalet Kopya', cost: 0, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3, phantomStyle: 'specter_teal' },
+  tasarim4:         { id: 'tasarim4',         name: 'Tasarim 4', desc: 'GLB Savaş Gemisi', cost: 3500, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2 },
+  tasarim4_hayalet: { id: 'tasarim4_hayalet', name: 'Tasarim 4 · Hayalet', desc: 'Ruhani Gölge · Hayalet Kopya', cost: 0, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2, phantomStyle: 'specter_violet' },
+  tasarim6:         { id: 'tasarim6',         name: 'Tasarim 6', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim6.glb', heightOffset: 85 },
+  tasarim7:         { id: 'tasarim7',         name: 'Tasarim 7', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim7.glb', heightOffset: 45, rotationOffset: Math.PI },
+  tasarim8:         { id: 'tasarim8',         name: 'Tasarim 8', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim8.glb', heightOffset: 85 },
+  tasarim9:         { id: 'tasarim9',         name: 'Tasarim 9', desc: 'GLB Savaş Gemisi', cost: 4000, type: 'glb', modelPath: 'tasarim9.glb', heightOffset: 45 },
+  tasarim10:        { id: 'tasarim10',        name: 'Tasarim 10', desc: 'GLB Savaş Gemisi', cost: 4500, type: 'glb', modelPath: 'tasarim10.glb', heightOffset: 45 },
+  tasarim11:        { id: 'tasarim11',        name: 'Tasarim 11', desc: 'GLB Savaş Gemisi', cost: 5000, type: 'glb', modelPath: 'tasarim11.glb', heightOffset: 45 }
+};
+
+const PHANTOM_THEMES = {
+  specter_teal: {
+    color: 0x67e8f9,
+    emissive: 0x0891b2,
+    emissiveIntensity: 0.62,
+    opacity: 0.56,
+    lightColor: 0x22d3ee,
+    lightIntensity: 0.65,
+    wispColor: 0xa5f3fc,
+    pulseSpeed: 3.1
+  },
+  specter_violet: {
+    color: 0xd8b4fe,
+    emissive: 0x7e22ce,
+    emissiveIntensity: 0.64,
+    opacity: 0.56,
+    lightColor: 0xc084fc,
+    lightIntensity: 0.65,
+    wispColor: 0xe9d5ff,
+    pulseSpeed: 2.7
+  }
 };
 
 const DENEME_THEMES = {
@@ -839,6 +864,12 @@ let denemeLanternCores = [];
 let deneme4BowCannonEmber = null;
 let activeDenemeStyleKey = null;
 
+let activePhantomGroup = null;
+let activePhantomLight = null;
+let activePhantomStyleKey = null;
+let phantomWispsMeta = [];
+let phantomMaterialsList = [];
+
 function clearAllEnemyAggro() {
   enemies.forEach((en) => {
     en.isAggro = false;
@@ -868,6 +899,100 @@ function clearDenemeShipStyling() {
   denemeLanternCores = [];
   deneme4BowCannonEmber = null;
   activeDenemeStyleKey = null;
+
+  if (activePhantomLight && activePhantomLight.parent) {
+    activePhantomLight.parent.remove(activePhantomLight);
+  }
+  activePhantomLight = null;
+
+  if (activePhantomGroup) {
+    if (activePhantomGroup.parent) {
+      activePhantomGroup.parent.remove(activePhantomGroup);
+    }
+    activePhantomGroup.traverse((obj) => {
+      if (obj.geometry) obj.geometry.dispose();
+      if (obj.material) {
+        const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+        mats.forEach(m => m.dispose());
+      }
+    });
+  }
+  activePhantomGroup = null;
+  activePhantomStyleKey = null;
+  phantomWispsMeta = [];
+  phantomMaterialsList = [];
+}
+
+function applyPhantomShipStyling(shipMesh, phantomKey = 'specter_teal') {
+  if (!shipMesh || typeof THREE === 'undefined') return;
+  const theme = PHANTOM_THEMES[phantomKey] || PHANTOM_THEMES.specter_teal;
+  activePhantomStyleKey = phantomKey;
+  phantomMaterialsList = [];
+
+  const bounds = new THREE.Box3().setFromObject(shipMesh);
+  const shipSize = new THREE.Vector3();
+  bounds.getSize(shipSize);
+
+  shipMesh.traverse((child) => {
+    if (child.isMesh && child.material) {
+      const mats = Array.isArray(child.material) ? child.material : [child.material];
+      const clonedMats = mats.map((origMat) => {
+        const m = origMat.clone();
+        if (m.color) m.color.setHex(theme.color);
+        if (m.emissive) {
+          m.emissive.setHex(theme.emissive);
+          m.emissiveIntensity = theme.emissiveIntensity;
+        }
+        m.transparent = true;
+        m.opacity = theme.opacity;
+        m.depthWrite = false;
+        m.needsUpdate = true;
+        phantomMaterialsList.push(m);
+        return m;
+      });
+      child.material = Array.isArray(child.material) ? clonedMats : clonedMats[0];
+    }
+  });
+
+  const wispGroup = new THREE.Group();
+  const wispCount = 6;
+  const rx = Math.max(1.0, shipSize.x * 0.38);
+  const rz = Math.max(1.2, shipSize.z * 0.38);
+  const baseY = bounds.min.y + shipSize.y * 0.42;
+  const wispGeo = new THREE.OctahedronGeometry(Math.max(0.16, shipSize.y * 0.045), 1);
+
+  phantomWispsMeta = [];
+  for (let i = 0; i < wispCount; i++) {
+    const wMat = new THREE.MeshBasicMaterial({
+      color: theme.wispColor,
+      transparent: true,
+      opacity: 0.72,
+      depthWrite: false
+    });
+    const wMesh = new THREE.Mesh(wispGeo, wMat);
+    wMesh.scale.set(0.7, 1.5, 0.7);
+    const angle = (i / wispCount) * Math.PI * 2;
+    wMesh.position.set(Math.cos(angle) * rx, baseY, Math.sin(angle) * rz);
+    wispGroup.add(wMesh);
+
+    phantomWispsMeta.push({
+      mesh: wMesh,
+      mat: wMat,
+      angle,
+      rx,
+      rz,
+      baseY,
+      speed: 1.15,
+      phase: i * 1.05
+    });
+  }
+
+  shipMesh.add(wispGroup);
+  activePhantomGroup = wispGroup;
+
+  activePhantomLight = new THREE.PointLight(theme.lightColor, theme.lightIntensity, 55);
+  activePhantomLight.position.set(0, 14, 0);
+  shipMesh.add(activePhantomLight);
 }
 
 function createLanternAssembly(theme, scale = 1) {
@@ -1193,6 +1318,8 @@ function getShipThumbnail(modelSpec, callback) {
   loadCachedGLB(modelSpec.modelPath, (clonedModel) => {
     if (modelSpec.denemeStyle) {
       applyDenemeShipStyling(clonedModel, modelSpec.denemeStyle, { with3DProps: true });
+    } else if (modelSpec.phantomStyle) {
+      applyPhantomShipStyling(clonedModel, modelSpec.phantomStyle);
     }
     if (!thumbnailRenderer) {
       thumbnailRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
@@ -1300,7 +1427,7 @@ if (logoutBtn) logoutBtn.addEventListener('click', () => { try { localStorage.re
 let scene, camera, renderer;
 let oceanTexture = null, oceanBumpTexture = null;
 let activeGlbShip = null, playerNeonRing, enemies = [], defenseTowers = [], rangeRingMesh;
-let activeProjectiles = [], particleSystems = [], cannonEffects = [], castleFlameSystems = [], flameEmberParticles = [];
+let activeProjectiles = [], particleSystems = [], cannonEffects = [], castleFlameSystems = [], flameEmberParticles = [], sinkExplosions = [];
 let activeDefenseIslandGroup = null;
 let raycaster, planeGeo, mouse;
 let selectedRingMesh = null;
@@ -1448,6 +1575,84 @@ function setPlayerDestination(toX, toZ) {
   if (!player) return;
   navigationQueue = buildNavigationRoute(player.x, player.z, toX, toZ);
   targetDestination = navigationQueue.shift() || null;
+}
+
+function triggerSinkExplosion(wx, wz, scale = 1.0) {
+  if (!scene || typeof THREE === 'undefined') return;
+  const baseY = 14;
+
+  const shockGeo = new THREE.RingGeometry(4 * scale, 9 * scale, 28);
+  const shockMat = new THREE.MeshBasicMaterial({
+    color: 0xffb703,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.92
+  });
+  const shockRing = new THREE.Mesh(shockGeo, shockMat);
+  shockRing.rotation.x = -Math.PI / 2;
+  shockRing.position.set(wx, 2.5, wz);
+  scene.add(shockRing);
+
+  const flashGeo = new THREE.SphereGeometry(12 * scale, 14, 14);
+  const flashMat = new THREE.MeshBasicMaterial({
+    color: 0xfff3b0,
+    transparent: true,
+    opacity: 0.95
+  });
+  const flashCore = new THREE.Mesh(flashGeo, flashMat);
+  flashCore.position.set(wx, baseY + 6 * scale, wz);
+  scene.add(flashCore);
+
+  const expLight = new THREE.PointLight(0xff5500, 3.2 * scale, 240 * scale);
+  expLight.position.set(wx, baseY + 24 * scale, wz);
+  scene.add(expLight);
+
+  const pieces = [];
+  const palette = [0xff2a00, 0xff6a00, 0xffb703, 0x334155, 0x1e293b];
+  const pieceCount = 22;
+
+  for (let i = 0; i < pieceCount; i++) {
+    const isSmoke = i >= 16;
+    const pMat = new THREE.MeshBasicMaterial({
+      color: palette[i % palette.length],
+      transparent: true,
+      opacity: isSmoke ? 0.75 : 0.96
+    });
+    const pMesh = new THREE.Mesh(SHARED_PARTICLE_GEO, pMat);
+    const pScale = (isSmoke ? (5.5 + Math.random() * 5.0) : (3.2 + Math.random() * 3.8)) * scale;
+    pMesh.scale.setScalar(pScale);
+    pMesh.position.set(
+      wx + (Math.random() - 0.5) * 14 * scale,
+      baseY + Math.random() * 10 * scale,
+      wz + (Math.random() - 0.5) * 14 * scale
+    );
+    scene.add(pMesh);
+
+    const ang = (i / pieceCount) * Math.PI * 2 + (Math.random() - 0.5) * 0.4;
+    const radialSpd = (isSmoke ? (18 + Math.random() * 24) : (42 + Math.random() * 58)) * scale;
+    pieces.push({
+      mesh: pMesh,
+      mat: pMat,
+      vx: Math.cos(ang) * radialSpd,
+      vy: (isSmoke ? (28 + Math.random() * 24) : (35 + Math.random() * 52)) * scale,
+      vz: Math.sin(ang) * radialSpd,
+      isSmoke
+    });
+  }
+
+  sinkExplosions.push({
+    shockRing,
+    shockMat,
+    shockGeo,
+    flashCore,
+    flashMat,
+    flashGeo,
+    expLight,
+    baseLightIntensity: 3.2 * scale,
+    pieces,
+    age: 0,
+    maxAge: 46
+  });
 }
 
 function createSeamlessDarkOceanTexture() {
@@ -1827,6 +2032,8 @@ function setupPlayerShipVisual() {
     activeGlbShip.scale.set(scaleFactor, scaleFactor, scaleFactor);
     if (modelSpec.denemeStyle) {
       applyDenemeShipStyling(activeGlbShip, modelSpec.denemeStyle, { with3DProps: true });
+    } else if (modelSpec.phantomStyle) {
+      applyPhantomShipStyling(activeGlbShip, modelSpec.phantomStyle);
     }
     scene.add(activeGlbShip);
   });
@@ -2524,6 +2731,49 @@ function animate3D() {
     oceanBumpTexture.offset.y = (animTimeSec * 0.01) % 1;
   }
 
+  for (let i = sinkExplosions.length - 1; i >= 0; i--) {
+    const ex = sinkExplosions[i];
+    ex.age++;
+    const progress = ex.age / ex.maxAge;
+
+    ex.shockRing.scale.setScalar(1 + progress * 7.5);
+    ex.shockMat.opacity = Math.max(0, 0.92 * (1 - progress));
+
+    ex.flashCore.scale.setScalar(Math.max(0.1, 1.3 - progress * 0.9));
+    ex.flashMat.opacity = Math.max(0, 0.95 * (1 - progress * 1.25));
+
+    if (ex.expLight) {
+      ex.expLight.intensity = Math.max(0, ex.baseLightIntensity * (1 - progress));
+    }
+
+    for (let j = 0; j < ex.pieces.length; j++) {
+      const p = ex.pieces[j];
+      p.mesh.position.x += p.vx * dt;
+      p.mesh.position.y += p.vy * dt;
+      p.mesh.position.z += p.vz * dt;
+      if (!p.isSmoke) {
+        p.vy -= 68 * dt;
+      }
+      p.mesh.scale.multiplyScalar(p.isSmoke ? 1.015 : 0.95);
+      p.mat.opacity = Math.max(0, (p.isSmoke ? 0.75 : 0.96) * (1 - progress));
+    }
+
+    if (ex.age >= ex.maxAge) {
+      scene.remove(ex.shockRing);
+      ex.shockGeo.dispose();
+      ex.shockMat.dispose();
+      scene.remove(ex.flashCore);
+      ex.flashGeo.dispose();
+      ex.flashMat.dispose();
+      if (ex.expLight) scene.remove(ex.expLight);
+      for (let j = 0; j < ex.pieces.length; j++) {
+        scene.remove(ex.pieces[j].mesh);
+        ex.pieces[j].mat.dispose();
+      }
+      sinkExplosions.splice(i, 1);
+    }
+  }
+
   if (castleFlameSystems.length > 0) {
     for (let i = 0; i < castleFlameSystems.length; i++) {
       const sys = castleFlameSystems[i];
@@ -2646,7 +2896,33 @@ function animate3D() {
     const hOffset = modelSpec.heightOffset || 0;
     const rotOffset = modelSpec.rotationOffset || 0;
 
-    if (modelSpec.denemeStyle) {
+    if (modelSpec.phantomStyle) {
+      const pTheme = PHANTOM_THEMES[modelSpec.phantomStyle] || PHANTOM_THEMES.specter_teal;
+      const pulseWave = 0.5 + 0.5 * Math.sin(timeSec * pTheme.pulseSpeed);
+
+      for (let i = 0; i < phantomMaterialsList.length; i++) {
+        phantomMaterialsList[i].opacity = pTheme.opacity * (0.78 + pulseWave * 0.28);
+        if (phantomMaterialsList[i].emissive) {
+          phantomMaterialsList[i].emissiveIntensity = pTheme.emissiveIntensity * (0.8 + pulseWave * 0.4);
+        }
+      }
+
+      if (activePhantomLight) {
+        activePhantomLight.intensity = pTheme.lightIntensity + pulseWave * 0.35;
+      }
+
+      for (let i = 0; i < phantomWispsMeta.length; i++) {
+        const w = phantomWispsMeta[i];
+        const wAng = w.angle + timeSec * w.speed;
+        w.mesh.position.set(
+          Math.cos(wAng) * w.rx,
+          w.baseY + Math.sin(timeSec * 2.4 + w.phase) * 0.35,
+          Math.sin(wAng) * w.rz
+        );
+        w.mesh.rotation.y += 3.0 * dt;
+        w.mat.opacity = 0.45 + pulseWave * 0.4;
+      }
+    } else if (modelSpec.denemeStyle) {
       const dTheme = DENEME_THEMES[modelSpec.denemeStyle] || DENEME_THEMES.gold;
       const pulseWave = 0.5 + 0.5 * Math.sin(timeSec * dTheme.pulseSpeed);
 
@@ -2684,7 +2960,8 @@ function animate3D() {
       }
     }
 
-    activeGlbShip.position.set(player.x, SHIP_Y_POS + hOffset + waveBobY - 100, player.z);
+    const phantomFloatY = modelSpec.phantomStyle ? (3.5 + Math.sin(timeSec * 1.9) * 2.4) : 0;
+    activeGlbShip.position.set(player.x, SHIP_Y_POS + hOffset + waveBobY + phantomFloatY - 100, player.z);
     activeGlbShip.rotation.order = 'YXZ';
     activeGlbShip.rotation.y = (-player.a + Math.PI / 2) + rotOffset;
     activeGlbShip.rotation.x = speedPitchX;
@@ -2784,7 +3061,11 @@ function animate3D() {
         lastRegenTime = now;
         showFloatingDamage(player.x, player.z, '-120 (Kule)', '#ef4444');
         updateHUD();
-        if (player.hp <= 0) { isGameOver = true; isAttacking = false; gameOverEl.style.display = 'flex'; finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString(); }
+        if (player.hp <= 0) {
+          triggerSinkExplosion(player.x, player.z, 1.45);
+          isGameOver = true; isAttacking = false; gameOverEl.style.display = 'flex';
+          finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString();
+        }
       }
       const tempVector = new THREE.Vector3(t.x, SHIP_Y_POS, t.z);
       tempVector.project(camera);
@@ -2815,7 +3096,11 @@ function animate3D() {
         lastRegenTime = now;
         showFloatingDamage(player.x, player.z, '-100', '#ef4444');
         updateHUD();
-        if (player.hp <= 0) { isGameOver = true; isAttacking = false; gameOverEl.style.display = 'flex'; finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString(); }
+        if (player.hp <= 0) {
+          triggerSinkExplosion(player.x, player.z, 1.45);
+          isGameOver = true; isAttacking = false; gameOverEl.style.display = 'flex';
+          finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString();
+        }
       }
     } else {
       en.wanderTimer -= (dt * 60);
@@ -2874,6 +3159,7 @@ function animate3D() {
 
           if (!ammoSpec.isHeal && target.hp <= 0) {
             if (target.id >= 9000 && target.id < 9100) {
+              triggerSinkExplosion(target.x, target.z, 1.55);
               if (target.mesh) scene.remove(target.mesh);
               target.labelEl.remove();
               defenseTowers = defenseTowers.filter(t => t.id !== target.id);
@@ -2883,6 +3169,7 @@ function animate3D() {
               player.score += 25000;
               showFloatingDamage(player.x, player.z, 'KULE YIKILDI! +25.000 Altın', '#f59e0b');
             } else {
+              triggerSinkExplosion(target.x, target.z, 1.25);
               if (target.mesh) scene.remove(target.mesh);
               target.labelEl.remove();
               enemies = enemies.filter(e => e.id !== target.id);
