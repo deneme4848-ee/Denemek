@@ -616,9 +616,6 @@
     </div>
   </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-
 <script>
 const levelEl = document.querySelector('#level');
 const hpTextEl = document.querySelector('#hp-text');
@@ -964,6 +961,46 @@ let lastClockTime = performance.now();
 let lastRegenTime = performance.now();
 let gltfLoader;
 
+// Sur çemberi ve açıklık koordinatları
+const WALL_RADIUS = ATTACK_RANGE;
+const WALL_GAP_ANGLE = Math.PI; // Açıklık açısı (~180 derece, x = -300, z = 0)
+let navigationQueue = [];
+
+function buildNavigationRoute(fromX, fromZ, toX, toZ) {
+  const queue = [];
+  const startDist = Math.hypot(fromX, fromZ);
+  const endDist = Math.hypot(toX, toZ);
+  const margin = 55;
+
+  const crossesWall =
+    (startDist > WALL_RADIUS + 20 && endDist < WALL_RADIUS - 20) ||
+    (startDist < WALL_RADIUS - 20 && endDist > WALL_RADIUS + 20);
+
+  if (crossesWall) {
+    const gapOutX = Math.cos(WALL_GAP_ANGLE) * (WALL_RADIUS + margin);
+    const gapOutZ = Math.sin(WALL_GAP_ANGLE) * (WALL_RADIUS + margin);
+    const gapInX  = Math.cos(WALL_GAP_ANGLE) * (WALL_RADIUS - margin);
+    const gapInZ  = Math.sin(WALL_GAP_ANGLE) * (WALL_RADIUS - margin);
+
+    if (startDist > WALL_RADIUS + 20) {
+      queue.push({ x: gapOutX, z: gapOutZ });
+      queue.push({ x: gapInX, z: gapInZ });
+    } else {
+      queue.push({ x: gapInX, z: gapInZ });
+      queue.push({ x: gapOutX, z: gapOutZ });
+    }
+  }
+
+  queue.push({ x: toX, z: toZ });
+  return queue;
+}
+
+function setPlayerDestination(toX, toZ) {
+  if (!player) return;
+  navigationQueue = buildNavigationRoute(player.x, player.z, toX, toZ);
+  targetDestination = navigationQueue.shift() || null;
+}
+
 function createSeamlessDarkOceanTexture() {
   const canvas = document.createElement('canvas');
   canvas.width = 1024; canvas.height = 1024;
@@ -1046,7 +1083,6 @@ function initThreeGame() {
   document.getElementById('game').appendChild(renderer.domElement);
 
   SHARED_PARTICLE_GEO = new THREE.SphereGeometry(1, 8, 8);
-  // Güllelerin aşırı büyük görünmemesi için geometrik ölçeği optimize edildi
   SHARED_PROJECTILE_GEO = new THREE.SphereGeometry(3.5, 12, 12);
 
   gltfLoader = new THREE.GLTFLoader();
@@ -1173,7 +1209,7 @@ function initThreeGame() {
 
       const oceanIntersect = raycaster.intersectObject(ocean);
       if (oceanIntersect.length > 0) {
-        targetDestination = { x: oceanIntersect[0].point.x, z: oceanIntersect[0].point.z };
+        setPlayerDestination(oceanIntersect[0].point.x, oceanIntersect[0].point.z);
       }
     }
     hasDragged = false;
@@ -1212,7 +1248,7 @@ function setupPlayerShipVisual() {
 }
 
 function startGameLogic() {
-  isGameOver = false; targetDestination = null; selectedEnemyId = null; isAttacking = false;
+  isGameOver = false; targetDestination = null; navigationQueue = []; selectedEnemyId = null; isAttacking = false;
   cameraLookOffset = { x: 0, z: 0 };
   gameOverEl.style.display = 'none';
 
@@ -1250,7 +1286,7 @@ function spawnDefenseTowersRing() {
   const defenseIslandGroup = new THREE.Group();
   defenseIslandGroup.name = "DefenseIsland_RangeMatchLayout";
 
-  const wallRadius = ATTACK_RANGE; 
+  const wallRadius = WALL_RADIUS; 
   const wallSegments = 20;
   
   const wallMat = new THREE.MeshStandardMaterial({ 
@@ -1359,6 +1395,7 @@ function changeMap(mapIdx, entrySide = 'center') {
   currentMapIndex = mapIdx;
   radarTitleEl.textContent = MAP_DATA[mapIdx].name;
   targetDestination = null;
+  navigationQueue = [];
   cameraLookOffset = { x: 0, z: 0 };
   hideTransitButton();
 
@@ -1532,7 +1569,7 @@ function triggerCannonFireEffect(shipX, shipZ, targetX, targetZ, ammoKey) {
   const flashColor = ammoKey === 'snow' ? 0xa5f3fc : ammoKey === 'fire' ? 0xf97316 : 0xffaa00;
   const flashMat = new THREE.MeshBasicMaterial({ color: flashColor, transparent: true, opacity: 0.9 });
   const flashMesh = new THREE.Mesh(SHARED_PARTICLE_GEO, flashMat);
-  flashMesh.scale.setScalar(6); // Efekt patlama boyutu da küçültüldü
+  flashMesh.scale.setScalar(6);
   flashMesh.position.set(muzzleX, 24, muzzleZ);
   scene.add(flashMesh);
   cannonEffects.push({ mesh: flashMesh, vx: 0, vy: 0.2, vz: 0, grow: 1.05, fade: 0.18, life: 6 });
@@ -1559,7 +1596,6 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
   if (tex) {
     const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
     mesh = new THREE.Sprite(mat);
-    // Sprite güllelerin boyutu normal ve şık bir seviyeye getirildi (14x14)
     mesh.scale.set(14, 14, 1);
   } else {
     const pMat = new THREE.MeshStandardMaterial({ color: ammoSpec.color, roughness: 0.2, metalness: 0.8 });
@@ -1613,12 +1649,14 @@ function animate3D() {
     const dx = targetDestination.x - player.x;
     const dz = targetDestination.z - player.z;
     const dist = Math.hypot(dx, dz);
-    if (dist > 10) {
+    if (dist > 14) {
       player.a = Math.atan2(dz, dx);
       player.speed = player.maxSpeed;
     } else {
-      player.speed = 0;
-      targetDestination = null;
+      targetDestination = navigationQueue.shift() || null;
+      if (!targetDestination) {
+        player.speed = 0;
+      }
     }
   } else {
     player.speed = 0;
