@@ -731,16 +731,16 @@ const BASE_SHIP_MODELS = {
   deneme1:             { id: 'deneme1',             name: 'Deneme 1 · Altın Güneş', desc: 'Minik 3D Detay · Hafif Altın Parıltı', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'gold' },
   deneme2:             { id: 'deneme2',             name: 'Deneme 2 · Zümrüt Leviathan', desc: 'Minik 3D Detay · Hafif Zümrüt Parıltı', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'emerald' },
   deneme3:             { id: 'deneme3',             name: 'Deneme 3 · Mor Gölge', desc: 'Minik 3D Detay · Hafif Mor Parıltı', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'violet' },
-  deneme4:             { id: 'deneme4',             name: 'Deneme 4 · Kızıl Cehennem', desc: 'Burunda Ağır Top · Hafif Kızıl Parıltı', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'crimson' },
+  deneme4:             { id: 'deneme4',             name: 'Deneme 4 · Kızıl Cehennem', desc: 'Burunda Eski Top · Hafif Kızıl Parıltı', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'crimson' },
   deneme5:             { id: 'deneme5',             name: 'Deneme 5 · Buzul Kraliyet', desc: 'Minik 3D Detay · Hafif Buzul Parıltı', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, scaleMultiplier: 1.12, denemeStyle: 'frost' },
   tasarim2:            { id: 'tasarim2',            name: 'Tasarim 2', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim2.glb', heightOffset: 45, rotationOffset: Math.PI / 2 },
   tasarim3:            { id: 'tasarim3',            name: 'Tasarim 3', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3 },
   tasarim3_hayalet:    { id: 'tasarim3_hayalet',    name: 'Tasarim 3 · Hayalet', desc: 'Sürekli Parlayıp Sönen Hayalet Kopya', cost: 0, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3, phantomStyle: 'specter_teal' },
   tasarim4:            { id: 'tasarim4',            name: 'Tasarim 4', desc: 'GLB Savaş Gemisi', cost: 3500, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2 },
   tasarim4_hayalet:    { id: 'tasarim4_hayalet',    name: 'Tasarim 4 · Hayalet', desc: 'Mor Ruhani Parlayıp Sönen Hayalet', cost: 0, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2, phantomStyle: 'specter_violet' },
-  tasarim4_burun_topu: { id: 'tasarim4_burun_topu', name: 'Ağır Burun Topu · Demir Boğaz', desc: 'Burunda Dev Eski Top Bataryası', cost: 4200, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2, customRig: 'bow_heavy_battery' },
+  tasarim4_burun_topu: { id: 'tasarim4_burun_topu', name: 'Ağır Burun Topu · Demir Boğaz', desc: 'Burunda Sabit Eski Top Bataryası', cost: 4200, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2, customRig: 'bow_heavy_battery' },
   tasarim6:            { id: 'tasarim6',            name: 'Tasarim 6', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim6.glb', heightOffset: 85 },
-  tasarim6_yan_toplar: { id: 'tasarim6_yan_toplar', name: 'Yan Batarya · Fırtına Salvosu', desc: 'Gövdeye Sabit Büyük Eski Yan Topları', cost: 4600, type: 'glb', modelPath: 'tasarim6.glb', heightOffset: 85, customRig: 'broadside_heavy_cannons' },
+  tasarim6_yan_toplar: { id: 'tasarim6_yan_toplar', name: 'Yan Batarya · Fırtına Salvosu', desc: 'Gövdeye Sabit Eski Yan Topları', cost: 4600, type: 'glb', modelPath: 'tasarim6.glb', heightOffset: 85, customRig: 'broadside_heavy_cannons' },
   tasarim7:            { id: 'tasarim7',            name: 'Tasarim 7', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim7.glb', heightOffset: 45, rotationOffset: Math.PI },
   tasarim8:            { id: 'tasarim8',            name: 'Tasarim 8', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim8.glb', heightOffset: 85 },
   tasarim11:           { id: 'tasarim11',           name: 'Tasarim 11', desc: 'GLB Savaş Gemisi', cost: 5000, type: 'glb', modelPath: 'tasarim11.glb', heightOffset: 45 }
@@ -1070,7 +1070,7 @@ function createLanternAssembly(theme, scale = 1) {
 function createClassicNavalCannon(scale = 1, accentHex = 0xb45309, emberHex = 0xff6b00) {
   const cannonGroup = new THREE.Group();
   const pitchGroup = new THREE.Group();
-  pitchGroup.rotation.x = -0.14;
+  pitchGroup.rotation.x = -0.12;
 
   const woodCarriageMat = new THREE.MeshStandardMaterial({
     color: 0x5c361c,
@@ -1100,106 +1100,106 @@ function createClassicNavalCannon(scale = 1, accentHex = 0xb45309, emberHex = 0x
   const emberMat = new THREE.MeshStandardMaterial({
     color: 0xffd166,
     emissive: emberHex,
-    emissiveIntensity: 0.95,
+    emissiveIntensity: 0.9,
     roughness: 0.25,
     metalness: 0.1
   });
 
   const anchorBlock = new THREE.Mesh(
-    new THREE.BoxGeometry(0.92 * scale, 0.48 * scale, 1.35 * scale),
+    new THREE.BoxGeometry(0.88 * scale, 0.42 * scale, 1.25 * scale),
     woodCarriageMat
   );
-  anchorBlock.position.set(0, -0.26 * scale, -0.25 * scale);
+  anchorBlock.position.set(0, -0.22 * scale, -0.2 * scale);
   pitchGroup.add(anchorBlock);
 
-  [-0.36, 0.36].forEach((sx) => {
+  [-0.34, 0.34].forEach((sx) => {
     const cheek = new THREE.Mesh(
-      new THREE.BoxGeometry(0.16 * scale, 0.44 * scale, 1.05 * scale),
+      new THREE.BoxGeometry(0.15 * scale, 0.4 * scale, 0.98 * scale),
       woodCarriageMat
     );
-    cheek.position.set(sx * scale, -0.04 * scale, 0.05 * scale);
+    cheek.position.set(sx * scale, -0.04 * scale, 0.04 * scale);
     pitchGroup.add(cheek);
 
-    [-0.34, 0.34].forEach((wz) => {
+    [-0.32, 0.32].forEach((wz) => {
       const wheel = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.22 * scale, 0.22 * scale, 0.14 * scale, 12),
+        new THREE.CylinderGeometry(0.2 * scale, 0.2 * scale, 0.12 * scale, 10),
         ironWheelMat
       );
       wheel.rotation.z = Math.PI / 2;
-      wheel.position.set((sx + (sx > 0 ? 0.11 : -0.11)) * scale, -0.24 * scale, wz * scale);
+      wheel.position.set((sx + (sx > 0 ? 0.09 : -0.09)) * scale, -0.22 * scale, wz * scale);
       pitchGroup.add(wheel);
     });
   });
 
   const cascabelKnob = new THREE.Mesh(
-    new THREE.SphereGeometry(0.24 * scale, 12, 12),
+    new THREE.SphereGeometry(0.22 * scale, 10, 10),
     castIronBarrelMat
   );
-  cascabelKnob.position.set(0, 0.12 * scale, -0.78 * scale);
+  cascabelKnob.position.set(0, 0.11 * scale, -0.72 * scale);
   pitchGroup.add(cascabelKnob);
 
   const breechSeg = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.36 * scale, 0.4 * scale, 0.62 * scale, 16),
+    new THREE.CylinderGeometry(0.34 * scale, 0.38 * scale, 0.58 * scale, 14),
     castIronBarrelMat
   );
   breechSeg.rotation.x = Math.PI / 2;
-  breechSeg.position.set(0, 0.12 * scale, -0.4 * scale);
+  breechSeg.position.set(0, 0.11 * scale, -0.36 * scale);
   pitchGroup.add(breechSeg);
 
   const midSeg = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.31 * scale, 0.36 * scale, 0.72 * scale, 16),
+    new THREE.CylinderGeometry(0.29 * scale, 0.34 * scale, 0.66 * scale, 14),
     castIronBarrelMat
   );
   midSeg.rotation.x = Math.PI / 2;
-  midSeg.position.set(0, 0.12 * scale, 0.24 * scale);
+  midSeg.position.set(0, 0.11 * scale, 0.22 * scale);
   pitchGroup.add(midSeg);
 
   const chaseSeg = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.26 * scale, 0.31 * scale, 0.7 * scale, 16),
+    new THREE.CylinderGeometry(0.24 * scale, 0.29 * scale, 0.64 * scale, 14),
     castIronBarrelMat
   );
   chaseSeg.rotation.x = Math.PI / 2;
-  chaseSeg.position.set(0, 0.12 * scale, 0.92 * scale);
+  chaseSeg.position.set(0, 0.11 * scale, 0.84 * scale);
   pitchGroup.add(chaseSeg);
 
-  [-0.64, -0.06, 0.56].forEach((rz, idx) => {
-    const rad = (0.38 - idx * 0.04) * scale;
+  [-0.58, -0.05, 0.52].forEach((rz, idx) => {
+    const rad = (0.36 - idx * 0.04) * scale;
     const band = new THREE.Mesh(
-      new THREE.TorusGeometry(rad, 0.045 * scale, 8, 18),
+      new THREE.TorusGeometry(rad, 0.04 * scale, 8, 14),
       brassReinforceMat
     );
-    band.position.set(0, 0.12 * scale, rz * scale);
+    band.position.set(0, 0.11 * scale, rz * scale);
     pitchGroup.add(band);
   });
 
   const muzzleSwelling = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.35 * scale, 0.27 * scale, 0.22 * scale, 16),
+    new THREE.CylinderGeometry(0.32 * scale, 0.25 * scale, 0.2 * scale, 14),
     castIronBarrelMat
   );
   muzzleSwelling.rotation.x = Math.PI / 2;
-  muzzleSwelling.position.set(0, 0.12 * scale, 1.32 * scale);
+  muzzleSwelling.position.set(0, 0.11 * scale, 1.2 * scale);
   pitchGroup.add(muzzleSwelling);
 
   const muzzleLip = new THREE.Mesh(
-    new THREE.TorusGeometry(0.31 * scale, 0.05 * scale, 8, 18),
+    new THREE.TorusGeometry(0.29 * scale, 0.045 * scale, 8, 14),
     brassReinforceMat
   );
-  muzzleLip.position.set(0, 0.12 * scale, 1.42 * scale);
+  muzzleLip.position.set(0, 0.11 * scale, 1.29 * scale);
   pitchGroup.add(muzzleLip);
 
   const boreOpening = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.2 * scale, 0.2 * scale, 0.08 * scale, 12),
+    new THREE.CylinderGeometry(0.18 * scale, 0.18 * scale, 0.07 * scale, 10),
     boreMat
   );
   boreOpening.rotation.x = Math.PI / 2;
-  boreOpening.position.set(0, 0.12 * scale, 1.4 * scale);
+  boreOpening.position.set(0, 0.11 * scale, 1.27 * scale);
   pitchGroup.add(boreOpening);
 
   const emberCore = new THREE.Mesh(
-    new THREE.SphereGeometry(0.11 * scale, 8, 8),
+    new THREE.SphereGeometry(0.1 * scale, 8, 8),
     emberMat
   );
-  emberCore.position.set(0, 0.12 * scale, 1.42 * scale);
+  emberCore.position.set(0, 0.11 * scale, 1.29 * scale);
   pitchGroup.add(emberCore);
 
   cannonGroup.add(pitchGroup);
@@ -1231,42 +1231,46 @@ function applyCustomShipRig(shipMesh, rigKey, bounds, shipSize) {
   });
 
   const rigGroup = new THREE.Group();
-  const baseUnit = Math.max(0.75, Math.min(1.65, Math.max(shipSize.x, shipSize.z) * 0.145));
+  const center = new THREE.Vector3();
+  bounds.getCenter(center);
+
+  // Gemi gövdesinin yerel güverte yüksekliği ve gerçekçi top ölçeği
+  const deckY = center.y + shipSize.y * 0.08;
   const forwardSign = Math.abs(bounds.min.z) >= Math.abs(bounds.max.z) ? -1 : 1;
-  const bowZ = (forwardSign < 0 ? bounds.min.z : bounds.max.z) - forwardSign * (shipSize.z * 0.03);
-  const deckY = bounds.min.y + shipSize.y * 0.48;
+  const bowZ = center.z + forwardSign * (shipSize.z * 0.24);
+  const cannonScale = Math.max(0.18, Math.min(0.45, Math.min(shipSize.x, shipSize.z) * 0.045));
 
   if (rigKey === 'bow_heavy_battery') {
-    const heroBow = createClassicNavalCannon(baseUnit * 1.95, 0xd97706, 0xff5500);
-    heroBow.cannonGroup.position.set(0, deckY + baseUnit * 0.25, bowZ);
+    const heroBow = createClassicNavalCannon(cannonScale * 1.35, 0xd97706, 0xff5500);
+    heroBow.cannonGroup.position.set(center.x, deckY + cannonScale * 0.25, bowZ);
     if (forwardSign < 0) heroBow.cannonGroup.rotation.y = Math.PI;
     rigGroup.add(heroBow.cannonGroup);
     customRigEmbers.push(heroBow.emberMat);
 
     [-1, 1].forEach((side) => {
-      const wingCannon = createClassicNavalCannon(baseUnit * 1.25, 0xb45309, 0xff8800);
-      const sideX = side * Math.max(0.85, shipSize.x * 0.22);
+      const wingCannon = createClassicNavalCannon(cannonScale * 1.0, 0xb45309, 0xff8800);
       wingCannon.cannonGroup.position.set(
-        sideX,
-        deckY + baseUnit * 0.05,
-        bowZ - forwardSign * (shipSize.z * 0.08)
+        center.x + side * (shipSize.x * 0.08),
+        deckY + cannonScale * 0.15,
+        bowZ - forwardSign * (shipSize.z * 0.06)
       );
       if (forwardSign < 0) wingCannon.cannonGroup.rotation.y = Math.PI;
-      wingCannon.cannonGroup.rotation.y += side * 0.18;
+      wingCannon.cannonGroup.rotation.y += side * 0.14;
       rigGroup.add(wingCannon.cannonGroup);
       customRigEmbers.push(wingCannon.emberMat);
     });
   } else if (rigKey === 'broadside_heavy_cannons') {
-    const embeddedX = Math.max(0.45, shipSize.x * 0.24);
-    const zRatios = [-0.28, -0.09, 0.11, 0.3];
+    // Gövde merkezine yakın ve bordadan dışa bakan büyük eski yan toplar
+    const sideOffsetX = shipSize.x * 0.095;
+    const zRatios = [-0.14, 0.0, 0.14];
 
     [-1, 1].forEach((sideSign) => {
       zRatios.forEach((zr) => {
-        const broadsideCannon = createClassicNavalCannon(baseUnit * 1.48, 0xb45309, 0xff6b00);
+        const broadsideCannon = createClassicNavalCannon(cannonScale * 1.25, 0xb45309, 0xff6b00);
         broadsideCannon.cannonGroup.position.set(
-          sideSign * embeddedX,
-          deckY + baseUnit * 0.08,
-          zr * shipSize.z
+          center.x + sideSign * sideOffsetX,
+          deckY + cannonScale * 0.2,
+          center.z + zr * shipSize.z
         );
         broadsideCannon.cannonGroup.rotation.y = sideSign > 0 ? Math.PI / 2 : -Math.PI / 2;
         rigGroup.add(broadsideCannon.cannonGroup);
@@ -1278,19 +1282,21 @@ function applyCustomShipRig(shipMesh, rigKey, bounds, shipSize) {
   shipMesh.add(rigGroup);
   activeCustomRigGroup = rigGroup;
 
-  activeCustomRigLight = new THREE.PointLight(theme.lightColor, theme.lightIntensity, 56);
-  activeCustomRigLight.position.set(0, deckY + 8, 0);
+  activeCustomRigLight = new THREE.PointLight(theme.lightColor, theme.lightIntensity, 42);
+  activeCustomRigLight.position.set(center.x, deckY + 6, center.z);
   shipMesh.add(activeCustomRigLight);
 }
 
 function attachDeneme3DProps(shipMesh, theme, bounds, shipSize, styleKey) {
   if (!shipMesh || typeof THREE === 'undefined') return;
   const propsGroup = new THREE.Group();
-  const unitScale = Math.max(0.35, Math.min(0.85, shipSize.y * 0.065));
+  const center = new THREE.Vector3();
+  bounds.getCenter(center);
+  const unitScale = Math.max(0.25, Math.min(0.65, shipSize.y * 0.05));
 
   const lanternOffsets = [
-    { x: 0, y: bounds.min.y + shipSize.y * 0.56, z: bounds.min.z + shipSize.z * 0.2, s: unitScale },
-    { x: 0, y: bounds.min.y + shipSize.y * 0.4, z: bounds.max.z - shipSize.z * 0.22, s: unitScale * 0.85 }
+    { x: center.x, y: center.y + shipSize.y * 0.22, z: center.z - shipSize.z * 0.16, s: unitScale },
+    { x: center.x, y: center.y + shipSize.y * 0.16, z: center.z + shipSize.z * 0.16, s: unitScale * 0.85 }
   ];
 
   denemeLanternCores = [];
@@ -1305,10 +1311,10 @@ function attachDeneme3DProps(shipMesh, theme, bounds, shipSize, styleKey) {
   });
 
   const crystalCount = 5;
-  const orbitRx = Math.max(0.65, shipSize.x * 0.28);
-  const orbitRz = Math.max(0.85, shipSize.z * 0.30);
-  const crystalY = bounds.min.y + shipSize.y * 0.34;
-  const crystalGeo = new THREE.OctahedronGeometry(0.13 * unitScale, 0);
+  const orbitRx = Math.max(0.4, shipSize.x * 0.14);
+  const orbitRz = Math.max(0.5, shipSize.z * 0.16);
+  const crystalY = center.y + shipSize.y * 0.12;
+  const crystalGeo = new THREE.OctahedronGeometry(0.11 * unitScale, 0);
   const crystalMat = new THREE.MeshStandardMaterial({
     color: theme.crystalColor,
     emissive: theme.lanternColor,
@@ -1322,29 +1328,31 @@ function attachDeneme3DProps(shipMesh, theme, bounds, shipSize, styleKey) {
     const cMesh = new THREE.Mesh(crystalGeo, crystalMat);
     cMesh.scale.set(0.75, 1.25, 0.75);
     const angle = (i / crystalCount) * Math.PI * 2;
-    cMesh.position.set(Math.cos(angle) * orbitRx, crystalY, Math.sin(angle) * orbitRz);
+    cMesh.position.set(center.x + Math.cos(angle) * orbitRx, crystalY, center.z + Math.sin(angle) * orbitRz);
     propsGroup.add(cMesh);
 
     denemeCrystalsMeta.push({
       mesh: cMesh,
+      centerX: center.x,
+      centerZ: center.z,
       angle,
       orbitRx,
       orbitRz,
       baseY: crystalY,
       orbitSpeed: 0.85,
-      bobAmp: Math.max(0.04, shipSize.y * 0.01),
+      bobAmp: Math.max(0.03, shipSize.y * 0.008),
       phase: i * 1.25
     });
   }
 
   if (styleKey === 'crimson') {
-    const bowCannonScale = Math.max(1.5, Math.min(2.4, Math.max(shipSize.x, shipSize.z) * 0.24));
-    const bowBuilt = createClassicNavalCannon(bowCannonScale);
+    const bowCannonScale = Math.max(0.22, Math.min(0.45, Math.min(shipSize.x, shipSize.z) * 0.045));
+    const bowBuilt = createClassicNavalCannon(bowCannonScale * 1.25);
     const forwardSign = Math.abs(bounds.min.z) >= Math.abs(bounds.max.z) ? -1 : 1;
-    const bowZ = (forwardSign < 0 ? bounds.min.z : bounds.max.z) + forwardSign * (shipSize.z * 0.06);
-    const bowY = bounds.min.y + shipSize.y * 0.44;
+    const bowZ = center.z + forwardSign * (shipSize.z * 0.22);
+    const bowY = center.y + shipSize.y * 0.12 + bowCannonScale * 0.2;
 
-    bowBuilt.cannonGroup.position.set(0, bowY, bowZ);
+    bowBuilt.cannonGroup.position.set(center.x, bowY, bowZ);
     if (forwardSign < 0) {
       bowBuilt.cannonGroup.rotation.y = Math.PI;
     }
@@ -3246,9 +3254,9 @@ function animate3D() {
           const c = denemeCrystalsMeta[i];
           const cAngle = c.angle + timeSec * c.orbitSpeed;
           c.mesh.position.set(
-            Math.cos(cAngle) * c.orbitRx,
+            c.centerX + Math.cos(cAngle) * c.orbitRx,
             c.baseY + Math.sin(timeSec * 2.1 + c.phase) * c.bobAmp,
-            Math.sin(cAngle) * c.orbitRz
+            c.centerZ + Math.sin(cAngle) * c.orbitRz
           );
           c.mesh.rotation.y += 2.2 * dt;
           c.mesh.rotation.x = Math.sin(timeSec * 1.5 + c.phase) * 0.25;
