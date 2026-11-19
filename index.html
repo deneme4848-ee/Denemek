@@ -834,7 +834,8 @@ const REMOVED_SHIP_IDS = [
 
 const BASE_SHIP_MODELS = {
   standard:         { id: 'standard',         name: 'Ejderha Kalyonu', desc: 'Başlangıç 3D Savaş Gemisi', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45 },
-  deneme1:          { id: 'deneme1',          name: 'Deneme 1 · Dragon Yeşil Duman', desc: 'Zümrüt Yeşil Işıltı & Yeşil Duman Efekti', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'dragon_green', greenSmoke: true },
+  ejder_alevli:     { id: 'ejder_alevli',     name: 'Alevli Ejderha Kalyonu', desc: 'Yoğun Alev Gövde, Alev Dilleri & Kızıl Kıvılcımlar', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, scaleMultiplier: 1.08, denemeStyle: 'inferno_flame', flameAura: true },
+  deneme1:          { id: 'deneme1',          name: 'Deneme 1 · Dragon Yeşil Duman', desc: 'Yoğun Zümrüt Duman & Gerçekçi Sis Efekti', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'dragon_green', greenSmoke: true },
   deneme2:          { id: 'deneme2',          name: 'Deneme 2 · Zümrüt Leviathan', desc: 'Sakin Zümrüt Işıltı · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'emerald' },
   deneme3:          { id: 'deneme3',          name: 'Deneme 3 · Mor Gölge', desc: 'Sakin Mor Işıltı · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'violet' },
   deneme4:          { id: 'deneme4',          name: 'Deneme 4 · Kızıl Cehennem', desc: 'Sakin Kızıl Işıltı · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'crimson' },
@@ -879,16 +880,28 @@ const PHANTOM_THEMES = {
 
 const DENEME_THEMES = {
   dragon_green: {
-    color: 0x9ef5b4,
-    emissive: 0x1fd668,
-    emissiveIntensity: 0.42,
+    color: 0x8ef5ad,
+    emissive: 0x16c95c,
+    emissiveIntensity: 0.52,
     metalnessAdd: 0.18,
     roughnessSub: 0.16,
-    lightColor: 0x39ff7a,
-    lightIntensity: 0.95,
-    crystalColor: 0x69ff9c,
-    lanternColor: 0x22e068,
-    pulseSpeed: 2.3
+    lightColor: 0x29ff70,
+    lightIntensity: 1.35,
+    crystalColor: 0x66ff99,
+    lanternColor: 0x1ee066,
+    pulseSpeed: 2.5
+  },
+  inferno_flame: {
+    color: 0xff9d5c,
+    emissive: 0xff3b08,
+    emissiveIntensity: 0.65,
+    metalnessAdd: 0.2,
+    roughnessSub: 0.18,
+    lightColor: 0xff5a14,
+    lightIntensity: 1.65,
+    crystalColor: 0xffb84d,
+    lanternColor: 0xff4500,
+    pulseSpeed: 3.4
   },
   gold: {
     color: 0xe8d59e,
@@ -1020,9 +1033,36 @@ let mainTowerGlowState = null;
 
 const MAX_TRAIL_PARTICLES = 160;
 const MAX_SPARK_PARTICLES = 140;
-const MAX_DRAGON_SMOKE_PARTICLES = 55;
+
+const MAX_DRAGON_SMOKE_PARTICLES = 110;
 let dragonSmokeParticles = [];
 let dragonSmokeSpawnTimer = 0;
+let SOFT_SMOKE_TEXTURE = null;
+
+const MAX_INFERNO_PARTICLES = 95;
+let infernoFlameParticles = [];
+let infernoSpawnTimer = 0;
+
+function getSoftSmokeTexture() {
+  if (SOFT_SMOKE_TEXTURE) return SOFT_SMOKE_TEXTURE;
+  const canvas = document.createElement('canvas');
+  canvas.width = 128;
+  canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+
+  const grad = ctx.createRadialGradient(64, 64, 4, 64, 64, 62);
+  grad.addColorStop(0.0, 'rgba(255, 255, 255, 0.92)');
+  grad.addColorStop(0.32, 'rgba(240, 255, 246, 0.62)');
+  grad.addColorStop(0.68, 'rgba(210, 250, 224, 0.22)');
+  grad.addColorStop(1.0, 'rgba(210, 250, 224, 0.0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 128, 128);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.needsUpdate = true;
+  SOFT_SMOKE_TEXTURE = tex;
+  return tex;
+}
 
 function clearDragonSmokeParticles() {
   for (let i = dragonSmokeParticles.length - 1; i >= 0; i--) {
@@ -1032,6 +1072,14 @@ function clearDragonSmokeParticles() {
   }
   dragonSmokeParticles = [];
   dragonSmokeSpawnTimer = 0;
+
+  for (let i = infernoFlameParticles.length - 1; i >= 0; i--) {
+    const fp = infernoFlameParticles[i];
+    if (fp.mesh && scene) scene.remove(fp.mesh);
+    if (fp.mat) fp.mat.dispose();
+  }
+  infernoFlameParticles = [];
+  infernoSpawnTimer = 0;
 }
 
 function spawnDragonGreenSmoke(wx, wz) {
@@ -1042,39 +1090,102 @@ function spawnDragonGreenSmoke(wx, wz) {
     if (oldest && oldest.mat) oldest.mat.dispose();
   }
 
-  const smokeColors = [0x2ee66b, 0x58ff8a, 0x19b852, 0x8cffb0];
+  const smokeTex = getSoftSmokeTexture();
+  const smokeColors = [0x1be368, 0x45ff88, 0x0eb852, 0x8cffb3, 0x26d468];
   const colorHex = smokeColors[Math.floor(Math.random() * smokeColors.length)];
-  const mat = new THREE.MeshBasicMaterial({
+  const isWisp = Math.random() > 0.55;
+  const baseOpacity = isWisp ? 0.44 : 0.34;
+
+  const mat = new THREE.SpriteMaterial({
+    map: smokeTex,
     color: colorHex,
     transparent: true,
-    opacity: 0.34,
-    depthWrite: false
+    opacity: baseOpacity,
+    depthWrite: false,
+    blending: isWisp ? THREE.AdditiveBlending : THREE.NormalBlending
   });
-  const mesh = new THREE.Mesh(SHARED_PARTICLE_GEO, mat);
 
+  const mesh = new THREE.Sprite(mat);
   const ang = Math.random() * Math.PI * 2;
-  const spreadR = 6 + Math.random() * 24;
-  const startY = SHIP_Y_POS - 22 + Math.random() * 26;
+  const spreadR = Math.pow(Math.random(), 0.65) * 34;
+  const startY = SHIP_Y_POS - 28 + Math.random() * 34;
+
   mesh.position.set(
     wx + Math.cos(ang) * spreadR,
     startY,
     wz + Math.sin(ang) * spreadR
   );
 
-  const initScale = 5.5 + Math.random() * 6.5;
-  mesh.scale.set(initScale * 1.15, initScale * 0.85, initScale * 1.15);
+  const initSize = isWisp ? (18 + Math.random() * 14) : (24 + Math.random() * 18);
+  mesh.scale.set(initSize, initSize * (0.85 + Math.random() * 0.35), 1);
   scene.add(mesh);
 
+  const swirlDir = Math.random() > 0.5 ? 1 : -1;
   dragonSmokeParticles.push({
     mesh,
     mat,
-    vx: Math.cos(ang) * (7 + Math.random() * 11),
-    vy: 14 + Math.random() * 14,
-    vz: Math.sin(ang) * (7 + Math.random() * 11),
-    growSpeed: 6.5 + Math.random() * 5.0,
+    vx: Math.cos(ang) * (8 + Math.random() * 14),
+    vy: 16 + Math.random() * 18,
+    vz: Math.sin(ang) * (8 + Math.random() * 14),
+    swirlDir,
+    swirlSpeed: (1.4 + Math.random() * 1.8) * swirlDir,
+    rotSpeed: (Math.random() - 0.5) * 1.4,
+    growRate: 14 + Math.random() * 12,
     life: 0,
-    maxLife: 42 + Math.floor(Math.random() * 22),
-    baseOpacity: 0.34
+    maxLife: 46 + Math.floor(Math.random() * 26),
+    baseOpacity
+  });
+}
+
+function spawnInfernoFlameParticle(wx, wz) {
+  if (!scene || typeof THREE === 'undefined') return;
+  if (infernoFlameParticles.length >= MAX_INFERNO_PARTICLES) {
+    const oldest = infernoFlameParticles.shift();
+    if (oldest && oldest.mesh) scene.remove(oldest.mesh);
+    if (oldest && oldest.mat) oldest.mat.dispose();
+  }
+
+  const smokeTex = getSoftSmokeTexture();
+  const isSpark = Math.random() > 0.65;
+  const flameColors = [0xff2a00, 0xff5e00, 0xff9500, 0xffd15c];
+  const colorHex = flameColors[Math.floor(Math.random() * flameColors.length)];
+  const baseOpacity = isSpark ? 0.85 : 0.58;
+
+  const mat = new THREE.SpriteMaterial({
+    map: smokeTex,
+    color: colorHex,
+    transparent: true,
+    opacity: baseOpacity,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending
+  });
+
+  const mesh = new THREE.Sprite(mat);
+  const ang = Math.random() * Math.PI * 2;
+  const spreadR = Math.pow(Math.random(), 0.7) * 28;
+  const startY = SHIP_Y_POS - 24 + Math.random() * 32;
+
+  mesh.position.set(
+    wx + Math.cos(ang) * spreadR,
+    startY,
+    wz + Math.sin(ang) * spreadR
+  );
+
+  const initSize = isSpark ? (7 + Math.random() * 7) : (20 + Math.random() * 16);
+  mesh.scale.set(initSize * 0.9, initSize * (isSpark ? 1.4 : 1.25), 1);
+  scene.add(mesh);
+
+  infernoFlameParticles.push({
+    mesh,
+    mat,
+    vx: Math.cos(ang) * (6 + Math.random() * 12),
+    vy: isSpark ? (34 + Math.random() * 28) : (20 + Math.random() * 18),
+    vz: Math.sin(ang) * (6 + Math.random() * 12),
+    isSpark,
+    growRate: isSpark ? -2 : (11 + Math.random() * 9),
+    life: 0,
+    maxLife: isSpark ? (20 + Math.floor(Math.random() * 12)) : (30 + Math.floor(Math.random() * 16)),
+    baseOpacity
   });
 }
 
@@ -1317,8 +1428,9 @@ function applyDenemeShipStyling(shipMesh, styleKey = 'gold', options = { with3DP
   }
 
   if (typeof THREE !== 'undefined') {
-    activeDenemeLight = new THREE.PointLight(theme.lightColor, theme.lightIntensity, styleKey === 'dragon_green' ? 120 : 70);
-    activeDenemeLight.position.set(0, 16, 0);
+    const lightRange = (styleKey === 'dragon_green' || styleKey === 'inferno_flame') ? 150 : 70;
+    activeDenemeLight = new THREE.PointLight(theme.lightColor, theme.lightIntensity, lightRange);
+    activeDenemeLight.position.set(0, 18, 0);
     shipMesh.add(activeDenemeLight);
   }
 }
@@ -3068,21 +3180,63 @@ function animate3D() {
     const sm = dragonSmokeParticles[i];
     sm.life++;
     const progress = sm.life / sm.maxLife;
-    sm.mesh.position.x += sm.vx * dt;
-    sm.mesh.position.y += sm.vy * dt;
-    sm.mesh.position.z += sm.vz * dt;
-    sm.vx *= 0.965;
-    sm.vz *= 0.965;
-    const expand = sm.growSpeed * dt;
-    sm.mesh.scale.x += expand * 1.15;
-    sm.mesh.scale.y += expand * 0.9;
-    sm.mesh.scale.z += expand * 1.15;
-    sm.mat.opacity = Math.max(0, sm.baseOpacity * (1 - Math.pow(progress, 1.3)));
 
-    if (sm.life >= sm.maxLife || sm.mat.opacity <= 0.01) {
+    const curlX = Math.cos(animTimeSec * 2.4 + sm.life * 0.14) * sm.swirlDir * 12;
+    const curlZ = Math.sin(animTimeSec * 2.4 + sm.life * 0.14) * sm.swirlDir * 12;
+
+    sm.mesh.position.x += (sm.vx + curlX) * dt;
+    sm.mesh.position.y += sm.vy * dt;
+    sm.mesh.position.z += (sm.vz + curlZ) * dt;
+
+    sm.vx *= 0.962;
+    sm.vz *= 0.962;
+    sm.vy *= 0.988;
+
+    const expand = sm.growRate * dt;
+    sm.mesh.scale.x += expand * 1.2;
+    sm.mesh.scale.y += expand * 1.05;
+    sm.mat.rotation += sm.rotSpeed * dt;
+
+    const fadeCurve = progress < 0.2
+      ? (progress / 0.2)
+      : (1 - Math.pow((progress - 0.2) / 0.8, 1.25));
+    sm.mat.opacity = Math.max(0, sm.baseOpacity * fadeCurve);
+
+    if (sm.life >= sm.maxLife || (progress > 0.25 && sm.mat.opacity <= 0.008)) {
       scene.remove(sm.mesh);
       sm.mat.dispose();
       dragonSmokeParticles.splice(i, 1);
+    }
+  }
+
+  for (let i = infernoFlameParticles.length - 1; i >= 0; i--) {
+    const fp = infernoFlameParticles[i];
+    fp.life++;
+    const progress = fp.life / fp.maxLife;
+
+    const flickerX = Math.sin(animTimeSec * 9.0 + fp.life * 0.4) * (fp.isSpark ? 18 : 10);
+    const flickerZ = Math.cos(animTimeSec * 8.5 + fp.life * 0.35) * (fp.isSpark ? 18 : 10);
+
+    fp.mesh.position.x += (fp.vx + flickerX) * dt;
+    fp.mesh.position.y += fp.vy * dt;
+    fp.mesh.position.z += (fp.vz + flickerZ) * dt;
+
+    if (!fp.isSpark) {
+      const g = fp.growRate * dt;
+      fp.mesh.scale.x = Math.max(2, fp.mesh.scale.x + g);
+      fp.mesh.scale.y = Math.max(2, fp.mesh.scale.y + g * 1.2);
+    } else {
+      fp.mesh.scale.x = Math.max(1.5, fp.mesh.scale.x * 0.96);
+      fp.mesh.scale.y = Math.max(2.5, fp.mesh.scale.y * 0.97);
+    }
+
+    const fadeOut = 1 - Math.pow(progress, 1.15);
+    fp.mat.opacity = Math.max(0, fp.baseOpacity * fadeOut);
+
+    if (fp.life >= fp.maxLife || fp.mat.opacity <= 0.01) {
+      scene.remove(fp.mesh);
+      fp.mat.dispose();
+      infernoFlameParticles.splice(i, 1);
     }
   }
 
@@ -3210,9 +3364,19 @@ function animate3D() {
 
     if (modelSpec.greenSmoke) {
       dragonSmokeSpawnTimer += dt;
-      if (dragonSmokeSpawnTimer >= 0.09) {
+      if (dragonSmokeSpawnTimer >= 0.042) {
         dragonSmokeSpawnTimer = 0;
         spawnDragonGreenSmoke(player.x, player.z);
+        if (Math.random() > 0.45) spawnDragonGreenSmoke(player.x, player.z);
+      }
+    }
+
+    if (modelSpec.flameAura) {
+      infernoSpawnTimer += dt;
+      if (infernoSpawnTimer >= 0.045) {
+        infernoSpawnTimer = 0;
+        spawnInfernoFlameParticle(player.x, player.z);
+        if (Math.random() > 0.4) spawnInfernoFlameParticle(player.x, player.z);
       }
     }
 
@@ -3247,12 +3411,12 @@ function animate3D() {
       for (let i = 0; i < denemeMaterialsList.length; i++) {
         const mat = denemeMaterialsList[i];
         if (mat.emissive) {
-          mat.emissiveIntensity = dTheme.emissiveIntensity * (0.8 + 0.4 * pulseWave);
+          mat.emissiveIntensity = dTheme.emissiveIntensity * (0.78 + 0.48 * pulseWave);
         }
       }
 
       if (activeDenemeLight) {
-        activeDenemeLight.intensity = dTheme.lightIntensity * (0.8 + 0.35 * pulseWave);
+        activeDenemeLight.intensity = dTheme.lightIntensity * (0.78 + 0.45 * pulseWave);
       }
 
       if (denemeCrystalsMeta.length > 0) {
