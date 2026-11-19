@@ -8,47 +8,59 @@
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
       margin: 0; width: 100%; height: 100%; overflow: hidden;
-      background: #031422; color: #fef3c7; font-family: system-ui, -apple-system, sans-serif;
+      background: #060e16; color: #e2d9c8; font-family: system-ui, -apple-system, sans-serif;
     }
     #game { display: block; width: 100%; height: 100%; position: fixed; inset: 0; z-index: 0; cursor: grab; }
     #game:active { cursor: grabbing; }
+
+    /* Sinematik & Göz Yormayan Palet */
+    :root {
+      --panel-bg: linear-gradient(170deg, rgba(16, 22, 30, 0.90), rgba(9, 13, 19, 0.94));
+      --panel-soft: rgba(20, 28, 38, 0.72);
+      --brass-border: rgba(186, 152, 92, 0.36);
+      --brass-accent: #c8a262;
+      --text-main: #e6decb;
+      --text-muted: #9aa5b1;
+      --hp-fill: linear-gradient(90deg, #6e2424, #9c3434);
+      --exp-fill: linear-gradient(90deg, #7c5823, #b08238);
+    }
 
     /* Masaüstü ve Geniş Ekranlar */
     @media (min-width: 1024px) {
       body { zoom: 1.0; }
       #top-vital-hud {
-        position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
-        width: 650px; z-index: 6; pointer-events: none;
-        display: flex; flex-direction: row; align-items: center; gap: 12px;
-        background: linear-gradient(145deg, rgba(36, 15, 9, 0.95), rgba(14, 7, 5, 0.96));
-        backdrop-filter: blur(8px);
-        border: 2px solid rgba(212, 175, 55, 0.72); border-radius: 16px;
-        padding: 8px 18px; box-shadow: 0 12px 32px rgba(0,0,0,0.9), inset 0 1px 0 rgba(251, 191, 36, 0.25);
+        position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
+        width: 640px; z-index: 6; pointer-events: none;
+        display: flex; flex-direction: row; align-items: center; gap: 14px;
+        background: var(--panel-bg);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--brass-border); border-radius: 14px;
+        padding: 9px 18px; box-shadow: 0 14px 36px rgba(0,0,0,0.65);
       }
       #top-left-hud {
-        position: fixed; top: 16px; left: 20px;
-        display: flex; flex-direction: row; align-items: flex-start; gap: 14px;
+        position: fixed; top: 18px; left: 20px;
+        display: flex; flex-direction: row; align-items: flex-start; gap: 12px;
         z-index: 6; pointer-events: none;
       }
-      .side-tool-col { flex-direction: column; gap: 8px; }
+      .side-tool-col { flex-direction: column; gap: 7px; }
       #bottom-dock {
         position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-        width: auto; display: flex; flex-direction: row; align-items: flex-end; gap: 20px;
+        width: auto; display: flex; flex-direction: row; align-items: flex-end; gap: 18px;
         z-index: 6; pointer-events: none;
       }
-      .radar-card { padding: 7px !important; border-radius: 14px !important; }
-      #minimap { width: 112px !important; height: 112px !important; border-radius: 8px !important; }
-      .coord-pill { font-size: 11px !important; padding: 3px 6px !important; }
-      .radar-title { font-size: 10px !important; margin-bottom: 2px; }
-      .tool-icon-btn { width: 50px !important; height: 50px !important; border-radius: 12px !important; }
-      .tool-icon-btn span.ico { font-size: 20px !important; }
+      .radar-card { padding: 7px !important; border-radius: 12px !important; }
+      #minimap { width: 108px !important; height: 108px !important; border-radius: 7px !important; }
+      .coord-pill { font-size: 10.5px !important; padding: 3px 6px !important; }
+      .radar-title { font-size: 9.5px !important; margin-bottom: 2px; }
+      .tool-icon-btn { width: 46px !important; height: 46px !important; border-radius: 10px !important; }
+      .tool-icon-btn span.ico { font-size: 18px !important; }
       .tool-icon-btn span.lbl { font-size: 8px !important; }
-      .ammo-slot { width: 62px !important; height: 66px !important; border-radius: 12px !important; }
-      .ammo-slot .ammo-ico img { width: 40px !important; height: 40px !important; }
-      .ammo-slot .ammo-qty { font-size: 12px !important; }
-      .ammo-slot .key-hint { font-size: 10px !important; top: 3px !important; left: 5px !important; }
-      #attack-btn { width: 92px !important; height: 92px !important; font-size: 13px !important; }
-      #attack-btn .crosshair { font-size: 26px !important; }
+      .ammo-slot { width: 58px !important; height: 62px !important; border-radius: 10px !important; }
+      .ammo-slot .ammo-ico img { width: 36px !important; height: 36px !important; }
+      .ammo-slot .ammo-qty { font-size: 11px !important; }
+      .ammo-slot .key-hint { font-size: 9.5px !important; top: 3px !important; left: 5px !important; }
+      #attack-btn { width: 86px !important; height: 86px !important; font-size: 12px !important; }
+      #attack-btn .crosshair { font-size: 22px !important; }
     }
 
     /* Mobil Dikey Ekranlar */
@@ -56,22 +68,22 @@
       #top-vital-hud {
         position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
         width: min(92vw, 520px); display: flex; align-items: center; gap: 6px; z-index: 6; pointer-events: none;
-        background: linear-gradient(145deg, rgba(36, 15, 9, 0.94), rgba(14, 7, 5, 0.96));
-        padding: 4px 8px; border-radius: 10px; border: 1.5px solid rgba(212, 175, 55, 0.6);
+        background: var(--panel-bg);
+        padding: 5px 8px; border-radius: 10px; border: 1px solid var(--brass-border);
       }
       #top-left-hud {
-        position: fixed; top: 56px; left: 8px; display: flex; align-items: flex-start; gap: 6px; z-index: 6; pointer-events: none;
+        position: fixed; top: 58px; left: 8px; display: flex; align-items: flex-start; gap: 6px; z-index: 6; pointer-events: none;
       }
       #bottom-dock {
         position: fixed; bottom: 10px; left: 8px; right: 8px;
         display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; z-index: 6; pointer-events: none;
       }
       .radar-card { padding: 4px; }
-      #minimap { width: 72px; height: 72px; border-radius: 5px; }
-      .tool-icon-btn { width: 38px; height: 38px; border-radius: 9px; }
-      .ammo-slot { width: 50px; height: 54px; border-radius: 10px; }
-      .ammo-slot .ammo-ico img { width: 32px; height: 32px; }
-      #attack-btn { width: 72px; height: 72px; font-size: 11px; }
+      #minimap { width: 70px; height: 70px; border-radius: 5px; }
+      .tool-icon-btn { width: 38px; height: 38px; border-radius: 8px; }
+      .ammo-slot { width: 48px; height: 52px; border-radius: 9px; }
+      .ammo-slot .ammo-ico img { width: 30px; height: 30px; }
+      #attack-btn { width: 70px; height: 70px; font-size: 10.5px; }
     }
 
     /* Mobil Yatay (Landscape) Ekranlar */
@@ -79,11 +91,11 @@
       #top-vital-hud {
         position: fixed; top: 6px; left: 50%; transform: translateX(-50%);
         width: min(70vw, 460px); display: flex; align-items: center; gap: 6px; z-index: 6; pointer-events: none;
-        background: linear-gradient(145deg, rgba(36, 15, 9, 0.94), rgba(14, 7, 5, 0.96));
-        padding: 3px 10px; border-radius: 10px; border: 1.5px solid rgba(212, 175, 55, 0.6);
+        background: var(--panel-bg);
+        padding: 3px 10px; border-radius: 10px; border: 1px solid var(--brass-border);
       }
-      .level-crest { width: 36px !important; height: 36px !important; border-radius: 8px !important; }
-      .level-crest strong { font-size: 13px !important; }
+      .level-crest { width: 34px !important; height: 34px !important; border-radius: 8px !important; }
+      .level-crest strong { font-size: 12.5px !important; }
       .vital-track { height: 12px !important; border-radius: 4px !important; }
       .vital-label { font-size: 9px !important; }
 
@@ -91,12 +103,12 @@
         position: fixed; top: 8px; left: 10px; display: flex; align-items: flex-start; gap: 8px; z-index: 6; pointer-events: none;
       }
       .radar-card { padding: 3px !important; border-radius: 8px !important; }
-      #minimap { width: 62px !important; height: 62px !important; border-radius: 4px !important; }
+      #minimap { width: 60px !important; height: 60px !important; border-radius: 4px !important; }
       .coord-pill { font-size: 9px !important; padding: 1px 4px !important; }
       .radar-title { font-size: 8px !important; margin-bottom: 1px; }
       .side-tool-col { flex-direction: row !important; gap: 4px !important; margin-top: 2px; }
       .tool-icon-btn { width: 32px !important; height: 32px !important; border-radius: 6px !important; }
-      .tool-icon-btn span.ico { font-size: 14px !important; }
+      .tool-icon-btn span.ico { font-size: 13px !important; }
       .tool-icon-btn span.lbl { display: none; }
 
       #bottom-dock {
@@ -109,82 +121,80 @@
       .ammo-slot .ammo-ico img { width: 26px !important; height: 26px !important; }
       .ammo-slot .ammo-qty { font-size: 9px !important; }
       .ammo-slot .key-hint { display: none !important; }
-      #attack-btn { width: 64px !important; height: 64px !important; font-size: 10px !important; }
-      #attack-btn .crosshair { font-size: 20px !important; }
+      #attack-btn { width: 62px !important; height: 62px !important; font-size: 9.5px !important; }
+      #attack-btn .crosshair { font-size: 18px !important; }
       #target-card { padding: 4px 8px !important; min-width: 110px !important; }
       .target-header { font-size: 9px !important; }
     }
 
     #map-transit-banner {
-      display: none; position: fixed; top: 85px; left: 50%; transform: translateX(-50%);
-      z-index: 12; background: linear-gradient(135deg, #5c1f12, #260d07);
-      border: 2px solid #eab308; border-radius: 14px; padding: 10px 22px;
-      color: #fef3c7; font-size: 13px; font-weight: 900; cursor: pointer;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.9); animation: pulseTransit 1.2s infinite alternate;
-      pointer-events: auto; letter-spacing: 0.5px;
+      display: none; position: fixed; top: 82px; left: 50%; transform: translateX(-50%);
+      z-index: 12; background: var(--panel-bg);
+      border: 1px solid var(--brass-border); border-radius: 12px; padding: 9px 20px;
+      color: var(--text-main); font-size: 12.5px; font-weight: 700; cursor: pointer;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.65); transition: border-color 0.2s, transform 0.2s;
+      pointer-events: auto; letter-spacing: 0.4px;
     }
+    #map-transit-banner:hover { border-color: var(--brass-accent); transform: translateX(-50%) translateY(-1px); }
     #map-transit-banner.visible { display: block; }
-    @keyframes pulseTransit {
-      from { transform: translateX(-50%) scale(1.0); box-shadow: 0 0 14px rgba(234, 179, 8, 0.45); }
-      to { transform: translateX(-50%) scale(1.06); box-shadow: 0 0 26px rgba(251, 191, 36, 0.8); }
-    }
 
     .level-crest {
-      width: 46px; height: 46px; flex-shrink: 0; border-radius: 12px;
-      background: linear-gradient(145deg, #4a1c10, #190905);
-      border: 2px solid #eab308; box-shadow: 0 4px 14px rgba(0,0,0,0.85);
+      width: 44px; height: 44px; flex-shrink: 0; border-radius: 10px;
+      background: linear-gradient(160deg, rgba(32, 38, 48, 0.92), rgba(14, 18, 25, 0.96));
+      border: 1px solid var(--brass-border); box-shadow: 0 6px 14px rgba(0,0,0,0.55);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
-    .level-crest span { font-size: 7px; color: #fbbf24; font-weight: 800; letter-spacing: 0.5px; }
-    .level-crest strong { font-size: 16px; color: #fffbeb; line-height: 1; }
+    .level-crest span { font-size: 7px; color: var(--brass-accent); font-weight: 700; letter-spacing: 0.8px; }
+    .level-crest strong { font-size: 15px; color: var(--text-main); line-height: 1.05; }
 
     .vital-bars-wrap { flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 200px; }
     .vital-track {
-      position: relative; width: 100%; height: 16px;
-      background: rgba(20, 9, 6, 0.94); border-radius: 6px; overflow: hidden;
-      border: 1px solid rgba(212, 175, 55, 0.35);
+      position: relative; width: 100%; height: 15px;
+      background: rgba(8, 12, 18, 0.88); border-radius: 5px; overflow: hidden;
+      border: 1px solid rgba(186, 152, 92, 0.2);
     }
-    #hp-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #7f1d1d, #dc2626, #f87171); transition: width 0.2s ease; }
-    #exp-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #92400e, #d97706, #fbbf24); transition: width 0.25s ease; }
+    #hp-bar { width: 100%; height: 100%; background: var(--hp-fill); transition: width 0.2s ease; }
+    #exp-bar { width: 0%; height: 100%; background: var(--exp-fill); transition: width 0.25s ease; }
     .vital-label {
       position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: 800; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.95);
+      font-size: 10.5px; font-weight: 700; color: #f3ede0; text-shadow: 0 1px 2px rgba(0,0,0,0.9);
     }
 
     .radar-card {
       pointer-events: auto;
-      background: linear-gradient(160deg, rgba(38, 16, 10, 0.96), rgba(15, 7, 5, 0.97));
-      border: 2px solid rgba(212, 175, 55, 0.6); border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.9);
+      background: var(--panel-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--brass-border); border-radius: 12px;
+      box-shadow: 0 10px 26px rgba(0,0,0,0.65);
       display: flex; flex-direction: column; align-items: center; gap: 3px;
     }
-    .radar-title { font-size: 9px; font-weight: 800; color: #fbbf24; letter-spacing: 0.5px; text-transform: uppercase; }
-    #minimap { background: #071926; border: 1px solid rgba(212, 175, 55, 0.5); display: block; }
+    .radar-title { font-size: 9px; font-weight: 700; color: var(--brass-accent); letter-spacing: 0.6px; text-transform: uppercase; }
+    #minimap { background: #07121c; border: 1px solid rgba(186, 152, 92, 0.28); display: block; }
     .coord-pill {
-      width: 100%; text-align: center; font-weight: 800;
-      background: rgba(12, 5, 3, 0.9); color: #fde68a;
-      border-radius: 4px; border: 1px solid rgba(212, 175, 55, 0.35);
+      width: 100%; text-align: center; font-weight: 600;
+      background: rgba(8, 12, 18, 0.85); color: var(--text-muted);
+      border-radius: 4px; border: 1px solid rgba(186, 152, 92, 0.18);
     }
 
     .side-tool-col { pointer-events: auto; display: flex; flex-direction: column; }
     .tool-icon-btn {
-      background: linear-gradient(155deg, #3b170e, #170805);
-      border: 1.5px solid rgba(212, 175, 55, 0.55); color: #fef3c7;
+      background: var(--panel-bg);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--brass-border); color: var(--text-main);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      cursor: pointer; box-shadow: 0 5px 14px rgba(0,0,0,0.8);
-      transition: transform 0.12s, border-color 0.15s, box-shadow 0.15s;
+      cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,0.55);
+      transition: transform 0.15s, border-color 0.15s, background 0.15s;
     }
-    .tool-icon-btn:hover { border-color: #fbbf24; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(245, 158, 11, 0.25); }
-    .tool-icon-btn:active { transform: scale(0.94); }
-    .tool-icon-btn span.ico { line-height: 1.1; }
-    .tool-icon-btn span.lbl { font-weight: 800; color: #fcd34d; }
-    
+    .tool-icon-btn:hover { border-color: var(--brass-accent); transform: translateY(-1px); background: rgba(25, 34, 46, 0.95); }
+    .tool-icon-btn:active { transform: scale(0.96); }
+    .tool-icon-btn span.ico { line-height: 1.1; opacity: 0.92; }
+    .tool-icon-btn span.lbl { font-weight: 600; color: var(--text-muted); }
+
     .ship-level-badge {
-      background: linear-gradient(135deg, #b45309, #78350f);
-      border: 1px solid #f59e0b; color: #fef3c7;
-      font-size: 9px; font-weight: 900; padding: 1px 5px; border-radius: 5px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.6); display: inline-flex; align-items: center;
-      letter-spacing: 0.3px; white-space: nowrap;
+      background: rgba(34, 42, 54, 0.92);
+      border: 1px solid rgba(186, 152, 92, 0.45); color: var(--brass-accent);
+      font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 4px;
+      display: inline-flex; align-items: center; white-space: nowrap;
     }
 
     #player-label {
@@ -194,13 +204,12 @@
       will-change: transform;
     }
     .ship-hp-track {
-      width: 52px; height: 5px; background: rgba(0, 0, 0, 0.75);
-      border: 1px solid rgba(251, 191, 36, 0.45); border-radius: 3px; overflow: hidden;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.8);
+      width: 50px; height: 4px; background: rgba(0, 0, 0, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 2px; overflow: hidden;
     }
-    #player-ship-hp-fill { width: 100%; height: 100%; background: #22c55e; transition: width 0.15s, background-color 0.2s; }
-    .ship-name-tag { font-size: 10px; font-weight: 900; color: #fffbeb; text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap; }
-    .ship-fleet-tag { font-size: 9px; font-weight: 800; color: #fbbf24; text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap; }
+    #player-ship-hp-fill { width: 100%; height: 100%; background: #4d9b6a; transition: width 0.15s, background-color 0.2s; }
+    .ship-name-tag { font-size: 10px; font-weight: 700; color: #ece4d4; text-shadow: 0 1px 3px rgba(0,0,0,0.9); white-space: nowrap; }
+    .ship-fleet-tag { font-size: 8.5px; font-weight: 600; color: var(--text-muted); text-shadow: 0 1px 2px rgba(0,0,0,0.9); white-space: nowrap; }
 
     .enemy-label {
       position: fixed; z-index: 5; pointer-events: none;
@@ -209,252 +218,254 @@
       will-change: transform;
     }
     .enemy-hp-track {
-      width: 44px; height: 4px; background: rgba(0, 0, 0, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 2px; overflow: hidden;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.8);
+      width: 42px; height: 3.5px; background: rgba(0, 0, 0, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 2px; overflow: hidden;
     }
-    .enemy-hp-fill { width: 100%; height: 100%; background: #ef4444; transition: width 0.15s; }
-    .enemy-name-tag { font-size: 9px; font-weight: 800; color: #fca5a5; text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap; }
+    .enemy-hp-fill { width: 100%; height: 100%; background: #b84a4a; transition: width 0.15s; }
+    .enemy-name-tag { font-size: 8.5px; font-weight: 700; color: #d5b4b4; text-shadow: 0 1px 2px rgba(0,0,0,0.9); white-space: nowrap; }
 
     .floating-dmg {
       position: fixed; z-index: 10; pointer-events: none;
-      font-weight: 900; font-size: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.9);
-      animation: floatUpAndFade 0.9s ease-out forwards;
+      font-weight: 700; font-size: 14px; text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+      animation: floatUpAndFade 0.85s ease-out forwards;
       transform: translate(-50%, -50%);
     }
     @keyframes floatUpAndFade {
-      0% { opacity: 1; transform: translate(-50%, 0) scale(1.2); }
-      100% { opacity: 0; transform: translate(-50%, -50px) scale(0.9); }
+      0% { opacity: 0.95; transform: translate(-50%, 0) scale(1.05); }
+      100% { opacity: 0; transform: translate(-50%, -38px) scale(0.95); }
     }
 
     .ammo-dock-container { pointer-events: auto; display: flex; flex-direction: column; gap: 4px; }
     .active-ammo-banner {
-      background: linear-gradient(90deg, rgba(38, 16, 10, 0.94), rgba(16, 7, 5, 0.96));
-      border: 1.5px solid rgba(212, 175, 55, 0.5); border-radius: 7px;
-      padding: 4px 10px; font-size: 11px; color: #fde68a; font-weight: 700;
+      background: var(--panel-bg);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(186, 152, 92, 0.28); border-radius: 7px;
+      padding: 4px 10px; font-size: 10.5px; color: var(--text-muted); font-weight: 600;
     }
-    .ammo-slots-row { display: flex; gap: 8px; padding-bottom: 2px; }
+    .ammo-slots-row { display: flex; gap: 7px; padding-bottom: 2px; }
     .ammo-slot {
       position: relative; flex-shrink: 0;
-      background: linear-gradient(165deg, #38160d, #150805);
-      border: 2px solid rgba(212, 175, 55, 0.45);
+      background: var(--panel-bg);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(186, 152, 92, 0.28);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      cursor: pointer; transition: all 0.15s ease; box-shadow: 0 5px 12px rgba(0,0,0,0.85);
+      cursor: pointer; transition: all 0.15s ease; box-shadow: 0 6px 16px rgba(0,0,0,0.6);
     }
     .ammo-slot.selected {
-      border-color: #fbbf24; background: linear-gradient(165deg, #6b2412, #2b0e07);
-      box-shadow: 0 0 16px rgba(245, 158, 11, 0.55); transform: translateY(-2px);
+      border-color: var(--brass-accent);
+      background: linear-gradient(170deg, rgba(36, 44, 56, 0.95), rgba(16, 21, 29, 0.98));
+      box-shadow: 0 6px 18px rgba(0,0,0,0.75); transform: translateY(-2px);
     }
-    .ammo-slot .key-hint { position: absolute; font-weight: 800; color: #fbbf24; z-index: 2; }
-    .ammo-slot .ammo-ico { display: flex; align-items: center; justify-content: center; width: 100%; height: 36px; margin-top: 6px; }
-    .ammo-slot .ammo-ico img { object-fit: contain; width: 38px; height: 38px; }
+    .ammo-slot .key-hint { position: absolute; font-weight: 700; color: var(--brass-accent); z-index: 2; }
+    .ammo-slot .ammo-ico { display: flex; align-items: center; justify-content: center; width: 100%; height: 34px; margin-top: 6px; }
+    .ammo-slot .ammo-ico img { object-fit: contain; width: 34px; height: 34px; opacity: 0.92; }
     .ammo-slot .ammo-qty {
-      font-weight: 900; color: #fffbeb; margin-top: 1px;
-      background: rgba(0,0,0,0.65); padding: 1px 6px; border-radius: 4px;
+      font-weight: 700; color: var(--text-main); margin-top: 1px;
+      background: rgba(8, 12, 18, 0.72); padding: 1px 6px; border-radius: 4px;
     }
-    .ammo-slot.empty { opacity: 0.45; }
+    .ammo-slot.empty { opacity: 0.4; }
 
     .right-combat-cluster { pointer-events: auto; display: flex; flex-direction: column; align-items: center; gap: 6px; }
     #target-card {
-      display: none; background: linear-gradient(145deg, rgba(44, 14, 10, 0.95), rgba(18, 6, 5, 0.96));
-      border: 1.5px solid #f59e0b; border-radius: 10px;
-      padding: 6px 10px; min-width: 140px; box-shadow: 0 6px 16px rgba(0,0,0,0.9);
+      display: none; background: var(--panel-bg);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--brass-border); border-radius: 10px;
+      padding: 6px 10px; min-width: 140px; box-shadow: 0 8px 20px rgba(0,0,0,0.65);
     }
     #target-card.visible { display: block; }
-    .target-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: #fde68a; margin-bottom: 3px; }
-    .target-hp-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.15); border-radius: 3px; overflow: hidden; }
-    #target-hp-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #dc2626, #f97316); transition: width 0.15s; }
+    .target-header { display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 700; color: var(--text-main); margin-bottom: 3px; }
+    .target-hp-bg { width: 100%; height: 5px; background: rgba(255,255,255,0.12); border-radius: 3px; overflow: hidden; }
+    #target-hp-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #7f2424, #b84444); transition: width 0.15s; }
 
     #attack-btn {
       border-radius: 50%;
-      border: 2.5px solid #eab308;
-      background: radial-gradient(circle at 35% 30%, #7c2312, #2b0c06 75%, #110402);
-      color: #fef3c7; font-weight: 900; letter-spacing: 0.4px;
-      box-shadow: 0 6px 22px rgba(0,0,0,0.9), inset 0 2px 6px rgba(251, 191, 36, 0.35);
-      cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
-      transition: all 0.16s ease;
+      border: 1.5px solid var(--brass-border);
+      background: radial-gradient(circle at 35% 30%, rgba(44, 34, 28, 0.95), rgba(14, 18, 25, 0.98) 80%);
+      color: var(--text-main); font-weight: 700; letter-spacing: 0.5px;
+      box-shadow: 0 10px 26px rgba(0,0,0,0.75);
+      cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+      transition: all 0.18s ease;
     }
+    #attack-btn:hover:not(:disabled) { border-color: var(--brass-accent); transform: scale(1.02); }
     #attack-btn.firing {
-      border-color: #ef4444;
-      background: radial-gradient(circle at 35% 30%, #dc2626, #7f1d1d 80%);
-      animation: pulseFire 1s infinite alternate;
+      border-color: #c95648;
+      background: radial-gradient(circle at 35% 30%, rgba(88, 32, 28, 0.95), rgba(22, 14, 16, 0.98) 85%);
     }
-    #attack-btn:disabled { opacity: 0.42; filter: grayscale(0.7); cursor: not-allowed; animation: none; }
-    @keyframes pulseFire {
-      from { box-shadow: 0 0 10px rgba(239, 68, 68, 0.55); }
-      to { box-shadow: 0 0 24px rgba(245, 158, 11, 0.95); }
-    }
+    #attack-btn:disabled { opacity: 0.4; filter: grayscale(0.6); cursor: not-allowed; }
 
-    /* Büyütülmüş ve Korsan Temalı Harita Penceresi */
+    /* Sinematik Büyütülmüş Harita Penceresi */
     #maps-panel {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
       width: min(96vw, 760px); max-height: 88vh;
-      background: linear-gradient(160deg, #2b120b, #140704);
-      border: 2.5px solid rgba(212, 175, 55, 0.75); border-radius: 18px; padding: 22px; z-index: 25;
-      box-shadow: 0 32px 85px rgba(0,0,0,0.96), inset 0 1px 0 rgba(251, 191, 36, 0.25);
+      background: var(--panel-bg);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--brass-border); border-radius: 16px; padding: 20px; z-index: 25;
+      box-shadow: 0 28px 70px rgba(0,0,0,0.82);
       pointer-events: auto; overflow-y: auto;
     }
     #maps-panel.open { display: block; }
     .maps-header {
       display: flex; justify-content: space-between; align-items: center;
-      background: linear-gradient(90deg, #5c2212, #2b1008); border: 1.5px solid rgba(212, 175, 55, 0.55);
-      padding: 11px 16px; border-radius: 12px; margin-bottom: 16px;
+      background: rgba(10, 14, 20, 0.72); border: 1px solid rgba(186, 152, 92, 0.24);
+      padding: 10px 15px; border-radius: 10px; margin-bottom: 14px;
     }
-    .maps-header strong { color: #fde68a; font-size: 16px; text-transform: uppercase; letter-spacing: 0.7px; }
+    .maps-header strong { color: var(--text-main); font-size: 14.5px; font-weight: 700; letter-spacing: 0.6px; }
     .maps-close {
-      background: rgba(251, 191, 36, 0.14); border: 1px solid rgba(212, 175, 55, 0.45);
-      color: #fef3c7; width: 32px; height: 32px; border-radius: 8px; font-weight: 800; cursor: pointer;
+      background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(186, 152, 92, 0.28);
+      color: var(--text-muted); width: 30px; height: 30px; border-radius: 8px; font-weight: 700; cursor: pointer;
     }
-    .maps-close:hover { background: rgba(220, 38, 38, 0.45); }
-    
+    .maps-close:hover { color: var(--text-main); border-color: var(--brass-accent); }
+
     .maps-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
     .map-box {
-      min-height: 98px; border-radius: 11px;
-      background: linear-gradient(165deg, #3b170e, #1a0905);
-      border: 2px solid rgba(212, 175, 55, 0.45);
+      min-height: 96px; border-radius: 10px;
+      background: rgba(11, 16, 23, 0.85);
+      border: 1px solid rgba(186, 152, 92, 0.22);
       display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 6px;
-      cursor: default; text-align: center; box-shadow: inset 0 2px 8px rgba(0,0,0,0.65);
-      transition: transform 0.15s, border-color 0.15s;
+      cursor: default; text-align: center;
+      transition: transform 0.15s, border-color 0.15s, background 0.15s;
     }
-    .map-box:hover { transform: translateY(-2px); border-color: rgba(251, 191, 36, 0.8); }
+    .map-box:hover { transform: translateY(-1px); border-color: rgba(186, 152, 92, 0.5); }
     .map-box.current {
-      background: linear-gradient(145deg, #7c2d12, #451a03);
-      border: 2.5px solid #fbbf24; box-shadow: 0 0 16px rgba(251, 191, 36, 0.5);
+      background: linear-gradient(160deg, rgba(44, 36, 24, 0.92), rgba(18, 22, 29, 0.96));
+      border: 1.5px solid var(--brass-accent);
     }
     .map-box.captured {
-      border-color: rgba(250, 204, 21, 0.9);
-      background: linear-gradient(145deg, #422006, #1c1917);
+      border-color: rgba(196, 164, 96, 0.65);
+      background: rgba(26, 24, 18, 0.9);
     }
-    .map-box .m-num { font-size: 14px; font-weight: 900; color: #fef3c7; line-height: 1.1; }
-    .map-box .m-name { font-size: 10px; font-weight: 800; color: #fcd34d; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
-    .map-box .m-owner { font-size: 9px; font-weight: 800; color: #d6b88c; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
-    .map-box.captured .m-owner { color: #fde047; }
+    .map-box .m-num { font-size: 13.5px; font-weight: 700; color: var(--text-main); line-height: 1.1; }
+    .map-box .m-name { font-size: 10px; font-weight: 600; color: var(--brass-accent); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+    .map-box .m-owner { font-size: 9px; font-weight: 600; color: var(--text-muted); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+    .map-box.captured .m-owner { color: #dcc38a; }
 
-    /* Korsan Temalı Liman / Market Penceresi */
+    /* Sinematik Liman / Market Penceresi */
     #market-panel {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
       width: min(94vw, 590px); max-height: 86vh;
-      background: linear-gradient(160deg, #2b120b, #120604);
-      backdrop-filter: blur(12px); border: 2.5px solid rgba(212, 175, 55, 0.72); border-radius: 18px;
-      z-index: 15; box-shadow: 0 30px 75px rgba(0,0,0,0.96); pointer-events: auto;
+      background: var(--panel-bg);
+      backdrop-filter: blur(14px); border: 1px solid var(--brass-border); border-radius: 16px;
+      z-index: 15; box-shadow: 0 28px 70px rgba(0,0,0,0.82); pointer-events: auto;
       display: flex; flex-direction: column; overflow: hidden;
     }
     #market-panel:not(.open) { display: none !important; }
     .market-panel-inner { display: flex; flex-direction: column; height: 100%; padding: 16px; overflow: hidden; }
-    .market-header { 
-      display: flex; justify-content: space-between; align-items: center; 
-      background: linear-gradient(90deg, #5c2212, #2b1008); border: 1.5px solid rgba(212, 175, 55, 0.5);
+    .market-header {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(10, 14, 20, 0.72); border: 1px solid rgba(186, 152, 92, 0.24);
       padding: 9px 14px; border-radius: 10px; margin-bottom: 10px; flex-shrink: 0;
     }
-    .market-header strong { color: #fde68a; font-size: 14px; text-transform: uppercase; letter-spacing: 0.6px; }
+    .market-header strong { color: var(--text-main); font-size: 13px; font-weight: 700; letter-spacing: 0.6px; }
     .market-close {
-      background: rgba(251, 191, 36, 0.14); border: 1px solid rgba(212, 175, 55, 0.45);
-      color: #fef3c7; width: 28px; height: 28px; border-radius: 8px; font-weight: 700; cursor: pointer;
+      background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(186, 152, 92, 0.28);
+      color: var(--text-muted); width: 28px; height: 28px; border-radius: 8px; font-weight: 700; cursor: pointer;
     }
-    
+    .market-close:hover { color: var(--text-main); border-color: var(--brass-accent); }
+
     .port-tabs-scroll { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 10px; flex-shrink: 0; }
     .market-tab-btn {
-      background: rgba(45, 18, 10, 0.75); border: 1px solid rgba(212, 175, 55, 0.35); color: #fcd34d;
-      padding: 7px 13px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap; flex-shrink: 0;
-      transition: all 0.2s;
+      background: rgba(12, 17, 24, 0.75); border: 1px solid rgba(186, 152, 92, 0.22); color: var(--text-muted);
+      padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      transition: all 0.15s;
     }
     .market-tab-btn.active {
-      background: linear-gradient(135deg, #b45309, #78350f);
-      color: #fffbeb; border-color: #fbbf24; box-shadow: 0 4px 12px rgba(180, 83, 9, 0.45);
+      background: rgba(42, 36, 26, 0.92);
+      color: var(--text-main); border-color: var(--brass-accent);
     }
-    
-    .market-balance { 
-      display: flex; justify-content: space-around; font-size: 12px; 
-      background: rgba(15, 6, 4, 0.78); border: 1px solid rgba(212, 175, 55, 0.4); 
-      padding: 8px; border-radius: 8px; margin-bottom: 10px; color: #fef3c7; font-weight: 700; flex-shrink: 0;
+
+    .market-balance {
+      display: flex; justify-content: space-around; font-size: 11.5px;
+      background: rgba(9, 13, 19, 0.8); border: 1px solid rgba(186, 152, 92, 0.22);
+      padding: 7px 10px; border-radius: 8px; margin-bottom: 10px; color: var(--text-muted); font-weight: 600; flex-shrink: 0;
     }
-    
+
     .market-scroll-body { flex: 1; overflow-y: auto; padding-right: 4px; max-height: 52vh; }
     .market-section { display: none; }
     .market-section.active { display: block; }
-    
-    .shipyard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding-bottom: 10px; }
+
+    .shipyard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 11px; padding-bottom: 10px; }
     .ship-card-item {
-      background: linear-gradient(165deg, rgba(43, 18, 11, 0.95), rgba(18, 7, 5, 0.97));
-      border: 1.5px solid rgba(212, 175, 55, 0.45); border-radius: 14px;
-      padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
-      box-shadow: 0 8px 22px rgba(0,0,0,0.8); transition: transform 0.15s, border-color 0.15s;
+      background: rgba(11, 16, 23, 0.85);
+      border: 1px solid rgba(186, 152, 92, 0.24); border-radius: 12px;
+      padding: 11px; display: flex; flex-direction: column; align-items: center; gap: 7px; text-align: center;
+      transition: transform 0.15s, border-color 0.15s;
     }
-    .ship-card-item:hover { border-color: #fbbf24; transform: translateY(-2px); }
+    .ship-card-item:hover { border-color: rgba(186, 152, 92, 0.55); transform: translateY(-1px); }
     .ship-card-img-wrap {
-      width: 100%; height: 112px; border-radius: 10px; 
-      background: radial-gradient(circle at 50% 50%, #1b3648, #071420);
-      border: 1.5px solid rgba(212, 175, 55, 0.45); display: flex; align-items: center; justify-content: center;
-      overflow: hidden; box-shadow: inset 0 3px 10px rgba(0,0,0,0.9); position: relative;
-      color: #fcd34d; font-size: 11px; font-weight: 700;
+      width: 100%; height: 108px; border-radius: 9px;
+      background: radial-gradient(circle at 50% 50%, #142636, #071018);
+      border: 1px solid rgba(186, 152, 92, 0.24); display: flex; align-items: center; justify-content: center;
+      overflow: hidden; position: relative;
+      color: var(--text-muted); font-size: 11px; font-weight: 600;
     }
     .ship-card-img-wrap img { width: 100%; height: 100%; object-fit: contain; display: block; }
-    .ship-card-title { font-size: 12px; font-weight: 800; color: #fef3c7; margin-top: 2px; }
-    .ship-card-sub { font-size: 10px; color: #d6b88c; line-height: 1.25; margin-bottom: 2px; }
+    .ship-card-title { font-size: 11.5px; font-weight: 700; color: var(--text-main); margin-top: 2px; }
+    .ship-card-sub { font-size: 10px; color: var(--text-muted); line-height: 1.25; }
 
     .market-item {
       display: flex; justify-content: space-between; align-items: center; gap: 8px;
-      background: linear-gradient(90deg, rgba(38, 15, 9, 0.92), rgba(18, 7, 5, 0.95));
-      border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 9px; padding: 8px 10px; margin-bottom: 7px;
+      background: rgba(11, 16, 23, 0.82);
+      border: 1px solid rgba(186, 152, 92, 0.2); border-radius: 9px; padding: 8px 10px; margin-bottom: 7px;
     }
     .market-item-info { display: flex; flex-direction: column; gap: 2px; }
-    .market-item-title { font-size: 12px; font-weight: 700; color: #fffbeb; display: flex; align-items: center; gap: 8px; }
-    .market-item-title img { width: 26px; height: 26px; object-fit: contain; }
-    .market-item-sub { font-size: 10px; color: #d6b88c; }
-    
+    .market-item-title { font-size: 11.5px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+    .market-item-title img { width: 24px; height: 24px; object-fit: contain; }
+    .market-item-sub { font-size: 10px; color: var(--text-muted); }
+
     .buy-btn {
       width: 100%; padding: 7px 12px; border-radius: 8px;
-      border: 1px solid #eab308; background: linear-gradient(135deg, #92400e, #5c220a);
-      color: #fffbeb; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap; margin-top: 4px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.6); transition: filter 0.15s;
+      border: 1px solid rgba(186, 152, 92, 0.45); background: rgba(34, 42, 54, 0.9);
+      color: var(--text-main); font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; margin-top: 3px;
+      transition: background 0.15s, border-color 0.15s;
     }
-    .buy-btn:hover:not(:disabled) { filter: brightness(1.15); }
-    .buy-btn:disabled { opacity: 0.45; background: rgba(45, 20, 12, 0.8); cursor: not-allowed; box-shadow: none; }
-    .buy-btn.equipped { background: linear-gradient(135deg, #15803d, #14532d); border-color: #4ade80; color: #f0fdf4; }
-    #market-feedback { font-size: 11px; min-height: 14px; margin-top: 5px; text-align: center; color: #4ade80; font-weight: 700; flex-shrink: 0; }
-    .generic-tab-content { text-align: center; padding: 40px 10px; color: #d6b88c; font-size: 13px; font-weight: 700; }
+    .buy-btn:hover:not(:disabled) { background: rgba(54, 48, 36, 0.95); border-color: var(--brass-accent); }
+    .buy-btn:disabled { opacity: 0.4; background: rgba(16, 20, 27, 0.7); cursor: not-allowed; }
+    .buy-btn.equipped { background: rgba(27, 56, 42, 0.9); border-color: rgba(94, 178, 134, 0.65); color: #d8f3e4; }
+    #market-feedback { font-size: 11px; min-height: 14px; margin-top: 5px; text-align: center; color: #8fd1ab; font-weight: 600; flex-shrink: 0; }
+    .generic-tab-content { text-align: center; padding: 40px 10px; color: var(--text-muted); font-size: 12.5px; font-weight: 600; }
 
     #gameover {
-      display: none; position: fixed; inset: 0; background: rgba(15, 6, 4, 0.94);
+      display: none; position: fixed; inset: 0; background: rgba(6, 10, 15, 0.88);
+      backdrop-filter: blur(6px);
       flex-direction: column; align-items: center; justify-content: center; z-index: 30; text-align: center; padding: 20px;
     }
-    #gameover h1 { color: #fbbf24; margin: 0 0 10px; font-size: 32px; }
-    #gameover p { font-size: 16px; margin: 0 0 24px; color: #fef3c7; }
+    #gameover h1 { color: var(--text-main); margin: 0 0 10px; font-size: 28px; font-weight: 700; letter-spacing: 1px; }
+    #gameover p { font-size: 15px; margin: 0 0 22px; color: var(--text-muted); }
     #restart-btn {
-      padding: 12px 28px; font-size: 16px; font-weight: bold; border-radius: 12px;
-      border: 2px solid #eab308; background: linear-gradient(135deg, #92400e, #5c220a); color: #fffbeb; cursor: pointer;
+      padding: 11px 26px; font-size: 14px; font-weight: 700; border-radius: 10px;
+      border: 1px solid var(--brass-accent); background: rgba(34, 42, 54, 0.95); color: var(--text-main); cursor: pointer;
     }
 
     #auth-overlay {
       position: fixed; inset: 0; z-index: 999999;
-      background: radial-gradient(circle at 50% 35%, rgba(45, 18, 10, 0.98), rgba(10, 4, 3, 0.99));
+      background: radial-gradient(circle at 50% 35%, #121d29, #060b10);
       backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 18px;
     }
     .auth-card {
-      width: 100%; max-width: 420px; background: linear-gradient(160deg, #2b120b, #120604);
-      border: 1.5px solid rgba(212,175,55,0.65); border-radius: 24px; padding: 28px 24px; box-shadow: 0 25px 70px rgba(0,0,0,0.95);
+      width: 100%; max-width: 410px; background: var(--panel-bg);
+      border: 1px solid var(--brass-border); border-radius: 18px; padding: 26px 22px; box-shadow: 0 25px 65px rgba(0,0,0,0.8);
     }
     .auth-brand { text-align: center; margin-bottom: 18px; }
-    .auth-brand h1 { margin: 0; font-size: 26px; color: #fde68a; }
-    .auth-brand p { margin: 6px 0 0; font-size: 12px; color: #d6b88c; }
-    .auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: rgba(251, 191, 36, 0.08); padding: 4px; border-radius: 12px; margin-bottom: 16px; }
-    .auth-tab { border: none; background: transparent; color: #fcd34d; padding: 10px; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; }
-    .auth-tab.active { background: linear-gradient(135deg, #b45309, #78350f); color: #fffbeb; }
-    .auth-field { margin-bottom: 14px; }
-    .auth-field label { display: block; font-size: 12px; color: #fcd34d; margin-bottom: 5px; font-weight: 600; }
+    .auth-brand h1 { margin: 0; font-size: 23px; color: var(--text-main); font-weight: 700; }
+    .auth-brand p { margin: 6px 0 0; font-size: 12px; color: var(--text-muted); }
+    .auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: rgba(8, 12, 18, 0.75); padding: 4px; border-radius: 10px; margin-bottom: 16px; border: 1px solid rgba(186, 152, 92, 0.18); }
+    .auth-tab { border: none; background: transparent; color: var(--text-muted); padding: 9px; border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+    .auth-tab.active { background: rgba(36, 44, 56, 0.95); color: var(--text-main); }
+    .auth-field { margin-bottom: 13px; }
+    .auth-field label { display: block; font-size: 11.5px; color: var(--text-muted); margin-bottom: 5px; font-weight: 600; }
     .auth-field input {
-      width: 100%; height: 46px; padding: 0 14px; border-radius: 12px;
-      border: 1px solid rgba(212, 175, 55, 0.45); background: #170805; color: #fffbeb; font-size: 16px; outline: none;
+      width: 100%; height: 44px; padding: 0 13px; border-radius: 10px;
+      border: 1px solid rgba(186, 152, 92, 0.28); background: rgba(8, 12, 18, 0.9); color: var(--text-main); font-size: 15px; outline: none;
     }
-    .auth-msg { min-height: 18px; font-size: 12px; margin: 4px 0 12px; color: #fca5a5; }
+    .auth-msg { min-height: 18px; font-size: 12px; margin: 4px 0 10px; color: #d68484; }
     .auth-submit {
-      width: 100%; height: 50px; border-radius: 14px; border: 1.5px solid #eab308;
-      background: linear-gradient(135deg, #b45309, #78350f); color: #fffbeb; font-size: 15px; font-weight: 900; cursor: pointer;
+      width: 100%; height: 46px; border-radius: 11px; border: 1px solid var(--brass-accent);
+      background: rgba(36, 44, 56, 0.95); color: var(--text-main); font-size: 14px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px;
     }
-    .quick-test-box { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(212, 175, 55, 0.25); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #fde68a; }
+    .quick-test-box { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(186, 152, 92, 0.18); display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; color: var(--text-muted); }
     .quick-test-btn {
-      border: 1px solid rgba(251, 191, 36, 0.55); background: rgba(146, 64, 14, 0.45);
-      color: #fef3c7; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer;
+      border: 1px solid rgba(186, 152, 92, 0.35); background: rgba(20, 27, 36, 0.9);
+      color: var(--text-main); padding: 5px 10px; border-radius: 7px; font-size: 11px; font-weight: 600; cursor: pointer;
     }
   </style>
 
@@ -503,7 +514,7 @@
         <span class="ico">⚓</span>
         <span class="lbl">Liman</span>
       </button>
-      <button id="logout-btn" class="tool-icon-btn" type="button" title="Çıkış Yap" style="background: linear-gradient(155deg, #7f1d1d, #450a0a); border-color: rgba(248, 113, 113, 0.55);">
+      <button id="logout-btn" class="tool-icon-btn" type="button" title="Çıkış Yap" style="background: rgba(34, 18, 20, 0.9); border-color: rgba(185, 92, 92, 0.35);">
         <span class="ico">🚪</span>
         <span class="lbl">Çıkış</span>
       </button>
@@ -516,9 +527,9 @@
       <div class="ammo-slots-row" id="ammo-slots-row">
         <div class="ammo-slot selected" data-type="iron"><span class="key-hint">1</span><span class="ammo-ico">⚫</span><span class="ammo-qty" id="qty-iron">1m</span></div>
         <div class="ammo-slot" data-type="chain"><span class="key-hint">2</span><span class="ammo-ico"><img src="zincir.png" alt="Zincirli Gülle" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\' viewBox=\'0 0 24 24\' fill=\'%2394a3b8\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';"></span><span class="ammo-qty" id="qty-chain">1m</span></div>
-        <div class="ammo-slot" data-type="fire"><span class="key-hint">3</span><span class="ammo-ico"><img src="alev.png" alt="Alev Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\' viewBox=\'0 0 24 24\' fill=\'%23f97316\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';"></span><span class="ammo-qty" id="qty-fire">1m</span></div>
-        <div class="ammo-slot" data-type="amiral"><span class="key-hint">4</span><span class="ammo-ico"><img src="amiral.png" alt="Amiral Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\' viewBox=\'0 0 24 24\' fill=\'%2338bdf8\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';"></span><span class="ammo-qty" id="qty-amiral">1m</span></div>
-        <div class="ammo-slot" data-type="snow"><span class="key-hint">5</span><span class="ammo-ico"><img src="kar.png" alt="Kar Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\' viewBox=\'0 0 24 24\' fill=\'%23ffffff\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';"></span><span class="ammo-qty" id="qty-snow">1m</span></div>
+        <div class="ammo-slot" data-type="fire"><span class="key-hint">3</span><span class="ammo-ico"><img src="alev.png" alt="Alev Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\' viewBox=\'0 0 24 24\' fill=\'%23c87d4b\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';"></span><span class="ammo-qty" id="qty-fire">1m</span></div>
+        <div class="ammo-slot" data-type="amiral"><span class="key-hint">4</span><span class="ammo-ico"><img src="amiral.png" alt="Amiral Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\' viewBox=\'0 0 24 24\' fill=\'%236ba3c7\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';"></span><span class="ammo-qty" id="qty-amiral">1m</span></div>
+        <div class="ammo-slot" data-type="snow"><span class="key-hint">5</span><span class="ammo-ico"><img src="kar.png" alt="Kar Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\' viewBox=\'0 0 24 24\' fill=\'%23d8e2eb\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';"></span><span class="ammo-qty" id="qty-snow">1m</span></div>
       </div>
     </div>
 
@@ -552,10 +563,10 @@
         <button id="tab-crew" class="market-tab-btn" type="button">Tayfa</button>
       </div>
       <div class="market-balance">
-        <span>Altın: <strong id="market-gold" style="color:#ffd783;">100,000,000</strong></span>
-        <span>Elmas: <strong id="market-diamond" style="color:#38bdf8;">1,103</strong></span>
+        <span>Altın: <strong id="market-gold" style="color:#dfc07d;">100,000,000</strong></span>
+        <span>Elmas: <strong id="market-diamond" style="color:#7fb8d9;">1,103</strong></span>
       </div>
-      
+
       <div class="market-scroll-body">
         <div id="section-ammo" class="market-section active">
           <div class="market-item">
@@ -575,7 +586,7 @@
           <div class="market-item">
             <div class="market-item-info">
               <span class="market-item-title">
-                <img src="alev.png" alt="Alev Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%23f97316\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">
+                <img src="alev.png" alt="Alev Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%23c87d4b\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">
                 15x Alevli Gülle
               </span>
               <span class="market-item-sub">30.000 Hasar · NPC'lere %20 Ekstra Hasar</span>
@@ -585,7 +596,7 @@
           <div class="market-item">
             <div class="market-item-info">
               <span class="market-item-title">
-                <img src="amiral.png" alt="Amiral Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%2338bdf8\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">
+                <img src="amiral.png" alt="Amiral Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%236ba3c7\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">
                 10x Amiral Güllesi
               </span>
               <span class="market-item-sub">40.000 Hasar · Gerçek oyunculara özel yıkım</span>
@@ -595,7 +606,7 @@
           <div class="market-item">
             <div class="market-item-info">
               <span class="market-item-title">
-                <img src="kar.png" alt="Kar Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%23ffffff\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">
+                <img src="kar.png" alt="Kar Güllesi" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'%23d8e2eb\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg>';">
                 20x Kar Güllesi
               </span>
               <span class="market-item-sub">+25.000 Can Doldurur (NPC hariç)</span>
@@ -605,32 +616,32 @@
         </div>
 
         <div id="section-shipyard" class="market-section"><div class="shipyard-grid" id="shipyard-list"></div></div>
-        
+
         <div id="section-expand" class="market-section">
-          <div style="background: rgba(180, 83, 9, 0.18); border: 1px solid rgba(251, 191, 36, 0.4); padding: 10px; border-radius: 10px; margin-bottom: 12px; font-size: 11px; color: #fde68a; text-align: center;">
+          <div style="background: rgba(186, 152, 92, 0.08); border: 1px solid rgba(186, 152, 92, 0.24); padding: 10px; border-radius: 10px; margin-bottom: 12px; font-size: 11px; color: var(--text-muted); text-align: center;">
             Kalan Genişletme Hakları (Her türden 1 adet kullanılabilir):<br>
-            Top Hak: <strong id="rights-cannon" style="color:#fbbf24;">1</strong> | Can Hak: <strong id="rights-hp" style="color:#f87171;">1</strong> | Hız Hak: <strong id="rights-speed" style="color:#4ade80;">1</strong>
+            Top Hak: <strong id="rights-cannon" style="color:#dfc07d;">1</strong> | Can Hak: <strong id="rights-hp" style="color:#d48a8a;">1</strong> | Hız Hak: <strong id="rights-speed" style="color:#8fd1ab;">1</strong>
           </div>
           <div class="market-item">
             <div class="market-item-info">
               <span class="market-item-title">🎯 TOP GENİŞLETMESİ</span>
-              <span class="market-item-sub">Kapasite: <strong id="stat-cannons" style="color:#fbbf24;">250</strong> Top (+20 Top artırır)</span>
+              <span class="market-item-sub">Kapasite: <strong id="stat-cannons" style="color:#dfc07d;">250</strong> Top (+20 Top artırır)</span>
             </div>
-            <button class="buy-btn" id="btn-expand-cannon" type="button" style="width:auto; background: linear-gradient(135deg, #b45309, #78350f); border-color: #f59e0b;">5 Elmas</button>
+            <button class="buy-btn" id="btn-expand-cannon" type="button" style="width:auto;">5 Elmas</button>
           </div>
           <div class="market-item">
             <div class="market-item-info">
               <span class="market-item-title">❤️ CAN GENİŞLETMESİ</span>
-              <span class="market-item-sub">Toplam Can: <strong id="stat-hp" style="color:#f87171;">1.000.000</strong> (+50.000 Can artırır)</span>
+              <span class="market-item-sub">Toplam Can: <strong id="stat-hp" style="color:#d48a8a;">1.000.000</strong> (+50.000 Can artırır)</span>
             </div>
-            <button class="buy-btn" id="btn-expand-hp" type="button" style="width:auto; background: linear-gradient(135deg, #991b1b, #7f1d1d); border-color: #f87171;">5 Elmas</button>
+            <button class="buy-btn" id="btn-expand-hp" type="button" style="width:auto;">5 Elmas</button>
           </div>
           <div class="market-item">
             <div class="market-item-info">
               <span class="market-item-title">⚡ HIZ GENİŞLETMESİ</span>
-              <span class="market-item-sub">Gemi Hızı: <strong id="stat-speed" style="color:#4ade80;">180</strong> (%2 Hız artırır)</span>
+              <span class="market-item-sub">Gemi Hızı: <strong id="stat-speed" style="color:#8fd1ab;">180</strong> (%2 Hız artırır)</span>
             </div>
-            <button class="buy-btn" id="btn-expand-speed" type="button" style="width:auto; background: linear-gradient(135deg, #166534, #14532d); border-color: #4ade80;">5 Elmas</button>
+            <button class="buy-btn" id="btn-expand-speed" type="button" style="width:auto;">5 Elmas</button>
           </div>
         </div>
 
@@ -769,9 +780,9 @@ function formatShortNumber(num) {
 const AMMO_TYPES = {
   iron:   { id: 'iron',   name: 'Demir Gülle',    damage: 180, slow: 1.0,  isHeal: false, bonusNpc: 1.0, desc: '180 Hasar', color: 0x555555 },
   chain:  { id: 'chain',  name: 'Zincirli Gülle', damage: 140, slow: 0.6,  isHeal: false, bonusNpc: 1.0, desc: '140 Hasar + %40 Yavaşlatma', color: 0x888888, img: 'zincir.png' },
-  fire:   { id: 'fire',   name: 'Alev Güllesi',   damage: 30000, slow: 1.0, isHeal: false, bonusNpc: 1.2, desc: '30.000 Hasar (NPC\'lere +%20 Ekstra)', color: 0xff3300, img: 'alev.png' },
-  amiral: { id: 'amiral', name: 'Amiral Güllesi', damage: 40000, slow: 0.85,isHeal: false, bonusNpc: 1.0, desc: '40.000 Yıkıcı Hasar', color: 0x3b82f6, img: 'amiral.png' },
-  snow:   { id: 'snow',   name: 'Kar Güllesi',    damage: 25000, slow: 1.0,  isHeal: true,  bonusNpc: 1.0, desc: '+25.000 Can Doldurur', color: 0xffffff, img: 'kar.png' }
+  fire:   { id: 'fire',   name: 'Alev Güllesi',   damage: 30000, slow: 1.0, isHeal: false, bonusNpc: 1.2, desc: '30.000 Hasar (NPC\'lere +%20 Ekstra)', color: 0xd96b27, img: 'alev.png' },
+  amiral: { id: 'amiral', name: 'Amiral Güllesi', damage: 40000, slow: 0.85,isHeal: false, bonusNpc: 1.0, desc: '40.000 Yıkıcı Hasar', color: 0x4f86b8, img: 'amiral.png' },
+  snow:   { id: 'snow',   name: 'Kar Güllesi',    damage: 25000, slow: 1.0,  isHeal: true,  bonusNpc: 1.0, desc: '+25.000 Can Doldurur', color: 0xdbe6ef, img: 'kar.png' }
 };
 
 const REMOVED_SHIP_IDS = [
@@ -781,16 +792,16 @@ const REMOVED_SHIP_IDS = [
 
 const BASE_SHIP_MODELS = {
   standard:         { id: 'standard',         name: 'Ejderha Kalyonu', desc: 'Başlangıç 3D Savaş Gemisi', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45 },
-  deneme1:          { id: 'deneme1',          name: 'Deneme 1 · Altın Güneş', desc: 'Parlak Altın Aura · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'gold' },
-  deneme2:          { id: 'deneme2',          name: 'Deneme 2 · Zümrüt Leviathan', desc: 'Parlak Zümrüt Aura · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'emerald' },
-  deneme3:          { id: 'deneme3',          name: 'Deneme 3 · Mor Gölge', desc: 'Parlak Mor Aura · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'violet' },
-  deneme4:          { id: 'deneme4',          name: 'Deneme 4 · Kızıl Cehennem', desc: 'Parlak Kızıl Aura · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'crimson' },
-  deneme5:          { id: 'deneme5',          name: 'Deneme 5 · Buzul Kraliyet', desc: 'Parlak Buzul Aura · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, scaleMultiplier: 1.12, denemeStyle: 'frost' },
+  deneme1:          { id: 'deneme1',          name: 'Deneme 1 · Altın Güneş', desc: 'Sakin Altın Işıltı · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'gold' },
+  deneme2:          { id: 'deneme2',          name: 'Deneme 2 · Zümrüt Leviathan', desc: 'Sakin Zümrüt Işıltı · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'emerald' },
+  deneme3:          { id: 'deneme3',          name: 'Deneme 3 · Mor Gölge', desc: 'Sakin Mor Işıltı · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'violet' },
+  deneme4:          { id: 'deneme4',          name: 'Deneme 4 · Kızıl Cehennem', desc: 'Sakin Kızıl Işıltı · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'crimson' },
+  deneme5:          { id: 'deneme5',          name: 'Deneme 5 · Buzul Kraliyet', desc: 'Sakin Buzul Işıltı · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, scaleMultiplier: 1.12, denemeStyle: 'frost' },
   tasarim2:         { id: 'tasarim2',         name: 'Tasarim 2', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim2.glb', heightOffset: 45, rotationOffset: Math.PI / 2 },
   tasarim3:         { id: 'tasarim3',         name: 'Tasarim 3', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3 },
-  tasarim3_hayalet: { id: 'tasarim3_hayalet', name: 'Tasarim 3 · Hayalet', desc: 'Sürekli Parlayıp Sönen Hayalet Kopya', cost: 0, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3, phantomStyle: 'specter_teal' },
+  tasarim3_hayalet: { id: 'tasarim3_hayalet', name: 'Tasarim 3 · Hayalet', desc: 'Sakin Hayalet Işıltı', cost: 0, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3, phantomStyle: 'specter_teal' },
   tasarim4:         { id: 'tasarim4',         name: 'Tasarim 4', desc: 'GLB Savaş Gemisi', cost: 3500, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2 },
-  tasarim4_hayalet: { id: 'tasarim4_hayalet', name: 'Tasarim 4 · Hayalet', desc: 'Mor Ruhani Parlayıp Sönen Hayalet', cost: 0, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2, phantomStyle: 'specter_violet' },
+  tasarim4_hayalet: { id: 'tasarim4_hayalet', name: 'Tasarim 4 · Hayalet', desc: 'Sakin Mor Ruhani Işıltı', cost: 0, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2, phantomStyle: 'specter_violet' },
   tasarim6:         { id: 'tasarim6',         name: 'Tasarim 6', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim6.glb', heightOffset: 85 },
   tasarim7:         { id: 'tasarim7',         name: 'Tasarim 7', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim7.glb', heightOffset: 45, rotationOffset: Math.PI },
   tasarim8:         { id: 'tasarim8',         name: 'Tasarim 8', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim8.glb', heightOffset: 85 },
@@ -799,91 +810,91 @@ const BASE_SHIP_MODELS = {
 
 const PHANTOM_THEMES = {
   specter_teal: {
-    color: 0x67e8f9,
-    emissive: 0x0891b2,
-    baseEmissive: 0.28,
-    peakEmissive: 1.5,
-    minOpacity: 0.28,
-    maxOpacity: 0.88,
-    lightColor: 0x22d3ee,
-    baseLight: 0.25,
-    peakLight: 1.25,
-    pulseSpeed: 3.4
+    color: 0x7cc6d4,
+    emissive: 0x2b7a8b,
+    baseEmissive: 0.16,
+    peakEmissive: 0.65,
+    minOpacity: 0.36,
+    maxOpacity: 0.82,
+    lightColor: 0x5ab8c9,
+    baseLight: 0.15,
+    peakLight: 0.55,
+    pulseSpeed: 2.2
   },
   specter_violet: {
-    color: 0xc084fc,
-    emissive: 0x9333ea,
-    baseEmissive: 0.45,
-    peakEmissive: 1.85,
-    minOpacity: 0.32,
-    maxOpacity: 0.9,
-    lightColor: 0xa855f7,
-    baseLight: 0.45,
-    peakLight: 1.65,
-    pulseSpeed: 3.5
+    color: 0xb094cf,
+    emissive: 0x674188,
+    baseEmissive: 0.2,
+    peakEmissive: 0.75,
+    minOpacity: 0.38,
+    maxOpacity: 0.84,
+    lightColor: 0x9675bd,
+    baseLight: 0.18,
+    peakLight: 0.6,
+    pulseSpeed: 2.2
   }
 };
 
 const DENEME_THEMES = {
   gold: {
-    color: 0xfef08a,
-    emissive: 0xf59e0b,
-    emissiveIntensity: 0.46,
-    metalnessAdd: 0.26,
-    roughnessSub: 0.2,
-    lightColor: 0xffd166,
-    lightIntensity: 0.95,
-    crystalColor: 0xfde047,
-    lanternColor: 0xffb703,
-    pulseSpeed: 2.5
+    color: 0xe8d59e,
+    emissive: 0xb88934,
+    emissiveIntensity: 0.24,
+    metalnessAdd: 0.18,
+    roughnessSub: 0.14,
+    lightColor: 0xe0b55b,
+    lightIntensity: 0.45,
+    crystalColor: 0xd9b35f,
+    lanternColor: 0xc9963b,
+    pulseSpeed: 1.8
   },
   emerald: {
-    color: 0xa7f3d0,
-    emissive: 0x10b981,
-    emissiveIntensity: 0.46,
-    metalnessAdd: 0.24,
-    roughnessSub: 0.22,
-    lightColor: 0x34d399,
-    lightIntensity: 0.95,
-    crystalColor: 0x6ee7b7,
-    lanternColor: 0x10b981,
-    pulseSpeed: 2.6
+    color: 0xa5cfb8,
+    emissive: 0x2e7d5b,
+    emissiveIntensity: 0.24,
+    metalnessAdd: 0.16,
+    roughnessSub: 0.14,
+    lightColor: 0x5da887,
+    lightIntensity: 0.45,
+    crystalColor: 0x7db89d,
+    lanternColor: 0x3b8c6a,
+    pulseSpeed: 1.8
   },
   violet: {
-    color: 0xede9fe,
-    emissive: 0x8b5cf6,
-    emissiveIntensity: 0.48,
-    metalnessAdd: 0.26,
-    roughnessSub: 0.2,
-    lightColor: 0xc084fc,
-    lightIntensity: 0.95,
-    crystalColor: 0xd8b4fe,
-    lanternColor: 0x8b5cf6,
-    pulseSpeed: 2.4
+    color: 0xc7bce0,
+    emissive: 0x5b468c,
+    emissiveIntensity: 0.25,
+    metalnessAdd: 0.18,
+    roughnessSub: 0.14,
+    lightColor: 0x8e79bd,
+    lightIntensity: 0.45,
+    crystalColor: 0xa794cf,
+    lanternColor: 0x6c559e,
+    pulseSpeed: 1.7
   },
   crimson: {
-    color: 0xfecaca,
-    emissive: 0xef4444,
-    emissiveIntensity: 0.5,
-    metalnessAdd: 0.22,
-    roughnessSub: 0.18,
-    lightColor: 0xf87171,
-    lightIntensity: 1.0,
-    crystalColor: 0xfca5a5,
-    lanternColor: 0xef4444,
-    pulseSpeed: 3.0
+    color: 0xdfb0a8,
+    emissive: 0x9c382c,
+    emissiveIntensity: 0.26,
+    metalnessAdd: 0.16,
+    roughnessSub: 0.14,
+    lightColor: 0xc96457,
+    lightIntensity: 0.48,
+    crystalColor: 0xd4857a,
+    lanternColor: 0xad4437,
+    pulseSpeed: 1.9
   },
   frost: {
-    color: 0xe0f2fe,
-    emissive: 0x38bdf8,
-    emissiveIntensity: 0.46,
-    metalnessAdd: 0.2,
-    roughnessSub: 0.25,
-    lightColor: 0x7dd3fc,
-    lightIntensity: 0.95,
-    crystalColor: 0xbae6fd,
-    lanternColor: 0x38bdf8,
-    pulseSpeed: 2.5
+    color: 0xbdd5e3,
+    emissive: 0x3b7699,
+    emissiveIntensity: 0.24,
+    metalnessAdd: 0.14,
+    roughnessSub: 0.16,
+    lightColor: 0x73a8c7,
+    lightIntensity: 0.45,
+    crystalColor: 0x95c2db,
+    lanternColor: 0x4b89ad,
+    pulseSpeed: 1.8
   }
 };
 
@@ -1029,7 +1040,7 @@ function applyPhantomShipStyling(shipMesh, phantomKey = 'specter_teal') {
     }
   });
 
-  activePhantomLight = new THREE.PointLight(theme.lightColor, theme.baseLight, 60);
+  activePhantomLight = new THREE.PointLight(theme.lightColor, theme.baseLight, 50);
   activePhantomLight.position.set(0, 14, 0);
   shipMesh.add(activePhantomLight);
 }
@@ -1038,16 +1049,16 @@ function createLanternAssembly(theme, scale = 1) {
   const lantern = new THREE.Group();
 
   const capMat = new THREE.MeshStandardMaterial({
-    color: 0x1e293b,
-    metalness: 0.85,
-    roughness: 0.25
+    color: 0x262f3b,
+    metalness: 0.7,
+    roughness: 0.35
   });
   const coreMat = new THREE.MeshStandardMaterial({
     color: theme.lanternColor,
     emissive: theme.lanternColor,
-    emissiveIntensity: 1.25,
-    roughness: 0.2,
-    metalness: 0.2
+    emissiveIntensity: 0.55,
+    roughness: 0.3,
+    metalness: 0.25
   });
 
   const baseMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.14 * scale, 0.18 * scale, 0.08 * scale, 8), capMat);
@@ -1096,9 +1107,9 @@ function attachDeneme3DProps(shipMesh, theme, bounds, shipSize) {
   const crystalMat = new THREE.MeshStandardMaterial({
     color: theme.crystalColor,
     emissive: theme.lanternColor,
-    emissiveIntensity: 1.05,
-    metalness: 0.65,
-    roughness: 0.18
+    emissiveIntensity: 0.45,
+    metalness: 0.55,
+    roughness: 0.28
   });
 
   denemeCrystalsMeta = [];
@@ -1117,7 +1128,7 @@ function attachDeneme3DProps(shipMesh, theme, bounds, shipSize) {
       orbitRx,
       orbitRz,
       baseY: crystalY,
-      orbitSpeed: 0.85,
+      orbitSpeed: 0.75,
       bobAmp: Math.max(0.03, shipSize.y * 0.008),
       phase: i * 1.25
     });
@@ -1144,10 +1155,10 @@ function applyDenemeShipStyling(shipMesh, styleKey = 'gold', options = { with3DP
           mat.emissiveIntensity = theme.emissiveIntensity;
         }
         if (typeof mat.metalness === 'number') {
-          mat.metalness = Math.min(0.8, (mat.metalness || 0.25) + theme.metalnessAdd);
+          mat.metalness = Math.min(0.65, (mat.metalness || 0.25) + theme.metalnessAdd);
         }
         if (typeof mat.roughness === 'number') {
-          mat.roughness = Math.max(0.22, (mat.roughness || 0.6) - theme.roughnessSub);
+          mat.roughness = Math.max(0.32, (mat.roughness || 0.6) - theme.roughnessSub);
         }
         mat.needsUpdate = true;
         denemeMaterialsList.push(mat);
@@ -1166,7 +1177,7 @@ function applyDenemeShipStyling(shipMesh, styleKey = 'gold', options = { with3DP
   }
 
   if (typeof THREE !== 'undefined') {
-    activeDenemeLight = new THREE.PointLight(theme.lightColor, theme.lightIntensity, 85);
+    activeDenemeLight = new THREE.PointLight(theme.lightColor, theme.lightIntensity, 70);
     activeDenemeLight.position.set(0, 16, 0);
     shipMesh.add(activeDenemeLight);
   }
@@ -1275,8 +1286,8 @@ function getShipThumbnail(modelSpec, callback) {
     pCamera.position.set(0, 50, 120);
     pCamera.lookAt(0, 0, 0);
 
-    pScene.add(new THREE.AmbientLight(0xffffff, 1.0));
-    const pDir = new THREE.DirectionalLight(0xfff5cc, 1.0);
+    pScene.add(new THREE.AmbientLight(0xffffff, 0.9));
+    const pDir = new THREE.DirectionalLight(0xf5ebd6, 0.85);
     pDir.position.set(50, 100, 50);
     pScene.add(pDir);
 
@@ -1338,11 +1349,11 @@ if (fillTestBtn) fillTestBtn.addEventListener('click', () => { authUsernameInput
 function completeLogin(user) {
   const owned = sanitizeOwnedShips(user.ownedShips);
   const equipped = sanitizeShipId(user.equippedShip);
-  currentUser = { 
-    id: user.id, 
-    username: user.username, 
-    ownedShips: owned, 
-    equippedShip: equipped 
+  currentUser = {
+    id: user.id,
+    username: user.username,
+    ownedShips: owned,
+    equippedShip: equipped
   };
   try { localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser)); } catch(e) {}
   tagUsernameEl.textContent = currentUser.username;
@@ -1372,7 +1383,7 @@ if (logoutBtn) logoutBtn.addEventListener('click', () => { try { localStorage.re
 let scene, camera, renderer;
 let oceanTexture = null, oceanBumpTexture = null;
 let activeGlbShip = null, playerNeonRing, enemies = [], defenseTowers = [], rangeRingMesh;
-let activeProjectiles = [], particleSystems = [], cannonEffects = [], castleFlameSystems = [], flameEmberParticles = [], sinkExplosions = [];
+let activeProjectiles = [], particleSystems = [], cannonEffects = [], castleFlameSystems = [], flameEmberParticles = [], sinkSparks = [];
 let activeDefenseIslandGroup = null;
 let raycaster, planeGeo, mouse;
 let selectedRingMesh = null;
@@ -1385,14 +1396,14 @@ let isDraggingCamera = false;
 let dragStartX = 0, dragStartY = 0;
 let hasDragged = false;
 
-const WORLD_SIZE = 9900; 
-const ATTACK_RANGE = 300; 
+const WORLD_SIZE = 9900;
+const ATTACK_RANGE = 300;
 const SHIP_Y_POS = 100;
 
 const CAMERA_HEIGHT = 800;
 const CAMERA_DEPTH = 650;
 
-let currentMapIndex = 0; 
+let currentMapIndex = 0;
 const MAP_DATA = [
   { id: 1, name: "Harita 1", subtitle: "Sığcık Limanı", levelReq: "Seviye 1+", col: 0, row: 0, ownerFleet: null },
   { id: 2, name: "Harita 2", subtitle: "Martı Kıyıları", levelReq: "Seviye 2+", col: 1, row: 0, ownerFleet: null },
@@ -1544,81 +1555,63 @@ function setPlayerDestination(toX, toZ) {
   targetDestination = navigationQueue.shift() || null;
 }
 
-function triggerSinkExplosion(wx, wz, scale = 1.0) {
+/* Gerçekçi & Ölçülü Batış Kıvılcım Efekti */
+function triggerSinkSparks(wx, wz, scale = 1.0) {
   if (!scene || typeof THREE === 'undefined') return;
-  const baseY = 14;
+  const baseY = 12;
 
-  const shockGeo = new THREE.RingGeometry(4 * scale, 9 * scale, 28);
-  const shockMat = new THREE.MeshBasicMaterial({
-    color: 0xffb703,
-    side: THREE.DoubleSide,
-    transparent: true,
-    opacity: 0.92
-  });
-  const shockRing = new THREE.Mesh(shockGeo, shockMat);
-  shockRing.rotation.x = -Math.PI / 2;
-  shockRing.position.set(wx, 2.5, wz);
-  scene.add(shockRing);
+  const sparkGeo = new THREE.BoxGeometry(0.65 * scale, 2.4 * scale, 0.65 * scale);
+  const sparkColors = [0xffc86b, 0xff9d3b, 0xe87a24, 0xfff1cc];
+  const sparkCount = 26;
 
-  const flashGeo = new THREE.SphereGeometry(12 * scale, 14, 14);
-  const flashMat = new THREE.MeshBasicMaterial({
-    color: 0xfff3b0,
-    transparent: true,
-    opacity: 0.95
-  });
-  const flashCore = new THREE.Mesh(flashGeo, flashMat);
-  flashCore.position.set(wx, baseY + 6 * scale, wz);
-  scene.add(flashCore);
-
-  const expLight = new THREE.PointLight(0xff5500, 3.2 * scale, 240 * scale);
-  expLight.position.set(wx, baseY + 24 * scale, wz);
-  scene.add(expLight);
-
-  const pieces = [];
-  const palette = [0xff2a00, 0xff6a00, 0xffb703, 0x334155, 0x1e293b];
-  const pieceCount = 22;
-
-  for (let i = 0; i < pieceCount; i++) {
-    const isSmoke = i >= 16;
-    const pMat = new THREE.MeshBasicMaterial({
-      color: palette[i % palette.length],
+  for (let i = 0; i < sparkCount; i++) {
+    const sMat = new THREE.MeshBasicMaterial({
+      color: sparkColors[i % sparkColors.length],
       transparent: true,
-      opacity: isSmoke ? 0.75 : 0.96
+      opacity: 0.92
     });
-    const pMesh = new THREE.Mesh(SHARED_PARTICLE_GEO, pMat);
-    const pScale = (isSmoke ? (5.5 + Math.random() * 5.0) : (3.2 + Math.random() * 3.8)) * scale;
-    pMesh.scale.setScalar(pScale);
-    pMesh.position.set(
+    const mesh = new THREE.Mesh(sparkGeo, sMat);
+    mesh.position.set(
       wx + (Math.random() - 0.5) * 14 * scale,
-      baseY + Math.random() * 10 * scale,
+      baseY + Math.random() * 8 * scale,
       wz + (Math.random() - 0.5) * 14 * scale
     );
-    scene.add(pMesh);
 
-    const ang = (i / pieceCount) * Math.PI * 2 + (Math.random() - 0.5) * 0.4;
-    const radialSpd = (isSmoke ? (18 + Math.random() * 24) : (42 + Math.random() * 58)) * scale;
-    pieces.push({
-      mesh: pMesh,
-      mat: pMat,
-      vx: Math.cos(ang) * radialSpd,
-      vy: (isSmoke ? (28 + Math.random() * 24) : (35 + Math.random() * 52)) * scale,
-      vz: Math.sin(ang) * radialSpd,
-      isSmoke
+    const ang = Math.random() * Math.PI * 2;
+    const radialSpd = (18 + Math.random() * 44) * scale;
+    const vy = (24 + Math.random() * 42) * scale;
+    const vx = Math.cos(ang) * radialSpd;
+    const vz = Math.sin(ang) * radialSpd;
+
+    mesh.lookAt(
+      mesh.position.x + vx,
+      mesh.position.y + vy,
+      mesh.position.z + vz
+    );
+    scene.add(mesh);
+
+    sinkSparks.push({
+      mesh,
+      mat: sMat,
+      vx,
+      vy,
+      vz,
+      age: 0,
+      maxAge: 28 + Math.floor(Math.random() * 16)
     });
   }
 
-  sinkExplosions.push({
-    shockRing,
-    shockMat,
-    shockGeo,
-    flashCore,
-    flashMat,
-    flashGeo,
-    expLight,
-    baseLightIntensity: 3.2 * scale,
-    pieces,
+  // Kısa süreli hafif kıvılcım parıltısı
+  const sparkLight = new THREE.PointLight(0xffa94d, 1.15 * scale, 110 * scale);
+  sparkLight.position.set(wx, baseY + 14 * scale, wz);
+  scene.add(sparkLight);
+
+  sinkSparks.push({
+    isLight: true,
+    light: sparkLight,
+    baseIntensity: 1.15 * scale,
     age: 0,
-    maxAge: 46
+    maxAge: 18
   });
 }
 
@@ -1627,21 +1620,21 @@ function createSeamlessDarkOceanTexture() {
   canvas.width = 1024; canvas.height = 1024;
   const ctx = canvas.getContext('2d');
   const baseGrad = ctx.createLinearGradient(0, 0, 1024, 1024);
-  baseGrad.addColorStop(0, '#042234');
-  baseGrad.addColorStop(0.5, '#031a29');
-  baseGrad.addColorStop(1, '#021320');
+  baseGrad.addColorStop(0, '#041c2b');
+  baseGrad.addColorStop(0.5, '#031521');
+  baseGrad.addColorStop(1, '#020f18');
   ctx.fillStyle = baseGrad;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  for (let i = 0; i < 240; i++) {
+  for (let i = 0; i < 200; i++) {
     const x = Math.random() * canvas.width;
     const y = Math.random() * canvas.height;
-    const rx = 24 + Math.random() * 72;
-    const ry = 14 + Math.random() * 44;
+    const rx = 24 + Math.random() * 68;
+    const ry = 14 + Math.random() * 40;
     const glow = ctx.createRadialGradient(x, y, 0, x, y, Math.max(rx, ry));
-    glow.addColorStop(0, 'rgba(20, 112, 142, 0.16)');
-    glow.addColorStop(0.5, 'rgba(8, 66, 88, 0.08)');
-    glow.addColorStop(1, 'rgba(3, 26, 41, 0)');
+    glow.addColorStop(0, 'rgba(18, 92, 118, 0.13)');
+    glow.addColorStop(0.5, 'rgba(7, 52, 70, 0.06)');
+    glow.addColorStop(1, 'rgba(3, 21, 33, 0)');
     ctx.save();
     ctx.translate(x, y);
     ctx.scale(rx / Math.max(rx, ry), ry / Math.max(rx, ry));
@@ -1652,15 +1645,15 @@ function createSeamlessDarkOceanTexture() {
     ctx.restore();
   }
 
-  ctx.strokeStyle = 'rgba(135, 206, 235, 0.06)';
-  ctx.lineWidth = 1.5;
-  for (let s = 0; s < 140; s++) {
+  ctx.strokeStyle = 'rgba(130, 185, 210, 0.045)';
+  ctx.lineWidth = 1.2;
+  for (let s = 0; s < 120; s++) {
     const sx = Math.random() * canvas.width;
     const sy = Math.random() * canvas.height;
-    const len = 18 + Math.random() * 45;
+    const len = 18 + Math.random() * 42;
     ctx.beginPath();
     ctx.moveTo(sx, sy);
-    ctx.quadraticCurveTo(sx + len * 0.5, sy - 4, sx + len, sy);
+    ctx.quadraticCurveTo(sx + len * 0.5, sy - 3, sx + len, sy);
     ctx.stroke();
   }
 
@@ -1681,12 +1674,12 @@ function createOceanBumpTexture() {
   ctx.fillStyle = '#808080';
   ctx.fillRect(0, 0, 512, 512);
 
-  for (let i = 0; i < 420; i++) {
+  for (let i = 0; i < 380; i++) {
     const x = Math.random() * 512;
     const y = Math.random() * 512;
-    const r = 6 + Math.random() * 24;
+    const r = 6 + Math.random() * 22;
     const g = ctx.createRadialGradient(x, y, 1, x, y, r);
-    const tone = i % 2 === 0 ? 'rgba(175,175,175,0.16)' : 'rgba(85,85,85,0.16)';
+    const tone = i % 2 === 0 ? 'rgba(170,170,170,0.14)' : 'rgba(85,85,85,0.14)';
     g.addColorStop(0, tone);
     g.addColorStop(1, 'rgba(128,128,128,0)');
     ctx.fillStyle = g;
@@ -1710,24 +1703,24 @@ function createIslandSandTexture() {
   const ctx = canvas.getContext('2d');
 
   const grad = ctx.createRadialGradient(256, 256, 20, 256, 256, 256);
-  grad.addColorStop(0, '#a88c5e');
-  grad.addColorStop(0.55, '#8c7249');
-  grad.addColorStop(0.85, '#685942');
-  grad.addColorStop(1, '#3b4a54');
+  grad.addColorStop(0, '#9c8359');
+  grad.addColorStop(0.55, '#7e6844');
+  grad.addColorStop(0.85, '#5b4f3c');
+  grad.addColorStop(1, '#323f48');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, 512, 512);
 
-  for (let i = 0; i < 850; i++) {
+  for (let i = 0; i < 750; i++) {
     const ang = Math.random() * Math.PI * 2;
     const dist = Math.pow(Math.random(), 0.7) * 244;
     const px = 256 + Math.cos(ang) * dist;
     const py = 256 + Math.sin(ang) * dist;
-    const r = 1.2 + Math.random() * 5.0;
+    const r = 1.2 + Math.random() * 4.5;
     ctx.fillStyle = i % 3 === 0
-      ? 'rgba(224, 200, 150, 0.18)'
+      ? 'rgba(210, 190, 145, 0.14)'
       : i % 3 === 1
-      ? 'rgba(52, 40, 28, 0.24)'
-      : 'rgba(110, 95, 72, 0.18)';
+      ? 'rgba(45, 35, 24, 0.2)'
+      : 'rgba(100, 86, 66, 0.15)';
     ctx.beginPath();
     ctx.arc(px, py, r, 0, Math.PI * 2);
     ctx.fill();
@@ -1745,7 +1738,7 @@ function createStoneWallTexture() {
   canvas.height = 256;
   const ctx = canvas.getContext('2d');
 
-  ctx.fillStyle = '#383f4a';
+  ctx.fillStyle = '#323842';
   ctx.fillRect(0, 0, 256, 256);
 
   const rows = 8;
@@ -1758,11 +1751,11 @@ function createStoneWallTexture() {
     for (let c = -1; c <= cols; c++) {
       const x = c * cw + offset;
       const y = r * rh;
-      const shade = 52 + ((r * 17 + c * 29) % 22);
-      ctx.fillStyle = `rgb(${shade}, ${shade + 4}, ${shade + 11})`;
+      const shade = 48 + ((r * 17 + c * 29) % 20);
+      ctx.fillStyle = `rgb(${shade}, ${shade + 4}, ${shade + 10})`;
       ctx.fillRect(x + 1, y + 1, cw - 2, rh - 2);
-      ctx.strokeStyle = 'rgba(212, 175, 55, 0.22)';
-      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = 'rgba(186, 152, 92, 0.16)';
+      ctx.lineWidth = 1.2;
       ctx.strokeRect(x + 1, y + 1, cw - 2, rh - 2);
     }
   }
@@ -1793,24 +1786,24 @@ function createBorderFrame() {
   holePath.closePath();
   shape.holes.push(holePath);
 
-  const extrudeSettings = { depth: 35, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 4, bevelThickness: 4 };
+  const extrudeSettings = { depth: 32, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 3, bevelThickness: 3 };
   const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
   geometry.rotateX(Math.PI / 2);
 
   const material = new THREE.MeshStandardMaterial({
-    color: 0x3b170e, roughness: 0.45, metalness: 0.85,
-    emissive: 0x1a0804, emissiveIntensity: 0.25
+    color: 0x262019, roughness: 0.55, metalness: 0.7,
+    emissive: 0x0c0906, emissiveIntensity: 0.15
   });
 
   borderFrameMesh = new THREE.Mesh(geometry, material);
-  borderFrameMesh.position.y = 15;
+  borderFrameMesh.position.y = 14;
   scene.add(borderFrameMesh);
 }
 
 function initThreeGame() {
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x020c16);
-  scene.fog = new THREE.FogExp2(0x020c16, 0.000045);
+  scene.background = new THREE.Color(0x040b12);
+  scene.fog = new THREE.FogExp2(0x040b12, 0.000042);
 
   camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 50000);
   camera.position.set(0, CAMERA_HEIGHT, CAMERA_DEPTH);
@@ -1820,11 +1813,11 @@ function initThreeGame() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
+  renderer.toneMappingExposure = 0.96;
   document.getElementById('game').appendChild(renderer.domElement);
 
   SHARED_PARTICLE_GEO = new THREE.SphereGeometry(1, 8, 8);
-  SHARED_PROJECTILE_GEO = new THREE.SphereGeometry(3.5, 12, 12);
+  SHARED_PROJECTILE_GEO = new THREE.SphereGeometry(3.2, 12, 12);
 
   gltfLoader = new THREE.GLTFLoader();
   textureLoader = new THREE.TextureLoader();
@@ -1837,14 +1830,14 @@ function initThreeGame() {
     }, undefined, (err) => {});
   });
 
-  const ambientLight = new THREE.AmbientLight(0xcbd5e1, 0.85);
+  const ambientLight = new THREE.AmbientLight(0xb8c4d0, 0.78);
   scene.add(ambientLight);
 
-  const sunLight = new THREE.DirectionalLight(0xfff5cc, 1.15);
+  const sunLight = new THREE.DirectionalLight(0xf5ebd6, 0.95);
   sunLight.position.set(2000, 3000, 1500);
   scene.add(sunLight);
 
-  const rimLight = new THREE.DirectionalLight(0x7dd3fc, 0.5);
+  const rimLight = new THREE.DirectionalLight(0x6d9bb3, 0.4);
   rimLight.position.set(-1800, 1600, -1600);
   scene.add(rimLight);
 
@@ -1854,12 +1847,12 @@ function initThreeGame() {
   const oceanMat = new THREE.MeshStandardMaterial({
     map: oceanTexture,
     bumpMap: oceanBumpTexture,
-    bumpScale: 1.4,
-    color: 0x73a8ba,
-    roughness: 0.62,
-    metalness: 0.18,
-    emissive: 0x03131d,
-    emissiveIntensity: 0.12
+    bumpScale: 1.2,
+    color: 0x6290a1,
+    roughness: 0.68,
+    metalness: 0.14,
+    emissive: 0x020d14,
+    emissiveIntensity: 0.08
   });
   const ocean = new THREE.Mesh(planeGeo, oceanMat);
   ocean.rotation.x = -Math.PI / 2;
@@ -1868,22 +1861,22 @@ function initThreeGame() {
 
   createBorderFrame();
 
-  const ringGeo = new THREE.RingGeometry(ATTACK_RANGE - 3, ATTACK_RANGE, 64);
-  const ringMat = new THREE.MeshBasicMaterial({ color: 0xfbbf24, side: THREE.DoubleSide, transparent: true, opacity: 0.65 });
+  const ringGeo = new THREE.RingGeometry(ATTACK_RANGE - 2.5, ATTACK_RANGE, 64);
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0xc8a262, side: THREE.DoubleSide, transparent: true, opacity: 0.42 });
   rangeRingMesh = new THREE.Mesh(ringGeo, ringMat);
   rangeRingMesh.rotation.x = -Math.PI / 2;
   rangeRingMesh.position.y = 0.6;
   scene.add(rangeRingMesh);
 
-  const neonGeo = new THREE.RingGeometry(28, 34, 48);
-  const neonMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b, side: THREE.DoubleSide, transparent: true, opacity: 0.88 });
+  const neonGeo = new THREE.RingGeometry(28, 33, 48);
+  const neonMat = new THREE.MeshBasicMaterial({ color: 0xc8a262, side: THREE.DoubleSide, transparent: true, opacity: 0.55 });
   playerNeonRing = new THREE.Mesh(neonGeo, neonMat);
   playerNeonRing.rotation.x = -Math.PI / 2;
   playerNeonRing.position.y = 0.8;
   scene.add(playerNeonRing);
 
-  const selRingGeo = new THREE.RingGeometry(30, 36, 48);
-  const selRingMat = new THREE.MeshBasicMaterial({ color: 0xef4444, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
+  const selRingGeo = new THREE.RingGeometry(30, 35, 48);
+  const selRingMat = new THREE.MeshBasicMaterial({ color: 0xc45c4e, side: THREE.DoubleSide, transparent: true, opacity: 0.65 });
   selectedRingMesh = new THREE.Mesh(selRingGeo, selRingMat);
   selectedRingMesh.rotation.x = -Math.PI / 2;
   selectedRingMesh.position.y = 0.9;
@@ -2038,14 +2031,14 @@ function addCastleFlameCluster(parentGroup, x, y, z, scale = 1.0, phaseOffset = 
 
   if (withStoneBase) {
     const stonePedestalMat = new THREE.MeshStandardMaterial({
-      color: 0x3b424c,
-      roughness: 0.68,
-      metalness: 0.45
+      color: 0x353b44,
+      roughness: 0.72,
+      metalness: 0.38
     });
     const goldTrimPedestalMat = new THREE.MeshStandardMaterial({
-      color: 0xd4af37,
-      roughness: 0.28,
-      metalness: 0.9
+      color: 0xb89452,
+      roughness: 0.38,
+      metalness: 0.75
     });
     const pedestal = new THREE.Mesh(
       new THREE.CylinderGeometry(12.5 * scale, 15.5 * scale, 14 * scale, 12),
@@ -2055,7 +2048,7 @@ function addCastleFlameCluster(parentGroup, x, y, z, scale = 1.0, phaseOffset = 
     clusterGroup.add(pedestal);
 
     const pedestalGoldBand = new THREE.Mesh(
-      new THREE.TorusGeometry(13.2 * scale, 0.95 * scale, 10, 20),
+      new THREE.TorusGeometry(13.2 * scale, 0.9 * scale, 10, 20),
       goldTrimPedestalMat
     );
     pedestalGoldBand.rotation.x = Math.PI / 2;
@@ -2064,63 +2057,63 @@ function addCastleFlameCluster(parentGroup, x, y, z, scale = 1.0, phaseOffset = 
   }
 
   const brazierMat = new THREE.MeshStandardMaterial({
-    color: 0x2a231e,
-    roughness: 0.58,
-    metalness: 0.86
+    color: 0x241f1b,
+    roughness: 0.62,
+    metalness: 0.75
   });
   const goldTrimMat = new THREE.MeshStandardMaterial({
-    color: 0xeab308,
-    roughness: 0.25,
-    metalness: 0.92
+    color: 0xc8a262,
+    roughness: 0.35,
+    metalness: 0.78
   });
   const brazierBowl = new THREE.Mesh(new THREE.CylinderGeometry(9.8 * scale, 6.2 * scale, 7.5 * scale, 14), brazierMat);
   brazierBowl.position.y = -3.2 * scale;
   clusterGroup.add(brazierBowl);
 
-  const rimRing = new THREE.Mesh(new THREE.TorusGeometry(9.6 * scale, 0.95 * scale, 10, 20), goldTrimMat);
+  const rimRing = new THREE.Mesh(new THREE.TorusGeometry(9.6 * scale, 0.9 * scale, 10, 20), goldTrimMat);
   rimRing.rotation.x = Math.PI / 2;
   rimRing.position.y = 0.4 * scale;
   clusterGroup.add(rimRing);
 
   const coreMat = new THREE.MeshBasicMaterial({
-    color: 0xfff3b0,
+    color: 0xf7dca2,
     transparent: true,
-    opacity: 0.96
+    opacity: 0.85
   });
-  const coreFlame = new THREE.Mesh(new THREE.ConeGeometry(4.2 * scale, 18 * scale, 10), coreMat);
-  coreFlame.position.set(0, 8.5 * scale, 0);
+  const coreFlame = new THREE.Mesh(new THREE.ConeGeometry(3.8 * scale, 16 * scale, 10), coreMat);
+  coreFlame.position.set(0, 7.8 * scale, 0);
   clusterGroup.add(coreFlame);
 
-  const flameColors = [0xff1e00, 0xff5500, 0xff9900, 0xffe66d];
+  const flameColors = [0xc94a24, 0xd96b27, 0xe08d38, 0xf0be65];
   const tongues = [];
-  const tongueCount = 12;
+  const tongueCount = 10;
 
   for (let i = 0; i < tongueCount; i++) {
     const tMat = new THREE.MeshBasicMaterial({
       color: flameColors[i % flameColors.length],
       transparent: true,
-      opacity: 0.9
+      opacity: 0.76
     });
-    const tGeo = new THREE.ConeGeometry(5.0 * scale, 29 * scale, 8);
+    const tGeo = new THREE.ConeGeometry(4.5 * scale, 24 * scale, 8);
     const tMesh = new THREE.Mesh(tGeo, tMat);
     const ang = (i / tongueCount) * Math.PI * 2;
-    const rad = (i % 2 === 0 ? 3.4 : 1.4) * scale;
-    tMesh.position.set(Math.cos(ang) * rad, 13.5 * scale, Math.sin(ang) * rad);
-    tMesh.rotation.z = -Math.cos(ang) * 0.25;
-    tMesh.rotation.x = Math.sin(ang) * 0.25;
+    const rad = (i % 2 === 0 ? 3.2 : 1.4) * scale;
+    tMesh.position.set(Math.cos(ang) * rad, 12 * scale, Math.sin(ang) * rad);
+    tMesh.rotation.z = -Math.cos(ang) * 0.22;
+    tMesh.rotation.x = Math.sin(ang) * 0.22;
     clusterGroup.add(tMesh);
 
     tongues.push({
       mesh: tMesh,
-      baseY: 13.5 * scale,
+      baseY: 12 * scale,
       baseScaleY: 1.0,
       phase: phaseOffset + i * 0.65,
-      speed: 8.0 + (i % 4) * 1.25
+      speed: 6.5 + (i % 4) * 0.9
     });
   }
 
-  const flameLight = new THREE.PointLight(0xff6a00, 1.85 * scale, 185 * scale);
-  flameLight.position.set(0, 18 * scale, 0);
+  const flameLight = new THREE.PointLight(0xd97736, 1.15 * scale, 150 * scale);
+  flameLight.position.set(0, 16 * scale, 0);
   clusterGroup.add(flameLight);
 
   parentGroup.add(clusterGroup);
@@ -2130,7 +2123,7 @@ function addCastleFlameCluster(parentGroup, x, y, z, scale = 1.0, phaseOffset = 
     coreMat,
     tongues,
     light: flameLight,
-    baseIntensity: 1.85 * scale,
+    baseIntensity: 1.15 * scale,
     scale,
     phase: phaseOffset,
     emberTimer: 0
@@ -2138,28 +2131,28 @@ function addCastleFlameCluster(parentGroup, x, y, z, scale = 1.0, phaseOffset = 
 }
 
 function spawnFlameEmber(wx, wy, wz, scale = 1.0) {
-  if (flameEmberParticles.length > 90) return;
+  if (flameEmberParticles.length > 70) return;
   const mat = new THREE.MeshBasicMaterial({
-    color: Math.random() > 0.35 ? 0xffae34 : 0xff4d00,
+    color: Math.random() > 0.4 ? 0xd98a3c : 0xb85328,
     transparent: true,
-    opacity: 0.95
+    opacity: 0.72
   });
   const mesh = new THREE.Mesh(SHARED_PARTICLE_GEO, mat);
   const ang = Math.random() * Math.PI * 2;
-  const spd = (8 + Math.random() * 14) * scale;
-  mesh.scale.setScalar((1.1 + Math.random() * 1.4) * scale);
+  const spd = (6 + Math.random() * 10) * scale;
+  mesh.scale.setScalar((0.85 + Math.random() * 1.0) * scale);
   mesh.position.set(
-    wx + (Math.random() - 0.5) * 6 * scale,
+    wx + (Math.random() - 0.5) * 5 * scale,
     wy,
-    wz + (Math.random() - 0.5) * 6 * scale
+    wz + (Math.random() - 0.5) * 5 * scale
   );
   scene.add(mesh);
   flameEmberParticles.push({
     mesh,
-    vx: Math.cos(ang) * spd * 0.45,
-    vy: (26 + Math.random() * 22) * scale,
-    vz: Math.sin(ang) * spd * 0.45,
-    life: 28 + Math.floor(Math.random() * 18)
+    vx: Math.cos(ang) * spd * 0.4,
+    vy: (20 + Math.random() * 16) * scale,
+    vz: Math.sin(ang) * spd * 0.4,
+    life: 24 + Math.floor(Math.random() * 14)
   });
 }
 
@@ -2170,21 +2163,21 @@ function buildCastleKeepAndIsland(parentGroup, wallRadius) {
   const sandShoreMat = new THREE.MeshStandardMaterial({
     map: sandTex,
     bumpMap: sandTex,
-    bumpScale: 1.5,
-    color: 0xc7ae82,
-    roughness: 0.9,
-    metalness: 0.05,
+    bumpScale: 1.3,
+    color: 0xb59d74,
+    roughness: 0.92,
+    metalness: 0.04,
     transparent: true,
-    opacity: 0.94,
+    opacity: 0.92,
     depthWrite: true,
     depthTest: true
   });
   const islandRockMat = new THREE.MeshStandardMaterial({
     bumpMap: stoneTex,
-    bumpScale: 1.6,
-    color: 0x3b4048,
-    roughness: 0.85,
-    metalness: 0.22,
+    bumpScale: 1.4,
+    color: 0x343942,
+    roughness: 0.86,
+    metalness: 0.18,
     depthWrite: true,
     depthTest: true
   });
@@ -2220,11 +2213,11 @@ function buildCastleKeepAndIsland(parentGroup, wallRadius) {
   const glowMaterials = [];
   const baseEmissiveIntensities = [];
 
-  const mainTowerLight = new THREE.PointLight(0xffd27d, 1.35, 360);
+  const mainTowerLight = new THREE.PointLight(0xe0be82, 0.95, 300);
   mainTowerLight.position.set(0, 65, 0);
   mainTowerGroup.add(mainTowerLight);
 
-  const softAuraLight = new THREE.PointLight(0x7dd3fc, 0.55, 260);
+  const softAuraLight = new THREE.PointLight(0x73a5bd, 0.4, 220);
   softAuraLight.position.set(0, 28, 0);
   mainTowerGroup.add(softAuraLight);
 
@@ -2232,10 +2225,10 @@ function buildCastleKeepAndIsland(parentGroup, wallRadius) {
     materials: glowMaterials,
     baseEmissiveIntensities,
     light: mainTowerLight,
-    baseLightIntensity: 1.35,
+    baseLightIntensity: 0.95,
     auraLight: softAuraLight,
-    baseAuraIntensity: 0.55,
-    pulseSpeed: 1.25
+    baseAuraIntensity: 0.4,
+    pulseSpeed: 1.15
   };
 
   loadCachedGLB('anakule.glb', (towerModel) => {
@@ -2258,10 +2251,10 @@ function buildCastleKeepAndIsland(parentGroup, wallRadius) {
           const m = origMat.clone();
           const hasEmissiveMap = Boolean(m.emissiveMap);
           const currentEmissiveHex = m.emissive ? m.emissive.getHex() : 0x000000;
-          const baseInt = hasEmissiveMap || currentEmissiveHex > 0x050505 ? 0.55 : 0.14;
+          const baseInt = hasEmissiveMap || currentEmissiveHex > 0x050505 ? 0.35 : 0.1;
           if (m.emissive) {
             if (!hasEmissiveMap && currentEmissiveHex <= 0x050505) {
-              m.emissive.setHex(0xffc971);
+              m.emissive.setHex(0xd4b272);
             }
             m.emissiveIntensity = baseInt;
           }
@@ -2290,7 +2283,7 @@ function buildCastleKeepAndIsland(parentGroup, wallRadius) {
   innerFlameAngles.forEach((ang, idx) => {
     const fx = Math.cos(ang) * innerWallFlameRadius;
     const fz = Math.sin(ang) * innerWallFlameRadius;
-    addCastleFlameCluster(parentGroup, fx, keepBaseY + 12, fz, 1.15, idx * 1.35, true);
+    addCastleFlameCluster(parentGroup, fx, keepBaseY + 12, fz, 1.05, idx * 1.35, true);
   });
 }
 
@@ -2331,36 +2324,36 @@ function spawnDefenseTowersRing() {
   defenseIslandGroup.name = "DefenseIsland_RangeMatchLayout";
   activeDefenseIslandGroup = defenseIslandGroup;
 
-  const wallRadius = WALL_RADIUS; 
+  const wallRadius = WALL_RADIUS;
   const wallSegments = 32;
   const wallStoneTex = createStoneWallTexture();
-  
-  const wallMat = new THREE.MeshStandardMaterial({ 
+
+  const wallMat = new THREE.MeshStandardMaterial({
     map: wallStoneTex,
     bumpMap: wallStoneTex,
-    bumpScale: 1.4,
-    color: 0x434b57, 
-    roughness: 0.52, 
-    metalness: 0.48,
+    bumpScale: 1.2,
+    color: 0x3b424d,
+    roughness: 0.58,
+    metalness: 0.42,
     depthWrite: true,
     depthTest: true
   });
   wallMat.renderOrder = 0;
 
   const goldTrimMat = new THREE.MeshStandardMaterial({
-    color: 0xd4af37,
-    roughness: 0.28,
-    metalness: 0.88,
+    color: 0xb89452,
+    roughness: 0.36,
+    metalness: 0.75,
     depthWrite: true,
     depthTest: true
   });
 
   const merlonMat = new THREE.MeshStandardMaterial({
     bumpMap: wallStoneTex,
-    bumpScale: 0.9,
-    color: 0x2c333d,
-    roughness: 0.56,
-    metalness: 0.52,
+    bumpScale: 0.8,
+    color: 0x282e37,
+    roughness: 0.62,
+    metalness: 0.45,
     depthWrite: true,
     depthTest: true
   });
@@ -2368,18 +2361,18 @@ function spawnDefenseTowersRing() {
   const towerBaseMat = new THREE.MeshStandardMaterial({
     map: wallStoneTex,
     bumpMap: wallStoneTex,
-    bumpScale: 1.2,
-    color: 0x343b46,
-    roughness: 0.5,
-    metalness: 0.58
+    bumpScale: 1.1,
+    color: 0x2f353f,
+    roughness: 0.55,
+    metalness: 0.5
   });
 
   const gatePillarMat = new THREE.MeshStandardMaterial({
-    color: 0xeab308,
-    roughness: 0.25,
-    metalness: 0.92
+    color: 0xc8a262,
+    roughness: 0.35,
+    metalness: 0.78
   });
-  
+
   for (let i = 0; i < wallSegments; i++) {
     const angle = (i / wallSegments) * Math.PI * 2;
     const nextAngle = ((i + 1) / wallSegments) * Math.PI * 2;
@@ -2388,23 +2381,23 @@ function spawnDefenseTowersRing() {
     if (isGateAngle(midAngle)) {
       continue;
     }
-    
+
     const segmentWidth = (2 * Math.PI * wallRadius) / wallSegments * 1.07;
     const wallSegGeo = new THREE.BoxGeometry(segmentWidth, 44, 28);
     const wallSegMesh = new THREE.Mesh(wallSegGeo, wallMat);
     wallSegMesh.renderOrder = 0;
-    
+
     const wx = Math.cos(midAngle) * wallRadius;
     const wz = Math.sin(midAngle) * wallRadius;
     const rotY = -midAngle + Math.PI / 2;
     const cosA = Math.cos(rotY);
     const sinA = Math.sin(rotY);
-    
+
     wallSegMesh.position.set(wx, SHIP_Y_POS - 59, wz);
     wallSegMesh.rotation.y = rotY;
     defenseIslandGroup.add(wallSegMesh);
 
-    const topGoldCornice = new THREE.Mesh(new THREE.BoxGeometry(segmentWidth * 1.02, 3.2, 30.5), goldTrimMat);
+    const topGoldCornice = new THREE.Mesh(new THREE.BoxGeometry(segmentWidth * 1.02, 3.0, 30.5), goldTrimMat);
     topGoldCornice.position.set(wx, SHIP_Y_POS - 36.5, wz);
     topGoldCornice.rotation.y = rotY;
     defenseIslandGroup.add(topGoldCornice);
@@ -2421,7 +2414,7 @@ function spawnDefenseTowersRing() {
         merlon.rotation.y = rotY;
         defenseIslandGroup.add(merlon);
 
-        const merlonGoldCap = new THREE.Mesh(new THREE.BoxGeometry(segmentWidth * 0.25, 1.5, 30), goldTrimMat);
+        const merlonGoldCap = new THREE.Mesh(new THREE.BoxGeometry(segmentWidth * 0.25, 1.4, 30), goldTrimMat);
         merlonGoldCap.position.set(
           wx + mLocalX * cosA,
           SHIP_Y_POS - 24,
@@ -2442,7 +2435,7 @@ function spawnDefenseTowersRing() {
     deckPlinth.position.set(tx, SHIP_Y_POS - 25.5, tz);
     defenseIslandGroup.add(deckPlinth);
 
-    const deckGoldRim = new THREE.Mesh(new THREE.TorusGeometry(18.5, 1.0, 10, 24), goldTrimMat);
+    const deckGoldRim = new THREE.Mesh(new THREE.TorusGeometry(18.5, 0.95, 10, 24), goldTrimMat);
     deckGoldRim.rotation.x = Math.PI / 2;
     deckGoldRim.position.set(tx, SHIP_Y_POS - 23.3, tz);
     defenseIslandGroup.add(deckGoldRim);
@@ -2474,7 +2467,7 @@ function spawnDefenseTowersRing() {
     labelEl.className = 'enemy-label';
     labelEl.innerHTML = `
       <div class="enemy-hp-track"><div class="enemy-hp-fill" id="tower-hp-fill-${towerId}"></div></div>
-      <div class="enemy-name-tag" style="color: #f59e0b;">${towerName}</div>
+      <div class="enemy-name-tag" style="color: #dfc07d;">${towerName}</div>
     `;
     document.body.appendChild(labelEl);
 
@@ -2698,7 +2691,7 @@ function showFloatingDamage(wx, wz, text, colorHex) {
   div.style.left = ((tempV.x * 0.5 + 0.5) * window.innerWidth) + 'px';
   div.style.top = ((tempV.y * -0.5 + 0.5) * window.innerHeight) + 'px';
 
-  setTimeout(() => div.remove(), 900);
+  setTimeout(() => div.remove(), 850);
 }
 
 function triggerCannonFireEffect(shipX, shipZ, targetX, targetZ, ammoKey) {
@@ -2706,24 +2699,24 @@ function triggerCannonFireEffect(shipX, shipZ, targetX, targetZ, ammoKey) {
   const muzzleX = shipX + Math.cos(angleToTarget) * 28;
   const muzzleZ = shipZ + Math.sin(angleToTarget) * 28;
 
-  const flashColor = ammoKey === 'snow' ? 0xa5f3fc : ammoKey === 'fire' ? 0xf97316 : 0xffaa00;
-  const flashMat = new THREE.MeshBasicMaterial({ color: flashColor, transparent: true, opacity: 0.9 });
+  const flashColor = ammoKey === 'snow' ? 0xa5d4e8 : ammoKey === 'fire' ? 0xd97736 : 0xd99b43;
+  const flashMat = new THREE.MeshBasicMaterial({ color: flashColor, transparent: true, opacity: 0.75 });
   const flashMesh = new THREE.Mesh(SHARED_PARTICLE_GEO, flashMat);
-  flashMesh.scale.setScalar(6);
+  flashMesh.scale.setScalar(5);
   flashMesh.position.set(muzzleX, 24, muzzleZ);
   scene.add(flashMesh);
-  cannonEffects.push({ mesh: flashMesh, vx: 0, vy: 0.2, vz: 0, grow: 1.05, fade: 0.18, life: 6 });
+  cannonEffects.push({ mesh: flashMesh, vx: 0, vy: 0.2, vz: 0, grow: 1.04, fade: 0.18, life: 6 });
 
   for (let i = 0; i < 4; i++) {
-    const grayTone = ammoKey === 'snow' ? 0.9 + Math.random() * 0.1 : 0.75 + Math.random() * 0.2;
-    const smokeMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(grayTone, grayTone, grayTone), transparent: true, opacity: 0.6 });
+    const grayTone = ammoKey === 'snow' ? 0.85 + Math.random() * 0.1 : 0.7 + Math.random() * 0.18;
+    const smokeMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(grayTone, grayTone, grayTone), transparent: true, opacity: 0.5 });
     const smokeMesh = new THREE.Mesh(SHARED_PARTICLE_GEO, smokeMat);
-    smokeMesh.scale.setScalar(3 + Math.random() * 4);
+    smokeMesh.scale.setScalar(2.8 + Math.random() * 3.5);
     smokeMesh.position.set(muzzleX + (Math.random() - 0.5) * 10, 22 + Math.random() * 6, muzzleZ + (Math.random() - 0.5) * 10);
     scene.add(smokeMesh);
-    const spreadSpeed = 0.5 + Math.random() * 0.8;
+    const spreadSpeed = 0.5 + Math.random() * 0.75;
     const spreadAngle = angleToTarget + (Math.random() - 0.5) * 0.7;
-    cannonEffects.push({ mesh: smokeMesh, vx: Math.cos(spreadAngle) * spreadSpeed, vy: 0.35 + Math.random() * 0.3, vz: Math.sin(spreadAngle) * spreadSpeed, grow: 1.02, fade: 0.04, life: 20 });
+    cannonEffects.push({ mesh: smokeMesh, vx: Math.cos(spreadAngle) * spreadSpeed, vy: 0.3 + Math.random() * 0.25, vz: Math.sin(spreadAngle) * spreadSpeed, grow: 1.02, fade: 0.04, life: 18 });
   }
 }
 
@@ -2736,9 +2729,9 @@ function fireProjectile(startX, startZ, targetX, targetZ, ammoKey, onHit) {
   if (tex) {
     const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
     mesh = new THREE.Sprite(mat);
-    mesh.scale.set(14, 14, 1);
+    mesh.scale.set(13, 13, 1);
   } else {
-    const pMat = new THREE.MeshStandardMaterial({ color: ammoSpec.color, roughness: 0.2, metalness: 0.8 });
+    const pMat = new THREE.MeshStandardMaterial({ color: ammoSpec.color, roughness: 0.3, metalness: 0.7 });
     mesh = new THREE.Mesh(SHARED_PROJECTILE_GEO, pMat);
   }
 
@@ -2784,7 +2777,7 @@ function animate3D() {
 
   if (mainTowerGlowState) {
     const slowWave = 0.5 + 0.5 * Math.sin(animTimeSec * mainTowerGlowState.pulseSpeed);
-    const gentleFactor = 0.78 + 0.36 * slowWave;
+    const gentleFactor = 0.82 + 0.28 * slowWave;
     for (let i = 0; i < mainTowerGlowState.materials.length; i++) {
       const m = mainTowerGlowState.materials[i];
       if (m && m.emissive) {
@@ -2792,54 +2785,40 @@ function animate3D() {
       }
     }
     if (mainTowerGlowState.light) {
-      mainTowerGlowState.light.intensity = mainTowerGlowState.baseLightIntensity * (0.82 + 0.32 * slowWave);
+      mainTowerGlowState.light.intensity = mainTowerGlowState.baseLightIntensity * (0.85 + 0.25 * slowWave);
     }
     if (mainTowerGlowState.auraLight) {
       const auraWave = 0.5 + 0.5 * Math.cos(animTimeSec * (mainTowerGlowState.pulseSpeed * 0.8));
-      mainTowerGlowState.auraLight.intensity = mainTowerGlowState.baseAuraIntensity * (0.8 + 0.3 * auraWave);
+      mainTowerGlowState.auraLight.intensity = mainTowerGlowState.baseAuraIntensity * (0.85 + 0.25 * auraWave);
     }
   }
 
-  for (let i = sinkExplosions.length - 1; i >= 0; i--) {
-    const ex = sinkExplosions[i];
-    ex.age++;
-    const progress = ex.age / ex.maxAge;
+  for (let i = sinkSparks.length - 1; i >= 0; i--) {
+    const sp = sinkSparks[i];
+    sp.age++;
+    const progress = sp.age / sp.maxAge;
 
-    ex.shockRing.scale.setScalar(1 + progress * 7.5);
-    ex.shockMat.opacity = Math.max(0, 0.92 * (1 - progress));
-
-    ex.flashCore.scale.setScalar(Math.max(0.1, 1.3 - progress * 0.9));
-    ex.flashMat.opacity = Math.max(0, 0.95 * (1 - progress * 1.25));
-
-    if (ex.expLight) {
-      ex.expLight.intensity = Math.max(0, ex.baseLightIntensity * (1 - progress));
+    if (sp.isLight) {
+      sp.light.intensity = Math.max(0, sp.baseIntensity * (1 - progress));
+      if (sp.age >= sp.maxAge) {
+        scene.remove(sp.light);
+        sinkSparks.splice(i, 1);
+      }
+      continue;
     }
 
-    for (let j = 0; j < ex.pieces.length; j++) {
-      const p = ex.pieces[j];
-      p.mesh.position.x += p.vx * dt;
-      p.mesh.position.y += p.vy * dt;
-      p.mesh.position.z += p.vz * dt;
-      if (!p.isSmoke) {
-        p.vy -= 68 * dt;
-      }
-      p.mesh.scale.multiplyScalar(p.isSmoke ? 1.015 : 0.95);
-      p.mat.opacity = Math.max(0, (p.isSmoke ? 0.75 : 0.96) * (1 - progress));
-    }
+    sp.mesh.position.x += sp.vx * dt;
+    sp.mesh.position.y += sp.vy * dt;
+    sp.mesh.position.z += sp.vz * dt;
+    sp.vy -= 76 * dt;
+    sp.vx *= 0.985;
+    sp.vz *= 0.985;
+    sp.mat.opacity = Math.max(0, 0.92 * (1 - progress));
 
-    if (ex.age >= ex.maxAge) {
-      scene.remove(ex.shockRing);
-      ex.shockGeo.dispose();
-      ex.shockMat.dispose();
-      scene.remove(ex.flashCore);
-      ex.flashGeo.dispose();
-      ex.flashMat.dispose();
-      if (ex.expLight) scene.remove(ex.expLight);
-      for (let j = 0; j < ex.pieces.length; j++) {
-        scene.remove(ex.pieces[j].mesh);
-        ex.pieces[j].mat.dispose();
-      }
-      sinkExplosions.splice(i, 1);
+    if (sp.age >= sp.maxAge || sp.mesh.position.y < 1) {
+      scene.remove(sp.mesh);
+      sp.mat.dispose();
+      sinkSparks.splice(i, 1);
     }
   }
 
@@ -2849,24 +2828,24 @@ function animate3D() {
       for (let j = 0; j < sys.tongues.length; j++) {
         const t = sys.tongues[j];
         const wave = Math.sin(animTimeSec * t.speed + t.phase);
-        const flicker = Math.cos(animTimeSec * (t.speed * 1.37) + t.phase * 0.7);
-        const scaleY = Math.max(0.55, t.baseScaleY + wave * 0.35 + flicker * 0.12);
-        const scaleXZ = Math.max(0.65, 1.0 - wave * 0.16);
+        const flicker = Math.cos(animTimeSec * (t.speed * 1.25) + t.phase * 0.7);
+        const scaleY = Math.max(0.65, t.baseScaleY + wave * 0.26 + flicker * 0.08);
+        const scaleXZ = Math.max(0.72, 1.0 - wave * 0.12);
         t.mesh.scale.set(scaleXZ, scaleY, scaleXZ);
-        t.mesh.position.y = t.baseY + (scaleY - 1.0) * 6.5;
-        t.mesh.rotation.z = (-Math.cos((j / sys.tongues.length) * Math.PI * 2) * 0.22) + flicker * 0.14;
+        t.mesh.position.y = t.baseY + (scaleY - 1.0) * 5.5;
+        t.mesh.rotation.z = (-Math.cos((j / sys.tongues.length) * Math.PI * 2) * 0.18) + flicker * 0.1;
       }
       if (sys.coreFlame) {
-        const cPulse = 0.85 + 0.25 * Math.sin(animTimeSec * 11.5 + sys.phase);
-        sys.coreFlame.scale.set(cPulse, 0.8 + 0.3 * Math.cos(animTimeSec * 13.0 + sys.phase), cPulse);
+        const cPulse = 0.88 + 0.18 * Math.sin(animTimeSec * 9.5 + sys.phase);
+        sys.coreFlame.scale.set(cPulse, 0.85 + 0.2 * Math.cos(animTimeSec * 11.0 + sys.phase), cPulse);
       }
       if (sys.light) {
-        sys.light.intensity = sys.baseIntensity * (0.85 + 0.32 * Math.sin(animTimeSec * 9.5 + sys.phase));
+        sys.light.intensity = sys.baseIntensity * (0.88 + 0.22 * Math.sin(animTimeSec * 8.0 + sys.phase));
       }
       sys.emberTimer += dt;
-      if (sys.emberTimer >= 0.16) {
+      if (sys.emberTimer >= 0.22) {
         sys.emberTimer = 0;
-        spawnFlameEmber(sys.group.position.x, sys.group.position.y + 10 * sys.scale, sys.group.position.z, sys.scale);
+        spawnFlameEmber(sys.group.position.x, sys.group.position.y + 9 * sys.scale, sys.group.position.z, sys.scale);
       }
     }
   }
@@ -2890,7 +2869,7 @@ function animate3D() {
     if (now - lastRegenTime >= 5000) {
       lastRegenTime = now;
       player.hp = Math.min(player.maxHp, player.hp + 5000);
-      showFloatingDamage(player.x, player.z, '+5000', '#22c55e');
+      showFloatingDamage(player.x, player.z, '+5000', '#7ec49c');
       updateHUD();
     }
   }
@@ -2951,12 +2930,12 @@ function animate3D() {
   if (!nearEdge && pendingTransitMapIndex !== null) { hideTransitButton(); }
 
   coordDisplayEl.textContent = `X: ${Math.round((player.x / HALF_WORLD) * 100)} · Y: ${Math.round((player.z / HALF_WORLD) * 100)}`;
-  
+
   if (activeGlbShip) {
-    const timeSec = now * 0.0025;
-    const waveBobY = Math.sin(timeSec) * 1.4;
-    const waveRollZ = Math.cos(timeSec * 0.85) * 0.045;
-    const speedPitchX = (player.speed > 0 ? -0.05 : 0) + Math.sin(timeSec * 1.2) * 0.025;
+    const timeSec = now * 0.0022;
+    const waveBobY = Math.sin(timeSec) * 1.3;
+    const waveRollZ = Math.cos(timeSec * 0.85) * 0.04;
+    const speedPitchX = (player.speed > 0 ? -0.045 : 0) + Math.sin(timeSec * 1.2) * 0.022;
 
     const users = loadUsers();
     const dbUser = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
@@ -2989,12 +2968,12 @@ function animate3D() {
       for (let i = 0; i < denemeMaterialsList.length; i++) {
         const mat = denemeMaterialsList[i];
         if (mat.emissive) {
-          mat.emissiveIntensity = dTheme.emissiveIntensity * (0.7 + 0.65 * pulseWave);
+          mat.emissiveIntensity = dTheme.emissiveIntensity * (0.8 + 0.4 * pulseWave);
         }
       }
 
       if (activeDenemeLight) {
-        activeDenemeLight.intensity = dTheme.lightIntensity * (0.7 + 0.6 * pulseWave);
+        activeDenemeLight.intensity = dTheme.lightIntensity * (0.8 + 0.35 * pulseWave);
       }
 
       if (denemeCrystalsMeta.length > 0) {
@@ -3003,27 +2982,27 @@ function animate3D() {
           const cAngle = c.angle + timeSec * c.orbitSpeed;
           c.mesh.position.set(
             c.centerX + Math.cos(cAngle) * c.orbitRx,
-            c.baseY + Math.sin(timeSec * 2.1 + c.phase) * c.bobAmp,
+            c.baseY + Math.sin(timeSec * 1.9 + c.phase) * c.bobAmp,
             c.centerZ + Math.sin(cAngle) * c.orbitRz
           );
-          c.mesh.rotation.y += 2.2 * dt;
-          c.mesh.rotation.x = Math.sin(timeSec * 1.5 + c.phase) * 0.25;
+          c.mesh.rotation.y += 1.8 * dt;
+          c.mesh.rotation.x = Math.sin(timeSec * 1.4 + c.phase) * 0.2;
         }
       }
 
       if (denemeLanternCores.length > 0) {
         for (let i = 0; i < denemeLanternCores.length; i++) {
           const l = denemeLanternCores[i];
-          l.coreMat.emissiveIntensity = 1.0 + pulseWave * 0.65;
+          l.coreMat.emissiveIntensity = 0.45 + pulseWave * 0.35;
           if (l.coreMesh) {
-            const s = 0.95 + pulseWave * 0.14;
+            const s = 0.96 + pulseWave * 0.08;
             l.coreMesh.scale.set(0.85 * s, 1.2 * s, 0.85 * s);
           }
         }
       }
     }
 
-    const phantomFloatY = modelSpec.phantomStyle ? (2.5 + Math.sin(animTimeSec * 2.1) * 1.8) : 0;
+    const phantomFloatY = modelSpec.phantomStyle ? (2.0 + Math.sin(animTimeSec * 1.8) * 1.4) : 0;
     activeGlbShip.position.set(player.x, SHIP_Y_POS + hOffset + waveBobY + phantomFloatY - 100, player.z);
     activeGlbShip.rotation.order = 'YXZ';
     activeGlbShip.rotation.y = (-player.a + Math.PI / 2) + rotOffset;
@@ -3033,7 +3012,7 @@ function animate3D() {
 
   if (playerNeonRing) {
     playerNeonRing.position.set(player.x, 0.8, player.z);
-    playerNeonRing.rotation.z += (1.2 * dt);
+    playerNeonRing.rotation.z += (1.0 * dt);
   }
   rangeRingMesh.position.set(player.x, 0.6, player.z);
 
@@ -3042,7 +3021,7 @@ function animate3D() {
     if (target) {
       selectedRingMesh.visible = true;
       selectedRingMesh.position.set(target.x, 0.9, target.z);
-      selectedRingMesh.rotation.z += (1.2 * dt);
+      selectedRingMesh.rotation.z += (1.0 * dt);
     }
   }
 
@@ -3082,7 +3061,7 @@ function animate3D() {
     const step = p.speed * dt;
 
     if (dist < step) {
-      scene.remove(p.mesh); 
+      scene.remove(p.mesh);
       if (p.mesh.material) p.mesh.material.dispose();
       activeProjectiles.splice(i, 1);
       if (p.onHit) p.onHit();
@@ -3090,16 +3069,16 @@ function animate3D() {
       p.x += (dx / dist) * step; p.z += (dz / dist) * step;
       p.mesh.position.set(p.x, SHIP_Y_POS - p.yOffset, p.z);
 
-      let sparkColor = p.ammoKey === 'fire' ? (Math.random() > 0.4 ? 0xf97316 : 0xffaa00) :
-                       p.ammoKey === 'amiral' ? [0x38bdf8, 0xa855f7, 0x34d399, 0xffffff][Math.floor(Math.random()*4)] :
-                       p.ammoKey === 'snow' ? 0xffffff :
-                       p.ammoKey === 'chain' ? 0x94a3b8 : 0xffa500;
-      const sparkMat = new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 0.8 });
+      let sparkColor = p.ammoKey === 'fire' ? (Math.random() > 0.4 ? 0xd97736 : 0xc8963e) :
+                       p.ammoKey === 'amiral' ? [0x6da4c4, 0x9b82bd, 0x72b092, 0xdce4ec][Math.floor(Math.random()*4)] :
+                       p.ammoKey === 'snow' ? 0xdbe6ef :
+                       p.ammoKey === 'chain' ? 0x8d99a6 : 0xc8963e;
+      const sparkMat = new THREE.MeshBasicMaterial({ color: sparkColor, transparent: true, opacity: 0.7 });
       const sparkMesh = new THREE.Mesh(SHARED_PROJECTILE_GEO, sparkMat);
-      sparkMesh.scale.setScalar(1.2 + Math.random() * 0.8);
+      sparkMesh.scale.setScalar(1.0 + Math.random() * 0.6);
       sparkMesh.position.set(p.x + (Math.random() - 0.5) * 6, (SHIP_Y_POS - p.yOffset) + (Math.random() - 0.5) * 6, p.z + (Math.random() - 0.5) * 6);
       scene.add(sparkMesh);
-      particleSystems.push({ mesh: sparkMesh, life: 15, scaleDecay: 0.85 });
+      particleSystems.push({ mesh: sparkMesh, life: 14, scaleDecay: 0.85 });
     }
   }
 
@@ -3122,10 +3101,10 @@ function animate3D() {
         player.hp = Math.max(0, player.hp - 120);
         player.lastDamagedTime = now;
         lastRegenTime = now;
-        showFloatingDamage(player.x, player.z, '-120 (Kule)', '#ef4444');
+        showFloatingDamage(player.x, player.z, '-120 (Kule)', '#d48a8a');
         updateHUD();
         if (player.hp <= 0) {
-          triggerSinkExplosion(player.x, player.z, 1.45);
+          triggerSinkSparks(player.x, player.z, 1.35);
           isGameOver = true; isAttacking = false; gameOverEl.style.display = 'flex';
           finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString();
         }
@@ -3157,10 +3136,10 @@ function animate3D() {
         player.hp = Math.max(0, player.hp - 100);
         player.lastDamagedTime = now;
         lastRegenTime = now;
-        showFloatingDamage(player.x, player.z, '-100', '#ef4444');
+        showFloatingDamage(player.x, player.z, '-100', '#d48a8a');
         updateHUD();
         if (player.hp <= 0) {
-          triggerSinkExplosion(player.x, player.z, 1.45);
+          triggerSinkSparks(player.x, player.z, 1.35);
           isGameOver = true; isAttacking = false; gameOverEl.style.display = 'flex';
           finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString();
         }
@@ -3177,8 +3156,8 @@ function animate3D() {
     en.z = Math.max(-HALF_WORLD, Math.min(HALF_WORLD, en.z));
 
     if (en.mesh) {
-      const timeSec = now * 0.0025 + en.id;
-      en.mesh.position.set(en.x, SHIP_Y_POS + ENEMY_GLB_HEIGHT_OFFSET + Math.sin(timeSec) * 1.2 - 100, en.z);
+      const timeSec = now * 0.0022 + en.id;
+      en.mesh.position.set(en.x, SHIP_Y_POS + ENEMY_GLB_HEIGHT_OFFSET + Math.sin(timeSec) * 1.1 - 100, en.z);
       en.mesh.rotation.order = 'YXZ';
       en.mesh.rotation.y = (-en.a + Math.PI / 2) + ENEMY_GLB_ROTATION_OFFSET;
 
@@ -3196,7 +3175,7 @@ function animate3D() {
       isAttacking = false;
       clearAllEnemyAggro();
       syncAttackButton();
-      showFloatingDamage(player.x, player.z, 'GÜLLE YETERSİZ!', '#f87171');
+      showFloatingDamage(player.x, player.z, 'GÜLLE YETERSİZ!', '#d48a8a');
     } else {
       const target = getTargetById(selectedEnemyId);
       if (target && Math.hypot(target.x - player.x, target.z - player.z) <= ATTACK_RANGE && (now - lastPlayerAttackTime >= 1000)) {
@@ -3206,23 +3185,23 @@ function animate3D() {
         fireProjectile(player.x, player.z, target.x, target.z, ammoKey, () => {
           if (ammoSpec.isHeal) {
             if (target.hp >= target.maxHp) {
-              showFloatingDamage(target.x, target.z, 'CAN DOLU!', '#94a3b8');
+              showFloatingDamage(target.x, target.z, 'CAN DOLU!', '#9aa5b1');
             } else {
               target.hp = Math.min(target.maxHp, target.hp + ammoSpec.damage);
-              showFloatingDamage(target.x, target.z, '+' + ammoSpec.damage.toLocaleString(), '#38bdf8');
+              showFloatingDamage(target.x, target.z, '+' + ammoSpec.damage.toLocaleString(), '#7fb8d9');
             }
           } else {
             let finalDmg = ammoSpec.damage;
             if (ammoSpec.bonusNpc > 1.0) finalDmg = Math.round(finalDmg * ammoSpec.bonusNpc);
             target.hp -= finalDmg;
             if (ammoSpec.slow < 1.0) target.slowTimer = 240;
-            showFloatingDamage(target.x, target.z, '-' + finalDmg.toLocaleString(), '#f97316');
+            showFloatingDamage(target.x, target.z, '-' + finalDmg.toLocaleString(), '#e09b56');
           }
           updateTargetCard(); updateHUD(); syncAttackButton();
 
           if (!ammoSpec.isHeal && target.hp <= 0) {
             if (target.id >= 9000 && target.id < 9100) {
-              triggerSinkExplosion(target.x, target.z, 1.55);
+              triggerSinkSparks(target.x, target.z, 1.4);
               if (target.mesh) scene.remove(target.mesh);
               target.labelEl.remove();
               defenseTowers = defenseTowers.filter(t => t.id !== target.id);
@@ -3230,14 +3209,14 @@ function animate3D() {
               clearAllEnemyAggro();
               if (selectedRingMesh) selectedRingMesh.visible = false;
               player.score += 25000;
-              showFloatingDamage(player.x, player.z, 'KULE YIKILDI! +25.000 Altın', '#f59e0b');
+              showFloatingDamage(player.x, player.z, 'KULE YIKILDI! +25.000 Altın', '#dfc07d');
               if (defenseTowers.length === 0) {
                 MAP_DATA[currentMapIndex].ownerFleet = PLAYER_FLEET_TAG;
                 renderMapsGrid();
-                showFloatingDamage(0, 0, `ADA ELE GEÇİRİLDİ! (${PLAYER_FLEET_TAG} Filosu)`, '#fde047');
+                showFloatingDamage(0, 0, `ADA ELE GEÇİRİLDİ! (${PLAYER_FLEET_TAG} Filosu)`, '#dfc07d');
               }
             } else {
-              triggerSinkExplosion(target.x, target.z, 1.25);
+              triggerSinkSparks(target.x, target.z, 1.15);
               if (target.mesh) scene.remove(target.mesh);
               target.labelEl.remove();
               enemies = enemies.filter(e => e.id !== target.id);
@@ -3253,7 +3232,7 @@ function animate3D() {
                 player.expansionRights.cannon++;
                 player.expansionRights.hp++;
                 player.expansionRights.speed++;
-                showFloatingDamage(player.x, player.z, `LEVEL UP! +1 Top, +1 Can, +1 Hız Hakkı`, '#38bdf8');
+                showFloatingDamage(player.x, player.z, `LEVEL UP! +1 Top, +1 Can, +1 Hız Hakkı`, '#7fb8d9');
               }
             }
             updateTargetCard(); updateHUD(); syncAttackButton();
@@ -3273,10 +3252,10 @@ function animate3D() {
 function drawMinimap() {
   const w = miniCanvas.width, h = miniCanvas.height;
   mctx.clearRect(0, 0, w, h);
-  mctx.fillStyle = '#06131f';
+  mctx.fillStyle = '#06101a';
   mctx.fillRect(0, 0, w, h);
 
-  mctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+  mctx.strokeStyle = 'rgba(255, 255, 255, 0.09)';
   mctx.lineWidth = 1;
   mctx.beginPath();
   mctx.moveTo(w / 2, 0); mctx.lineTo(w / 2, h);
@@ -3287,23 +3266,23 @@ function drawMinimap() {
   const scale = w / WORLD_SIZE;
   const cx = w / 2, cy = h / 2;
 
-  mctx.fillStyle = '#f59e0b';
+  mctx.fillStyle = '#c8a262';
   defenseTowers.forEach(t => {
     mctx.beginPath();
-    mctx.arc(cx + t.x * scale, cy + t.z * scale, 2.5, 0, Math.PI * 2);
+    mctx.arc(cx + t.x * scale, cy + t.z * scale, 2.3, 0, Math.PI * 2);
     mctx.fill();
   });
 
-  mctx.fillStyle = '#dc2626';
+  mctx.fillStyle = '#b84a4a';
   enemies.forEach(en => {
     mctx.beginPath();
-    mctx.arc(cx + en.x * scale, cy + en.z * scale, 2.2, 0, Math.PI * 2);
+    mctx.arc(cx + en.x * scale, cy + en.z * scale, 2.0, 0, Math.PI * 2);
     mctx.fill();
   });
 
-  mctx.fillStyle = '#38bdf8';
+  mctx.fillStyle = '#7fb8d9';
   mctx.beginPath();
-  mctx.arc(cx + player.x * scale, cy + player.z * scale, 3.0, 0, Math.PI * 2);
+  mctx.arc(cx + player.x * scale, cy + player.z * scale, 2.8, 0, Math.PI * 2);
   mctx.fill();
 }
 
@@ -3328,7 +3307,7 @@ function updateHUD() {
 
   const hpPercent = Math.max(0, Math.min(100, (player.hp / player.maxHp) * 100));
   playerShipHpFillEl.style.width = hpPercent + '%';
-  playerShipHpFillEl.style.backgroundColor = hpPercent > 50 ? '#22c55e' : hpPercent > 20 ? '#eab308' : '#ef4444';
+  playerShipHpFillEl.style.backgroundColor = hpPercent > 50 ? '#5a9e74' : hpPercent > 20 ? '#c49b45' : '#b84a4a';
 
   Object.keys(qtyEls).forEach(type => {
     const count = player.ammo[type] || 0;
@@ -3339,29 +3318,29 @@ function updateHUD() {
 }
 
 btnExpandCannon.addEventListener('click', () => {
-  if (player.expansionRights.cannon <= 0) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Hak kalmadı!'; return; }
-  if (player.diamonds < 5) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Yetersiz elmas!'; return; }
+  if (player.expansionRights.cannon <= 0) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Hak kalmadı!'; return; }
+  if (player.diamonds < 5) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Yetersiz elmas!'; return; }
   player.diamonds -= 5; player.expansionRights.cannon--; player.cannons += 20;
   updateHUD(); syncAttackButton();
-  marketFeedbackEl.style.color = '#4ade80'; marketFeedbackEl.textContent = 'Top kapasitesi +20 artırıldı!';
+  marketFeedbackEl.style.color = '#8fd1ab'; marketFeedbackEl.textContent = 'Top kapasitesi +20 artırıldı!';
   setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
 });
 
 btnExpandHp.addEventListener('click', () => {
-  if (player.expansionRights.hp <= 0) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Hak kalmadı!'; return; }
-  if (player.diamonds < 5) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Yetersiz elmas!'; return; }
+  if (player.expansionRights.hp <= 0) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Hak kalmadı!'; return; }
+  if (player.diamonds < 5) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Yetersiz elmas!'; return; }
   player.diamonds -= 5; player.expansionRights.hp--; player.maxHp += 50000; player.hp = Math.min(player.maxHp, player.hp + 50000);
   updateHUD();
-  marketFeedbackEl.style.color = '#4ade80'; marketFeedbackEl.textContent = 'Gemi canı +50.000 artırıldı!';
+  marketFeedbackEl.style.color = '#8fd1ab'; marketFeedbackEl.textContent = 'Gemi canı +50.000 artırıldı!';
   setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
 });
 
 btnExpandSpeed.addEventListener('click', () => {
-  if (player.expansionRights.speed <= 0) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Hak kalmadı!'; return; }
-  if (player.diamonds < 5) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Yetersiz elmas!'; return; }
+  if (player.expansionRights.speed <= 0) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Hak kalmadı!'; return; }
+  if (player.diamonds < 5) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Yetersiz elmas!'; return; }
   player.diamonds -= 5; player.expansionRights.speed--; player.maxSpeed *= 1.02;
   updateHUD();
-  marketFeedbackEl.style.color = '#4ade80'; marketFeedbackEl.textContent = 'Gemi hızı %2 artırıldı!';
+  marketFeedbackEl.style.color = '#8fd1ab'; marketFeedbackEl.textContent = 'Gemi hızı %2 artırıldı!';
   setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
 });
 
@@ -3407,11 +3386,11 @@ document.querySelectorAll('.ammo-buy-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     if (!player) return;
     const type = btn.dataset.type, amount = parseInt(btn.dataset.amount, 10), cost = parseInt(btn.dataset.cost, 10);
-    if (player.score < cost) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Yetersiz altın!'; return; }
+    if (player.score < cost) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Yetersiz altın!'; return; }
     player.score -= cost;
     player.ammo[type] = (player.ammo[type] || 0) + amount;
     updateHUD(); syncAttackButton();
-    marketFeedbackEl.style.color = '#4ade80'; marketFeedbackEl.textContent = `${amount} adet ${AMMO_TYPES[type].name} alındı!`;
+    marketFeedbackEl.style.color = '#8fd1ab'; marketFeedbackEl.textContent = `${amount} adet ${AMMO_TYPES[type].name} alındı!`;
     setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
   });
 });
@@ -3443,7 +3422,7 @@ function renderShipyardList() {
   shipyardListEl.querySelectorAll('.ship-buy-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const shipId = btn.dataset.id, cost = parseInt(btn.dataset.cost, 10);
-      if (player.score < cost) { marketFeedbackEl.style.color = '#f87171'; marketFeedbackEl.textContent = 'Yetersiz altın!'; return; }
+      if (player.score < cost) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Yetersiz altın!'; return; }
       player.score -= cost;
       const users = loadUsers();
       const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
@@ -3456,7 +3435,7 @@ function renderShipyardList() {
       if (!currentUser.ownedShips.includes(shipId)) currentUser.ownedShips.push(shipId);
       currentUser.equippedShip = shipId;
       updateHUD(); setupPlayerShipVisual(); renderShipyardList();
-      marketFeedbackEl.style.color = '#4ade80'; marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} kuşanıldı!`;
+      marketFeedbackEl.style.color = '#8fd1ab'; marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} kuşanıldı!`;
       setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2500);
     });
   });
@@ -3469,7 +3448,7 @@ function renderShipyardList() {
       if (uIdx !== -1) { users[uIdx].equippedShip = shipId; saveUsers(users); }
       currentUser.equippedShip = shipId;
       setupPlayerShipVisual(); renderShipyardList();
-      marketFeedbackEl.style.color = '#4ade80'; marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} kuşanıldı!`;
+      marketFeedbackEl.style.color = '#8fd1ab'; marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} kuşanıldı!`;
       setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
     });
   });
