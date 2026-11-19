@@ -662,7 +662,7 @@ const BLOCKED_SHIP_IDS = new Set([
 
 const SHIP_MODELS = {
   standard:         { id: 'standard',         name: 'Ejderha Kalyonu', desc: 'Başlangıç 3D Savaş Gemisi', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45 },
-  ejder_alevli:     { id: 'ejder_alevli',     name: 'Alevli Ejderha Kalyonu', desc: 'Keskin Alev Dilleri & Gövde Yangını', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, scaleMultiplier: 1.08, denemeStyle: 'inferno_flame', flameAura: true },
+  ejder_alevli:     { id: 'ejder_alevli',     name: 'Alevli Ejderha Kalyonu', desc: 'Sinematik Kor & Alev Efekti', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, scaleMultiplier: 1.08, denemeStyle: 'cinematic_ember', flameAura: true },
   deneme1:          { id: 'deneme1',          name: 'Deneme 1 · Dragon Yeşil Duman', desc: 'Tam Yeşil Gemi & Kaliteli Yeşil Duman', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'dragon_green', greenSmoke: true },
   deneme2:          { id: 'deneme2',          name: 'Deneme 2 · Zümrüt Leviathan', desc: 'Sakin Zümrüt Işıltı · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'emerald' },
   deneme3:          { id: 'deneme3',          name: 'Deneme 3 · Mor Gölge', desc: 'Sakin Mor Işıltı · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'violet' },
@@ -676,13 +676,14 @@ const SHIP_MODELS = {
   tasarim6:         { id: 'tasarim6',         name: 'Tasarim 6', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim6.glb', heightOffset: 85 },
   tasarim7:         { id: 'tasarim7',         name: 'Tasarim 7', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim7.glb', heightOffset: 45, rotationOffset: Math.PI },
   tasarim8:         { id: 'tasarim8',         name: 'Tasarim 8', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim8.glb', heightOffset: 85 },
+  tasarim8_kopya:   { id: 'tasarim8_kopya',   name: 'Tasarim 8 Kopya', desc: 'Tam Mor Gemi & Mor Dumanlı Tasarım', cost: 2500, type: 'glb', modelPath: 'tasarim8.glb', heightOffset: 85, denemeStyle: 'royal_purple', purpleSmoke: true },
   tasarim11:        { id: 'tasarim11',        name: 'Tasarim 11', desc: 'GLB Savaş Gemisi', cost: 5000, type: 'glb', modelPath: 'tasarim11.glb', heightOffset: 45 }
 };
 
 const ALL_UNLOCKED_SHIP_IDS = Object.keys(SHIP_MODELS);
 
 function isBlockedShipId(id) {
-  return !id || BLOCKED_SHIP_IDS.has(id) || /kopya|tasarim10|kraliyet|topu|toplar/i.test(id) || !SHIP_MODELS[id];
+  return !id || BLOCKED_SHIP_IDS.has(id) || /kopya_eski|tasarim10|kraliyet_susu|topu|toplar/i.test(id) || !SHIP_MODELS[id];
 }
 
 function sanitizeShipId(shipId) {
@@ -712,30 +713,35 @@ const DENEME_THEMES = {
     metalnessAdd: 0.18, roughnessSub: 0.16, lightColor: 0x22f068, lightIntensity: 1.55,
     crystalColor: 0x5eff92, lanternColor: 0x16d458, pulseSpeed: 2.6, tintAllGreen: true
   },
-  inferno_flame: {
-    color: 0xffa866, emissive: 0xff4500, emissiveIntensity: 0.78,
-    metalnessAdd: 0.22, roughnessSub: 0.2, lightColor: 0xff621a, lightIntensity: 2.1,
-    crystalColor: 0xffc252, lanternColor: 0xff4d00, pulseSpeed: 3.8, tintAllGreen: false
+  royal_purple: {
+    color: 0xb56dff, emissive: 0x6c22bd, emissiveIntensity: 0.68,
+    metalnessAdd: 0.18, roughnessSub: 0.16, lightColor: 0x994dff, lightIntensity: 1.55,
+    crystalColor: 0xc994ff, lanternColor: 0x8432e0, pulseSpeed: 2.5, tintAllPurple: true
+  },
+  cinematic_ember: {
+    color: 0xd89b72, emissive: 0x8f3314, emissiveIntensity: 0.48,
+    metalnessAdd: 0.22, roughnessSub: 0.14, lightColor: 0xd96a2b, lightIntensity: 1.25,
+    crystalColor: 0xe69a5c, lanternColor: 0xb8471c, pulseSpeed: 2.4, tintWarmBronze: true
   },
   emerald: {
     color: 0xa5cfb8, emissive: 0x2e7d5b, emissiveIntensity: 0.24,
     metalnessAdd: 0.16, roughnessSub: 0.14, lightColor: 0x5da887, lightIntensity: 0.45,
-    crystalColor: 0x7db89d, lanternColor: 0x3b8c6a, pulseSpeed: 1.8, tintAllGreen: false
+    crystalColor: 0x7db89d, lanternColor: 0x3b8c6a, pulseSpeed: 1.8
   },
   violet: {
     color: 0xc7bce0, emissive: 0x5b468c, emissiveIntensity: 0.25,
     metalnessAdd: 0.18, roughnessSub: 0.14, lightColor: 0x8e79bd, lightIntensity: 0.45,
-    crystalColor: 0xa794cf, lanternColor: 0x6c559e, pulseSpeed: 1.7, tintAllGreen: false
+    crystalColor: 0xa794cf, lanternColor: 0x6c559e, pulseSpeed: 1.7
   },
   crimson: {
     color: 0xdfb0a8, emissive: 0x9c382c, emissiveIntensity: 0.26,
     metalnessAdd: 0.16, roughnessSub: 0.14, lightColor: 0xc96457, lightIntensity: 0.48,
-    crystalColor: 0xd4857a, lanternColor: 0xad4437, pulseSpeed: 1.9, tintAllGreen: false
+    crystalColor: 0xd4857a, lanternColor: 0xad4437, pulseSpeed: 1.9
   },
   frost: {
     color: 0xbdd5e3, emissive: 0x3b7699, emissiveIntensity: 0.24,
     metalnessAdd: 0.14, roughnessSub: 0.16, lightColor: 0x73a8c7, lightIntensity: 0.45,
-    crystalColor: 0x95c2db, lanternColor: 0x4b89ad, pulseSpeed: 1.8, tintAllGreen: false
+    crystalColor: 0x95c2db, lanternColor: 0x4b89ad, pulseSpeed: 1.8
   }
 };
 
@@ -770,7 +776,7 @@ let mainTowerGlowState = null;
 const MAX_TRAIL_PARTICLES = 160;
 const MAX_SPARK_PARTICLES = 140;
 const MAX_DRAGON_SMOKE_PARTICLES = 130;
-const MAX_INFERNO_PARTICLES = 220;
+const MAX_INFERNO_PARTICLES = 170;
 
 let dragonSmokeParticles = [];
 let dragonSmokeSpawnTimer = 0;
@@ -778,7 +784,7 @@ let infernoFlameParticles = [];
 let infernoSpawnTimer = 0;
 
 let SOFT_SMOKE_TEXTURE = null;
-let SHARP_FLAME_TEXTURE = null;
+let CINEMATIC_FLAME_TEXTURE = null;
 
 function getSoftSmokeTexture() {
   if (SOFT_SMOKE_TEXTURE) return SOFT_SMOKE_TEXTURE;
@@ -798,9 +804,9 @@ function getSoftSmokeTexture() {
   blobs.forEach((b) => {
     const grad = ctx.createRadialGradient(b.x, b.y, 4, b.x, b.y, b.r);
     grad.addColorStop(0.0, `rgba(255, 255, 255, ${b.a})`);
-    grad.addColorStop(0.45, `rgba(235, 255, 242, ${(b.a * 0.55).toFixed(3)})`);
-    grad.addColorStop(0.78, `rgba(205, 250, 222, ${(b.a * 0.16).toFixed(3)})`);
-    grad.addColorStop(1.0, 'rgba(205, 250, 222, 0.0)');
+    grad.addColorStop(0.45, `rgba(242, 232, 255, ${(b.a * 0.55).toFixed(3)})`);
+    grad.addColorStop(0.78, `rgba(220, 200, 250, ${(b.a * 0.16).toFixed(3)})`);
+    grad.addColorStop(1.0, 'rgba(220, 200, 250, 0.0)');
     ctx.fillStyle = grad;
     ctx.beginPath();
     ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
@@ -813,63 +819,54 @@ function getSoftSmokeTexture() {
   return tex;
 }
 
-function getSharpFlameTexture() {
-  if (SHARP_FLAME_TEXTURE) return SHARP_FLAME_TEXTURE;
+// Olgun, derin ve sinematik alev dokusu (tek sivri üçgen yerine organik duman-kor geçişli alev dili)
+function getCinematicFlameTexture() {
+  if (CINEMATIC_FLAME_TEXTURE) return CINEMATIC_FLAME_TEXTURE;
   const canvas = document.createElement('canvas');
   canvas.width = 256;
   canvas.height = 256;
   const ctx = canvas.getContext('2d');
 
-  // Keskin, sivri uçlu yalaz dili (yuvarlak değil, yukarı doğru sivrilen alev formu)
-  ctx.save();
-  const outerGrad = ctx.createLinearGradient(128, 242, 128, 12);
-  outerGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0.98)');
-  outerGrad.addColorStop(0.48, 'rgba(255, 255, 255, 0.88)');
-  outerGrad.addColorStop(0.85, 'rgba(255, 255, 255, 0.42)');
-  outerGrad.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)');
-
-  ctx.fillStyle = outerGrad;
+  // Alt/dış duman-kor bulutu
+  const baseGlow = ctx.createRadialGradient(128, 178, 12, 128, 168, 96);
+  baseGlow.addColorStop(0.0, 'rgba(255, 255, 255, 0.78)');
+  baseGlow.addColorStop(0.55, 'rgba(255, 255, 255, 0.34)');
+  baseGlow.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)');
+  ctx.fillStyle = baseGlow;
   ctx.beginPath();
-  ctx.moveTo(128, 12);
-  ctx.bezierCurveTo(156, 74, 198, 134, 184, 198);
-  ctx.bezierCurveTo(176, 228, 152, 244, 128, 244);
-  ctx.bezierCurveTo(104, 244, 80, 228, 72, 198);
-  ctx.bezierCurveTo(58, 134, 100, 74, 128, 12);
+  ctx.arc(128, 178, 96, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Organik, kıvrımlı ve üst kısmı dumanlaşarak sönen sinematik alev dili
+  const flameGrad = ctx.createLinearGradient(128, 236, 128, 22);
+  flameGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0.92)');
+  flameGrad.addColorStop(0.45, 'rgba(255, 255, 255, 0.68)');
+  flameGrad.addColorStop(0.78, 'rgba(255, 255, 255, 0.24)');
+  flameGrad.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)');
+
+  ctx.fillStyle = flameGrad;
+  ctx.beginPath();
+  ctx.moveTo(128, 24);
+  ctx.bezierCurveTo(152, 68, 186, 114, 176, 176);
+  ctx.bezierCurveTo(170, 214, 150, 236, 128, 236);
+  ctx.bezierCurveTo(106, 236, 86, 214, 80, 176);
+  ctx.bezierCurveTo(70, 114, 104, 68, 128, 24);
   ctx.closePath();
   ctx.fill();
 
-  // İkinci yan sivri yalaz kıvrımı (dinamik alev silüeti için)
-  const sideGrad = ctx.createLinearGradient(168, 236, 176, 56);
-  sideGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0.85)');
-  sideGrad.addColorStop(0.75, 'rgba(255, 255, 255, 0.35)');
-  sideGrad.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)');
-  ctx.fillStyle = sideGrad;
-  ctx.beginPath();
-  ctx.moveTo(176, 58);
-  ctx.quadraticCurveTo(212, 126, 194, 206);
-  ctx.quadraticCurveTo(172, 234, 148, 236);
-  ctx.quadraticCurveTo(168, 162, 176, 58);
-  ctx.closePath();
-  ctx.fill();
-
-  // İç parlak öz (keskin çekirdek)
-  const coreGrad = ctx.createLinearGradient(128, 238, 128, 86);
-  coreGrad.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
-  coreGrad.addColorStop(0.7, 'rgba(255, 255, 255, 0.72)');
+  // Sıcak iç kor
+  const coreGrad = ctx.createRadialGradient(128, 192, 6, 128, 184, 54);
+  coreGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0.95)');
+  coreGrad.addColorStop(0.65, 'rgba(255, 255, 255, 0.45)');
   coreGrad.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)');
   ctx.fillStyle = coreGrad;
   ctx.beginPath();
-  ctx.moveTo(128, 86);
-  ctx.quadraticCurveTo(154, 154, 144, 214);
-  ctx.quadraticCurveTo(128, 238, 112, 214);
-  ctx.quadraticCurveTo(102, 154, 128, 86);
-  ctx.closePath();
+  ctx.arc(128, 188, 54, 0, Math.PI * 2);
   ctx.fill();
-  ctx.restore();
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.needsUpdate = true;
-  SHARP_FLAME_TEXTURE = tex;
+  CINEMATIC_FLAME_TEXTURE = tex;
   return tex;
 }
 
@@ -936,6 +933,54 @@ function spawnDragonGreenSmoke(wx, wz) {
   });
 }
 
+function spawnPurpleSmoke(wx, wz) {
+  if (!scene || typeof THREE === 'undefined') return;
+  if (dragonSmokeParticles.length >= MAX_DRAGON_SMOKE_PARTICLES) {
+    const oldest = dragonSmokeParticles.shift();
+    if (oldest && oldest.mesh) scene.remove(oldest.mesh);
+    if (oldest && oldest.mat) oldest.mat.dispose();
+  }
+
+  const smokeTex = getSoftSmokeTexture();
+  const purpleSmokeColors = [0x8b3dff, 0xb266ff, 0x6a1fd6, 0xc799ff, 0x9a4dff];
+  const colorHex = purpleSmokeColors[Math.floor(Math.random() * purpleSmokeColors.length)];
+  const baseOpacity = 0.44;
+
+  const mat = new THREE.SpriteMaterial({
+    map: smokeTex,
+    color: colorHex,
+    transparent: true,
+    opacity: baseOpacity,
+    depthWrite: false,
+    blending: THREE.NormalBlending
+  });
+
+  const mesh = new THREE.Sprite(mat);
+  const ang = Math.random() * Math.PI * 2;
+  const spreadR = Math.pow(Math.random(), 0.7) * 32;
+  const startY = SHIP_Y_POS - 24 + Math.random() * 28;
+
+  mesh.position.set(wx + Math.cos(ang) * spreadR, startY, wz + Math.sin(ang) * spreadR);
+  const initSize = 22 + Math.random() * 18;
+  mesh.scale.set(initSize, initSize * 0.92, 1);
+  scene.add(mesh);
+
+  dragonSmokeParticles.push({
+    mesh,
+    mat,
+    vx: Math.cos(ang) * (7 + Math.random() * 11),
+    vy: 15 + Math.random() * 14,
+    vz: Math.sin(ang) * (7 + Math.random() * 11),
+    swirlDir: Math.random() > 0.5 ? 1 : -1,
+    rotSpeed: (Math.random() - 0.5) * 1.1,
+    growRate: 15 + Math.random() * 11,
+    life: 0,
+    maxLife: 48 + Math.floor(Math.random() * 24),
+    baseOpacity
+  });
+}
+
+// Olgun, derin ve ağırbaşlı sinematik alev/kor partikülleri
 function spawnInfernoFlameParticle(wx, wz, shipYaw = 0) {
   if (!scene || typeof THREE === 'undefined') return;
   if (infernoFlameParticles.length >= MAX_INFERNO_PARTICLES) {
@@ -944,43 +989,43 @@ function spawnInfernoFlameParticle(wx, wz, shipYaw = 0) {
     if (oldest && oldest.mat) oldest.mat.dispose();
   }
 
-  const flameTex = getSharpFlameTexture();
+  const flameTex = getCinematicFlameTexture();
   const roll = Math.random();
-  const isSpark = roll > 0.85;
-  const isCore = !isSpark && roll < 0.34;
+  const isEmber = roll > 0.88;
+  const isCore = !isEmber && roll < 0.32;
 
-  const zoneAlongShip = (Math.random() - 0.5) * 68;
-  const zoneAcrossShip = (Math.random() - 0.5) * 34;
+  const zoneAlongShip = (Math.random() - 0.5) * 62;
+  const zoneAcrossShip = (Math.random() - 0.5) * 28;
   const cosY = Math.cos(shipYaw);
   const sinY = Math.sin(shipYaw);
   const worldOffsetX = zoneAcrossShip * cosY + zoneAlongShip * sinY;
   const worldOffsetZ = -zoneAcrossShip * sinY + zoneAlongShip * cosY;
 
-  const isUpper = Math.random() > 0.45;
-  const startY = isUpper
-    ? (SHIP_Y_POS - 6 + Math.random() * 38)
-    : (SHIP_Y_POS - 22 + Math.random() * 20);
+  const startY = SHIP_Y_POS - 10 + Math.random() * 26;
 
-  let colorHex, baseOpacity, widthSize, heightSize, vy;
-  if (isSpark) {
-    colorHex = Math.random() > 0.4 ? 0xffd166 : 0xff7b1c;
-    baseOpacity = 0.95;
-    widthSize = 5 + Math.random() * 4;
-    heightSize = 18 + Math.random() * 14;
-    vy = 48 + Math.random() * 32;
+  let colorHex, baseOpacity, widthSize, heightSize, vy, useAdditive;
+  if (isEmber) {
+    colorHex = Math.random() > 0.5 ? 0xe88b45 : 0xc95424;
+    baseOpacity = 0.72;
+    widthSize = 4 + Math.random() * 3;
+    heightSize = 9 + Math.random() * 7;
+    vy = 26 + Math.random() * 18;
+    useAdditive = true;
   } else if (isCore) {
-    colorHex = Math.random() > 0.45 ? 0xffe680 : 0xffaa2b;
-    baseOpacity = 0.86;
-    widthSize = 15 + Math.random() * 10;
-    heightSize = 36 + Math.random() * 22;
-    vy = 30 + Math.random() * 18;
+    colorHex = Math.random() > 0.5 ? 0xe3843c : 0xc74920;
+    baseOpacity = 0.66;
+    widthSize = 18 + Math.random() * 10;
+    heightSize = 26 + Math.random() * 14;
+    vy = 18 + Math.random() * 11;
+    useAdditive = true;
   } else {
-    const outerPalette = [0xe62e00, 0xff5500, 0xff7714, 0xcc2200];
-    colorHex = outerPalette[Math.floor(Math.random() * outerPalette.length)];
-    baseOpacity = 0.78;
-    widthSize = 20 + Math.random() * 14;
-    heightSize = 44 + Math.random() * 28;
-    vy = 24 + Math.random() * 16;
+    const maturePalette = [0x9e3218, 0xb8461e, 0x7d291a, 0xc96228];
+    colorHex = maturePalette[Math.floor(Math.random() * maturePalette.length)];
+    baseOpacity = 0.56;
+    widthSize = 24 + Math.random() * 14;
+    heightSize = 32 + Math.random() * 18;
+    vy = 15 + Math.random() * 10;
+    useAdditive = false;
   }
 
   const mat = new THREE.SpriteMaterial({
@@ -989,26 +1034,26 @@ function spawnInfernoFlameParticle(wx, wz, shipYaw = 0) {
     transparent: true,
     opacity: baseOpacity,
     depthWrite: false,
-    blending: THREE.AdditiveBlending
+    blending: useAdditive ? THREE.AdditiveBlending : THREE.NormalBlending
   });
 
   const mesh = new THREE.Sprite(mat);
   mesh.position.set(wx + worldOffsetX, startY, wz + worldOffsetZ);
   mesh.scale.set(widthSize, heightSize, 1);
-  mat.rotation = (Math.random() - 0.5) * 0.42;
+  mat.rotation = (Math.random() - 0.5) * 0.25;
   scene.add(mesh);
 
   infernoFlameParticles.push({
     mesh,
     mat,
-    vx: (Math.random() - 0.5) * 12,
+    vx: (Math.random() - 0.5) * 7,
     vy,
-    vz: (Math.random() - 0.5) * 12,
-    isSpark,
-    growRate: isSpark ? 0.6 : (10 + Math.random() * 9),
+    vz: (Math.random() - 0.5) * 7,
+    isEmber,
+    growRate: isEmber ? 0.3 : (9 + Math.random() * 6),
     swirlPhase: Math.random() * Math.PI * 2,
     life: 0,
-    maxLife: isSpark ? (20 + Math.floor(Math.random() * 10)) : (26 + Math.floor(Math.random() * 14)),
+    maxLife: isEmber ? (24 + Math.floor(Math.random() * 10)) : (30 + Math.floor(Math.random() * 14)),
     baseOpacity
   });
 }
@@ -1174,9 +1219,13 @@ function applyDenemeShipStyling(shipMesh, styleKey = 'emerald', options = { with
       const styledMats = mats.map((origMat) => {
         const mat = origMat.clone();
         if (mat.color) {
+          const lum = Math.max(0.28, (mat.color.r + mat.color.g + mat.color.b) / 3);
           if (theme.tintAllGreen) {
-            const lum = Math.max(0.28, (mat.color.r + mat.color.g + mat.color.b) / 3);
             mat.color.setRGB(0.08 * lum, Math.min(1, 0.92 * lum + 0.15), 0.26 * lum);
+          } else if (theme.tintAllPurple) {
+            mat.color.setRGB(Math.min(1, 0.72 * lum + 0.18), 0.18 * lum, Math.min(1, 0.96 * lum + 0.14));
+          } else if (theme.tintWarmBronze) {
+            mat.color.setRGB(Math.min(1, 0.85 * lum + 0.12), Math.min(1, 0.46 * lum + 0.06), 0.22 * lum);
           } else {
             mat.color.setHex(theme.color);
           }
@@ -1202,7 +1251,7 @@ function applyDenemeShipStyling(shipMesh, styleKey = 'emerald', options = { with
   if (options.with3DProps) attachDeneme3DProps(shipMesh, theme, bounds, shipSize);
 
   if (typeof THREE !== 'undefined') {
-    const lightRange = (styleKey === 'dragon_green' || styleKey === 'inferno_flame') ? 190 : 70;
+    const lightRange = (styleKey === 'dragon_green' || styleKey === 'royal_purple' || styleKey === 'cinematic_ember') ? 190 : 70;
     activeDenemeLight = new THREE.PointLight(theme.lightColor, theme.lightIntensity, lightRange);
     activeDenemeLight.position.set(0, 22, 0);
     shipMesh.add(activeDenemeLight);
@@ -1322,8 +1371,8 @@ function getShipThumbnail(modelSpec, callback) {
   });
 }
 
-const USERS_STORAGE_KEY = 'pirate3d_users_v85';
-const SESSION_STORAGE_KEY = 'pirate3d_session_v85';
+const USERS_STORAGE_KEY = 'pirate3d_users_v86';
+const SESSION_STORAGE_KEY = 'pirate3d_session_v86';
 let authMode = 'login';
 let currentUser = null;
 let gameInitialized = false;
@@ -2459,7 +2508,7 @@ function animate3D() {
     if (sp.age >= sp.maxAge || sp.mesh.position.y < 1) { scene.remove(sp.mesh); sp.mat.dispose(); sinkSparks.splice(i, 1); }
   }
 
-  // Yeşil duman partikülleri
+  // Yeşil & mor duman partikülleri
   for (let i = dragonSmokeParticles.length - 1; i >= 0; i--) {
     const sm = dragonSmokeParticles[i];
     sm.life++;
@@ -2483,30 +2532,30 @@ function animate3D() {
     }
   }
 
-  // Keskin alev dilleri partikülleri
+  // Olgun sinematik alev/kor partikülleri
   for (let i = infernoFlameParticles.length - 1; i >= 0; i--) {
     const fp = infernoFlameParticles[i];
     fp.life++;
     const progress = fp.life / fp.maxLife;
-    const swayX = Math.sin(animTimeSec * 12 + fp.swirlPhase + fp.life * 0.35) * (fp.isSpark ? 18 : 9);
-    const swayZ = Math.cos(animTimeSec * 11 + fp.swirlPhase + fp.life * 0.32) * (fp.isSpark ? 18 : 9);
+    const swayX = Math.sin(animTimeSec * 5.2 + fp.swirlPhase + fp.life * 0.2) * (fp.isEmber ? 11 : 5.5);
+    const swayZ = Math.cos(animTimeSec * 4.8 + fp.swirlPhase + fp.life * 0.18) * (fp.isEmber ? 11 : 5.5);
 
     fp.mesh.position.x += (fp.vx + swayX) * dt;
     fp.mesh.position.y += fp.vy * dt;
     fp.mesh.position.z += (fp.vz + swayZ) * dt;
 
-    if (!fp.isSpark) {
+    if (!fp.isEmber) {
       const g = fp.growRate * dt;
-      fp.mesh.scale.x = Math.max(4, fp.mesh.scale.x - g * 0.35);
-      fp.mesh.scale.y = Math.max(8, fp.mesh.scale.y + g * 1.6);
-      fp.mat.rotation = Math.sin(animTimeSec * 9.5 + fp.swirlPhase) * 0.24;
+      fp.mesh.scale.x += g * 0.75;
+      fp.mesh.scale.y += g * 0.95;
+      fp.mat.rotation = Math.sin(animTimeSec * 4.2 + fp.swirlPhase) * 0.14;
     } else {
-      fp.mesh.scale.y = Math.max(4, fp.mesh.scale.y * 0.95);
+      fp.mesh.scale.multiplyScalar(0.97);
     }
 
-    const fadeCurve = progress < 0.15 ? (progress / 0.15) : (1 - Math.pow((progress - 0.15) / 0.85, 1.2));
+    const fadeCurve = progress < 0.24 ? (progress / 0.24) : (1 - Math.pow((progress - 0.24) / 0.76, 1.35));
     fp.mat.opacity = Math.max(0, fp.baseOpacity * fadeCurve);
-    if (fp.life >= fp.maxLife || (progress > 0.2 && fp.mat.opacity <= 0.01)) {
+    if (fp.life >= fp.maxLife || (progress > 0.26 && fp.mat.opacity <= 0.008)) {
       scene.remove(fp.mesh); fp.mat.dispose(); infernoFlameParticles.splice(i, 1);
     }
   }
@@ -2610,13 +2659,21 @@ function animate3D() {
       }
     }
 
+    if (modelSpec.purpleSmoke) {
+      dragonSmokeSpawnTimer += dt;
+      if (dragonSmokeSpawnTimer >= 0.042) {
+        dragonSmokeSpawnTimer = 0;
+        spawnPurpleSmoke(player.x, player.z);
+        if (Math.random() > 0.45) spawnPurpleSmoke(player.x, player.z);
+      }
+    }
+
     if (modelSpec.flameAura) {
       infernoSpawnTimer += dt;
-      if (infernoSpawnTimer >= 0.022) {
+      if (infernoSpawnTimer >= 0.036) {
         infernoSpawnTimer = 0;
         spawnInfernoFlameParticle(player.x, player.z, player.a);
-        spawnInfernoFlameParticle(player.x, player.z, player.a);
-        if (Math.random() > 0.3) spawnInfernoFlameParticle(player.x, player.z, player.a);
+        if (Math.random() > 0.4) spawnInfernoFlameParticle(player.x, player.z, player.a);
       }
     }
 
