@@ -746,12 +746,11 @@ const DENEME_THEMES = {
   gold: {
     color: 0xffd166,
     emissive: 0xf59e0b,
-    emissiveIntensity: 0.36,
-    metalnessAdd: 0.4,
+    emissiveIntensity: 0.28,
+    metalnessAdd: 0.35,
     roughnessSub: 0.25,
     lightColor: 0xffb703,
-    lightIntensity: 1.6,
-    sparkleAccent: 0xffd166,
+    lightIntensity: 0.45,
     crystalColor: 0xfbbf24,
     lanternColor: 0xffb703,
     pulseSpeed: 2.6
@@ -759,12 +758,11 @@ const DENEME_THEMES = {
   emerald: {
     color: 0x6ee7b7,
     emissive: 0x059669,
-    emissiveIntensity: 0.38,
+    emissiveIntensity: 0.3,
     metalnessAdd: 0.3,
     roughnessSub: 0.35,
     lightColor: 0x10b981,
-    lightIntensity: 1.7,
-    sparkleAccent: 0x34d399,
+    lightIntensity: 0.45,
     crystalColor: 0x10b981,
     lanternColor: 0x34d399,
     pulseSpeed: 3.0
@@ -772,12 +770,11 @@ const DENEME_THEMES = {
   violet: {
     color: 0xc4b5fd,
     emissive: 0x7c3aed,
-    emissiveIntensity: 0.4,
+    emissiveIntensity: 0.32,
     metalnessAdd: 0.35,
     roughnessSub: 0.3,
     lightColor: 0xa855f7,
-    lightIntensity: 1.8,
-    sparkleAccent: 0xc084fc,
+    lightIntensity: 0.45,
     crystalColor: 0xa855f7,
     lanternColor: 0xc084fc,
     pulseSpeed: 2.4
@@ -785,12 +782,11 @@ const DENEME_THEMES = {
   crimson: {
     color: 0xfca5a5,
     emissive: 0xdc2626,
-    emissiveIntensity: 0.42,
+    emissiveIntensity: 0.34,
     metalnessAdd: 0.25,
     roughnessSub: 0.2,
     lightColor: 0xef4444,
-    lightIntensity: 1.9,
-    sparkleAccent: 0xfb7185,
+    lightIntensity: 0.5,
     crystalColor: 0xef4444,
     lanternColor: 0xf97316,
     pulseSpeed: 4.2
@@ -798,12 +794,11 @@ const DENEME_THEMES = {
   frost: {
     color: 0xbae6fd,
     emissive: 0x0284c7,
-    emissiveIntensity: 0.38,
+    emissiveIntensity: 0.3,
     metalnessAdd: 0.2,
     roughnessSub: 0.45,
     lightColor: 0x38bdf8,
-    lightIntensity: 1.6,
-    sparkleAccent: 0x7dd3fc,
+    lightIntensity: 0.45,
     crystalColor: 0x38bdf8,
     lanternColor: 0x7dd3fc,
     pulseSpeed: 2.8
@@ -859,7 +854,7 @@ function createLanternAssembly(theme, scale = 1) {
   const coreMat = new THREE.MeshStandardMaterial({
     color: theme.lanternColor,
     emissive: theme.lanternColor,
-    emissiveIntensity: 1.2,
+    emissiveIntensity: 1.1,
     roughness: 0.2,
     metalness: 0.15
   });
@@ -883,53 +878,53 @@ function createCinematicBowCannon(scale = 1) {
   const cannonGroup = new THREE.Group();
 
   const darkIronMat = new THREE.MeshStandardMaterial({
-    color: 0x1c1917,
-    metalness: 0.9,
-    roughness: 0.28
+    color: 0x18181b,
+    metalness: 0.88,
+    roughness: 0.25
   });
   const crimsonTrimMat = new THREE.MeshStandardMaterial({
-    color: 0x991b1b,
-    emissive: 0x7f1d1d,
-    emissiveIntensity: 0.45,
+    color: 0xdc2626,
+    emissive: 0x991b1b,
+    emissiveIntensity: 0.65,
     metalness: 0.75,
-    roughness: 0.3
+    roughness: 0.28
   });
   const emberMat = new THREE.MeshStandardMaterial({
-    color: 0xffedd5,
+    color: 0xfef08a,
     emissive: 0xf97316,
-    emissiveIntensity: 2.2,
+    emissiveIntensity: 2.5,
     roughness: 0.1,
     metalness: 0.1
   });
 
   // Top kaidesi / kızak
-  const carriage = new THREE.Mesh(new THREE.BoxGeometry(0.46 * scale, 0.16 * scale, 0.62 * scale), darkIronMat);
-  carriage.position.set(0, -0.14 * scale, -0.12 * scale);
+  const carriage = new THREE.Mesh(new THREE.BoxGeometry(0.65 * scale, 0.22 * scale, 0.85 * scale), darkIronMat);
+  carriage.position.set(0, -0.16 * scale, -0.1 * scale);
   cannonGroup.add(carriage);
 
   // Arka küre (cascabel)
-  const cascabel = new THREE.Mesh(new THREE.SphereGeometry(0.14 * scale, 12, 12), crimsonTrimMat);
-  cascabel.position.set(0, 0.04 * scale, -0.52 * scale);
+  const cascabel = new THREE.Mesh(new THREE.SphereGeometry(0.19 * scale, 12, 12), crimsonTrimMat);
+  cascabel.position.set(0, 0.06 * scale, -0.68 * scale);
   cannonGroup.add(cascabel);
 
-  // Ana namlu (Z ekseninde ileriye -Z veya +Z bakacak şekilde yönlendirilir)
-  const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.13 * scale, 0.21 * scale, 0.96 * scale, 14), darkIronMat);
+  // Ana namlu (lokal +Z yönüne uzanır)
+  const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.17 * scale, 0.28 * scale, 1.35 * scale, 16), darkIronMat);
   barrel.rotation.x = Math.PI / 2;
-  barrel.position.set(0, 0.04 * scale, 0.02 * scale);
+  barrel.position.set(0, 0.06 * scale, 0.05 * scale);
   cannonGroup.add(barrel);
 
   // Namlu güçlendirme halkaları
-  const ringPositions = [-0.26, 0.04, 0.34];
+  const ringPositions = [-0.38, 0.04, 0.46];
   ringPositions.forEach((rz, idx) => {
-    const rRadius = (0.19 - idx * 0.022) * scale;
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(rRadius, 0.028 * scale, 8, 16), crimsonTrimMat);
-    ring.position.set(0, 0.04 * scale, rz * scale);
+    const rRadius = (0.26 - idx * 0.028) * scale;
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(rRadius, 0.038 * scale, 8, 16), crimsonTrimMat);
+    ring.position.set(0, 0.06 * scale, rz * scale);
     cannonGroup.add(ring);
   });
 
   // Ağzındaki kızgın kor çekirdeği
-  const muzzleEmber = new THREE.Mesh(new THREE.SphereGeometry(0.11 * scale, 10, 10), emberMat);
-  muzzleEmber.position.set(0, 0.04 * scale, 0.51 * scale);
+  const muzzleEmber = new THREE.Mesh(new THREE.SphereGeometry(0.16 * scale, 12, 12), emberMat);
+  muzzleEmber.position.set(0, 0.06 * scale, 0.74 * scale);
   cannonGroup.add(muzzleEmber);
 
   return { cannonGroup, emberMat };
@@ -964,7 +959,7 @@ function attachDeneme3DProps(shipMesh, theme, bounds, shipSize, styleKey) {
   const crystalMat = new THREE.MeshStandardMaterial({
     color: theme.crystalColor,
     emissive: theme.lanternColor,
-    emissiveIntensity: 0.7,
+    emissiveIntensity: 0.65,
     metalness: 0.6,
     roughness: 0.2
   });
@@ -991,11 +986,11 @@ function attachDeneme3DProps(shipMesh, theme, bounds, shipSize, styleKey) {
 
   // Deneme 4'e özel burun kısmında görkemli sinematik top
   if (styleKey === 'crimson') {
-    const bowCannonScale = Math.max(0.95, Math.min(1.65, shipSize.z * 0.16));
+    const bowCannonScale = Math.max(1.35, Math.min(2.2, Math.max(shipSize.x, shipSize.z) * 0.22));
     const bowBuilt = createCinematicBowCannon(bowCannonScale);
     const forwardSign = Math.abs(bounds.min.z) >= Math.abs(bounds.max.z) ? -1 : 1;
-    const bowZ = (forwardSign < 0 ? bounds.min.z : bounds.max.z) - forwardSign * (shipSize.z * 0.06);
-    const bowY = bounds.min.y + shipSize.y * 0.28;
+    const bowZ = (forwardSign < 0 ? bounds.min.z : bounds.max.z) + forwardSign * (shipSize.z * 0.14);
+    const bowY = bounds.min.y + shipSize.y * 0.38;
 
     bowBuilt.cannonGroup.position.set(0, bowY, bowZ);
     if (forwardSign < 0) {
@@ -1028,10 +1023,10 @@ function applyDenemeShipStyling(shipMesh, styleKey = 'gold', options = { with3DP
           mat.emissiveIntensity = theme.emissiveIntensity;
         }
         if (typeof mat.metalness === 'number') {
-          mat.metalness = Math.min(1, (mat.metalness || 0.3) + theme.metalnessAdd);
+          mat.metalness = Math.min(0.85, (mat.metalness || 0.25) + theme.metalnessAdd);
         }
         if (typeof mat.roughness === 'number') {
-          mat.roughness = Math.max(0.12, (mat.roughness || 0.6) - theme.roughnessSub);
+          mat.roughness = Math.max(0.22, (mat.roughness || 0.6) - theme.roughnessSub);
         }
         mat.needsUpdate = true;
       });
@@ -1043,8 +1038,8 @@ function applyDenemeShipStyling(shipMesh, styleKey = 'gold', options = { with3DP
   }
 
   if (typeof THREE !== 'undefined') {
-    activeDenemeLight = new THREE.PointLight(theme.lightColor, theme.lightIntensity, 110);
-    activeDenemeLight.position.set(0, 8, 0);
+    activeDenemeLight = new THREE.PointLight(theme.lightColor, theme.lightIntensity, 45);
+    activeDenemeLight.position.set(0, 12, 0);
     shipMesh.add(activeDenemeLight);
   }
 }
@@ -1398,8 +1393,8 @@ function createSeamlessDarkOceanTexture() {
     const rx = 25 + Math.random() * 60;
     const ry = 18 + Math.random() * 45;
     const glow = ctx.createRadialGradient(x, y, 0, x, y, Math.max(rx, ry));
-    glow.addColorStop(0, 'rgba(18, 119, 143, 0.16)');
-    glow.addColorStop(0.55, 'rgba(10, 88, 112, 0.075)');
+    glow.addColorStop(0, 'rgba(18, 119, 143, 0.14)');
+    glow.addColorStop(0.55, 'rgba(10, 88, 112, 0.06)');
     glow.addColorStop(1, 'rgba(4, 38, 56, 0)');
     ctx.save();
     ctx.translate(x, y);
@@ -1483,15 +1478,15 @@ function initThreeGame() {
   const ambientLight = new THREE.AmbientLight(0x93c5fd, 0.85);
   scene.add(ambientLight);
 
-  const sunLight = new THREE.DirectionalLight(0xfef08a, 1.4);
+  const sunLight = new THREE.DirectionalLight(0xfef08a, 1.35);
   sunLight.position.set(2000, 3000, 1500);
   scene.add(sunLight);
 
   oceanTexture = createSeamlessDarkOceanTexture();
   planeGeo = new THREE.PlaneGeometry(WORLD_SIZE * 2, WORLD_SIZE * 2, 32, 32);
   const oceanMat = new THREE.MeshStandardMaterial({
-    map: oceanTexture, color: 0x9acbd2, roughness: 0.2, metalness: 0.34,
-    emissive: 0x062536, emissiveIntensity: 0.16
+    map: oceanTexture, color: 0x9acbd2, roughness: 0.65, metalness: 0.12,
+    emissive: 0x051f2e, emissiveIntensity: 0.12
   });
   const ocean = new THREE.Mesh(planeGeo, oceanMat);
   ocean.rotation.x = -Math.PI / 2;
@@ -2110,7 +2105,7 @@ function animate3D() {
       const pulseWave = 0.5 + 0.5 * Math.sin(timeSec * dTheme.pulseSpeed);
 
       if (activeDenemeLight) {
-        activeDenemeLight.intensity = dTheme.lightIntensity + pulseWave * 0.6;
+        activeDenemeLight.intensity = dTheme.lightIntensity + pulseWave * 0.25;
       }
 
       if (denemeCrystalsMeta.length > 0) {
@@ -2130,7 +2125,7 @@ function animate3D() {
       if (denemeLanternCores.length > 0) {
         for (let i = 0; i < denemeLanternCores.length; i++) {
           const l = denemeLanternCores[i];
-          l.coreMat.emissiveIntensity = 1.0 + pulseWave * 0.6;
+          l.coreMat.emissiveIntensity = 1.0 + pulseWave * 0.5;
           if (l.coreMesh) {
             const s = 0.92 + pulseWave * 0.14;
             l.coreMesh.scale.set(0.8 * s, 1.15 * s, 0.8 * s);
@@ -2139,7 +2134,7 @@ function animate3D() {
       }
 
       if (deneme4BowCannonEmber) {
-        deneme4BowCannonEmber.emissiveIntensity = 1.6 + pulseWave * 1.4;
+        deneme4BowCannonEmber.emissiveIntensity = 1.8 + pulseWave * 1.6;
       }
     }
 
