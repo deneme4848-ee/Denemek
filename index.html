@@ -964,7 +964,7 @@ let gltfLoader;
 // Sur çemberi ve geçit rotası ayarları
 const WALL_RADIUS = ATTACK_RANGE;
 const WALL_GAP_ANGLE = Math.PI;
-const WALL_GAP_HALF_ARC = 0.16;
+const WALL_GAP_HALF_ARC = 0.20;
 let navigationQueue = [];
 
 function normalizeAngle(a) {
@@ -973,33 +973,79 @@ function normalizeAngle(a) {
   return a;
 }
 
+function segmentIntersectsCircle(x1, z1, x2, z2, cx, cz, r) {
+  const dx = x2 - x1;
+  const dz = z2 - z1;
+  const lenSq = dx * dx + dz * dz;
+  if (lenSq === 0) return Math.hypot(x1 - cx, z1 - cz) < r;
+  let t = ((cx - x1) * dx + (cz - z1) * dz) / lenSq;
+  t = Math.max(0, Math.min(1, t));
+  const closestX = x1 + t * dx;
+  const closestZ = z1 + t * dz;
+  return Math.hypot(closestX - cx, closestZ - cz) < r;
+}
+
+function buildOuterArcWaypoints(fromX, fromZ, toX, toZ, radius) {
+  const points = [];
+  const startAngle = Math.atan2(fromZ, fromX);
+  let endAngle = Math.atan2(toZ, toX);
+  let diff = normalizeAngle(endAngle - startAngle);
+
+  // En kısa yayı seç; eğer tam zıt taraftaysa (diff ~ ±PI), kapı yönüne doğru dön
+  if (Math.abs(Math.abs(diff) - Math.PI) < 0.05) {
+    const toGapDiff = normalizeAngle(WALL_GAP_ANGLE - startAngle);
+    diff = toGapDiff >= 0 ? Math.PI : -Math.PI;
+  }
+
+  const steps = Math.max(2, Math.ceil(Math.abs(diff) / 0.45));
+  for (let i = 1; i < steps; i++) {
+    const ang = startAngle + diff * (i / steps);
+    points.push({
+      x: Math.cos(ang) * radius,
+      z: Math.sin(ang) * radius
+    });
+  }
+  return points;
+}
+
 function buildNavigationRoute(fromX, fromZ, toX, toZ) {
   const queue = [];
   const startDist = Math.hypot(fromX, fromZ);
   const endDist = Math.hypot(toX, toZ);
-  const margin = 65;
+  const outerClearance = WALL_RADIUS + 85;
+  const innerClearance = WALL_RADIUS - 85;
 
-  const startOutside = startDist > WALL_RADIUS + 20;
-  const endInside = endDist < WALL_RADIUS - 20;
-  const startInside = startDist < WALL_RADIUS - 20;
-  const endOutside = endDist > WALL_RADIUS + 20;
+  const startOutside = startDist > WALL_RADIUS + 18;
+  const endInside = endDist < WALL_RADIUS - 18;
+  const startInside = startDist < WALL_RADIUS - 18;
+  const endOutside = endDist > WALL_RADIUS + 18;
 
-  const gapOutX = Math.cos(WALL_GAP_ANGLE) * (WALL_RADIUS + margin);
-  const gapOutZ = Math.sin(WALL_GAP_ANGLE) * (WALL_RADIUS + margin);
-  const gapInX  = Math.cos(WALL_GAP_ANGLE) * (WALL_RADIUS - margin);
-  const gapInZ  = Math.sin(WALL_GAP_ANGLE) * (WALL_RADIUS - margin);
+  const gapOutX = Math.cos(WALL_GAP_ANGLE) * outerClearance;
+  const gapOutZ = Math.sin(WALL_GAP_ANGLE) * outerClearance;
+  const gapInX  = Math.cos(WALL_GAP_ANGLE) * innerClearance;
+  const gapInZ  = Math.sin(WALL_GAP_ANGLE) * innerClearance;
 
   if (startOutside && endInside) {
+    // Dışarıdaki uzak noktadan önce sur çemberinin dışından dolaşarak geçit dışına gel, sonra geçitten içeri gir
+    if (segmentIntersectsCircle(fromX, fromZ, gapOutX, gapOutZ, 0, 0, WALL_RADIUS + 35)) {
+      const arcPts = buildOuterArcWaypoints(fromX, fromZ, gapOutX, gapOutZ, outerClearance);
+      queue.push(...arcPts);
+    }
     queue.push({ x: gapOutX, z: gapOutZ });
     queue.push({ x: gapInX, z: gapInZ });
   } else if (startInside && endOutside) {
+    // İçeriden dışarıya: önce geçit içine, sonra geçit dışına, gerekirse dış çemberden hedefe dolaş
     queue.push({ x: gapInX, z: gapInZ });
     queue.push({ x: gapOutX, z: gapOutZ });
+    if (segmentIntersectsCircle(gapOutX, gapOutZ, toX, toZ, 0, 0, WALL_RADIUS + 35)) {
+      const arcPts = buildOuterArcWaypoints(gapOutX, gapOutZ, toX, toZ, outerClearance);
+      queue.push(...arcPts);
+    }
   } else if (startOutside && endOutside) {
-    const midX = (fromX + toX) * 0.5;
-    const midZ = (fromZ + toZ) * 0.5;
-    if (Math.hypot(midX, midZ) < WALL_RADIUS + 15) {
-      queue.push({ x: gapOutX, z: gapOutZ });
+    // İkisi de dışarıdaysa ve aradaki çizgi sur çemberini kesiyorsa çember dışından dolaş
+    if (segmentIntersectsCircle(fromX, fromZ, toX, toZ, 0, 0, WALL_RADIUS + 35)) {
+      const arcPts = buildOuterArcWaypoints(fromX, fromZ, toX, toZ, outerClearance);
+      queue.push(...arcPts);
     }
   }
 
@@ -1331,7 +1377,7 @@ function spawnDefenseTowersRing() {
     wallSegMesh.rotation.y = -midAngle + Math.PI / 2;
     defenseIslandGroup.add(wallSegMesh);
 
-    wallCollisionBoxes.push({ x: wx, z: wz, radius: segmentWidth / 2 + 12 });
+    wallCollisionBoxes.push({ x: wx, z: wz, radius: segmentWidth / 2 + 6 });
   }
 
   scene.add(defenseIslandGroup);
@@ -1660,7 +1706,7 @@ function animate3D() {
     const dx = targetDestination.x - player.x;
     const dz = targetDestination.z - player.z;
     const dist = Math.hypot(dx, dz);
-    if (dist > 16) {
+    if (dist > 18) {
       player.a = Math.atan2(dz, dx);
       player.speed = player.maxSpeed;
     } else {
