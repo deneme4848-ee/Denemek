@@ -722,11 +722,11 @@ const DENEME_IDS = ['deneme1', 'deneme2', 'deneme3', 'deneme4', 'deneme5'];
 
 const SHIP_MODELS = {
   standard:  { id: 'standard',  name: 'Ejderha Kalyonu', desc: 'Başlangıç 3D Savaş Gemisi', cost: 0,        type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45 },
-  deneme1:   { id: 'deneme1',   name: 'Deneme 1 · Altın Güneş', desc: '3D Fener & Kristal · Sinematik Altın Işık', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'gold' },
-  deneme2:   { id: 'deneme2',   name: 'Deneme 2 · Zümrüt Leviathan', desc: '3D Fener & Kristal · Sinematik Zümrüt Işık', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'emerald' },
-  deneme3:   { id: 'deneme3',   name: 'Deneme 3 · Mor Gölge', desc: '3D Fener & Kristal · Sinematik Mor Işık', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'violet' },
-  deneme4:   { id: 'deneme4',   name: 'Deneme 4 · Kızıl Cehennem', desc: '3D Fener & Kristal · Sinematik Kızıl Işık', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'crimson' },
-  deneme5:   { id: 'deneme5',   name: 'Deneme 5 · Buzul Kraliyet', desc: '3D Fener & Kristal · Sinematik Buzul Işık', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, scaleMultiplier: 1.12, denemeStyle: 'frost' },
+  deneme1:   { id: 'deneme1',   name: 'Deneme 1 · Altın Güneş', desc: '3D Fener & Kristal · Gemiye Bitişik Altın Işık', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'gold' },
+  deneme2:   { id: 'deneme2',   name: 'Deneme 2 · Zümrüt Leviathan', desc: '3D Fener & Kristal · Gemiye Bitişik Zümrüt Işık', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'emerald' },
+  deneme3:   { id: 'deneme3',   name: 'Deneme 3 · Mor Gölge', desc: '3D Fener & Kristal · Gemiye Bitişik Mor Işık', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'violet' },
+  deneme4:   { id: 'deneme4',   name: 'Deneme 4 · Kızıl Cehennem', desc: '3D Fener & Kristal · Gemiye Bitişik Kızıl Işık', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'crimson' },
+  deneme5:   { id: 'deneme5',   name: 'Deneme 5 · Buzul Kraliyet', desc: '3D Fener & Kristal · Gemiye Bitişik Buzul Işık', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, scaleMultiplier: 1.12, denemeStyle: 'frost' },
   ghost:     { id: 'ghost',     name: 'Hayalet Fırkateyn', desc: 'Gizli Sis Gövdesi',     cost: 5000000,  type: 'glb', modelPath: 'tasarim1.glb', heightOffset: 45 },
   gold:      { id: 'gold',      name: 'Altın Korsan',     desc: 'İhtişamlı Altın Kalyon', cost: 15000000, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, scaleMultiplier: 1.3 },
   tasarim1:  { id: 'tasarim1',  name: 'Tasarim 1', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim1.glb' },
@@ -750,7 +750,7 @@ const DENEME_THEMES = {
     metalnessAdd: 0.4,
     roughnessSub: 0.25,
     lightColor: 0xffb703,
-    lightIntensity: 2.8,
+    lightIntensity: 2.6,
     sparkleColor: 0xffffff,
     sparkleAccent: 0xffd166,
     crystalColor: 0xfbbf24,
@@ -764,7 +764,7 @@ const DENEME_THEMES = {
     metalnessAdd: 0.3,
     roughnessSub: 0.35,
     lightColor: 0x10b981,
-    lightIntensity: 2.9,
+    lightIntensity: 2.7,
     sparkleColor: 0xecfdf5,
     sparkleAccent: 0x34d399,
     crystalColor: 0x10b981,
@@ -778,7 +778,7 @@ const DENEME_THEMES = {
     metalnessAdd: 0.35,
     roughnessSub: 0.3,
     lightColor: 0xa855f7,
-    lightIntensity: 3.0,
+    lightIntensity: 2.8,
     sparkleColor: 0xfaf5ff,
     sparkleAccent: 0xc084fc,
     crystalColor: 0xa855f7,
@@ -792,7 +792,7 @@ const DENEME_THEMES = {
     metalnessAdd: 0.25,
     roughnessSub: 0.2,
     lightColor: 0xef4444,
-    lightIntensity: 3.2,
+    lightIntensity: 3.0,
     sparkleColor: 0xfff7ed,
     sparkleAccent: 0xfb7185,
     crystalColor: 0xef4444,
@@ -806,7 +806,7 @@ const DENEME_THEMES = {
     metalnessAdd: 0.2,
     roughnessSub: 0.45,
     lightColor: 0x38bdf8,
-    lightIntensity: 2.8,
+    lightIntensity: 2.6,
     sparkleColor: 0xffffff,
     sparkleAccent: 0x7dd3fc,
     crystalColor: 0x38bdf8,
@@ -824,8 +824,8 @@ function getRoundSparklePointTexture() {
   const ctx = c.getContext('2d');
   const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
   grad.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
-  grad.addColorStop(0.22, 'rgba(255, 255, 255, 0.98)');
-  grad.addColorStop(0.52, 'rgba(255, 255, 255, 0.48)');
+  grad.addColorStop(0.25, 'rgba(255, 255, 255, 0.98)');
+  grad.addColorStop(0.55, 'rgba(255, 255, 255, 0.45)');
   grad.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, 64, 64);
@@ -886,14 +886,14 @@ function createLanternAssembly(theme, scale = 1) {
   const coreMat = new THREE.MeshStandardMaterial({
     color: theme.lanternColor,
     emissive: theme.lanternColor,
-    emissiveIntensity: 1.45,
+    emissiveIntensity: 1.5,
     roughness: 0.15,
     metalness: 0.1
   });
   const haloMat = new THREE.MeshBasicMaterial({
     color: theme.sparkleAccent,
     transparent: true,
-    opacity: 0.34,
+    opacity: 0.36,
     blending: THREE.AdditiveBlending,
     depthWrite: false
   });
@@ -919,12 +919,11 @@ function createLanternAssembly(theme, scale = 1) {
 function attachDeneme3DProps(shipMesh, theme, bounds, shipSize) {
   if (!shipMesh || typeof THREE === 'undefined') return;
   const propsGroup = new THREE.Group();
-  const unitScale = Math.max(0.8, Math.min(2.2, shipSize.y * 0.16));
+  const unitScale = Math.max(0.6, Math.min(1.6, shipSize.y * 0.14));
 
-  // 1. Geminin kıç/pruva eksenine yakın 3D fenerler
   const lanternOffsets = [
-    { x: 0, y: bounds.min.y + shipSize.y * 0.62, z: bounds.min.z + shipSize.z * 0.14, s: unitScale * 1.15 },
-    { x: 0, y: bounds.min.y + shipSize.y * 0.44, z: bounds.max.z - shipSize.z * 0.16, s: unitScale * 0.95 }
+    { x: 0, y: bounds.min.y + shipSize.y * 0.58, z: bounds.min.z + shipSize.z * 0.18, s: unitScale * 1.05 },
+    { x: 0, y: bounds.min.y + shipSize.y * 0.42, z: bounds.max.z - shipSize.z * 0.20, s: unitScale * 0.9 }
   ];
 
   denemeLanternCores = [];
@@ -939,16 +938,15 @@ function attachDeneme3DProps(shipMesh, theme, bounds, shipSize) {
     });
   });
 
-  // 2. Geminin etrafında dönen 3D kristaller
   const crystalCount = 6;
-  const orbitRx = Math.max(2.2, shipSize.x * 0.52);
-  const orbitRz = Math.max(2.6, shipSize.z * 0.54);
-  const crystalY = bounds.min.y + shipSize.y * 0.42;
-  const crystalGeo = new THREE.OctahedronGeometry(0.42 * unitScale, 0);
+  const orbitRx = Math.max(1.2, shipSize.x * 0.44);
+  const orbitRz = Math.max(1.5, shipSize.z * 0.46);
+  const crystalY = bounds.min.y + shipSize.y * 0.36;
+  const crystalGeo = new THREE.OctahedronGeometry(0.34 * unitScale, 0);
   const crystalMat = new THREE.MeshStandardMaterial({
     color: theme.crystalColor,
     emissive: theme.lanternColor,
-    emissiveIntensity: 0.75,
+    emissiveIntensity: 0.8,
     metalness: 0.55,
     roughness: 0.2
   });
@@ -956,7 +954,7 @@ function attachDeneme3DProps(shipMesh, theme, bounds, shipSize) {
   denemeCrystalsMeta = [];
   for (let i = 0; i < crystalCount; i++) {
     const cMesh = new THREE.Mesh(crystalGeo, crystalMat);
-    cMesh.scale.set(0.75, 1.45, 0.75);
+    cMesh.scale.set(0.7, 1.35, 0.7);
     const angle = (i / crystalCount) * Math.PI * 2;
     cMesh.position.set(Math.cos(angle) * orbitRx, crystalY, Math.sin(angle) * orbitRz);
     propsGroup.add(cMesh);
@@ -967,8 +965,8 @@ function attachDeneme3DProps(shipMesh, theme, bounds, shipSize) {
       orbitRx,
       orbitRz,
       baseY: crystalY,
-      orbitSpeed: 0.75,
-      bobAmp: Math.max(0.18, shipSize.y * 0.03),
+      orbitSpeed: 0.8,
+      bobAmp: Math.max(0.1, shipSize.y * 0.02),
       phase: i * 1.05
     });
   }
@@ -1011,29 +1009,29 @@ function applyDenemeShipStyling(shipMesh, styleKey = 'gold', options = { withAur
   }
 
   if (options.withAuraPoints && typeof THREE !== 'undefined') {
-    activeDenemeLight = new THREE.PointLight(theme.lightColor, theme.lightIntensity, 260);
-    activeDenemeLight.position.set(0, 65, 0);
+    activeDenemeLight = new THREE.PointLight(theme.lightColor, theme.lightIntensity, 160);
+    activeDenemeLight.position.set(0, 12, 0);
     shipMesh.add(activeDenemeLight);
 
-    // Gemiye bitişik, sıkı ve daha parlak sinematik nokta ışıklar
-    const count = 48;
+    // Gemiye tam bitişik, dar yarıçaplı ve sahneye taşmayan sinematik nokta ışıklar
+    const count = 42;
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const primaryCol = new THREE.Color(theme.sparkleColor);
     const accentCol = new THREE.Color(theme.sparkleAccent);
 
-    const radiusX = Math.max(1.8, shipSize.x * 0.43);
-    const radiusZ = Math.max(2.2, shipSize.z * 0.45);
-    const minY = bounds.min.y + shipSize.y * 0.16;
-    const maxY = bounds.min.y + shipSize.y * 0.56;
+    const radiusX = Math.max(0.9, shipSize.x * 0.36);
+    const radiusZ = Math.max(1.2, shipSize.z * 0.38);
+    const minY = bounds.min.y + shipSize.y * 0.14;
+    const maxY = bounds.min.y + shipSize.y * 0.44;
 
     shipAuraMeta = [];
     for (let i = 0; i < count; i++) {
-      const angle = (i / count) * Math.PI * 2 + (i % 4) * 0.12;
-      const radialSpread = 0.86 + (i % 4) * 0.05;
+      const angle = (i / count) * Math.PI * 2 + (i % 3) * 0.14;
+      const radialSpread = 0.78 + (i % 3) * 0.08;
       const rx = radiusX * radialSpread;
       const rz = radiusZ * radialSpread;
-      const baseY = minY + ((i * 5) % count) / count * Math.max(0.8, maxY - minY);
+      const baseY = minY + ((i * 5) % count) / count * Math.max(0.4, maxY - minY);
 
       positions[i * 3] = Math.cos(angle) * rx;
       positions[i * 3 + 1] = baseY;
@@ -1049,10 +1047,10 @@ function applyDenemeShipStyling(shipMesh, styleKey = 'gold', options = { withAur
         rx,
         rz,
         baseY,
-        orbitSpeed: (i % 2 === 0 ? 1 : -1) * (0.55 + (i % 4) * 0.12),
-        bobSpeed: 1.8 + (i % 5) * 0.3,
-        bobAmp: Math.max(0.12, shipSize.y * 0.022),
-        phase: i * 0.42
+        orbitSpeed: (i % 2 === 0 ? 1 : -1) * (0.65 + (i % 3) * 0.15),
+        bobSpeed: 2.0 + (i % 4) * 0.35,
+        bobAmp: Math.max(0.06, shipSize.y * 0.015),
+        phase: i * 0.45
       });
     }
 
@@ -1061,12 +1059,12 @@ function applyDenemeShipStyling(shipMesh, styleKey = 'gold', options = { withAur
     ptGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const ptMat = new THREE.PointsMaterial({
-      size: 8.5,
-      sizeAttenuation: true,
+      size: 4.5,
+      sizeAttenuation: false,
       map: getRoundSparklePointTexture(),
       vertexColors: true,
       transparent: true,
-      opacity: 0.98,
+      opacity: 1.0,
       depthWrite: false,
       blending: THREE.AdditiveBlending
     });
@@ -2151,7 +2149,7 @@ function animate3D() {
           );
         }
         posAttr.needsUpdate = true;
-        activeShipAuraPoints.material.opacity = 0.85 + 0.15 * pulseWave;
+        activeShipAuraPoints.material.opacity = 0.88 + 0.12 * pulseWave;
       }
 
       if (denemeCrystalsMeta.length > 0) {
