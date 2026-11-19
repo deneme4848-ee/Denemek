@@ -722,11 +722,11 @@ const REMOVED_SHIP_IDS = ['ghost', 'tasarim1', 'gold', 'tasarim5'];
 
 const BASE_SHIP_MODELS = {
   standard:         { id: 'standard',         name: 'Ejderha Kalyonu', desc: 'Başlangıç 3D Savaş Gemisi', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45 },
-  deneme1:          { id: 'deneme1',          name: 'Deneme 1 · Altın Güneş', desc: 'Minik 3D Detay · Altın Gövde', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'gold' },
-  deneme2:          { id: 'deneme2',          name: 'Deneme 2 · Zümrüt Leviathan', desc: 'Minik 3D Detay · Zümrüt Gövde', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'emerald' },
-  deneme3:          { id: 'deneme3',          name: 'Deneme 3 · Mor Gölge', desc: 'Minik 3D Detay · Mor Gövde', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'violet' },
-  deneme4:          { id: 'deneme4',          name: 'Deneme 4 · Kızıl Cehennem', desc: 'Burunda Ağır Top · Kızıl Gövde', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'crimson' },
-  deneme5:          { id: 'deneme5',          name: 'Deneme 5 · Buzul Kraliyet', desc: 'Minik 3D Detay · Buzul Gövde', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, scaleMultiplier: 1.12, denemeStyle: 'frost' },
+  deneme1:          { id: 'deneme1',          name: 'Deneme 1 · Altın Güneş', desc: 'Minik 3D Detay · Hafif Altın Parıltı', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'gold' },
+  deneme2:          { id: 'deneme2',          name: 'Deneme 2 · Zümrüt Leviathan', desc: 'Minik 3D Detay · Hafif Zümrüt Parıltı', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'emerald' },
+  deneme3:          { id: 'deneme3',          name: 'Deneme 3 · Mor Gölge', desc: 'Minik 3D Detay · Hafif Mor Parıltı', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'violet' },
+  deneme4:          { id: 'deneme4',          name: 'Deneme 4 · Kızıl Cehennem', desc: 'Burunda Ağır Top · Hafif Kızıl Parıltı', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'crimson' },
+  deneme5:          { id: 'deneme5',          name: 'Deneme 5 · Buzul Kraliyet', desc: 'Minik 3D Detay · Hafif Buzul Parıltı', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, scaleMultiplier: 1.12, denemeStyle: 'frost' },
   tasarim2:         { id: 'tasarim2',         name: 'Tasarim 2', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim2.glb', heightOffset: 45, rotationOffset: Math.PI / 2 },
   tasarim3:         { id: 'tasarim3',         name: 'Tasarim 3', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3 },
   tasarim3_hayalet: { id: 'tasarim3_hayalet', name: 'Tasarim 3 · Hayalet', desc: 'Sürekli Parlayıp Sönen Hayalet Kopya', cost: 0, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3, phantomStyle: 'specter_teal' },
@@ -769,64 +769,64 @@ const PHANTOM_THEMES = {
 
 const DENEME_THEMES = {
   gold: {
-    color: 0xffd166,
+    color: 0xfde68a,
     emissive: 0xf59e0b,
-    emissiveIntensity: 0.28,
-    metalnessAdd: 0.35,
-    roughnessSub: 0.25,
-    lightColor: 0xffb703,
-    lightIntensity: 0.45,
+    emissiveIntensity: 0.14,
+    metalnessAdd: 0.22,
+    roughnessSub: 0.16,
+    lightColor: 0xffd166,
+    lightIntensity: 0.22,
     crystalColor: 0xfbbf24,
     lanternColor: 0xffb703,
-    pulseSpeed: 2.6
+    pulseSpeed: 2.2
   },
   emerald: {
-    color: 0x6ee7b7,
-    emissive: 0x059669,
-    emissiveIntensity: 0.3,
-    metalnessAdd: 0.3,
-    roughnessSub: 0.35,
-    lightColor: 0x10b981,
-    lightIntensity: 0.45,
-    crystalColor: 0x10b981,
+    color: 0xa7f3d0,
+    emissive: 0x10b981,
+    emissiveIntensity: 0.14,
+    metalnessAdd: 0.2,
+    roughnessSub: 0.2,
+    lightColor: 0x34d399,
+    lightIntensity: 0.22,
+    crystalColor: 0x34d399,
     lanternColor: 0x34d399,
-    pulseSpeed: 3.0
-  },
-  violet: {
-    color: 0xc4b5fd,
-    emissive: 0x7c3aed,
-    emissiveIntensity: 0.32,
-    metalnessAdd: 0.35,
-    roughnessSub: 0.3,
-    lightColor: 0xa855f7,
-    lightIntensity: 0.45,
-    crystalColor: 0xa855f7,
-    lanternColor: 0xc084fc,
     pulseSpeed: 2.4
   },
+  violet: {
+    color: 0xddd6fe,
+    emissive: 0x8b5cf6,
+    emissiveIntensity: 0.15,
+    metalnessAdd: 0.22,
+    roughnessSub: 0.18,
+    lightColor: 0xc084fc,
+    lightIntensity: 0.22,
+    crystalColor: 0xc084fc,
+    lanternColor: 0xc084fc,
+    pulseSpeed: 2.1
+  },
   crimson: {
-    color: 0xfca5a5,
-    emissive: 0xdc2626,
-    emissiveIntensity: 0.34,
-    metalnessAdd: 0.25,
-    roughnessSub: 0.2,
-    lightColor: 0xef4444,
-    lightIntensity: 0.5,
-    crystalColor: 0xef4444,
+    color: 0xfecaca,
+    emissive: 0xef4444,
+    emissiveIntensity: 0.16,
+    metalnessAdd: 0.18,
+    roughnessSub: 0.14,
+    lightColor: 0xf87171,
+    lightIntensity: 0.24,
+    crystalColor: 0xf87171,
     lanternColor: 0xf97316,
-    pulseSpeed: 4.2
+    pulseSpeed: 2.8
   },
   frost: {
-    color: 0xbae6fd,
-    emissive: 0x0284c7,
-    emissiveIntensity: 0.3,
-    metalnessAdd: 0.2,
-    roughnessSub: 0.45,
-    lightColor: 0x38bdf8,
-    lightIntensity: 0.45,
-    crystalColor: 0x38bdf8,
+    color: 0xe0f2fe,
+    emissive: 0x38bdf8,
+    emissiveIntensity: 0.14,
+    metalnessAdd: 0.15,
+    roughnessSub: 0.24,
+    lightColor: 0x7dd3fc,
+    lightIntensity: 0.22,
+    crystalColor: 0x7dd3fc,
     lanternColor: 0x7dd3fc,
-    pulseSpeed: 2.8
+    pulseSpeed: 2.3
   }
 };
 
@@ -867,6 +867,7 @@ let denemeCrystalsMeta = [];
 let denemeLanternCores = [];
 let deneme4BowCannonEmber = null;
 let activeDenemeStyleKey = null;
+let denemeMaterialsList = [];
 
 let activePhantomLight = null;
 let activePhantomStyleKey = null;
@@ -901,6 +902,13 @@ function clearDenemeShipStyling() {
   denemeLanternCores = [];
   deneme4BowCannonEmber = null;
   activeDenemeStyleKey = null;
+
+  denemeMaterialsList.forEach((mat) => {
+    if (mat && typeof mat.dispose === 'function') {
+      mat.dispose();
+    }
+  });
+  denemeMaterialsList = [];
 
   if (activePhantomLight && activePhantomLight.parent) {
     activePhantomLight.parent.remove(activePhantomLight);
@@ -959,9 +967,9 @@ function createLanternAssembly(theme, scale = 1) {
   const coreMat = new THREE.MeshStandardMaterial({
     color: theme.lanternColor,
     emissive: theme.lanternColor,
-    emissiveIntensity: 1.1,
-    roughness: 0.2,
-    metalness: 0.15
+    emissiveIntensity: 0.65,
+    roughness: 0.25,
+    metalness: 0.2
   });
 
   const baseMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.14 * scale, 0.18 * scale, 0.08 * scale, 8), capMat);
@@ -997,9 +1005,9 @@ function createCinematicBowCannon(scale = 1) {
   const goldBandMat = new THREE.MeshStandardMaterial({
     color: 0xfbbf24,
     emissive: 0xd97706,
-    emissiveIntensity: 0.45,
+    emissiveIntensity: 0.25,
     metalness: 0.88,
-    roughness: 0.22
+    roughness: 0.25
   });
   const boreDarkMat = new THREE.MeshStandardMaterial({
     color: 0x090d12,
@@ -1009,9 +1017,9 @@ function createCinematicBowCannon(scale = 1) {
   const emberMat = new THREE.MeshStandardMaterial({
     color: 0xfef08a,
     emissive: 0xf97316,
-    emissiveIntensity: 2.2,
-    roughness: 0.15,
-    metalness: 0.1
+    emissiveIntensity: 1.0,
+    roughness: 0.2,
+    metalness: 0.15
   });
 
   const basePlate = new THREE.Mesh(new THREE.BoxGeometry(0.95 * scale, 0.24 * scale, 1.15 * scale), gunmetalMat);
@@ -1101,9 +1109,9 @@ function attachDeneme3DProps(shipMesh, theme, bounds, shipSize, styleKey) {
   const crystalMat = new THREE.MeshStandardMaterial({
     color: theme.crystalColor,
     emissive: theme.lanternColor,
-    emissiveIntensity: 0.65,
-    metalness: 0.6,
-    roughness: 0.2
+    emissiveIntensity: 0.35,
+    metalness: 0.65,
+    roughness: 0.22
   });
 
   denemeCrystalsMeta = [];
@@ -1149,37 +1157,42 @@ function applyDenemeShipStyling(shipMesh, styleKey = 'gold', options = { with3DP
   if (!shipMesh) return;
   const theme = DENEME_THEMES[styleKey] || DENEME_THEMES.gold;
   activeDenemeStyleKey = styleKey;
-
-  const bounds = new THREE.Box3().setFromObject(shipMesh);
-  const shipSize = new THREE.Vector3();
-  bounds.getSize(shipSize);
+  denemeMaterialsList = [];
 
   shipMesh.traverse((child) => {
     if (child.isMesh && child.material) {
       const mats = Array.isArray(child.material) ? child.material : [child.material];
-      mats.forEach((mat) => {
+      const styledMats = mats.map((origMat) => {
+        const mat = origMat.clone();
         if (mat.color) mat.color.setHex(theme.color);
         if (mat.emissive) {
           mat.emissive.setHex(theme.emissive);
           mat.emissiveIntensity = theme.emissiveIntensity;
         }
         if (typeof mat.metalness === 'number') {
-          mat.metalness = Math.min(0.85, (mat.metalness || 0.25) + theme.metalnessAdd);
+          mat.metalness = Math.min(0.75, (mat.metalness || 0.25) + theme.metalnessAdd);
         }
         if (typeof mat.roughness === 'number') {
-          mat.roughness = Math.max(0.22, (mat.roughness || 0.6) - theme.roughnessSub);
+          mat.roughness = Math.max(0.28, (mat.roughness || 0.6) - theme.roughnessSub);
         }
         mat.needsUpdate = true;
+        denemeMaterialsList.push(mat);
+        return mat;
       });
+      child.material = Array.isArray(child.material) ? styledMats : styledMats[0];
     }
   });
+
+  const bounds = new THREE.Box3().setFromObject(shipMesh);
+  const shipSize = new THREE.Vector3();
+  bounds.getSize(shipSize);
 
   if (options.with3DProps) {
     attachDeneme3DProps(shipMesh, theme, bounds, shipSize, styleKey);
   }
 
   if (typeof THREE !== 'undefined') {
-    activeDenemeLight = new THREE.PointLight(theme.lightColor, theme.lightIntensity, 45);
+    activeDenemeLight = new THREE.PointLight(theme.lightColor, theme.lightIntensity, 36);
     activeDenemeLight.position.set(0, 12, 0);
     shipMesh.add(activeDenemeLight);
   }
@@ -1427,6 +1440,23 @@ let gltfLoader;
 const WALL_RADIUS = ATTACK_RANGE;
 const WALL_GATE_ANGLES = [Math.PI, 0];
 const WALL_GAP_HALF_ARC = 0.21;
+const TOWER_ANGLES = [
+  -2.748893571891069,
+  -2.356194490192345,
+  -1.9634954084936207,
+  -1.5707963267948966,
+  -1.1780972450961724,
+  -0.7853981633974483,
+  -0.39269908169872414,
+  0.39269908169872414,
+  0.7853981633974483,
+  1.1780972450961724,
+  1.5707963267948966,
+  1.9634954084936207,
+  2.356194490192345,
+  2.748893571891069
+];
+const TOWER_MOUNT_Y = SHIP_Y_POS - 23.5;
 let navigationQueue = [];
 
 function normalizeAngle(a) {
@@ -2297,6 +2327,15 @@ function isGateAngle(angle) {
   return false;
 }
 
+function isTowerAngle(angle) {
+  for (const tAng of TOWER_ANGLES) {
+    if (Math.abs(normalizeAngle(angle - tAng)) < 0.14) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function spawnDefenseTowersRing() {
   defenseTowers.forEach(t => {
     if (t.mesh) scene.remove(t.mesh);
@@ -2316,7 +2355,7 @@ function spawnDefenseTowersRing() {
   activeDefenseIslandGroup = defenseIslandGroup;
 
   const wallRadius = WALL_RADIUS; 
-  const wallSegments = 24;
+  const wallSegments = 32;
   const wallStoneTex = createStoneWallTexture();
   
   const wallMat = new THREE.MeshStandardMaterial({ 
@@ -2349,6 +2388,15 @@ function spawnDefenseTowersRing() {
     depthTest: true
   });
 
+  const towerBaseMat = new THREE.MeshStandardMaterial({
+    map: wallStoneTex,
+    bumpMap: wallStoneTex,
+    bumpScale: 1.2,
+    color: 0x343b46,
+    roughness: 0.5,
+    metalness: 0.58
+  });
+
   const gatePillarMat = new THREE.MeshStandardMaterial({
     color: 0xeab308,
     roughness: 0.25,
@@ -2364,7 +2412,7 @@ function spawnDefenseTowersRing() {
       continue;
     }
     
-    const segmentWidth = (2 * Math.PI * wallRadius) / wallSegments * 1.06;
+    const segmentWidth = (2 * Math.PI * wallRadius) / wallSegments * 1.07;
     const wallSegGeo = new THREE.BoxGeometry(segmentWidth, 44, 28);
     const wallSegMesh = new THREE.Mesh(wallSegGeo, wallMat);
     wallSegMesh.renderOrder = 0;
@@ -2384,29 +2432,44 @@ function spawnDefenseTowersRing() {
     topGoldCornice.rotation.y = rotY;
     defenseIslandGroup.add(topGoldCornice);
 
-    [-0.28, 0.28].forEach((offsetRatio) => {
-      const mLocalX = segmentWidth * offsetRatio;
-      const merlon = new THREE.Mesh(new THREE.BoxGeometry(segmentWidth * 0.24, 12, 29), merlonMat);
-      merlon.position.set(
-        wx + mLocalX * cosA,
-        SHIP_Y_POS - 29.5,
-        wz - mLocalX * sinA
-      );
-      merlon.rotation.y = rotY;
-      defenseIslandGroup.add(merlon);
+    if (!isTowerAngle(midAngle)) {
+      [-0.26, 0.26].forEach((offsetRatio) => {
+        const mLocalX = segmentWidth * offsetRatio;
+        const merlon = new THREE.Mesh(new THREE.BoxGeometry(segmentWidth * 0.24, 11, 29), merlonMat);
+        merlon.position.set(
+          wx + mLocalX * cosA,
+          SHIP_Y_POS - 30,
+          wz - mLocalX * sinA
+        );
+        merlon.rotation.y = rotY;
+        defenseIslandGroup.add(merlon);
 
-      const merlonGoldCap = new THREE.Mesh(new THREE.BoxGeometry(segmentWidth * 0.25, 1.6, 30), goldTrimMat);
-      merlonGoldCap.position.set(
-        wx + mLocalX * cosA,
-        SHIP_Y_POS - 23.2,
-        wz - mLocalX * sinA
-      );
-      merlonGoldCap.rotation.y = rotY;
-      defenseIslandGroup.add(merlonGoldCap);
-    });
+        const merlonGoldCap = new THREE.Mesh(new THREE.BoxGeometry(segmentWidth * 0.25, 1.5, 30), goldTrimMat);
+        merlonGoldCap.position.set(
+          wx + mLocalX * cosA,
+          SHIP_Y_POS - 24,
+          wz - mLocalX * sinA
+        );
+        merlonGoldCap.rotation.y = rotY;
+        defenseIslandGroup.add(merlonGoldCap);
+      });
+    }
 
     wallCollisionBoxes.push({ x: wx, z: wz, radius: segmentWidth / 2 + 6 });
   }
+
+  TOWER_ANGLES.forEach((tAng) => {
+    const tx = Math.cos(tAng) * wallRadius;
+    const tz = Math.sin(tAng) * wallRadius;
+    const deckPlinth = new THREE.Mesh(new THREE.CylinderGeometry(18, 20, 4.5, 16), towerBaseMat);
+    deckPlinth.position.set(tx, SHIP_Y_POS - 25.5, tz);
+    defenseIslandGroup.add(deckPlinth);
+
+    const deckGoldRim = new THREE.Mesh(new THREE.TorusGeometry(18.5, 1.0, 10, 24), goldTrimMat);
+    deckGoldRim.rotation.x = Math.PI / 2;
+    deckGoldRim.position.set(tx, SHIP_Y_POS - 23.3, tz);
+    defenseIslandGroup.add(deckGoldRim);
+  });
 
   WALL_GATE_ANGLES.forEach((gateAng) => {
     [-WALL_GAP_HALF_ARC, WALL_GAP_HALF_ARC].forEach((edgeOffset) => {
@@ -2465,20 +2528,21 @@ function spawnDefenseTowersRing() {
       const size = new THREE.Vector3();
       box.getSize(size);
       const maxDim = Math.max(size.x, size.y, size.z) || 1;
-      let computedScale = (85 / maxDim) * scaleFactor;
+      let computedScale = (58 / maxDim) * scaleFactor;
       model.scale.set(computedScale, computedScale, computedScale);
-      model.position.set(x, SHIP_Y_POS - 65, z);
+
+      const scaledBox = new THREE.Box3().setFromObject(model);
+      const bottomOffset = scaledBox.min.y - model.position.y;
+      model.position.set(x, TOWER_MOUNT_Y - bottomOffset, z);
+
       model.userData = { enemyId: towerId };
       scene.add(model);
       towerObj.mesh = model;
     });
   };
 
-  const totalTowersNeeded = 16;
-  for (let i = 0; i < totalTowersNeeded; i++) {
-    const angle = (i / totalTowersNeeded) * Math.PI * 2;
-    if (isGateAngle(angle)) continue;
-
+  for (let i = 0; i < TOWER_ANGLES.length; i++) {
+    const angle = TOWER_ANGLES[i];
     const tx = Math.cos(angle) * wallRadius;
     const tz = Math.sin(angle) * wallRadius;
     createTowerEntity(towerCounter++, tx, tz, 1.0);
@@ -2925,8 +2989,15 @@ function animate3D() {
       const dTheme = DENEME_THEMES[modelSpec.denemeStyle] || DENEME_THEMES.gold;
       const pulseWave = 0.5 + 0.5 * Math.sin(timeSec * dTheme.pulseSpeed);
 
+      for (let i = 0; i < denemeMaterialsList.length; i++) {
+        const mat = denemeMaterialsList[i];
+        if (mat.emissive) {
+          mat.emissiveIntensity = dTheme.emissiveIntensity * (0.75 + 0.45 * pulseWave);
+        }
+      }
+
       if (activeDenemeLight) {
-        activeDenemeLight.intensity = dTheme.lightIntensity + pulseWave * 0.25;
+        activeDenemeLight.intensity = dTheme.lightIntensity * (0.75 + 0.4 * pulseWave);
       }
 
       if (denemeCrystalsMeta.length > 0) {
@@ -2946,16 +3017,16 @@ function animate3D() {
       if (denemeLanternCores.length > 0) {
         for (let i = 0; i < denemeLanternCores.length; i++) {
           const l = denemeLanternCores[i];
-          l.coreMat.emissiveIntensity = 1.0 + pulseWave * 0.5;
+          l.coreMat.emissiveIntensity = 0.55 + pulseWave * 0.3;
           if (l.coreMesh) {
-            const s = 0.92 + pulseWave * 0.14;
+            const s = 0.95 + pulseWave * 0.1;
             l.coreMesh.scale.set(0.8 * s, 1.15 * s, 0.8 * s);
           }
         }
       }
 
       if (deneme4BowCannonEmber) {
-        deneme4BowCannonEmber.emissiveIntensity = 1.8 + pulseWave * 1.6;
+        deneme4BowCannonEmber.emissiveIntensity = 0.85 + pulseWave * 0.65;
       }
     }
 
