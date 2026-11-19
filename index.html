@@ -961,32 +961,44 @@ let lastClockTime = performance.now();
 let lastRegenTime = performance.now();
 let gltfLoader;
 
-// Sur çemberi ve açıklık koordinatları
+// Sur çemberi ve geçit rotası ayarları
 const WALL_RADIUS = ATTACK_RANGE;
-const WALL_GAP_ANGLE = Math.PI; // Açıklık açısı (~180 derece, x = -300, z = 0)
+const WALL_GAP_ANGLE = Math.PI;
+const WALL_GAP_HALF_ARC = 0.16;
 let navigationQueue = [];
+
+function normalizeAngle(a) {
+  while (a > Math.PI) a -= Math.PI * 2;
+  while (a < -Math.PI) a += Math.PI * 2;
+  return a;
+}
 
 function buildNavigationRoute(fromX, fromZ, toX, toZ) {
   const queue = [];
   const startDist = Math.hypot(fromX, fromZ);
   const endDist = Math.hypot(toX, toZ);
-  const margin = 55;
+  const margin = 65;
 
-  const crossesWall =
-    (startDist > WALL_RADIUS + 20 && endDist < WALL_RADIUS - 20) ||
-    (startDist < WALL_RADIUS - 20 && endDist > WALL_RADIUS + 20);
+  const startOutside = startDist > WALL_RADIUS + 20;
+  const endInside = endDist < WALL_RADIUS - 20;
+  const startInside = startDist < WALL_RADIUS - 20;
+  const endOutside = endDist > WALL_RADIUS + 20;
 
-  if (crossesWall) {
-    const gapOutX = Math.cos(WALL_GAP_ANGLE) * (WALL_RADIUS + margin);
-    const gapOutZ = Math.sin(WALL_GAP_ANGLE) * (WALL_RADIUS + margin);
-    const gapInX  = Math.cos(WALL_GAP_ANGLE) * (WALL_RADIUS - margin);
-    const gapInZ  = Math.sin(WALL_GAP_ANGLE) * (WALL_RADIUS - margin);
+  const gapOutX = Math.cos(WALL_GAP_ANGLE) * (WALL_RADIUS + margin);
+  const gapOutZ = Math.sin(WALL_GAP_ANGLE) * (WALL_RADIUS + margin);
+  const gapInX  = Math.cos(WALL_GAP_ANGLE) * (WALL_RADIUS - margin);
+  const gapInZ  = Math.sin(WALL_GAP_ANGLE) * (WALL_RADIUS - margin);
 
-    if (startDist > WALL_RADIUS + 20) {
-      queue.push({ x: gapOutX, z: gapOutZ });
-      queue.push({ x: gapInX, z: gapInZ });
-    } else {
-      queue.push({ x: gapInX, z: gapInZ });
+  if (startOutside && endInside) {
+    queue.push({ x: gapOutX, z: gapOutZ });
+    queue.push({ x: gapInX, z: gapInZ });
+  } else if (startInside && endOutside) {
+    queue.push({ x: gapInX, z: gapInZ });
+    queue.push({ x: gapOutX, z: gapOutZ });
+  } else if (startOutside && endOutside) {
+    const midX = (fromX + toX) * 0.5;
+    const midZ = (fromZ + toZ) * 0.5;
+    if (Math.hypot(midX, midZ) < WALL_RADIUS + 15) {
       queue.push({ x: gapOutX, z: gapOutZ });
     }
   }
@@ -1300,13 +1312,12 @@ function spawnDefenseTowersRing() {
   
   for (let i = 0; i < wallSegments; i++) {
     const angle = (i / wallSegments) * Math.PI * 2;
-    
-    if (angle > Math.PI * 0.95 && angle < Math.PI * 1.05) {
-      continue; 
-    }
-
     const nextAngle = ((i + 1) / wallSegments) * Math.PI * 2;
-    const midAngle = (angle + nextAngle) / 2;
+    const midAngle = normalizeAngle((angle + nextAngle) / 2);
+
+    if (Math.abs(normalizeAngle(midAngle - WALL_GAP_ANGLE)) < WALL_GAP_HALF_ARC) {
+      continue;
+    }
     
     const segmentWidth = (2 * Math.PI * wallRadius) / wallSegments * 1.05;
     const wallSegGeo = new THREE.BoxGeometry(segmentWidth, 40, 24);
@@ -1320,7 +1331,7 @@ function spawnDefenseTowersRing() {
     wallSegMesh.rotation.y = -midAngle + Math.PI / 2;
     defenseIslandGroup.add(wallSegMesh);
 
-    wallCollisionBoxes.push({ x: wx, z: wz, radius: segmentWidth / 2 + 15 });
+    wallCollisionBoxes.push({ x: wx, z: wz, radius: segmentWidth / 2 + 12 });
   }
 
   scene.add(defenseIslandGroup);
@@ -1649,7 +1660,7 @@ function animate3D() {
     const dx = targetDestination.x - player.x;
     const dz = targetDestination.z - player.z;
     const dist = Math.hypot(dx, dz);
-    if (dist > 14) {
+    if (dist > 16) {
       player.a = Math.atan2(dz, dx);
       player.speed = player.maxSpeed;
     } else {
