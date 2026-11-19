@@ -8,7 +8,7 @@
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
     html, body {
       margin: 0; width: 100%; height: 100%; overflow: hidden;
-      background: #031422; color: #fff; font-family: system-ui, -apple-system, sans-serif;
+      background: #031422; color: #fef3c7; font-family: system-ui, -apple-system, sans-serif;
     }
     #game { display: block; width: 100%; height: 100%; position: fixed; inset: 0; z-index: 0; cursor: grab; }
     #game:active { cursor: grabbing; }
@@ -18,11 +18,12 @@
       body { zoom: 1.0; }
       #top-vital-hud {
         position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
-        width: 640px; z-index: 6; pointer-events: none;
+        width: 650px; z-index: 6; pointer-events: none;
         display: flex; flex-direction: row; align-items: center; gap: 12px;
-        background: rgba(6, 17, 27, 0.92); backdrop-filter: blur(8px);
-        border: 2px solid rgba(245, 197, 94, 0.6); border-radius: 16px;
-        padding: 8px 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.85);
+        background: linear-gradient(145deg, rgba(36, 15, 9, 0.95), rgba(14, 7, 5, 0.96));
+        backdrop-filter: blur(8px);
+        border: 2px solid rgba(212, 175, 55, 0.72); border-radius: 16px;
+        padding: 8px 18px; box-shadow: 0 12px 32px rgba(0,0,0,0.9), inset 0 1px 0 rgba(251, 191, 36, 0.25);
       }
       #top-left-hud {
         position: fixed; top: 16px; left: 20px;
@@ -35,8 +36,8 @@
         width: auto; display: flex; flex-direction: row; align-items: flex-end; gap: 20px;
         z-index: 6; pointer-events: none;
       }
-      .radar-card { padding: 6px !important; border-radius: 14px !important; }
-      #minimap { width: 110px !important; height: 110px !important; border-radius: 8px !important; }
+      .radar-card { padding: 7px !important; border-radius: 14px !important; }
+      #minimap { width: 112px !important; height: 112px !important; border-radius: 8px !important; }
       .coord-pill { font-size: 11px !important; padding: 3px 6px !important; }
       .radar-title { font-size: 10px !important; margin-bottom: 2px; }
       .tool-icon-btn { width: 50px !important; height: 50px !important; border-radius: 12px !important; }
@@ -46,7 +47,7 @@
       .ammo-slot .ammo-ico img { width: 40px !important; height: 40px !important; }
       .ammo-slot .ammo-qty { font-size: 12px !important; }
       .ammo-slot .key-hint { font-size: 10px !important; top: 3px !important; left: 5px !important; }
-      #attack-btn { width: 90px !important; height: 90px !important; font-size: 13px !important; }
+      #attack-btn { width: 92px !important; height: 92px !important; font-size: 13px !important; }
       #attack-btn .crosshair { font-size: 26px !important; }
     }
 
@@ -55,7 +56,8 @@
       #top-vital-hud {
         position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
         width: min(92vw, 520px); display: flex; align-items: center; gap: 6px; z-index: 6; pointer-events: none;
-        background: rgba(6, 17, 27, 0.88); padding: 4px 8px; border-radius: 10px; border: 1px solid rgba(245, 197, 94, 0.4);
+        background: linear-gradient(145deg, rgba(36, 15, 9, 0.94), rgba(14, 7, 5, 0.96));
+        padding: 4px 8px; border-radius: 10px; border: 1.5px solid rgba(212, 175, 55, 0.6);
       }
       #top-left-hud {
         position: fixed; top: 56px; left: 8px; display: flex; align-items: flex-start; gap: 6px; z-index: 6; pointer-events: none;
@@ -77,7 +79,8 @@
       #top-vital-hud {
         position: fixed; top: 6px; left: 50%; transform: translateX(-50%);
         width: min(70vw, 460px); display: flex; align-items: center; gap: 6px; z-index: 6; pointer-events: none;
-        background: rgba(6, 17, 27, 0.9); padding: 3px 10px; border-radius: 10px; border: 1px solid rgba(245, 197, 94, 0.4);
+        background: linear-gradient(145deg, rgba(36, 15, 9, 0.94), rgba(14, 7, 5, 0.96));
+        padding: 3px 10px; border-radius: 10px; border: 1.5px solid rgba(212, 175, 55, 0.6);
       }
       .level-crest { width: 36px !important; height: 36px !important; border-radius: 8px !important; }
       .level-crest strong { font-size: 13px !important; }
@@ -114,66 +117,67 @@
 
     #map-transit-banner {
       display: none; position: fixed; top: 85px; left: 50%; transform: translateX(-50%);
-      z-index: 12; background: linear-gradient(135deg, #1e293b, #0f172a);
-      border: 2px solid #94a3b8; border-radius: 14px; padding: 10px 22px;
-      color: #f8fafc; font-size: 13px; font-weight: 900; cursor: pointer;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.85); animation: pulseTransit 1.2s infinite alternate;
+      z-index: 12; background: linear-gradient(135deg, #5c1f12, #260d07);
+      border: 2px solid #eab308; border-radius: 14px; padding: 10px 22px;
+      color: #fef3c7; font-size: 13px; font-weight: 900; cursor: pointer;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.9); animation: pulseTransit 1.2s infinite alternate;
       pointer-events: auto; letter-spacing: 0.5px;
     }
     #map-transit-banner.visible { display: block; }
     @keyframes pulseTransit {
-      from { transform: translateX(-50%) scale(1.0); box-shadow: 0 0 15px rgba(148, 163, 184, 0.4); }
-      to { transform: translateX(-50%) scale(1.06); box-shadow: 0 0 25px rgba(241, 245, 249, 0.7); }
+      from { transform: translateX(-50%) scale(1.0); box-shadow: 0 0 14px rgba(234, 179, 8, 0.45); }
+      to { transform: translateX(-50%) scale(1.06); box-shadow: 0 0 26px rgba(251, 191, 36, 0.8); }
     }
 
     .level-crest {
       width: 46px; height: 46px; flex-shrink: 0; border-radius: 12px;
-      background: linear-gradient(145deg, #1e293b, #09131d);
-      border: 2px solid #f59e0b; box-shadow: 0 4px 14px rgba(0,0,0,0.85);
+      background: linear-gradient(145deg, #4a1c10, #190905);
+      border: 2px solid #eab308; box-shadow: 0 4px 14px rgba(0,0,0,0.85);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
     .level-crest span { font-size: 7px; color: #fbbf24; font-weight: 800; letter-spacing: 0.5px; }
-    .level-crest strong { font-size: 16px; color: #fff; line-height: 1; }
+    .level-crest strong { font-size: 16px; color: #fffbeb; line-height: 1; }
 
     .vital-bars-wrap { flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 200px; }
     .vital-track {
       position: relative; width: 100%; height: 16px;
-      background: rgba(15, 23, 42, 0.92); border-radius: 6px; overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(20, 9, 6, 0.94); border-radius: 6px; overflow: hidden;
+      border: 1px solid rgba(212, 175, 55, 0.35);
     }
-    #hp-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #991b1b, #dc2626, #f87171); transition: width 0.2s ease; }
-    #exp-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #0369a1, #0284c7, #38bdf8); transition: width 0.25s ease; }
+    #hp-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #7f1d1d, #dc2626, #f87171); transition: width 0.2s ease; }
+    #exp-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #92400e, #d97706, #fbbf24); transition: width 0.25s ease; }
     .vital-label {
       position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
       font-size: 11px; font-weight: 800; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.95);
     }
 
     .radar-card {
-      pointer-events: auto; background: rgba(7, 20, 31, 0.94);
-      border: 2px solid rgba(148, 163, 184, 0.45); border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.85);
+      pointer-events: auto;
+      background: linear-gradient(160deg, rgba(38, 16, 10, 0.96), rgba(15, 7, 5, 0.97));
+      border: 2px solid rgba(212, 175, 55, 0.6); border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.9);
       display: flex; flex-direction: column; align-items: center; gap: 3px;
     }
-    .radar-title { font-size: 9px; font-weight: 800; color: #94a3b8; letter-spacing: 0.5px; text-transform: uppercase; }
-    #minimap { background: #0b1d2c; border: 1px solid #475569; display: block; }
+    .radar-title { font-size: 9px; font-weight: 800; color: #fbbf24; letter-spacing: 0.5px; text-transform: uppercase; }
+    #minimap { background: #071926; border: 1px solid rgba(212, 175, 55, 0.5); display: block; }
     .coord-pill {
       width: 100%; text-align: center; font-weight: 800;
-      background: rgba(2, 8, 14, 0.85); color: #f8fafc;
-      border-radius: 4px; border: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(12, 5, 3, 0.9); color: #fde68a;
+      border-radius: 4px; border: 1px solid rgba(212, 175, 55, 0.35);
     }
 
     .side-tool-col { pointer-events: auto; display: flex; flex-direction: column; }
     .tool-icon-btn {
-      background: linear-gradient(155deg, #172a3a, #091520);
-      border: 1.5px solid rgba(148, 163, 184, 0.4); color: #f8fafc;
+      background: linear-gradient(155deg, #3b170e, #170805);
+      border: 1.5px solid rgba(212, 175, 55, 0.55); color: #fef3c7;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      cursor: pointer; box-shadow: 0 5px 14px rgba(0,0,0,0.75);
-      transition: transform 0.12s, border-color 0.15s;
+      cursor: pointer; box-shadow: 0 5px 14px rgba(0,0,0,0.8);
+      transition: transform 0.12s, border-color 0.15s, box-shadow 0.15s;
     }
-    .tool-icon-btn:hover { border-color: #cbd5e1; transform: translateY(-1px); }
+    .tool-icon-btn:hover { border-color: #fbbf24; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(245, 158, 11, 0.25); }
     .tool-icon-btn:active { transform: scale(0.94); }
     .tool-icon-btn span.ico { line-height: 1.1; }
-    .tool-icon-btn span.lbl { font-weight: 800; color: #cbd5e1; }
+    .tool-icon-btn span.lbl { font-weight: 800; color: #fcd34d; }
     
     .ship-level-badge {
       background: linear-gradient(135deg, #b45309, #78350f);
@@ -190,13 +194,13 @@
       will-change: transform;
     }
     .ship-hp-track {
-      width: 52px; height: 5px; background: rgba(0, 0, 0, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 3px; overflow: hidden;
+      width: 52px; height: 5px; background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(251, 191, 36, 0.45); border-radius: 3px; overflow: hidden;
       box-shadow: 0 2px 5px rgba(0,0,0,0.8);
     }
     #player-ship-hp-fill { width: 100%; height: 100%; background: #22c55e; transition: width 0.15s, background-color 0.2s; }
-    .ship-name-tag { font-size: 10px; font-weight: 900; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap; }
-    .ship-fleet-tag { font-size: 9px; font-weight: 800; color: #cbd5e1; text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap; }
+    .ship-name-tag { font-size: 10px; font-weight: 900; color: #fffbeb; text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap; }
+    .ship-fleet-tag { font-size: 9px; font-weight: 800; color: #fbbf24; text-shadow: 0 1px 3px rgba(0,0,0,0.95); white-space: nowrap; }
 
     .enemy-label {
       position: fixed; z-index: 5; pointer-events: none;
@@ -225,48 +229,48 @@
 
     .ammo-dock-container { pointer-events: auto; display: flex; flex-direction: column; gap: 4px; }
     .active-ammo-banner {
-      background: rgba(6, 17, 27, 0.88);
-      border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 7px;
-      padding: 4px 10px; font-size: 11px; color: #cbd5e1; font-weight: 700;
+      background: linear-gradient(90deg, rgba(38, 16, 10, 0.94), rgba(16, 7, 5, 0.96));
+      border: 1.5px solid rgba(212, 175, 55, 0.5); border-radius: 7px;
+      padding: 4px 10px; font-size: 11px; color: #fde68a; font-weight: 700;
     }
     .ammo-slots-row { display: flex; gap: 8px; padding-bottom: 2px; }
     .ammo-slot {
       position: relative; flex-shrink: 0;
-      background: linear-gradient(165deg, #132838, #07131d);
-      border: 2px solid rgba(148, 163, 184, 0.35);
+      background: linear-gradient(165deg, #38160d, #150805);
+      border: 2px solid rgba(212, 175, 55, 0.45);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      cursor: pointer; transition: all 0.15s ease; box-shadow: 0 5px 12px rgba(0,0,0,0.8);
+      cursor: pointer; transition: all 0.15s ease; box-shadow: 0 5px 12px rgba(0,0,0,0.85);
     }
     .ammo-slot.selected {
-      border-color: #cbd5e1; background: linear-gradient(165deg, #1e293b, #0f172a);
-      box-shadow: 0 0 14px rgba(148, 163, 184, 0.4); transform: translateY(-2px);
+      border-color: #fbbf24; background: linear-gradient(165deg, #6b2412, #2b0e07);
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.55); transform: translateY(-2px);
     }
-    .ammo-slot .key-hint { position: absolute; font-weight: 800; color: #94a3b8; z-index: 2; }
+    .ammo-slot .key-hint { position: absolute; font-weight: 800; color: #fbbf24; z-index: 2; }
     .ammo-slot .ammo-ico { display: flex; align-items: center; justify-content: center; width: 100%; height: 36px; margin-top: 6px; }
     .ammo-slot .ammo-ico img { object-fit: contain; width: 38px; height: 38px; }
     .ammo-slot .ammo-qty {
-      font-weight: 900; color: #fff; margin-top: 1px;
-      background: rgba(0,0,0,0.55); padding: 1px 6px; border-radius: 4px;
+      font-weight: 900; color: #fffbeb; margin-top: 1px;
+      background: rgba(0,0,0,0.65); padding: 1px 6px; border-radius: 4px;
     }
     .ammo-slot.empty { opacity: 0.45; }
 
     .right-combat-cluster { pointer-events: auto; display: flex; flex-direction: column; align-items: center; gap: 6px; }
     #target-card {
-      display: none; background: rgba(15, 23, 42, 0.92);
-      border: 1.5px solid #ef4444; border-radius: 10px;
-      padding: 6px 10px; min-width: 140px; box-shadow: 0 6px 16px rgba(0,0,0,0.85);
+      display: none; background: linear-gradient(145deg, rgba(44, 14, 10, 0.95), rgba(18, 6, 5, 0.96));
+      border: 1.5px solid #f59e0b; border-radius: 10px;
+      padding: 6px 10px; min-width: 140px; box-shadow: 0 6px 16px rgba(0,0,0,0.9);
     }
     #target-card.visible { display: block; }
-    .target-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: #fca5a5; margin-bottom: 3px; }
+    .target-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: #fde68a; margin-bottom: 3px; }
     .target-hp-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.15); border-radius: 3px; overflow: hidden; }
     #target-hp-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #dc2626, #f97316); transition: width 0.15s; }
 
     #attack-btn {
       border-radius: 50%;
-      border: 2.5px solid #64748b;
-      background: radial-gradient(circle at 35% 30%, #334155, #0f172a 75%, #020617);
-      color: #f8fafc; font-weight: 900; letter-spacing: 0.4px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.85), inset 0 2px 5px rgba(255,255,255,0.2);
+      border: 2.5px solid #eab308;
+      background: radial-gradient(circle at 35% 30%, #7c2312, #2b0c06 75%, #110402);
+      color: #fef3c7; font-weight: 900; letter-spacing: 0.4px;
+      box-shadow: 0 6px 22px rgba(0,0,0,0.9), inset 0 2px 6px rgba(251, 191, 36, 0.35);
       cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
       transition: all 0.16s ease;
     }
@@ -275,74 +279,94 @@
       background: radial-gradient(circle at 35% 30%, #dc2626, #7f1d1d 80%);
       animation: pulseFire 1s infinite alternate;
     }
-    #attack-btn:disabled { opacity: 0.4; filter: grayscale(0.8); cursor: not-allowed; animation: none; }
+    #attack-btn:disabled { opacity: 0.42; filter: grayscale(0.7); cursor: not-allowed; animation: none; }
     @keyframes pulseFire {
-      from { box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
-      to { box-shadow: 0 0 22px rgba(239, 68, 68, 0.95); }
+      from { box-shadow: 0 0 10px rgba(239, 68, 68, 0.55); }
+      to { box-shadow: 0 0 24px rgba(245, 158, 11, 0.95); }
     }
 
+    /* Büyütülmüş ve Korsan Temalı Harita Penceresi */
     #maps-panel {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: min(94vw, 540px); background: linear-gradient(160deg, #092238, #030c14);
-      border: 2px solid rgba(148, 163, 184, 0.4); border-radius: 16px; padding: 18px; z-index: 25;
-      box-shadow: 0 30px 80px rgba(0,0,0,0.95); pointer-events: auto;
+      width: min(96vw, 760px); max-height: 88vh;
+      background: linear-gradient(160deg, #2b120b, #140704);
+      border: 2.5px solid rgba(212, 175, 55, 0.75); border-radius: 18px; padding: 22px; z-index: 25;
+      box-shadow: 0 32px 85px rgba(0,0,0,0.96), inset 0 1px 0 rgba(251, 191, 36, 0.25);
+      pointer-events: auto; overflow-y: auto;
     }
     #maps-panel.open { display: block; }
     .maps-header {
       display: flex; justify-content: space-between; align-items: center;
-      background: linear-gradient(90deg, #1e293b, #0f172a); border: 1px solid rgba(148, 163, 184, 0.3);
-      padding: 8px 14px; border-radius: 10px; margin-bottom: 12px;
+      background: linear-gradient(90deg, #5c2212, #2b1008); border: 1.5px solid rgba(212, 175, 55, 0.55);
+      padding: 11px 16px; border-radius: 12px; margin-bottom: 16px;
     }
-    .maps-header strong { color: #f8fafc; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .maps-close { background: rgba(255,255,255,0.1); border: none; color: #cbd5e1; width: 28px; height: 28px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+    .maps-header strong { color: #fde68a; font-size: 16px; text-transform: uppercase; letter-spacing: 0.7px; }
+    .maps-close {
+      background: rgba(251, 191, 36, 0.14); border: 1px solid rgba(212, 175, 55, 0.45);
+      color: #fef3c7; width: 32px; height: 32px; border-radius: 8px; font-weight: 800; cursor: pointer;
+    }
+    .maps-close:hover { background: rgba(220, 38, 38, 0.45); }
     
-    .maps-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .maps-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
     .map-box {
-      min-height: 76px; border-radius: 8px; background: #0c3b5e; border: 2px solid rgba(148, 163, 184, 0.4);
-      display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5px 4px;
-      cursor: default; text-align: center; box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+      min-height: 98px; border-radius: 11px;
+      background: linear-gradient(165deg, #3b170e, #1a0905);
+      border: 2px solid rgba(212, 175, 55, 0.45);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 6px;
+      cursor: default; text-align: center; box-shadow: inset 0 2px 8px rgba(0,0,0,0.65);
+      transition: transform 0.15s, border-color 0.15s;
     }
+    .map-box:hover { transform: translateY(-2px); border-color: rgba(251, 191, 36, 0.8); }
     .map-box.current {
-      background: linear-gradient(135deg, #1e293b, #0f172a);
-      border: 2.5px solid #38bdf8; box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+      background: linear-gradient(145deg, #7c2d12, #451a03);
+      border: 2.5px solid #fbbf24; box-shadow: 0 0 16px rgba(251, 191, 36, 0.5);
     }
     .map-box.captured {
-      border-color: rgba(250, 204, 21, 0.8);
+      border-color: rgba(250, 204, 21, 0.9);
+      background: linear-gradient(145deg, #422006, #1c1917);
     }
-    .map-box .m-num { font-size: 11px; font-weight: 900; color: #fff; line-height: 1; }
-    .map-box .m-name { font-size: 8px; font-weight: 800; color: #cbd5e1; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
-    .map-box .m-owner { font-size: 8px; font-weight: 900; color: #94a3b8; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+    .map-box .m-num { font-size: 14px; font-weight: 900; color: #fef3c7; line-height: 1.1; }
+    .map-box .m-name { font-size: 10px; font-weight: 800; color: #fcd34d; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+    .map-box .m-owner { font-size: 9px; font-weight: 800; color: #d6b88c; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
     .map-box.captured .m-owner { color: #fde047; }
 
+    /* Korsan Temalı Liman / Market Penceresi */
     #market-panel {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: min(94vw, 560px); max-height: 85vh; background: linear-gradient(160deg, #091c2b, #030a11);
-      backdrop-filter: blur(12px); border: 2px solid rgba(148, 163, 184, 0.4); border-radius: 18px;
-      z-index: 15; box-shadow: 0 30px 75px rgba(0,0,0,0.95); pointer-events: auto;
+      width: min(94vw, 590px); max-height: 86vh;
+      background: linear-gradient(160deg, #2b120b, #120604);
+      backdrop-filter: blur(12px); border: 2.5px solid rgba(212, 175, 55, 0.72); border-radius: 18px;
+      z-index: 15; box-shadow: 0 30px 75px rgba(0,0,0,0.96); pointer-events: auto;
       display: flex; flex-direction: column; overflow: hidden;
     }
     #market-panel:not(.open) { display: none !important; }
     .market-panel-inner { display: flex; flex-direction: column; height: 100%; padding: 16px; overflow: hidden; }
     .market-header { 
       display: flex; justify-content: space-between; align-items: center; 
-      background: linear-gradient(90deg, #1e293b, #0f172a); border: 1px solid rgba(148, 163, 184, 0.3);
-      padding: 8px 14px; border-radius: 10px; margin-bottom: 10px; flex-shrink: 0;
+      background: linear-gradient(90deg, #5c2212, #2b1008); border: 1.5px solid rgba(212, 175, 55, 0.5);
+      padding: 9px 14px; border-radius: 10px; margin-bottom: 10px; flex-shrink: 0;
     }
-    .market-header strong { color: #f8fafc; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .market-close { background: rgba(255,255,255,0.1); border: none; color: #cbd5e1; width: 28px; height: 28px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+    .market-header strong { color: #fde68a; font-size: 14px; text-transform: uppercase; letter-spacing: 0.6px; }
+    .market-close {
+      background: rgba(251, 191, 36, 0.14); border: 1px solid rgba(212, 175, 55, 0.45);
+      color: #fef3c7; width: 28px; height: 28px; border-radius: 8px; font-weight: 700; cursor: pointer;
+    }
     
     .port-tabs-scroll { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 10px; flex-shrink: 0; }
     .market-tab-btn {
-      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1;
-      padding: 7px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      background: rgba(45, 18, 10, 0.75); border: 1px solid rgba(212, 175, 55, 0.35); color: #fcd34d;
+      padding: 7px 13px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap; flex-shrink: 0;
       transition: all 0.2s;
     }
-    .market-tab-btn.active { background: linear-gradient(135deg, #334155, #1e293b); color: #fff; border-color: #94a3b8; box-shadow: 0 4px 12px rgba(15,23,42,0.4); }
+    .market-tab-btn.active {
+      background: linear-gradient(135deg, #b45309, #78350f);
+      color: #fffbeb; border-color: #fbbf24; box-shadow: 0 4px 12px rgba(180, 83, 9, 0.45);
+    }
     
     .market-balance { 
-      display: flex; justify-content: space-around; font-size: 11px; 
-      background: rgba(0,0,0,0.45); border: 1px solid rgba(148,163,184,0.25); 
-      padding: 8px; border-radius: 8px; margin-bottom: 10px; color: #e2e8f0; font-weight: 700; flex-shrink: 0;
+      display: flex; justify-content: space-around; font-size: 12px; 
+      background: rgba(15, 6, 4, 0.78); border: 1px solid rgba(212, 175, 55, 0.4); 
+      padding: 8px; border-radius: 8px; margin-bottom: 10px; color: #fef3c7; font-weight: 700; flex-shrink: 0;
     }
     
     .market-scroll-body { flex: 1; overflow-y: auto; padding-right: 4px; max-height: 52vh; }
@@ -351,61 +375,87 @@
     
     .shipyard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding-bottom: 10px; }
     .ship-card-item {
-      background: rgba(11, 26, 38, 0.95); border: 1.5px solid rgba(148, 163, 184, 0.35); border-radius: 14px;
+      background: linear-gradient(165deg, rgba(43, 18, 11, 0.95), rgba(18, 7, 5, 0.97));
+      border: 1.5px solid rgba(212, 175, 55, 0.45); border-radius: 14px;
       padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
-      box-shadow: 0 8px 22px rgba(0,0,0,0.7); transition: transform 0.15s, border-color 0.15s;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.8); transition: transform 0.15s, border-color 0.15s;
     }
-    .ship-card-item:hover { border-color: #cbd5e1; transform: translateY(-2px); }
+    .ship-card-item:hover { border-color: #fbbf24; transform: translateY(-2px); }
     .ship-card-img-wrap {
-      width: 100%; height: 110px; border-radius: 10px; 
-      background: radial-gradient(circle at 50% 50%, #083344, #031420);
-      border: 1.5px solid rgba(56, 189, 248, 0.35); display: flex; align-items: center; justify-content: center;
+      width: 100%; height: 112px; border-radius: 10px; 
+      background: radial-gradient(circle at 50% 50%, #1b3648, #071420);
+      border: 1.5px solid rgba(212, 175, 55, 0.45); display: flex; align-items: center; justify-content: center;
       overflow: hidden; box-shadow: inset 0 3px 10px rgba(0,0,0,0.9); position: relative;
-      color: #64748b; font-size: 11px; font-weight: 700;
+      color: #fcd34d; font-size: 11px; font-weight: 700;
     }
     .ship-card-img-wrap img { width: 100%; height: 100%; object-fit: contain; display: block; }
-    .ship-card-title { font-size: 12px; font-weight: 800; color: #fffbeb; margin-top: 2px; }
-    .ship-card-sub { font-size: 10px; color: #94a3b8; line-height: 1.2; margin-bottom: 2px; }
+    .ship-card-title { font-size: 12px; font-weight: 800; color: #fef3c7; margin-top: 2px; }
+    .ship-card-sub { font-size: 10px; color: #d6b88c; line-height: 1.25; margin-bottom: 2px; }
 
-    .market-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(6, 16, 24, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 9px; padding: 8px 10px; margin-bottom: 7px; }
+    .market-item {
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
+      background: linear-gradient(90deg, rgba(38, 15, 9, 0.92), rgba(18, 7, 5, 0.95));
+      border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 9px; padding: 8px 10px; margin-bottom: 7px;
+    }
     .market-item-info { display: flex; flex-direction: column; gap: 2px; }
-    .market-item-title { font-size: 12px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
+    .market-item-title { font-size: 12px; font-weight: 700; color: #fffbeb; display: flex; align-items: center; gap: 8px; }
     .market-item-title img { width: 26px; height: 26px; object-fit: contain; }
-    .market-item-sub { font-size: 10px; color: #94a3b8; }
+    .market-item-sub { font-size: 10px; color: #d6b88c; }
     
-    .buy-btn { width: 100%; padding: 7px 12px; border-radius: 8px; border: 1px solid #94a3b8; background: linear-gradient(135deg, #334155, #1e293b); color: #fff; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap; margin-top: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-    .buy-btn:disabled { opacity: 0.42; background: rgba(30, 41, 59, 0.8); cursor: not-allowed; box-shadow: none; }
-    .buy-btn.equipped { background: #1e40af; border-color: #60a5fa; color: #eff6ff; }
+    .buy-btn {
+      width: 100%; padding: 7px 12px; border-radius: 8px;
+      border: 1px solid #eab308; background: linear-gradient(135deg, #92400e, #5c220a);
+      color: #fffbeb; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap; margin-top: 4px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.6); transition: filter 0.15s;
+    }
+    .buy-btn:hover:not(:disabled) { filter: brightness(1.15); }
+    .buy-btn:disabled { opacity: 0.45; background: rgba(45, 20, 12, 0.8); cursor: not-allowed; box-shadow: none; }
+    .buy-btn.equipped { background: linear-gradient(135deg, #15803d, #14532d); border-color: #4ade80; color: #f0fdf4; }
     #market-feedback { font-size: 11px; min-height: 14px; margin-top: 5px; text-align: center; color: #4ade80; font-weight: 700; flex-shrink: 0; }
-    .generic-tab-content { text-align: center; padding: 40px 10px; color: #94a3b8; font-size: 13px; font-weight: 700; }
+    .generic-tab-content { text-align: center; padding: 40px 10px; color: #d6b88c; font-size: 13px; font-weight: 700; }
 
     #gameover {
-      display: none; position: fixed; inset: 0; background: rgba(3, 11, 18, 0.92);
+      display: none; position: fixed; inset: 0; background: rgba(15, 6, 4, 0.94);
       flex-direction: column; align-items: center; justify-content: center; z-index: 30; text-align: center; padding: 20px;
     }
-    #gameover h1 { color: #f8fafc; margin: 0 0 10px; font-size: 32px; }
-    #gameover p { font-size: 16px; margin: 0 0 24px; color: #cbd5e1; }
-    #restart-btn { padding: 12px 28px; font-size: 16px; font-weight: bold; border-radius: 12px; border: 2px solid #94a3b8; background: #334155; color: white; cursor: pointer; }
+    #gameover h1 { color: #fbbf24; margin: 0 0 10px; font-size: 32px; }
+    #gameover p { font-size: 16px; margin: 0 0 24px; color: #fef3c7; }
+    #restart-btn {
+      padding: 12px 28px; font-size: 16px; font-weight: bold; border-radius: 12px;
+      border: 2px solid #eab308; background: linear-gradient(135deg, #92400e, #5c220a); color: #fffbeb; cursor: pointer;
+    }
 
     #auth-overlay {
       position: fixed; inset: 0; z-index: 999999;
-      background: radial-gradient(circle at 50% 35%, rgba(10, 28, 41, 0.98), rgba(2, 6, 10, 0.99));
+      background: radial-gradient(circle at 50% 35%, rgba(45, 18, 10, 0.98), rgba(10, 4, 3, 0.99));
       backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 18px;
     }
-    .auth-card { width: 100%; max-width: 420px; background: linear-gradient(160deg, #0b2233, #030a11); border: 1px solid rgba(148,163,184,0.4); border-radius: 24px; padding: 28px 24px; box-shadow: 0 25px 70px rgba(0,0,0,0.9); }
+    .auth-card {
+      width: 100%; max-width: 420px; background: linear-gradient(160deg, #2b120b, #120604);
+      border: 1.5px solid rgba(212,175,55,0.65); border-radius: 24px; padding: 28px 24px; box-shadow: 0 25px 70px rgba(0,0,0,0.95);
+    }
     .auth-brand { text-align: center; margin-bottom: 18px; }
-    .auth-brand h1 { margin: 0; font-size: 26px; color: #f8fafc; }
-    .auth-brand p { margin: 6px 0 0; font-size: 12px; color: #94a3b8; }
-    .auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: rgba(255, 255, 255, 0.06); padding: 4px; border-radius: 12px; margin-bottom: 16px; }
-    .auth-tab { border: none; background: transparent; color: #cbd5e1; padding: 10px; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; }
-    .auth-tab.active { background: linear-gradient(135deg, #334155, #1e293b); color: #fff; }
+    .auth-brand h1 { margin: 0; font-size: 26px; color: #fde68a; }
+    .auth-brand p { margin: 6px 0 0; font-size: 12px; color: #d6b88c; }
+    .auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: rgba(251, 191, 36, 0.08); padding: 4px; border-radius: 12px; margin-bottom: 16px; }
+    .auth-tab { border: none; background: transparent; color: #fcd34d; padding: 10px; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .auth-tab.active { background: linear-gradient(135deg, #b45309, #78350f); color: #fffbeb; }
     .auth-field { margin-bottom: 14px; }
-    .auth-field label { display: block; font-size: 12px; color: #cbd5e1; margin-bottom: 5px; font-weight: 600; }
-    .auth-field input { width: 100%; height: 46px; padding: 0 14px; border-radius: 12px; border: 1px solid #334155; background: #081622; color: #fff; font-size: 16px; outline: none; }
+    .auth-field label { display: block; font-size: 12px; color: #fcd34d; margin-bottom: 5px; font-weight: 600; }
+    .auth-field input {
+      width: 100%; height: 46px; padding: 0 14px; border-radius: 12px;
+      border: 1px solid rgba(212, 175, 55, 0.45); background: #170805; color: #fffbeb; font-size: 16px; outline: none;
+    }
     .auth-msg { min-height: 18px; font-size: 12px; margin: 4px 0 12px; color: #fca5a5; }
-    .auth-submit { width: 100%; height: 50px; border-radius: 14px; border: 1px solid #94a3b8; background: linear-gradient(135deg, #334155, #1e293b); color: #f8fafc; font-size: 15px; font-weight: 900; cursor: pointer; }
-    .quick-test-box { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #bae6fd; }
-    .quick-test-btn { border: 1px solid rgba(186, 230, 253, 0.35); background: rgba(14, 116, 144, 0.35); color: #e0f2fe; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; }
+    .auth-submit {
+      width: 100%; height: 50px; border-radius: 14px; border: 1.5px solid #eab308;
+      background: linear-gradient(135deg, #b45309, #78350f); color: #fffbeb; font-size: 15px; font-weight: 900; cursor: pointer;
+    }
+    .quick-test-box { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(212, 175, 55, 0.25); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #fde68a; }
+    .quick-test-btn {
+      border: 1px solid rgba(251, 191, 36, 0.55); background: rgba(146, 64, 14, 0.45);
+      color: #fef3c7; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer;
+    }
   </style>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -453,7 +503,7 @@
         <span class="ico">⚓</span>
         <span class="lbl">Liman</span>
       </button>
-      <button id="logout-btn" class="tool-icon-btn" type="button" title="Çıkış Yap" style="background: linear-gradient(155deg, #7f1d1d, #450a0a); border-color: rgba(248, 113, 113, 0.4);">
+      <button id="logout-btn" class="tool-icon-btn" type="button" title="Çıkış Yap" style="background: linear-gradient(155deg, #7f1d1d, #450a0a); border-color: rgba(248, 113, 113, 0.55);">
         <span class="ico">🚪</span>
         <span class="lbl">Çıkış</span>
       </button>
@@ -483,7 +533,7 @@
 
   <div id="maps-panel">
     <div class="maps-header">
-      <strong id="maps-panel-title">🗺️ Harita Seçimi</strong>
+      <strong id="maps-panel-title">🗺️ Korsan Denizleri - Harita Seçimi</strong>
       <button id="maps-close-btn" class="maps-close" type="button">✕</button>
     </div>
     <div class="maps-grid" id="maps-grid-container"></div>
@@ -557,14 +607,14 @@
         <div id="section-shipyard" class="market-section"><div class="shipyard-grid" id="shipyard-list"></div></div>
         
         <div id="section-expand" class="market-section">
-          <div style="background: rgba(14, 116, 144, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); padding: 10px; border-radius: 10px; margin-bottom: 12px; font-size: 11px; color: #bae6fd; text-align: center;">
+          <div style="background: rgba(180, 83, 9, 0.18); border: 1px solid rgba(251, 191, 36, 0.4); padding: 10px; border-radius: 10px; margin-bottom: 12px; font-size: 11px; color: #fde68a; text-align: center;">
             Kalan Genişletme Hakları (Her türden 1 adet kullanılabilir):<br>
-            Top Hak: <strong id="rights-cannon" style="color:#f59e0b;">1</strong> | Can Hak: <strong id="rights-hp" style="color:#f87171;">1</strong> | Hız Hak: <strong id="rights-speed" style="color:#4ade80;">1</strong>
+            Top Hak: <strong id="rights-cannon" style="color:#fbbf24;">1</strong> | Can Hak: <strong id="rights-hp" style="color:#f87171;">1</strong> | Hız Hak: <strong id="rights-speed" style="color:#4ade80;">1</strong>
           </div>
           <div class="market-item">
             <div class="market-item-info">
               <span class="market-item-title">🎯 TOP GENİŞLETMESİ</span>
-              <span class="market-item-sub">Kapasite: <strong id="stat-cannons" style="color:#38bdf8;">250</strong> Top (+20 Top artırır)</span>
+              <span class="market-item-sub">Kapasite: <strong id="stat-cannons" style="color:#fbbf24;">250</strong> Top (+20 Top artırır)</span>
             </div>
             <button class="buy-btn" id="btn-expand-cannon" type="button" style="width:auto; background: linear-gradient(135deg, #b45309, #78350f); border-color: #f59e0b;">5 Elmas</button>
           </div>
@@ -580,7 +630,7 @@
               <span class="market-item-title">⚡ HIZ GENİŞLETMESİ</span>
               <span class="market-item-sub">Gemi Hızı: <strong id="stat-speed" style="color:#4ade80;">180</strong> (%2 Hız artırır)</span>
             </div>
-            <button class="buy-btn" id="btn-expand-speed" type="button" style="width:auto; background: linear-gradient(166deg, #166534, #14532d); border-color: #4ade80;">5 Elmas</button>
+            <button class="buy-btn" id="btn-expand-speed" type="button" style="width:auto; background: linear-gradient(135deg, #166534, #14532d); border-color: #4ade80;">5 Elmas</button>
           </div>
         </div>
 
@@ -724,26 +774,27 @@ const AMMO_TYPES = {
   snow:   { id: 'snow',   name: 'Kar Güllesi',    damage: 25000, slow: 1.0,  isHeal: true,  bonusNpc: 1.0, desc: '+25.000 Can Doldurur', color: 0xffffff, img: 'kar.png' }
 };
 
-const REMOVED_SHIP_IDS = ['ghost', 'tasarim1', 'gold', 'tasarim5', 'tasarim9', 'tasarim10', 'tasarim10_kraliyet_susu'];
+const REMOVED_SHIP_IDS = [
+  'ghost', 'tasarim1', 'gold', 'tasarim5', 'tasarim9', 'tasarim10', 'tasarim10_kraliyet_susu',
+  'tasarim4_burun_topu', 'tasarim6_yan_toplar'
+];
 
 const BASE_SHIP_MODELS = {
-  standard:            { id: 'standard',            name: 'Ejderha Kalyonu', desc: 'Başlangıç 3D Savaş Gemisi', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45 },
-  deneme1:             { id: 'deneme1',             name: 'Deneme 1 · Altın Güneş', desc: 'Minik 3D Detay · Hafif Altın Parıltı', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'gold' },
-  deneme2:             { id: 'deneme2',             name: 'Deneme 2 · Zümrüt Leviathan', desc: 'Minik 3D Detay · Hafif Zümrüt Parıltı', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'emerald' },
-  deneme3:             { id: 'deneme3',             name: 'Deneme 3 · Mor Gölge', desc: 'Minik 3D Detay · Hafif Mor Parıltı', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'violet' },
-  deneme4:             { id: 'deneme4',             name: 'Deneme 4 · Kızıl Cehennem', desc: 'Burunda Eski Top · Hafif Kızıl Parıltı', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'crimson' },
-  deneme5:             { id: 'deneme5',             name: 'Deneme 5 · Buzul Kraliyet', desc: 'Minik 3D Detay · Hafif Buzul Parıltı', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, scaleMultiplier: 1.12, denemeStyle: 'frost' },
-  tasarim2:            { id: 'tasarim2',            name: 'Tasarim 2', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim2.glb', heightOffset: 45, rotationOffset: Math.PI / 2 },
-  tasarim3:            { id: 'tasarim3',            name: 'Tasarim 3', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3 },
-  tasarim3_hayalet:    { id: 'tasarim3_hayalet',    name: 'Tasarim 3 · Hayalet', desc: 'Sürekli Parlayıp Sönen Hayalet Kopya', cost: 0, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3, phantomStyle: 'specter_teal' },
-  tasarim4:            { id: 'tasarim4',            name: 'Tasarim 4', desc: 'GLB Savaş Gemisi', cost: 3500, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2 },
-  tasarim4_hayalet:    { id: 'tasarim4_hayalet',    name: 'Tasarim 4 · Hayalet', desc: 'Mor Ruhani Parlayıp Sönen Hayalet', cost: 0, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2, phantomStyle: 'specter_violet' },
-  tasarim4_burun_topu: { id: 'tasarim4_burun_topu', name: 'Ağır Burun Topu · Demir Boğaz', desc: 'Burunda Sabit Eski Top Bataryası', cost: 4200, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2, customRig: 'bow_heavy_battery' },
-  tasarim6:            { id: 'tasarim6',            name: 'Tasarim 6', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim6.glb', heightOffset: 85 },
-  tasarim6_yan_toplar: { id: 'tasarim6_yan_toplar', name: 'Yan Batarya · Fırtına Salvosu', desc: 'Gövdeye Sabit Eski Yan Topları', cost: 4600, type: 'glb', modelPath: 'tasarim6.glb', heightOffset: 85, customRig: 'broadside_heavy_cannons' },
-  tasarim7:            { id: 'tasarim7',            name: 'Tasarim 7', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim7.glb', heightOffset: 45, rotationOffset: Math.PI },
-  tasarim8:            { id: 'tasarim8',            name: 'Tasarim 8', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim8.glb', heightOffset: 85 },
-  tasarim11:           { id: 'tasarim11',           name: 'Tasarim 11', desc: 'GLB Savaş Gemisi', cost: 5000, type: 'glb', modelPath: 'tasarim11.glb', heightOffset: 45 }
+  standard:         { id: 'standard',         name: 'Ejderha Kalyonu', desc: 'Başlangıç 3D Savaş Gemisi', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45 },
+  deneme1:          { id: 'deneme1',          name: 'Deneme 1 · Altın Güneş', desc: 'Parlak Altın Aura · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'gold' },
+  deneme2:          { id: 'deneme2',          name: 'Deneme 2 · Zümrüt Leviathan', desc: 'Parlak Zümrüt Aura · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'emerald' },
+  deneme3:          { id: 'deneme3',          name: 'Deneme 3 · Mor Gölge', desc: 'Parlak Mor Aura · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'violet' },
+  deneme4:          { id: 'deneme4',          name: 'Deneme 4 · Kızıl Cehennem', desc: 'Parlak Kızıl Aura · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, denemeStyle: 'crimson' },
+  deneme5:          { id: 'deneme5',          name: 'Deneme 5 · Buzul Kraliyet', desc: 'Parlak Buzul Aura · 3D Kristal & Fenerler', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, scaleMultiplier: 1.12, denemeStyle: 'frost' },
+  tasarim2:         { id: 'tasarim2',         name: 'Tasarim 2', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim2.glb', heightOffset: 45, rotationOffset: Math.PI / 2 },
+  tasarim3:         { id: 'tasarim3',         name: 'Tasarim 3', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3 },
+  tasarim3_hayalet: { id: 'tasarim3_hayalet', name: 'Tasarim 3 · Hayalet', desc: 'Sürekli Parlayıp Sönen Hayalet Kopya', cost: 0, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3, phantomStyle: 'specter_teal' },
+  tasarim4:         { id: 'tasarim4',         name: 'Tasarim 4', desc: 'GLB Savaş Gemisi', cost: 3500, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2 },
+  tasarim4_hayalet: { id: 'tasarim4_hayalet', name: 'Tasarim 4 · Hayalet', desc: 'Mor Ruhani Parlayıp Sönen Hayalet', cost: 0, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2, phantomStyle: 'specter_violet' },
+  tasarim6:         { id: 'tasarim6',         name: 'Tasarim 6', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim6.glb', heightOffset: 85 },
+  tasarim7:         { id: 'tasarim7',         name: 'Tasarim 7', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim7.glb', heightOffset: 45, rotationOffset: Math.PI },
+  tasarim8:         { id: 'tasarim8',         name: 'Tasarim 8', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim8.glb', heightOffset: 85 },
+  tasarim11:        { id: 'tasarim11',        name: 'Tasarim 11', desc: 'GLB Savaş Gemisi', cost: 5000, type: 'glb', modelPath: 'tasarim11.glb', heightOffset: 45 }
 };
 
 const PHANTOM_THEMES = {
@@ -775,83 +826,64 @@ const PHANTOM_THEMES = {
 
 const DENEME_THEMES = {
   gold: {
-    color: 0xfde68a,
+    color: 0xfef08a,
     emissive: 0xf59e0b,
-    emissiveIntensity: 0.14,
-    metalnessAdd: 0.22,
-    roughnessSub: 0.16,
+    emissiveIntensity: 0.46,
+    metalnessAdd: 0.26,
+    roughnessSub: 0.2,
     lightColor: 0xffd166,
-    lightIntensity: 0.22,
-    crystalColor: 0xfbbf24,
+    lightIntensity: 0.95,
+    crystalColor: 0xfde047,
     lanternColor: 0xffb703,
-    pulseSpeed: 2.2
+    pulseSpeed: 2.5
   },
   emerald: {
     color: 0xa7f3d0,
     emissive: 0x10b981,
-    emissiveIntensity: 0.14,
-    metalnessAdd: 0.2,
-    roughnessSub: 0.2,
+    emissiveIntensity: 0.46,
+    metalnessAdd: 0.24,
+    roughnessSub: 0.22,
     lightColor: 0x34d399,
-    lightIntensity: 0.22,
-    crystalColor: 0x34d399,
-    lanternColor: 0x34d399,
-    pulseSpeed: 2.4
+    lightIntensity: 0.95,
+    crystalColor: 0x6ee7b7,
+    lanternColor: 0x10b981,
+    pulseSpeed: 2.6
   },
   violet: {
-    color: 0xddd6fe,
+    color: 0xede9fe,
     emissive: 0x8b5cf6,
-    emissiveIntensity: 0.15,
-    metalnessAdd: 0.22,
-    roughnessSub: 0.18,
+    emissiveIntensity: 0.48,
+    metalnessAdd: 0.26,
+    roughnessSub: 0.2,
     lightColor: 0xc084fc,
-    lightIntensity: 0.22,
-    crystalColor: 0xc084fc,
-    lanternColor: 0xc084fc,
-    pulseSpeed: 2.1
+    lightIntensity: 0.95,
+    crystalColor: 0xd8b4fe,
+    lanternColor: 0x8b5cf6,
+    pulseSpeed: 2.4
   },
   crimson: {
     color: 0xfecaca,
     emissive: 0xef4444,
-    emissiveIntensity: 0.16,
-    metalnessAdd: 0.18,
-    roughnessSub: 0.14,
+    emissiveIntensity: 0.5,
+    metalnessAdd: 0.22,
+    roughnessSub: 0.18,
     lightColor: 0xf87171,
-    lightIntensity: 0.24,
-    crystalColor: 0xf87171,
-    lanternColor: 0xf97316,
-    pulseSpeed: 2.8
+    lightIntensity: 1.0,
+    crystalColor: 0xfca5a5,
+    lanternColor: 0xef4444,
+    pulseSpeed: 3.0
   },
   frost: {
     color: 0xe0f2fe,
     emissive: 0x38bdf8,
-    emissiveIntensity: 0.14,
-    metalnessAdd: 0.15,
-    roughnessSub: 0.24,
+    emissiveIntensity: 0.46,
+    metalnessAdd: 0.2,
+    roughnessSub: 0.25,
     lightColor: 0x7dd3fc,
-    lightIntensity: 0.22,
-    crystalColor: 0x7dd3fc,
-    lanternColor: 0x7dd3fc,
-    pulseSpeed: 2.3
-  }
-};
-
-const CUSTOM_RIG_THEMES = {
-  bow_heavy_battery: {
-    tintColor: 0xffedd5,
-    emissiveColor: 0xb45309,
-    emissiveIntensity: 0.18,
-    lightColor: 0xff9e2c,
-    lightIntensity: 0.35,
-    pulseSpeed: 2.4
-  },
-  broadside_heavy_cannons: {
-    tintColor: 0xfef3c7,
-    emissiveColor: 0x92400e,
-    emissiveIntensity: 0.16,
-    lightColor: 0xffa940,
-    lightIntensity: 0.32,
-    pulseSpeed: 2.2
+    lightIntensity: 0.95,
+    crystalColor: 0xbae6fd,
+    lanternColor: 0x38bdf8,
+    pulseSpeed: 2.5
   }
 };
 
@@ -859,7 +891,7 @@ function sanitizeShipModels(modelsMap) {
   const clean = {};
   Object.keys(modelsMap).forEach((key) => {
     const spec = modelsMap[key];
-    const nameHasCopy = /kopya|tasarim10|kraliyet/i.test(spec.name || '') || /kopya|tasarim10|kraliyet/i.test(key);
+    const nameHasCopy = /kopya|tasarim10|kraliyet|topu|toplar/i.test(spec.name || '') || /kopya|tasarim10|kraliyet|topu|toplar/i.test(key);
     if (!REMOVED_SHIP_IDS.includes(key) && !nameHasCopy) {
       clean[key] = spec;
     }
@@ -871,7 +903,7 @@ const SHIP_MODELS = sanitizeShipModels(BASE_SHIP_MODELS);
 const ALL_UNLOCKED_SHIP_IDS = Object.keys(SHIP_MODELS);
 
 function sanitizeShipId(shipId) {
-  if (!shipId || REMOVED_SHIP_IDS.includes(shipId) || /kopya|tasarim10|kraliyet/i.test(shipId) || !SHIP_MODELS[shipId]) {
+  if (!shipId || REMOVED_SHIP_IDS.includes(shipId) || /kopya|tasarim10|kraliyet|topu|toplar/i.test(shipId) || !SHIP_MODELS[shipId]) {
     return 'standard';
   }
   return shipId;
@@ -879,7 +911,7 @@ function sanitizeShipId(shipId) {
 
 function sanitizeOwnedShips(list) {
   const base = Array.isArray(list) ? list : ['standard'];
-  const filtered = base.filter(id => !REMOVED_SHIP_IDS.includes(id) && !/kopya|tasarim10|kraliyet/i.test(id) && Boolean(SHIP_MODELS[id]));
+  const filtered = base.filter(id => !REMOVED_SHIP_IDS.includes(id) && !/kopya|tasarim10|kraliyet|topu|toplar/i.test(id) && Boolean(SHIP_MODELS[id]));
   ALL_UNLOCKED_SHIP_IDS.forEach((id) => {
     if (!filtered.includes(id)) filtered.push(id);
   });
@@ -911,14 +943,8 @@ let activeDenemeLight = null;
 let activeDenemePropsGroup = null;
 let denemeCrystalsMeta = [];
 let denemeLanternCores = [];
-let deneme4BowCannonEmber = null;
 let activeDenemeStyleKey = null;
 let denemeMaterialsList = [];
-
-let activeCustomRigGroup = null;
-let activeCustomRigLight = null;
-let customRigEmbers = [];
-let customRigMaterials = [];
 
 let activePhantomLight = null;
 let activePhantomStyleKey = null;
@@ -953,7 +979,6 @@ function clearDenemeShipStyling() {
   activeDenemePropsGroup = null;
   denemeCrystalsMeta = [];
   denemeLanternCores = [];
-  deneme4BowCannonEmber = null;
   activeDenemeStyleKey = null;
 
   denemeMaterialsList.forEach((mat) => {
@@ -962,33 +987,6 @@ function clearDenemeShipStyling() {
     }
   });
   denemeMaterialsList = [];
-
-  if (activeCustomRigLight && activeCustomRigLight.parent) {
-    activeCustomRigLight.parent.remove(activeCustomRigLight);
-  }
-  activeCustomRigLight = null;
-
-  if (activeCustomRigGroup) {
-    if (activeCustomRigGroup.parent) {
-      activeCustomRigGroup.parent.remove(activeCustomRigGroup);
-    }
-    activeCustomRigGroup.traverse((obj) => {
-      if (obj.geometry) obj.geometry.dispose();
-      if (obj.material) {
-        const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
-        mats.forEach(m => m.dispose());
-      }
-    });
-  }
-  activeCustomRigGroup = null;
-  customRigEmbers = [];
-
-  customRigMaterials.forEach((mat) => {
-    if (mat && typeof mat.dispose === 'function') {
-      mat.dispose();
-    }
-  });
-  customRigMaterials = [];
 
   if (activePhantomLight && activePhantomLight.parent) {
     activePhantomLight.parent.remove(activePhantomLight);
@@ -1047,8 +1045,8 @@ function createLanternAssembly(theme, scale = 1) {
   const coreMat = new THREE.MeshStandardMaterial({
     color: theme.lanternColor,
     emissive: theme.lanternColor,
-    emissiveIntensity: 0.65,
-    roughness: 0.25,
+    emissiveIntensity: 1.25,
+    roughness: 0.2,
     metalness: 0.2
   });
 
@@ -1060,234 +1058,14 @@ function createLanternAssembly(theme, scale = 1) {
   topMesh.position.y = 0.2 * scale;
   lantern.add(topMesh);
 
-  const coreMesh = new THREE.Mesh(new THREE.OctahedronGeometry(0.14 * scale, 1), coreMat);
-  coreMesh.scale.set(0.8, 1.15, 0.8);
+  const coreMesh = new THREE.Mesh(new THREE.OctahedronGeometry(0.15 * scale, 1), coreMat);
+  coreMesh.scale.set(0.85, 1.2, 0.85);
   lantern.add(coreMesh);
 
   return { lantern, coreMat, coreMesh };
 }
 
-function createClassicNavalCannon(scale = 1, accentHex = 0xb45309, emberHex = 0xff6b00) {
-  const cannonGroup = new THREE.Group();
-  const pitchGroup = new THREE.Group();
-  pitchGroup.rotation.x = -0.12;
-
-  const woodCarriageMat = new THREE.MeshStandardMaterial({
-    color: 0x5c361c,
-    roughness: 0.78,
-    metalness: 0.12
-  });
-  const ironWheelMat = new THREE.MeshStandardMaterial({
-    color: 0x2a2623,
-    roughness: 0.65,
-    metalness: 0.65
-  });
-  const castIronBarrelMat = new THREE.MeshStandardMaterial({
-    color: 0x2c3035,
-    roughness: 0.42,
-    metalness: 0.82
-  });
-  const brassReinforceMat = new THREE.MeshStandardMaterial({
-    color: accentHex,
-    roughness: 0.34,
-    metalness: 0.84
-  });
-  const boreMat = new THREE.MeshStandardMaterial({
-    color: 0x07080a,
-    roughness: 0.9,
-    metalness: 0.2
-  });
-  const emberMat = new THREE.MeshStandardMaterial({
-    color: 0xffd166,
-    emissive: emberHex,
-    emissiveIntensity: 0.9,
-    roughness: 0.25,
-    metalness: 0.1
-  });
-
-  const anchorBlock = new THREE.Mesh(
-    new THREE.BoxGeometry(0.88 * scale, 0.42 * scale, 1.25 * scale),
-    woodCarriageMat
-  );
-  anchorBlock.position.set(0, -0.22 * scale, -0.2 * scale);
-  pitchGroup.add(anchorBlock);
-
-  [-0.34, 0.34].forEach((sx) => {
-    const cheek = new THREE.Mesh(
-      new THREE.BoxGeometry(0.15 * scale, 0.4 * scale, 0.98 * scale),
-      woodCarriageMat
-    );
-    cheek.position.set(sx * scale, -0.04 * scale, 0.04 * scale);
-    pitchGroup.add(cheek);
-
-    [-0.32, 0.32].forEach((wz) => {
-      const wheel = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.2 * scale, 0.2 * scale, 0.12 * scale, 10),
-        ironWheelMat
-      );
-      wheel.rotation.z = Math.PI / 2;
-      wheel.position.set((sx + (sx > 0 ? 0.09 : -0.09)) * scale, -0.22 * scale, wz * scale);
-      pitchGroup.add(wheel);
-    });
-  });
-
-  const cascabelKnob = new THREE.Mesh(
-    new THREE.SphereGeometry(0.22 * scale, 10, 10),
-    castIronBarrelMat
-  );
-  cascabelKnob.position.set(0, 0.11 * scale, -0.72 * scale);
-  pitchGroup.add(cascabelKnob);
-
-  const breechSeg = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.34 * scale, 0.38 * scale, 0.58 * scale, 14),
-    castIronBarrelMat
-  );
-  breechSeg.rotation.x = Math.PI / 2;
-  breechSeg.position.set(0, 0.11 * scale, -0.36 * scale);
-  pitchGroup.add(breechSeg);
-
-  const midSeg = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.29 * scale, 0.34 * scale, 0.66 * scale, 14),
-    castIronBarrelMat
-  );
-  midSeg.rotation.x = Math.PI / 2;
-  midSeg.position.set(0, 0.11 * scale, 0.22 * scale);
-  pitchGroup.add(midSeg);
-
-  const chaseSeg = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.24 * scale, 0.29 * scale, 0.64 * scale, 14),
-    castIronBarrelMat
-  );
-  chaseSeg.rotation.x = Math.PI / 2;
-  chaseSeg.position.set(0, 0.11 * scale, 0.84 * scale);
-  pitchGroup.add(chaseSeg);
-
-  [-0.58, -0.05, 0.52].forEach((rz, idx) => {
-    const rad = (0.36 - idx * 0.04) * scale;
-    const band = new THREE.Mesh(
-      new THREE.TorusGeometry(rad, 0.04 * scale, 8, 14),
-      brassReinforceMat
-    );
-    band.position.set(0, 0.11 * scale, rz * scale);
-    pitchGroup.add(band);
-  });
-
-  const muzzleSwelling = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.32 * scale, 0.25 * scale, 0.2 * scale, 14),
-    castIronBarrelMat
-  );
-  muzzleSwelling.rotation.x = Math.PI / 2;
-  muzzleSwelling.position.set(0, 0.11 * scale, 1.2 * scale);
-  pitchGroup.add(muzzleSwelling);
-
-  const muzzleLip = new THREE.Mesh(
-    new THREE.TorusGeometry(0.29 * scale, 0.045 * scale, 8, 14),
-    brassReinforceMat
-  );
-  muzzleLip.position.set(0, 0.11 * scale, 1.29 * scale);
-  pitchGroup.add(muzzleLip);
-
-  const boreOpening = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.18 * scale, 0.18 * scale, 0.07 * scale, 10),
-    boreMat
-  );
-  boreOpening.rotation.x = Math.PI / 2;
-  boreOpening.position.set(0, 0.11 * scale, 1.27 * scale);
-  pitchGroup.add(boreOpening);
-
-  const emberCore = new THREE.Mesh(
-    new THREE.SphereGeometry(0.1 * scale, 8, 8),
-    emberMat
-  );
-  emberCore.position.set(0, 0.11 * scale, 1.29 * scale);
-  pitchGroup.add(emberCore);
-
-  cannonGroup.add(pitchGroup);
-  return { cannonGroup, emberMat };
-}
-
-function applyCustomShipRig(shipMesh, rigKey, bounds, shipSize) {
-  if (!shipMesh || typeof THREE === 'undefined') return;
-  const theme = CUSTOM_RIG_THEMES[rigKey] || CUSTOM_RIG_THEMES.bow_heavy_battery;
-  customRigMaterials = [];
-  customRigEmbers = [];
-
-  shipMesh.traverse((child) => {
-    if (child.isMesh && child.material) {
-      const mats = Array.isArray(child.material) ? child.material : [child.material];
-      const styledMats = mats.map((origMat) => {
-        const m = origMat.clone();
-        if (m.color) m.color.multiply(new THREE.Color(theme.tintColor));
-        if (m.emissive) {
-          m.emissive.setHex(theme.emissiveColor);
-          m.emissiveIntensity = theme.emissiveIntensity;
-        }
-        m.needsUpdate = true;
-        customRigMaterials.push(m);
-        return m;
-      });
-      child.material = Array.isArray(child.material) ? styledMats : styledMats[0];
-    }
-  });
-
-  const rigGroup = new THREE.Group();
-  const center = new THREE.Vector3();
-  bounds.getCenter(center);
-
-  // Gemi gövdesinin yerel güverte yüksekliği ve gerçekçi top ölçeği
-  const deckY = center.y + shipSize.y * 0.08;
-  const forwardSign = Math.abs(bounds.min.z) >= Math.abs(bounds.max.z) ? -1 : 1;
-  const bowZ = center.z + forwardSign * (shipSize.z * 0.24);
-  const cannonScale = Math.max(0.18, Math.min(0.45, Math.min(shipSize.x, shipSize.z) * 0.045));
-
-  if (rigKey === 'bow_heavy_battery') {
-    const heroBow = createClassicNavalCannon(cannonScale * 1.35, 0xd97706, 0xff5500);
-    heroBow.cannonGroup.position.set(center.x, deckY + cannonScale * 0.25, bowZ);
-    if (forwardSign < 0) heroBow.cannonGroup.rotation.y = Math.PI;
-    rigGroup.add(heroBow.cannonGroup);
-    customRigEmbers.push(heroBow.emberMat);
-
-    [-1, 1].forEach((side) => {
-      const wingCannon = createClassicNavalCannon(cannonScale * 1.0, 0xb45309, 0xff8800);
-      wingCannon.cannonGroup.position.set(
-        center.x + side * (shipSize.x * 0.08),
-        deckY + cannonScale * 0.15,
-        bowZ - forwardSign * (shipSize.z * 0.06)
-      );
-      if (forwardSign < 0) wingCannon.cannonGroup.rotation.y = Math.PI;
-      wingCannon.cannonGroup.rotation.y += side * 0.14;
-      rigGroup.add(wingCannon.cannonGroup);
-      customRigEmbers.push(wingCannon.emberMat);
-    });
-  } else if (rigKey === 'broadside_heavy_cannons') {
-    // Gövde merkezine yakın ve bordadan dışa bakan büyük eski yan toplar
-    const sideOffsetX = shipSize.x * 0.095;
-    const zRatios = [-0.14, 0.0, 0.14];
-
-    [-1, 1].forEach((sideSign) => {
-      zRatios.forEach((zr) => {
-        const broadsideCannon = createClassicNavalCannon(cannonScale * 1.25, 0xb45309, 0xff6b00);
-        broadsideCannon.cannonGroup.position.set(
-          center.x + sideSign * sideOffsetX,
-          deckY + cannonScale * 0.2,
-          center.z + zr * shipSize.z
-        );
-        broadsideCannon.cannonGroup.rotation.y = sideSign > 0 ? Math.PI / 2 : -Math.PI / 2;
-        rigGroup.add(broadsideCannon.cannonGroup);
-        customRigEmbers.push(broadsideCannon.emberMat);
-      });
-    });
-  }
-
-  shipMesh.add(rigGroup);
-  activeCustomRigGroup = rigGroup;
-
-  activeCustomRigLight = new THREE.PointLight(theme.lightColor, theme.lightIntensity, 42);
-  activeCustomRigLight.position.set(center.x, deckY + 6, center.z);
-  shipMesh.add(activeCustomRigLight);
-}
-
-function attachDeneme3DProps(shipMesh, theme, bounds, shipSize, styleKey) {
+function attachDeneme3DProps(shipMesh, theme, bounds, shipSize) {
   if (!shipMesh || typeof THREE === 'undefined') return;
   const propsGroup = new THREE.Group();
   const center = new THREE.Vector3();
@@ -1314,19 +1092,19 @@ function attachDeneme3DProps(shipMesh, theme, bounds, shipSize, styleKey) {
   const orbitRx = Math.max(0.4, shipSize.x * 0.14);
   const orbitRz = Math.max(0.5, shipSize.z * 0.16);
   const crystalY = center.y + shipSize.y * 0.12;
-  const crystalGeo = new THREE.OctahedronGeometry(0.11 * unitScale, 0);
+  const crystalGeo = new THREE.OctahedronGeometry(0.12 * unitScale, 0);
   const crystalMat = new THREE.MeshStandardMaterial({
     color: theme.crystalColor,
     emissive: theme.lanternColor,
-    emissiveIntensity: 0.35,
+    emissiveIntensity: 1.05,
     metalness: 0.65,
-    roughness: 0.22
+    roughness: 0.18
   });
 
   denemeCrystalsMeta = [];
   for (let i = 0; i < crystalCount; i++) {
     const cMesh = new THREE.Mesh(crystalGeo, crystalMat);
-    cMesh.scale.set(0.75, 1.25, 0.75);
+    cMesh.scale.set(0.8, 1.3, 0.8);
     const angle = (i / crystalCount) * Math.PI * 2;
     cMesh.position.set(center.x + Math.cos(angle) * orbitRx, crystalY, center.z + Math.sin(angle) * orbitRz);
     propsGroup.add(cMesh);
@@ -1343,21 +1121,6 @@ function attachDeneme3DProps(shipMesh, theme, bounds, shipSize, styleKey) {
       bobAmp: Math.max(0.03, shipSize.y * 0.008),
       phase: i * 1.25
     });
-  }
-
-  if (styleKey === 'crimson') {
-    const bowCannonScale = Math.max(0.22, Math.min(0.45, Math.min(shipSize.x, shipSize.z) * 0.045));
-    const bowBuilt = createClassicNavalCannon(bowCannonScale * 1.25);
-    const forwardSign = Math.abs(bounds.min.z) >= Math.abs(bounds.max.z) ? -1 : 1;
-    const bowZ = center.z + forwardSign * (shipSize.z * 0.22);
-    const bowY = center.y + shipSize.y * 0.12 + bowCannonScale * 0.2;
-
-    bowBuilt.cannonGroup.position.set(center.x, bowY, bowZ);
-    if (forwardSign < 0) {
-      bowBuilt.cannonGroup.rotation.y = Math.PI;
-    }
-    propsGroup.add(bowBuilt.cannonGroup);
-    deneme4BowCannonEmber = bowBuilt.emberMat;
   }
 
   shipMesh.add(propsGroup);
@@ -1381,10 +1144,10 @@ function applyDenemeShipStyling(shipMesh, styleKey = 'gold', options = { with3DP
           mat.emissiveIntensity = theme.emissiveIntensity;
         }
         if (typeof mat.metalness === 'number') {
-          mat.metalness = Math.min(0.75, (mat.metalness || 0.25) + theme.metalnessAdd);
+          mat.metalness = Math.min(0.8, (mat.metalness || 0.25) + theme.metalnessAdd);
         }
         if (typeof mat.roughness === 'number') {
-          mat.roughness = Math.max(0.28, (mat.roughness || 0.6) - theme.roughnessSub);
+          mat.roughness = Math.max(0.22, (mat.roughness || 0.6) - theme.roughnessSub);
         }
         mat.needsUpdate = true;
         denemeMaterialsList.push(mat);
@@ -1399,12 +1162,12 @@ function applyDenemeShipStyling(shipMesh, styleKey = 'gold', options = { with3DP
   bounds.getSize(shipSize);
 
   if (options.with3DProps) {
-    attachDeneme3DProps(shipMesh, theme, bounds, shipSize, styleKey);
+    attachDeneme3DProps(shipMesh, theme, bounds, shipSize);
   }
 
   if (typeof THREE !== 'undefined') {
-    activeDenemeLight = new THREE.PointLight(theme.lightColor, theme.lightIntensity, 36);
-    activeDenemeLight.position.set(0, 12, 0);
+    activeDenemeLight = new THREE.PointLight(theme.lightColor, theme.lightIntensity, 85);
+    activeDenemeLight.position.set(0, 16, 0);
     shipMesh.add(activeDenemeLight);
   }
 }
@@ -1493,11 +1256,6 @@ function decorateShipModelWithSpec(shipMesh, modelSpec) {
     applyDenemeShipStyling(shipMesh, modelSpec.denemeStyle, { with3DProps: true });
   } else if (modelSpec.phantomStyle) {
     applyPhantomShipStyling(shipMesh, modelSpec.phantomStyle);
-  } else if (modelSpec.customRig) {
-    const bounds = new THREE.Box3().setFromObject(shipMesh);
-    const shipSize = new THREE.Vector3();
-    bounds.getSize(shipSize);
-    applyCustomShipRig(shipMesh, modelSpec.customRig, bounds, shipSize);
   }
 }
 
@@ -2040,8 +1798,8 @@ function createBorderFrame() {
   geometry.rotateX(Math.PI / 2);
 
   const material = new THREE.MeshStandardMaterial({
-    color: 0x1e293b, roughness: 0.4, metalness: 0.9,
-    emissive: 0x0f172a, emissiveIntensity: 0.2
+    color: 0x3b170e, roughness: 0.45, metalness: 0.85,
+    emissive: 0x1a0804, emissiveIntensity: 0.25
   });
 
   borderFrameMesh = new THREE.Mesh(geometry, material);
@@ -2111,14 +1869,14 @@ function initThreeGame() {
   createBorderFrame();
 
   const ringGeo = new THREE.RingGeometry(ATTACK_RANGE - 3, ATTACK_RANGE, 64);
-  const ringMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.6 });
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0xfbbf24, side: THREE.DoubleSide, transparent: true, opacity: 0.65 });
   rangeRingMesh = new THREE.Mesh(ringGeo, ringMat);
   rangeRingMesh.rotation.x = -Math.PI / 2;
   rangeRingMesh.position.y = 0.6;
   scene.add(rangeRingMesh);
 
   const neonGeo = new THREE.RingGeometry(28, 34, 48);
-  const neonMat = new THREE.MeshBasicMaterial({ color: 0x0ea5e9, side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
+  const neonMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b, side: THREE.DoubleSide, transparent: true, opacity: 0.88 });
   playerNeonRing = new THREE.Mesh(neonGeo, neonMat);
   playerNeonRing.rotation.x = -Math.PI / 2;
   playerNeonRing.position.y = 0.8;
@@ -3224,16 +2982,6 @@ function animate3D() {
       if (activePhantomLight) {
         activePhantomLight.intensity = pTheme.baseLight + (pTheme.peakLight - pTheme.baseLight) * pulseWave;
       }
-    } else if (modelSpec.customRig) {
-      const rTheme = CUSTOM_RIG_THEMES[modelSpec.customRig] || CUSTOM_RIG_THEMES.bow_heavy_battery;
-      const pulseWave = 0.5 + 0.5 * Math.sin(timeSec * rTheme.pulseSpeed);
-
-      for (let i = 0; i < customRigEmbers.length; i++) {
-        customRigEmbers[i].emissiveIntensity = 0.75 + pulseWave * 0.55;
-      }
-      if (activeCustomRigLight) {
-        activeCustomRigLight.intensity = rTheme.lightIntensity * (0.8 + 0.3 * pulseWave);
-      }
     } else if (modelSpec.denemeStyle) {
       const dTheme = DENEME_THEMES[modelSpec.denemeStyle] || DENEME_THEMES.gold;
       const pulseWave = 0.5 + 0.5 * Math.sin(timeSec * dTheme.pulseSpeed);
@@ -3241,12 +2989,12 @@ function animate3D() {
       for (let i = 0; i < denemeMaterialsList.length; i++) {
         const mat = denemeMaterialsList[i];
         if (mat.emissive) {
-          mat.emissiveIntensity = dTheme.emissiveIntensity * (0.75 + 0.45 * pulseWave);
+          mat.emissiveIntensity = dTheme.emissiveIntensity * (0.7 + 0.65 * pulseWave);
         }
       }
 
       if (activeDenemeLight) {
-        activeDenemeLight.intensity = dTheme.lightIntensity * (0.75 + 0.4 * pulseWave);
+        activeDenemeLight.intensity = dTheme.lightIntensity * (0.7 + 0.6 * pulseWave);
       }
 
       if (denemeCrystalsMeta.length > 0) {
@@ -3266,16 +3014,12 @@ function animate3D() {
       if (denemeLanternCores.length > 0) {
         for (let i = 0; i < denemeLanternCores.length; i++) {
           const l = denemeLanternCores[i];
-          l.coreMat.emissiveIntensity = 0.55 + pulseWave * 0.3;
+          l.coreMat.emissiveIntensity = 1.0 + pulseWave * 0.65;
           if (l.coreMesh) {
-            const s = 0.95 + pulseWave * 0.1;
-            l.coreMesh.scale.set(0.8 * s, 1.15 * s, 0.8 * s);
+            const s = 0.95 + pulseWave * 0.14;
+            l.coreMesh.scale.set(0.85 * s, 1.2 * s, 0.85 * s);
           }
         }
-      }
-
-      if (deneme4BowCannonEmber) {
-        deneme4BowCannonEmber.emissiveIntensity = 0.85 + pulseWave * 0.65;
       }
     }
 
