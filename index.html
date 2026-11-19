@@ -729,9 +729,9 @@ const BASE_SHIP_MODELS = {
   deneme5:          { id: 'deneme5',          name: 'Deneme 5 · Buzul Kraliyet', desc: 'Minik 3D Detay · Buzul Gövde', cost: 0, type: 'glb', modelPath: 'ejder_kalyon.glb', heightOffset: 45, scaleMultiplier: 1.12, denemeStyle: 'frost' },
   tasarim2:         { id: 'tasarim2',         name: 'Tasarim 2', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim2.glb', heightOffset: 45, rotationOffset: Math.PI / 2 },
   tasarim3:         { id: 'tasarim3',         name: 'Tasarim 3', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3 },
-  tasarim3_hayalet: { id: 'tasarim3_hayalet', name: 'Tasarim 3 · Hayalet', desc: 'Ruhani Sis · Hayalet Kopya', cost: 0, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3, phantomStyle: 'specter_teal' },
+  tasarim3_hayalet: { id: 'tasarim3_hayalet', name: 'Tasarim 3 · Hayalet', desc: 'Sürekli Parlayıp Sönen Hayalet Kopya', cost: 0, type: 'glb', modelPath: 'tasarim3.glb', heightOffset: 45, rotationOffset: Math.PI / 2, scaleMultiplier: 1.3, phantomStyle: 'specter_teal' },
   tasarim4:         { id: 'tasarim4',         name: 'Tasarim 4', desc: 'GLB Savaş Gemisi', cost: 3500, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2 },
-  tasarim4_hayalet: { id: 'tasarim4_hayalet', name: 'Tasarim 4 · Hayalet', desc: 'Ruhani Gölge · Hayalet Kopya', cost: 0, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2, phantomStyle: 'specter_violet' },
+  tasarim4_hayalet: { id: 'tasarim4_hayalet', name: 'Tasarim 4 · Hayalet', desc: 'Sürekli Parlayıp Sönen Hayalet Kopya', cost: 0, type: 'glb', modelPath: 'tasarim4.glb', heightOffset: 45, rotationOffset: -Math.PI / 2, phantomStyle: 'specter_violet' },
   tasarim6:         { id: 'tasarim6',         name: 'Tasarim 6', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim6.glb', heightOffset: 85 },
   tasarim7:         { id: 'tasarim7',         name: 'Tasarim 7', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim7.glb', heightOffset: 45, rotationOffset: Math.PI },
   tasarim8:         { id: 'tasarim8',         name: 'Tasarim 8', desc: 'GLB Savaş Gemisi', cost: 2500, type: 'glb', modelPath: 'tasarim8.glb', heightOffset: 85 },
@@ -744,22 +744,26 @@ const PHANTOM_THEMES = {
   specter_teal: {
     color: 0x67e8f9,
     emissive: 0x0891b2,
-    emissiveIntensity: 0.62,
-    opacity: 0.56,
+    baseEmissive: 0.25,
+    peakEmissive: 1.45,
+    minOpacity: 0.28,
+    maxOpacity: 0.88,
     lightColor: 0x22d3ee,
-    lightIntensity: 0.65,
-    wispColor: 0xa5f3fc,
-    pulseSpeed: 3.1
+    baseLight: 0.25,
+    peakLight: 1.25,
+    pulseSpeed: 3.4
   },
   specter_violet: {
     color: 0xd8b4fe,
     emissive: 0x7e22ce,
-    emissiveIntensity: 0.64,
-    opacity: 0.56,
+    baseEmissive: 0.25,
+    peakEmissive: 1.5,
+    minOpacity: 0.28,
+    maxOpacity: 0.88,
     lightColor: 0xc084fc,
-    lightIntensity: 0.65,
-    wispColor: 0xe9d5ff,
-    pulseSpeed: 2.7
+    baseLight: 0.25,
+    peakLight: 1.25,
+    pulseSpeed: 3.4
   }
 };
 
@@ -864,10 +868,8 @@ let denemeLanternCores = [];
 let deneme4BowCannonEmber = null;
 let activeDenemeStyleKey = null;
 
-let activePhantomGroup = null;
 let activePhantomLight = null;
 let activePhantomStyleKey = null;
-let phantomWispsMeta = [];
 let phantomMaterialsList = [];
 
 function clearAllEnemyAggro() {
@@ -904,22 +906,13 @@ function clearDenemeShipStyling() {
     activePhantomLight.parent.remove(activePhantomLight);
   }
   activePhantomLight = null;
-
-  if (activePhantomGroup) {
-    if (activePhantomGroup.parent) {
-      activePhantomGroup.parent.remove(activePhantomGroup);
-    }
-    activePhantomGroup.traverse((obj) => {
-      if (obj.geometry) obj.geometry.dispose();
-      if (obj.material) {
-        const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
-        mats.forEach(m => m.dispose());
-      }
-    });
-  }
-  activePhantomGroup = null;
   activePhantomStyleKey = null;
-  phantomWispsMeta = [];
+
+  phantomMaterialsList.forEach((mat) => {
+    if (mat && typeof mat.dispose === 'function') {
+      mat.dispose();
+    }
+  });
   phantomMaterialsList = [];
 }
 
@@ -929,10 +922,6 @@ function applyPhantomShipStyling(shipMesh, phantomKey = 'specter_teal') {
   activePhantomStyleKey = phantomKey;
   phantomMaterialsList = [];
 
-  const bounds = new THREE.Box3().setFromObject(shipMesh);
-  const shipSize = new THREE.Vector3();
-  bounds.getSize(shipSize);
-
   shipMesh.traverse((child) => {
     if (child.isMesh && child.material) {
       const mats = Array.isArray(child.material) ? child.material : [child.material];
@@ -941,10 +930,10 @@ function applyPhantomShipStyling(shipMesh, phantomKey = 'specter_teal') {
         if (m.color) m.color.setHex(theme.color);
         if (m.emissive) {
           m.emissive.setHex(theme.emissive);
-          m.emissiveIntensity = theme.emissiveIntensity;
+          m.emissiveIntensity = theme.baseEmissive;
         }
         m.transparent = true;
-        m.opacity = theme.opacity;
+        m.opacity = theme.maxOpacity;
         m.depthWrite = false;
         m.needsUpdate = true;
         phantomMaterialsList.push(m);
@@ -954,43 +943,7 @@ function applyPhantomShipStyling(shipMesh, phantomKey = 'specter_teal') {
     }
   });
 
-  const wispGroup = new THREE.Group();
-  const wispCount = 6;
-  const rx = Math.max(1.0, shipSize.x * 0.38);
-  const rz = Math.max(1.2, shipSize.z * 0.38);
-  const baseY = bounds.min.y + shipSize.y * 0.42;
-  const wispGeo = new THREE.OctahedronGeometry(Math.max(0.16, shipSize.y * 0.045), 1);
-
-  phantomWispsMeta = [];
-  for (let i = 0; i < wispCount; i++) {
-    const wMat = new THREE.MeshBasicMaterial({
-      color: theme.wispColor,
-      transparent: true,
-      opacity: 0.72,
-      depthWrite: false
-    });
-    const wMesh = new THREE.Mesh(wispGeo, wMat);
-    wMesh.scale.set(0.7, 1.5, 0.7);
-    const angle = (i / wispCount) * Math.PI * 2;
-    wMesh.position.set(Math.cos(angle) * rx, baseY, Math.sin(angle) * rz);
-    wispGroup.add(wMesh);
-
-    phantomWispsMeta.push({
-      mesh: wMesh,
-      mat: wMat,
-      angle,
-      rx,
-      rz,
-      baseY,
-      speed: 1.15,
-      phase: i * 1.05
-    });
-  }
-
-  shipMesh.add(wispGroup);
-  activePhantomGroup = wispGroup;
-
-  activePhantomLight = new THREE.PointLight(theme.lightColor, theme.lightIntensity, 55);
+  activePhantomLight = new THREE.PointLight(theme.lightColor, theme.baseLight, 55);
   activePhantomLight.position.set(0, 14, 0);
   shipMesh.add(activePhantomLight);
 }
@@ -2898,29 +2851,20 @@ function animate3D() {
 
     if (modelSpec.phantomStyle) {
       const pTheme = PHANTOM_THEMES[modelSpec.phantomStyle] || PHANTOM_THEMES.specter_teal;
-      const pulseWave = 0.5 + 0.5 * Math.sin(timeSec * pTheme.pulseSpeed);
+      const pulseWave = 0.5 + 0.5 * Math.sin(animTimeSec * pTheme.pulseSpeed);
+      const nextOpacity = pTheme.minOpacity + (pTheme.maxOpacity - pTheme.minOpacity) * pulseWave;
+      const nextEmissive = pTheme.baseEmissive + (pTheme.peakEmissive - pTheme.baseEmissive) * pulseWave;
 
       for (let i = 0; i < phantomMaterialsList.length; i++) {
-        phantomMaterialsList[i].opacity = pTheme.opacity * (0.78 + pulseWave * 0.28);
-        if (phantomMaterialsList[i].emissive) {
-          phantomMaterialsList[i].emissiveIntensity = pTheme.emissiveIntensity * (0.8 + pulseWave * 0.4);
+        const mat = phantomMaterialsList[i];
+        mat.opacity = nextOpacity;
+        if (mat.emissive) {
+          mat.emissiveIntensity = nextEmissive;
         }
       }
 
       if (activePhantomLight) {
-        activePhantomLight.intensity = pTheme.lightIntensity + pulseWave * 0.35;
-      }
-
-      for (let i = 0; i < phantomWispsMeta.length; i++) {
-        const w = phantomWispsMeta[i];
-        const wAng = w.angle + timeSec * w.speed;
-        w.mesh.position.set(
-          Math.cos(wAng) * w.rx,
-          w.baseY + Math.sin(timeSec * 2.4 + w.phase) * 0.35,
-          Math.sin(wAng) * w.rz
-        );
-        w.mesh.rotation.y += 3.0 * dt;
-        w.mat.opacity = 0.45 + pulseWave * 0.4;
+        activePhantomLight.intensity = pTheme.baseLight + (pTheme.peakLight - pTheme.baseLight) * pulseWave;
       }
     } else if (modelSpec.denemeStyle) {
       const dTheme = DENEME_THEMES[modelSpec.denemeStyle] || DENEME_THEMES.gold;
@@ -2960,7 +2904,7 @@ function animate3D() {
       }
     }
 
-    const phantomFloatY = modelSpec.phantomStyle ? (3.5 + Math.sin(timeSec * 1.9) * 2.4) : 0;
+    const phantomFloatY = modelSpec.phantomStyle ? (2.5 + Math.sin(animTimeSec * 2.1) * 1.8) : 0;
     activeGlbShip.position.set(player.x, SHIP_Y_POS + hOffset + waveBobY + phantomFloatY - 100, player.z);
     activeGlbShip.rotation.order = 'YXZ';
     activeGlbShip.rotation.y = (-player.a + Math.PI / 2) + rotOffset;
