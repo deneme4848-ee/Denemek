@@ -1384,6 +1384,7 @@ const USERS_STORAGE_KEY = 'pirate3d_users_v85';
 const SESSION_STORAGE_KEY = 'pirate3d_session_v85';
 let authMode = 'login';
 let currentUser = null;
+let gameInitialized = false;
 
 function loadUsers() {
   let users = [];
@@ -1427,21 +1428,30 @@ function completeLogin(user) {
     equippedShip: equipped
   };
   try { localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser)); } catch(e) {}
-  tagUsernameEl.textContent = currentUser.username;
-  authOverlay.style.display = 'none';
-  initThreeGame();
+  if (tagUsernameEl) tagUsernameEl.textContent = currentUser.username;
+  if (authOverlay) authOverlay.style.display = 'none';
+  if (!gameInitialized) {
+    gameInitialized = true;
+    initThreeGame();
+  } else if (typeof startGameLogic === 'function') {
+    startGameLogic();
+  }
 }
 
 if (authForm) {
   authForm.addEventListener('submit', e => {
     e.preventDefault();
     const uname = authUsernameInput.value.trim(); const pass = authPasswordInput.value;
+    if (!uname || !pass) {
+      if (authMsgEl) authMsgEl.textContent = 'Lütfen kaptan adı ve şifre girin.';
+      return;
+    }
     const users = loadUsers();
     if (authMode === 'register') {
       if (users.some(u => u.username.toLowerCase() === uname.toLowerCase())) { authMsgEl.textContent = 'Bu isim zaten kayıtlı.'; return; }
       const nu = { id: 'u_' + Date.now(), username: uname, password: pass, ownedShips: sanitizeOwnedShips(['standard']), equippedShip: 'standard' };
       users.push(nu); saveUsers(users);
-      setTimeout(() => completeLogin(nu), 200);
+      setTimeout(() => completeLogin(nu), 150);
     } else {
       const found = users.find(u => u.username.toLowerCase() === uname.toLowerCase() && u.password === pass);
       if (!found) { authMsgEl.textContent = 'Hatalı kullanıcı adı veya şifre.'; return; }
@@ -1450,6 +1460,16 @@ if (authForm) {
   });
 }
 if (logoutBtn) logoutBtn.addEventListener('click', () => { try { localStorage.removeItem(SESSION_STORAGE_KEY); } catch(e){} location.reload(); });
+
+window.addEventListener('DOMContentLoaded', () => {
+  loadUsers();
+  try {
+    const savedSession = JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY) || 'null');
+    if (savedSession && savedSession.username) {
+      completeLogin(savedSession);
+    }
+  } catch (e) {}
+});
 
 let scene, camera, renderer;
 let oceanTexture = null, oceanBumpTexture = null;
@@ -2987,3 +3007,635 @@ function animate3D() {
         t.mesh.position.y = t.baseY + (scaleY - 1.0) * 5.5;
         t.mesh.rotation.z = (-Math.cos((j / sys.tongues.length) * Math.PI * 2) * 0.18) + flicker * 0.1;
       }
+      if (sys.coreFlame) {
+        const cPulse = 0.88 + 0.18 * Math.sin(animTimeSec * 9.5 + sys.phase);
+        sys.coreFlame.scale.set(cPulse, 0.85 + 0.2 * Math.cos(animTimeSec * 11.0 + sys.phase), cPulse);
+      }
+      if (sys.light) {
+        sys.light.intensity = sys.baseIntensity * (0.88 + 0.22 * Math.sin(animTimeSec * 8.0 + sys.phase));
+      }
+      sys.emberTimer += dt;
+      if (sys.emberTimer >= 0.25) {
+        sys.emberTimer = 0;
+        spawnFlameEmber(sys.group.position.x, sys.group.position.y + 9 * sys.scale, sys.group.position.z, sys.scale);
+      }
+    }
+  }
+
+  for (let i = flameEmberParticles.length - 1; i >= 0; i--) {
+    const em = flameEmberParticles[i];
+    em.life--;
+    em.mesh.position.x += em.vx * dt;
+    em.mesh.position.y += em.vy * dt;
+    em.mesh.position.z += em.vz * dt;
+    em.mesh.scale.multiplyScalar(0.95);
+    em.mesh.material.opacity = Math.max(0, em.mesh.material.opacity - 0.025);
+    if (em.life <= 0 || em.mesh.material.opacity <= 0) {
+      scene.remove(em.mesh);
+      em.mesh.material.dispose();
+      flameEmberParticles.splice(i, 1);
+    }
+  }
+
+  if (player.hp < player.maxHp && (now - player.lastDamagedTime >= 5000)) {
+    if (now - lastRegenTime >= 5000) {
+      lastRegenTime = now;
+      player.hp = Math.min(player.maxHp, player.hp + 5000);
+      showFloatingDamage(player.x, player.z, '+5000', '#7ec49c');
+      updateHUD();
+    }
+  }
+
+  if (targetDestination) {
+    const dx = targetDestination.x - player.x;
+    const dz = targetDestination.z - player.z;
+    const dist = Math.hypot(dx, dz);
+    if (dist > 18) {
+      player.a = Math.atan2(dz, dx);
+      player.speed = player.maxSpeed;
+    } else {
+      targetDestination = navigationQueue.shift() || null;
+      if (!targetDestination) {
+        player.speed = 0;
+      }
+    }
+  } else {
+    player.speed = 0;
+  }
+
+  const nextX = player.x + Math.cos(player.a) * player.speed * dt;
+  const nextZ = player.z + Math.sin(player.a) * player.speed * dt;
+
+  const slidPos = resolveWallSlide(nextX, nextZ);
+  player.x = slidPos.x;
+  player.z = slidPos.z;
+
+  const HALF_WORLD = WORLD_SIZE / 2;
+  const HARD_LIMIT = HALF_WORLD - 120;
+  const TRIGGER_THRESHOLD = HALF_WORLD - 350;
+  const curMeta = MAP_DATA[currentMapIndex];
+  let nearEdge = false;
+
+  if (player.x > HARD_LIMIT) player.x = HARD_LIMIT;
+  if (player.x < -HARD_LIMIT) player.x = -HARD_LIMIT;
+  if (player.z > HARD_LIMIT) player.z = HARD_LIMIT;
+  if (player.z < -HARD_LIMIT) player.z = -HARD_LIMIT;
+
+  if (player.x > TRIGGER_THRESHOLD) {
+    if (curMeta.col < 4) { showTransitButton(currentMapIndex + 1, 'right'); nearEdge = true; }
+  } else if (player.x < -TRIGGER_THRESHOLD) {
+    if (curMeta.col > 0) { showTransitButton(currentMapIndex - 1, 'left'); nearEdge = true; }
+    else {
+      const targetIdx = currentMapIndex + 4;
+      if (targetIdx < MAP_DATA.length) { showTransitButton(targetIdx, 'left'); nearEdge = true; }
+    }
+  } else if (player.z > TRIGGER_THRESHOLD) {
+    if (curMeta.row < 2) { showTransitButton(currentMapIndex + 5, 'bottom'); nearEdge = true; }
+  } else if (player.z < -TRIGGER_THRESHOLD) {
+    if (curMeta.row > 0) { showTransitButton(currentMapIndex - 5, 'top'); nearEdge = true; }
+    else {
+      const targetIdx = currentMapIndex + 10;
+      if (targetIdx < MAP_DATA.length) { showTransitButton(targetIdx, 'top'); nearEdge = true; }
+    }
+  }
+
+  if (!nearEdge && pendingTransitMapIndex !== null) { hideTransitButton(); }
+
+  coordDisplayEl.textContent = `X: ${Math.round((player.x / HALF_WORLD) * 100)} · Y: ${Math.round((player.z / HALF_WORLD) * 100)}`;
+
+  if (activeGlbShip) {
+    const timeSec = now * 0.0022;
+    const waveBobY = Math.sin(timeSec) * 1.3;
+    const waveRollZ = Math.cos(timeSec * 0.85) * 0.04;
+    const speedPitchX = (player.speed > 0 ? -0.045 : 0) + Math.sin(timeSec * 1.2) * 0.022;
+
+    const users = loadUsers();
+    const dbUser = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
+    const equippedId = sanitizeShipId(dbUser.equippedShip);
+    const modelSpec = SHIP_MODELS[equippedId] || SHIP_MODELS.standard;
+    const hOffset = modelSpec.heightOffset || 0;
+    const rotOffset = modelSpec.rotationOffset || 0;
+
+    if (modelSpec.phantomStyle) {
+      const pTheme = PHANTOM_THEMES[modelSpec.phantomStyle] || PHANTOM_THEMES.specter_teal;
+      const pulseWave = 0.5 + 0.5 * Math.sin(animTimeSec * pTheme.pulseSpeed);
+      const nextOpacity = pTheme.minOpacity + (pTheme.maxOpacity - pTheme.minOpacity) * pulseWave;
+      const nextEmissive = pTheme.baseEmissive + (pTheme.peakEmissive - pTheme.baseEmissive) * pulseWave;
+
+      for (let i = 0; i < phantomMaterialsList.length; i++) {
+        const mat = phantomMaterialsList[i];
+        mat.opacity = nextOpacity;
+        if (mat.emissive) {
+          mat.emissiveIntensity = nextEmissive;
+        }
+      }
+
+      if (activePhantomLight) {
+        activePhantomLight.intensity = pTheme.baseLight + (pTheme.peakLight - pTheme.baseLight) * pulseWave;
+      }
+
+      if (activePhantomAuraMesh) {
+        activePhantomAuraMesh.rotation.z += 1.4 * dt;
+        const auraScale = 0.94 + pulseWave * 0.14;
+        activePhantomAuraMesh.scale.set(auraScale, 1, auraScale);
+        activePhantomAuraMesh.material.opacity = 0.26 + pulseWave * 0.24;
+      }
+    } else if (modelSpec.denemeStyle) {
+      const dTheme = DENEME_THEMES[modelSpec.denemeStyle] || DENEME_THEMES.gold;
+      const pulseWave = 0.5 + 0.5 * Math.sin(timeSec * dTheme.pulseSpeed);
+
+      for (let i = 0; i < denemeMaterialsList.length; i++) {
+        const mat = denemeMaterialsList[i];
+        if (mat.emissive) {
+          mat.emissiveIntensity = dTheme.emissiveIntensity * (0.8 + 0.4 * pulseWave);
+        }
+      }
+
+      if (activeDenemeLight) {
+        activeDenemeLight.intensity = dTheme.lightIntensity * (0.8 + 0.35 * pulseWave);
+      }
+
+      if (denemeCrystalsMeta.length > 0) {
+        for (let i = 0; i < denemeCrystalsMeta.length; i++) {
+          const c = denemeCrystalsMeta[i];
+          const cAngle = c.angle + timeSec * c.orbitSpeed;
+          c.mesh.position.set(
+            c.centerX + Math.cos(cAngle) * c.orbitRx,
+            c.baseY + Math.sin(timeSec * 1.9 + c.phase) * c.bobAmp,
+            c.centerZ + Math.sin(cAngle) * c.orbitRz
+          );
+          c.mesh.rotation.y += 1.8 * dt;
+          c.mesh.rotation.x = Math.sin(timeSec * 1.4 + c.phase) * 0.2;
+        }
+      }
+
+      if (denemeLanternCores.length > 0) {
+        for (let i = 0; i < denemeLanternCores.length; i++) {
+          const l = denemeLanternCores[i];
+          l.coreMat.emissiveIntensity = 0.45 + pulseWave * 0.35;
+          if (l.coreMesh) {
+            const s = 0.96 + pulseWave * 0.08;
+            l.coreMesh.scale.set(0.85 * s, 1.2 * s, 0.85 * s);
+          }
+        }
+      }
+    }
+
+    const phantomFloatY = modelSpec.phantomStyle ? (2.6 + Math.sin(animTimeSec * 2.1) * 1.6) : 0;
+    activeGlbShip.position.set(player.x, SHIP_Y_POS + hOffset + waveBobY + phantomFloatY - 100, player.z);
+    activeGlbShip.rotation.order = 'YXZ';
+    activeGlbShip.rotation.y = (-player.a + Math.PI / 2) + rotOffset;
+    activeGlbShip.rotation.x = speedPitchX;
+    activeGlbShip.rotation.z = waveRollZ;
+  }
+
+  if (playerNeonRing) {
+    playerNeonRing.position.set(player.x, 0.8, player.z);
+    playerNeonRing.rotation.z += (1.0 * dt);
+  }
+  rangeRingMesh.position.set(player.x, 0.6, player.z);
+
+  if (selectedRingMesh && selectedEnemyId) {
+    const target = getTargetById(selectedEnemyId);
+    if (target) {
+      selectedRingMesh.visible = true;
+      selectedRingMesh.position.set(target.x, 0.9, target.z);
+      selectedRingMesh.rotation.z += (1.0 * dt);
+    }
+  }
+
+  if (player) {
+    const tempVector = new THREE.Vector3(player.x, SHIP_Y_POS, player.z);
+    tempVector.project(camera);
+    playerLabelEl.style.transform = `translate(-50%, 0) translate(${(tempVector.x * .5 + .5) * window.innerWidth}px, ${(tempVector.y * -.5 + .5) * window.innerHeight + 38}px)`;
+  }
+
+  const targetCamX = player.x + cameraLookOffset.x;
+  const targetCamZ = player.z + CAMERA_DEPTH + cameraLookOffset.z;
+
+  camera.position.x += (targetCamX - camera.position.x) * (6.0 * dt);
+  camera.position.y += (CAMERA_HEIGHT - camera.position.y) * (6.0 * dt);
+  camera.position.z += (targetCamZ - camera.position.z) * (6.0 * dt);
+  camera.lookAt(player.x + cameraLookOffset.x, 0, player.z + cameraLookOffset.z);
+
+  for (let i = cannonEffects.length - 1; i >= 0; i--) {
+    const ce = cannonEffects[i];
+    ce.life--;
+    ce.mesh.position.x += ce.vx;
+    ce.mesh.position.y += ce.vy;
+    ce.mesh.position.z += ce.vz;
+    ce.mesh.scale.multiplyScalar(ce.grow);
+    ce.mesh.material.opacity = Math.max(0, ce.mesh.material.opacity - ce.fade);
+    if (ce.life <= 0 || ce.mesh.material.opacity <= 0) {
+      scene.remove(ce.mesh);
+      ce.mesh.material.dispose();
+      cannonEffects.splice(i, 1);
+    }
+  }
+
+  for (let i = activeProjectiles.length - 1; i >= 0; i--) {
+    const p = activeProjectiles[i];
+    const dx = p.targetX - p.x, dz = p.targetZ - p.z;
+    const dist = Math.hypot(dx, dz);
+    const step = p.speed * dt;
+    const py = SHIP_Y_POS - p.yOffset;
+
+    if (dist < step) {
+      scene.remove(p.mesh);
+      if (p.mesh.material) p.mesh.material.dispose();
+      activeProjectiles.splice(i, 1);
+      if (p.onHit) p.onHit();
+    } else {
+      p.x += (dx / dist) * step; p.z += (dz / dist) * step;
+      p.mesh.position.set(p.x, py, p.z);
+
+      p.trailTimer += dt;
+      if (p.trailTimer >= 0.035) {
+        p.trailTimer = 0;
+        spawnProjectileTrailSparks(p.x, py, p.z, p.ammoKey);
+      }
+    }
+  }
+
+  for (let i = particleSystems.length - 1; i >= 0; i--) {
+    const pt = particleSystems[i];
+    pt.life--;
+    if (pt.vx) pt.mesh.position.x += pt.vx * dt;
+    if (pt.vy) pt.mesh.position.y += pt.vy * dt;
+    if (pt.vz) pt.mesh.position.z += pt.vz * dt;
+    pt.mesh.scale.multiplyScalar(pt.scaleDecay || 0.90);
+    pt.mesh.material.opacity = Math.max(0, pt.mesh.material.opacity - (2.6 * dt));
+    if (pt.life <= 0 || pt.mesh.material.opacity <= 0) {
+      scene.remove(pt.mesh);
+      pt.mesh.material.dispose();
+      particleSystems.splice(i, 1);
+    }
+  }
+
+  for (const t of defenseTowers) {
+    if (t.mesh) {
+      const distToPlayer = Math.hypot(player.x - t.x, player.z - t.z);
+      if (distToPlayer <= TOWER_ATTACK_RANGE && (now - t.lastAttackTime >= 1200)) {
+        t.lastAttackTime = now;
+        const aimX = player.x;
+        const aimZ = player.z;
+        fireProjectile(t.x, t.z, aimX, aimZ, 'fire', () => {
+          player.hp = Math.max(0, player.hp - 120);
+          player.lastDamagedTime = Date.now();
+          lastRegenTime = Date.now();
+          showFloatingDamage(aimX, aimZ, '-120 (Alev Kulesi)', '#ff944d');
+          updateHUD();
+          if (player.hp <= 0) {
+            triggerSinkSparks(player.x, player.z, 1.35);
+            isGameOver = true; isAttacking = false; gameOverEl.style.display = 'flex';
+            finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString();
+          }
+        }, { speed: 430, yOffset: 36, muzzleY: 42, spriteScale: 15 });
+      }
+      const tempVector = new THREE.Vector3(t.x, SHIP_Y_POS, t.z);
+      tempVector.project(camera);
+      t.labelEl.style.transform = `translate(-50%, 0) translate(${(tempVector.x * .5 + .5) * window.innerWidth}px, ${(tempVector.y * -.5 + .5) * window.innerHeight + 50}px)`;
+      t.hpFillEl.style.width = Math.max(0, (t.hp / t.maxHp) * 100) + '%';
+    }
+  }
+
+  for (const en of enemies) {
+    if (en.slowTimer > 0) en.slowTimer -= (dt * 60);
+    const activeSpeed = en.slowTimer > 0 ? en.baseSpeed * 0.6 : en.baseSpeed;
+    const distToPlayer = Math.hypot(player.x - en.x, player.z - en.z);
+
+    if (!isAttacking) {
+      en.isAggro = false;
+    }
+
+    if (en.isAggro && isAttacking) {
+      en.a = Math.atan2(player.z - en.z, player.x - en.x);
+      if (distToPlayer > ATTACK_RANGE - 20) {
+        en.x += Math.cos(en.a) * (activeSpeed * 1.25) * dt;
+        en.z += Math.sin(en.a) * (activeSpeed * 1.25) * dt;
+      }
+      if (distToPlayer <= ATTACK_RANGE && (now - en.lastAttackTime >= 1000)) {
+        en.lastAttackTime = now;
+        player.hp = Math.max(0, player.hp - 100);
+        player.lastDamagedTime = now;
+        lastRegenTime = now;
+        showFloatingDamage(player.x, player.z, '-100', '#d48a8a');
+        updateHUD();
+        if (player.hp <= 0) {
+          triggerSinkSparks(player.x, player.z, 1.35);
+          isGameOver = true; isAttacking = false; gameOverEl.style.display = 'flex';
+          finalScoreEl.textContent = 'Toplanan Altın: ' + player.score.toLocaleString();
+        }
+      }
+    } else {
+      en.wanderTimer -= (dt * 60);
+      if (en.wanderTimer <= 0) { en.wanderAngle += (Math.random() - 0.5) * 1.5; en.wanderTimer = 180 + Math.random() * 200; }
+      en.a = en.wanderAngle;
+      en.x += Math.cos(en.a) * (activeSpeed * 0.5) * dt;
+      en.z += Math.sin(en.a) * (activeSpeed * 0.5) * dt;
+    }
+
+    en.x = Math.max(-HALF_WORLD, Math.min(HALF_WORLD, en.x));
+    en.z = Math.max(-HALF_WORLD, Math.min(HALF_WORLD, en.z));
+
+    if (en.mesh) {
+      const timeSec = now * 0.0022 + en.id;
+      en.mesh.position.set(en.x, SHIP_Y_POS + ENEMY_GLB_HEIGHT_OFFSET + Math.sin(timeSec) * 1.1 - 100, en.z);
+      en.mesh.rotation.order = 'YXZ';
+      en.mesh.rotation.y = (-en.a + Math.PI / 2) + ENEMY_GLB_ROTATION_OFFSET;
+
+      const tempVector = new THREE.Vector3(en.x, SHIP_Y_POS, en.z);
+      tempVector.project(camera);
+      en.labelEl.style.transform = `translate(-50%, 0) translate(${(tempVector.x * .5 + .5) * window.innerWidth}px, ${(tempVector.y * -.5 + .5) * window.innerHeight + 50}px)`;
+      en.hpFillEl.style.width = Math.max(0, (en.hp / en.maxHp) * 100) + '%';
+    }
+  }
+
+  if (isAttacking && selectedEnemyId) {
+    const ammoKey = player.selectedAmmo;
+    const ammoSpec = AMMO_TYPES[ammoKey];
+    if (player.ammo[ammoKey] < player.cannons) {
+      isAttacking = false;
+      clearAllEnemyAggro();
+      syncAttackButton();
+      showFloatingDamage(player.x, player.z, 'GÜLLE YETERSİZ!', '#d48a8a');
+    } else {
+      const target = getTargetById(selectedEnemyId);
+      if (target && Math.hypot(target.x - player.x, target.z - player.z) <= ATTACK_RANGE && (now - lastPlayerAttackTime >= 1000)) {
+        lastPlayerAttackTime = now;
+        player.ammo[ammoKey] -= player.cannons;
+        target.isAggro = true;
+        fireProjectile(player.x, player.z, target.x, target.z, ammoKey, () => {
+          if (ammoSpec.isHeal) {
+            if (target.hp >= target.maxHp) {
+              showFloatingDamage(target.x, target.z, 'CAN DOLU!', '#9aa5b1');
+            } else {
+              target.hp = Math.min(target.maxHp, target.hp + ammoSpec.damage);
+              showFloatingDamage(target.x, target.z, '+' + ammoSpec.damage.toLocaleString(), '#7fb8d9');
+            }
+          } else {
+            let finalDmg = ammoSpec.damage;
+            if (ammoSpec.bonusNpc > 1.0) finalDmg = Math.round(finalDmg * ammoSpec.bonusNpc);
+            target.hp -= finalDmg;
+            if (ammoSpec.slow < 1.0) target.slowTimer = 240;
+            showFloatingDamage(target.x, target.z, '-' + finalDmg.toLocaleString(), '#e09b56');
+          }
+          updateTargetCard(); updateHUD(); syncAttackButton();
+
+          if (!ammoSpec.isHeal && target.hp <= 0) {
+            if (target.id >= 9000 && target.id < 9100) {
+              triggerSinkSparks(target.x, target.z, 1.4);
+              if (target.mesh) scene.remove(target.mesh);
+              target.labelEl.remove();
+              defenseTowers = defenseTowers.filter(t => t.id !== target.id);
+              selectedEnemyId = null; isAttacking = false;
+              clearAllEnemyAggro();
+              if (selectedRingMesh) selectedRingMesh.visible = false;
+              player.score += 25000;
+              showFloatingDamage(player.x, player.z, 'KULE YIKILDI! +25.000 Altın', '#dfc07d');
+              if (defenseTowers.length === 0) {
+                MAP_DATA[currentMapIndex].ownerFleet = PLAYER_FLEET_TAG;
+                renderMapsGrid();
+                showFloatingDamage(0, 0, `ADA ELE GEÇİRİLDİ! (${PLAYER_FLEET_TAG} Filosu)`, '#dfc07d');
+              }
+            } else {
+              triggerSinkSparks(target.x, target.z, 1.15);
+              if (target.mesh) scene.remove(target.mesh);
+              target.labelEl.remove();
+              enemies = enemies.filter(e => e.id !== target.id);
+              selectedEnemyId = null; isAttacking = false;
+              clearAllEnemyAggro();
+              if (selectedRingMesh) selectedRingMesh.visible = false;
+              player.score += 150;
+              player.exp += 45;
+              if (player.exp >= player.maxExp) {
+                player.level++;
+                player.exp -= player.maxExp;
+                player.maxExp = Math.floor(player.maxExp * 1.35);
+                player.expansionRights.cannon++;
+                player.expansionRights.hp++;
+                player.expansionRights.speed++;
+                showFloatingDamage(player.x, player.z, `LEVEL UP! +1 Top, +1 Can, +1 Hız Hakkı`, '#7fb8d9');
+              }
+            }
+            updateTargetCard(); updateHUD(); syncAttackButton();
+            if (!(target.id >= 9000 && target.id < 9100)) {
+              setTimeout(() => spawnEnemyGlb(target.id), 3000);
+            }
+          }
+        });
+      }
+    }
+  }
+
+  renderer.render(scene, camera);
+  drawMinimap();
+}
+
+function drawMinimap() {
+  const w = miniCanvas.width, h = miniCanvas.height;
+  mctx.clearRect(0, 0, w, h);
+  mctx.fillStyle = '#06101a';
+  mctx.fillRect(0, 0, w, h);
+
+  mctx.strokeStyle = 'rgba(255, 255, 255, 0.09)';
+  mctx.lineWidth = 1;
+  mctx.beginPath();
+  mctx.moveTo(w / 2, 0); mctx.lineTo(w / 2, h);
+  mctx.moveTo(0, h / 2); mctx.lineTo(w, h / 2);
+  mctx.stroke();
+
+  if (!player) return;
+  const scale = w / WORLD_SIZE;
+  const cx = w / 2, cy = h / 2;
+
+  mctx.fillStyle = '#c8a262';
+  defenseTowers.forEach(t => {
+    mctx.beginPath();
+    mctx.arc(cx + t.x * scale, cy + t.z * scale, 2.3, 0, Math.PI * 2);
+    mctx.fill();
+  });
+
+  mctx.fillStyle = '#b84a4a';
+  enemies.forEach(en => {
+    mctx.beginPath();
+    mctx.arc(cx + en.x * scale, cy + en.z * scale, 2.0, 0, Math.PI * 2);
+    mctx.fill();
+  });
+
+  mctx.fillStyle = '#7fb8d9';
+  mctx.beginPath();
+  mctx.arc(cx + player.x * scale, cy + player.z * scale, 2.8, 0, Math.PI * 2);
+  mctx.fill();
+}
+
+function updateHUD() {
+  if (!player) return;
+  levelEl.textContent = player.level;
+  if (playerLabelLevelBadgeEl) playerLabelLevelBadgeEl.textContent = player.level;
+  hpTextEl.textContent = `Can ${Math.ceil(player.hp).toLocaleString()} / ${player.maxHp.toLocaleString()}`;
+  expTextEl.textContent = `Deneyim ${player.exp.toLocaleString()} / ${player.maxExp.toLocaleString()}`;
+  hpBarEl.style.width = ((player.hp / player.maxHp) * 100) + '%';
+  expBarEl.style.width = Math.min(100, (player.exp / player.maxExp) * 100) + '%';
+  marketGoldEl.textContent = player.score.toLocaleString();
+  marketDiamondEl.textContent = player.diamonds.toLocaleString();
+
+  statCannonsEl.textContent = player.cannons;
+  statHpEl.textContent = player.maxHp.toLocaleString();
+  statSpeedEl.textContent = Math.round(player.maxSpeed);
+
+  rightsCannonEl.textContent = player.expansionRights.cannon;
+  rightsHpEl.textContent = player.expansionRights.hp;
+  rightsSpeedEl.textContent = player.expansionRights.speed;
+
+  const hpPercent = Math.max(0, Math.min(100, (player.hp / player.maxHp) * 100));
+  playerShipHpFillEl.style.width = hpPercent + '%';
+  playerShipHpFillEl.style.backgroundColor = hpPercent > 50 ? '#5a9e74' : hpPercent > 20 ? '#c49b45' : '#b84a4a';
+
+  Object.keys(qtyEls).forEach(type => {
+    const count = player.ammo[type] || 0;
+    if (qtyEls[type]) qtyEls[type].textContent = formatShortNumber(count);
+    const slotEl = document.querySelector(`.ammo-slot[data-type="${type}"]`);
+    if (slotEl) slotEl.classList.toggle('empty', count < player.cannons);
+  });
+}
+
+btnExpandCannon.addEventListener('click', () => {
+  if (player.expansionRights.cannon <= 0) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Hak kalmadı!'; return; }
+  if (player.diamonds < 5) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Yetersiz elmas!'; return; }
+  player.diamonds -= 5; player.expansionRights.cannon--; player.cannons += 20;
+  updateHUD(); syncAttackButton();
+  marketFeedbackEl.style.color = '#8fd1ab'; marketFeedbackEl.textContent = 'Top kapasitesi +20 artırıldı!';
+  setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+});
+
+btnExpandHp.addEventListener('click', () => {
+  if (player.expansionRights.hp <= 0) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Hak kalmadı!'; return; }
+  if (player.diamonds < 5) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Yetersiz elmas!'; return; }
+  player.diamonds -= 5; player.expansionRights.hp--; player.maxHp += 50000; player.hp = Math.min(player.maxHp, player.hp + 50000);
+  updateHUD();
+  marketFeedbackEl.style.color = '#8fd1ab'; marketFeedbackEl.textContent = 'Gemi canı +50.000 artırıldı!';
+  setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+});
+
+btnExpandSpeed.addEventListener('click', () => {
+  if (player.expansionRights.speed <= 0) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Hak kalmadı!'; return; }
+  if (player.diamonds < 5) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Yetersiz elmas!'; return; }
+  player.diamonds -= 5; player.expansionRights.speed--; player.maxSpeed *= 1.02;
+  updateHUD();
+  marketFeedbackEl.style.color = '#8fd1ab'; marketFeedbackEl.textContent = 'Gemi hızı %2 artırıldı!';
+  setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+});
+
+function toggleMapsPanel() {
+  mapsPanel.classList.toggle('open');
+  if (mapsPanel.classList.contains('open')) renderMapsGrid();
+}
+mapsToggleBtn.addEventListener('click', toggleMapsPanel);
+mapsCloseBtn.addEventListener('click', () => mapsPanel.classList.remove('open'));
+
+function renderMapsGrid() {
+  mapsGridContainer.innerHTML = '';
+  MAP_DATA.forEach((mapObj, idx) => {
+    const isCurrent = (idx === currentMapIndex);
+    const isCaptured = Boolean(mapObj.ownerFleet);
+    const box = document.createElement('div');
+    box.className = `map-box ${isCurrent ? 'current' : ''} ${isCaptured ? 'captured' : ''}`;
+    box.innerHTML = `<span class="m-num">${mapObj.id}</span><span class="m-name">${mapObj.name}</span><span class="m-owner">${getMapIslandLabel(mapObj)}</span>`;
+    mapsGridContainer.appendChild(box);
+  });
+}
+
+function togglePortPanel() {
+  marketPanel.classList.toggle('open');
+  if (marketPanel.classList.contains('open') && sectionShipyard.classList.contains('active')) renderShipyardList();
+}
+portToggleBtn.addEventListener('click', togglePortPanel);
+marketCloseBtn.addEventListener('click', () => marketPanel.classList.remove('open'));
+
+function setActiveTab(activeBtn, activeSec, titleText) {
+  [tabAmmo, tabShipyard, tabExpand, tabCrew].forEach(b => b.classList.remove('active'));
+  [sectionAmmo, sectionShipyard, sectionExpand, sectionCrew].forEach(s => s.classList.remove('active'));
+  activeBtn.classList.add('active'); activeSec.classList.add('active');
+  portPanelTitle.textContent = titleText;
+}
+
+tabAmmo.addEventListener('click', () => setActiveTab(tabAmmo, sectionAmmo, '⚓ LİMAN - Gülle & Cephane'));
+tabShipyard.addEventListener('click', () => { setActiveTab(tabShipyard, sectionShipyard, '⚓ LİMAN - Tersane'); renderShipyardList(); });
+tabExpand.addEventListener('click', () => setActiveTab(tabExpand, sectionExpand, '⚓ LİMAN - Genişletme'));
+tabCrew.addEventListener('click', () => setActiveTab(tabCrew, sectionCrew, '⚓ LİMAN - Tayfa'));
+
+document.querySelectorAll('.ammo-buy-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (!player) return;
+    const type = btn.dataset.type, amount = parseInt(btn.dataset.amount, 10), cost = parseInt(btn.dataset.cost, 10);
+    if (player.score < cost) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Yetersiz altın!'; return; }
+    player.score -= cost;
+    player.ammo[type] = (player.ammo[type] || 0) + amount;
+    updateHUD(); syncAttackButton();
+    marketFeedbackEl.style.color = '#8fd1ab'; marketFeedbackEl.textContent = `${amount} adet ${AMMO_TYPES[type].name} alındı!`;
+    setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+  });
+});
+
+function renderShipyardList() {
+  shipyardListEl.innerHTML = '';
+  const users = loadUsers();
+  const dbUser = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
+  const owned = sanitizeOwnedShips(dbUser.ownedShips), equipped = sanitizeShipId(dbUser.equippedShip);
+
+  Object.values(SHIP_MODELS).forEach((model, idx) => {
+    const isOwned = owned.includes(model.id);
+    const isEquipped = equipped === model.id;
+    const div = document.createElement('div');
+    div.className = 'ship-card-item';
+    let btnHtml = isEquipped ? `<button class="buy-btn equipped" type="button" disabled>Kullanımda</button>` :
+                  isOwned ? `<button class="buy-btn ship-equip-btn" type="button" data-id="${model.id}">Kullan</button>` :
+                  `<button class="buy-btn ship-buy-btn" type="button" data-id="${model.id}" data-cost="${model.cost}">${model.cost.toLocaleString()} Altın</button>`;
+
+    div.innerHTML = `<div class="ship-card-img-wrap" id="preview-wrap-${idx}">Yükleniyor...</div><div class="ship-card-title">${model.name}</div><div class="ship-card-sub">${model.desc}</div>${btnHtml}`;
+    shipyardListEl.appendChild(div);
+
+    const wrapEl = document.getElementById(`preview-wrap-${idx}`);
+    getShipThumbnail(model, (dataUrl) => {
+      if (wrapEl) wrapEl.innerHTML = `<img src="${dataUrl}" alt="${model.name}">`;
+    });
+  });
+
+  shipyardListEl.querySelectorAll('.ship-buy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const shipId = btn.dataset.id, cost = parseInt(btn.dataset.cost, 10);
+      if (player.score < cost) { marketFeedbackEl.style.color = '#d48a8a'; marketFeedbackEl.textContent = 'Yetersiz altın!'; return; }
+      player.score -= cost;
+      const users = loadUsers();
+      const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
+      if (uIdx !== -1) {
+        users[uIdx].ownedShips = sanitizeOwnedShips(users[uIdx].ownedShips);
+        if (!users[uIdx].ownedShips.includes(shipId)) users[uIdx].ownedShips.push(shipId);
+        users[uIdx].equippedShip = shipId;
+        saveUsers(users);
+      }
+      if (!currentUser.ownedShips.includes(shipId)) currentUser.ownedShips.push(shipId);
+      currentUser.equippedShip = shipId;
+      updateHUD(); setupPlayerShipVisual(); renderShipyardList();
+      marketFeedbackEl.style.color = '#8fd1ab'; marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} kuşanıldı!`;
+      setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2500);
+    });
+  });
+
+  shipyardListEl.querySelectorAll('.ship-equip-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const shipId = btn.dataset.id;
+      const users = loadUsers();
+      const uIdx = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
+      if (uIdx !== -1) { users[uIdx].equippedShip = shipId; saveUsers(users); }
+      currentUser.equippedShip = shipId;
+      setupPlayerShipVisual(); renderShipyardList();
+      marketFeedbackEl.style.color = '#8fd1ab'; marketFeedbackEl.textContent = `${SHIP_MODELS[shipId].name} kuşanıldı!`;
+      setTimeout(() => { marketFeedbackEl.textContent = ''; }, 2000);
+    });
+  });
+}
+</script>
+</body>
+</html>
