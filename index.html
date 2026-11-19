@@ -1441,18 +1441,18 @@ function createSeamlessDarkOceanTexture() {
   const canvas = document.createElement('canvas');
   canvas.width = 1024; canvas.height = 1024;
   const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#042638';
+  ctx.fillStyle = '#031d2c';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  for (let i = 0; i < 160; i++) {
+  for (let i = 0; i < 190; i++) {
     const x = Math.random() * canvas.width;
     const y = Math.random() * canvas.height;
-    const rx = 25 + Math.random() * 60;
-    const ry = 18 + Math.random() * 45;
+    const rx = 28 + Math.random() * 68;
+    const ry = 20 + Math.random() * 48;
     const glow = ctx.createRadialGradient(x, y, 0, x, y, Math.max(rx, ry));
-    glow.addColorStop(0, 'rgba(18, 119, 143, 0.14)');
-    glow.addColorStop(0.55, 'rgba(10, 88, 112, 0.06)');
-    glow.addColorStop(1, 'rgba(4, 38, 56, 0)');
+    glow.addColorStop(0, 'rgba(13, 88, 114, 0.14)');
+    glow.addColorStop(0.55, 'rgba(7, 58, 78, 0.06)');
+    glow.addColorStop(1, 'rgba(3, 29, 44, 0)');
     ctx.save();
     ctx.translate(x, y);
     ctx.scale(rx / Math.max(rx, ry), ry / Math.max(rx, ry));
@@ -1470,6 +1470,78 @@ function createSeamlessDarkOceanTexture() {
   texture.anisotropy = 4;
   texture.needsUpdate = true;
   return texture;
+}
+
+function createIslandSandTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+
+  const grad = ctx.createRadialGradient(256, 256, 20, 256, 256, 256);
+  grad.addColorStop(0, '#a88c5e');
+  grad.addColorStop(0.55, '#8c7249');
+  grad.addColorStop(0.85, '#685942');
+  grad.addColorStop(1, '#3b4a54');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 512, 512);
+
+  for (let i = 0; i < 650; i++) {
+    const ang = Math.random() * Math.PI * 2;
+    const dist = Math.pow(Math.random(), 0.7) * 240;
+    const px = 256 + Math.cos(ang) * dist;
+    const py = 256 + Math.sin(ang) * dist;
+    const r = 1.5 + Math.random() * 5.5;
+    ctx.fillStyle = i % 3 === 0
+      ? 'rgba(214, 190, 142, 0.16)'
+      : i % 3 === 1
+      ? 'rgba(58, 46, 32, 0.22)'
+      : 'rgba(110, 95, 72, 0.18)';
+    ctx.beginPath();
+    ctx.arc(px, py, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.anisotropy = 4;
+  tex.needsUpdate = true;
+  return tex;
+}
+
+function createStoneWallTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#4e555e';
+  ctx.fillRect(0, 0, 256, 256);
+
+  const rows = 8;
+  const cols = 6;
+  const rh = 256 / rows;
+  const cw = 256 / cols;
+
+  for (let r = 0; r < rows; r++) {
+    const offset = (r % 2) * (cw * 0.5);
+    for (let c = -1; c <= cols; c++) {
+      const x = c * cw + offset;
+      const y = r * rh;
+      const shade = 68 + ((r * 17 + c * 29) % 24);
+      ctx.fillStyle = `rgb(${shade}, ${shade + 4}, ${shade + 10})`;
+      ctx.fillRect(x + 1, y + 1, cw - 2, rh - 2);
+      ctx.strokeStyle = 'rgba(20, 26, 34, 0.55)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x + 1, y + 1, cw - 2, rh - 2);
+    }
+  }
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(3, 1);
+  tex.needsUpdate = true;
+  return tex;
 }
 
 function createBorderFrame() {
@@ -1506,8 +1578,8 @@ function createBorderFrame() {
 
 function initThreeGame() {
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x030f1a);
-  scene.fog = new THREE.FogExp2(0x030f1a, 0.00005);
+  scene.background = new THREE.Color(0x020c16);
+  scene.fog = new THREE.FogExp2(0x020c16, 0.00005);
 
   camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 50000);
   camera.position.set(0, CAMERA_HEIGHT, CAMERA_DEPTH);
@@ -1542,8 +1614,8 @@ function initThreeGame() {
   oceanTexture = createSeamlessDarkOceanTexture();
   planeGeo = new THREE.PlaneGeometry(WORLD_SIZE * 2, WORLD_SIZE * 2, 32, 32);
   const oceanMat = new THREE.MeshStandardMaterial({
-    map: oceanTexture, color: 0x9acbd2, roughness: 0.65, metalness: 0.12,
-    emissive: 0x051f2e, emissiveIntensity: 0.12
+    map: oceanTexture, color: 0x7eb6c4, roughness: 0.68, metalness: 0.14,
+    emissive: 0x041926, emissiveIntensity: 0.14
   });
   const ocean = new THREE.Mesh(planeGeo, oceanMat);
   ocean.rotation.x = -Math.PI / 2;
@@ -1721,44 +1793,44 @@ function addCastleFlameCluster(parentGroup, x, y, z, scale = 1.0, phaseOffset = 
   clusterGroup.position.set(x, y, z);
 
   const brazierMat = new THREE.MeshStandardMaterial({
-    color: 0x292524,
-    roughness: 0.7,
-    metalness: 0.75
+    color: 0x26211d,
+    roughness: 0.72,
+    metalness: 0.78
   });
-  const brazierBowl = new THREE.Mesh(new THREE.CylinderGeometry(7.5 * scale, 5.2 * scale, 5.5 * scale, 10), brazierMat);
-  brazierBowl.position.y = -2.5 * scale;
+  const brazierBowl = new THREE.Mesh(new THREE.CylinderGeometry(9.5 * scale, 6.2 * scale, 7 * scale, 12), brazierMat);
+  brazierBowl.position.y = -3 * scale;
   clusterGroup.add(brazierBowl);
 
-  const flameColors = [0xff2a00, 0xff6a00, 0xffaa00, 0xfff078];
+  const flameColors = [0xff1e00, 0xff5500, 0xff9900, 0xffe66d];
   const tongues = [];
-  const tongueCount = 7;
+  const tongueCount = 10;
 
   for (let i = 0; i < tongueCount; i++) {
     const tMat = new THREE.MeshBasicMaterial({
       color: flameColors[i % flameColors.length],
       transparent: true,
-      opacity: 0.88
+      opacity: 0.9
     });
-    const tGeo = new THREE.ConeGeometry(3.8 * scale, 18 * scale, 7);
+    const tGeo = new THREE.ConeGeometry(5.2 * scale, 28 * scale, 8);
     const tMesh = new THREE.Mesh(tGeo, tMat);
     const ang = (i / tongueCount) * Math.PI * 2;
-    const rad = 2.4 * scale;
-    tMesh.position.set(Math.cos(ang) * rad, 8 * scale, Math.sin(ang) * rad);
-    tMesh.rotation.z = -Math.cos(ang) * 0.22;
-    tMesh.rotation.x = Math.sin(ang) * 0.22;
+    const rad = (i % 2 === 0 ? 3.2 : 1.3) * scale;
+    tMesh.position.set(Math.cos(ang) * rad, 13 * scale, Math.sin(ang) * rad);
+    tMesh.rotation.z = -Math.cos(ang) * 0.25;
+    tMesh.rotation.x = Math.sin(ang) * 0.25;
     clusterGroup.add(tMesh);
 
     tongues.push({
       mesh: tMesh,
-      baseY: 8 * scale,
+      baseY: 13 * scale,
       baseScaleY: 1.0,
-      phase: phaseOffset + i * 0.85,
-      speed: 7.5 + (i % 3) * 1.4
+      phase: phaseOffset + i * 0.72,
+      speed: 7.8 + (i % 4) * 1.25
     });
   }
 
-  const flameLight = new THREE.PointLight(0xff6a00, 1.3 * scale, 130 * scale);
-  flameLight.position.set(0, 12 * scale, 0);
+  const flameLight = new THREE.PointLight(0xff6200, 1.6 * scale, 170 * scale);
+  flameLight.position.set(0, 18 * scale, 0);
   clusterGroup.add(flameLight);
 
   parentGroup.add(clusterGroup);
@@ -1766,43 +1838,51 @@ function addCastleFlameCluster(parentGroup, x, y, z, scale = 1.0, phaseOffset = 
     group: clusterGroup,
     tongues,
     light: flameLight,
-    baseIntensity: 1.3 * scale,
+    baseIntensity: 1.6 * scale,
     phase: phaseOffset
   });
 }
 
 function buildCastleKeepAndIsland(parentGroup, wallRadius) {
+  const sandTex = createIslandSandTexture();
+  const stoneTex = createStoneWallTexture();
+
   const stoneMainMat = new THREE.MeshStandardMaterial({
-    color: 0x57534e,
+    map: stoneTex,
+    color: 0x6b645c,
     roughness: 0.82,
-    metalness: 0.14,
+    metalness: 0.16,
     depthWrite: true,
     depthTest: true
   });
   const stoneTrimMat = new THREE.MeshStandardMaterial({
-    color: 0x78716c,
-    roughness: 0.75,
-    metalness: 0.2,
+    map: stoneTex,
+    color: 0x8a8177,
+    roughness: 0.74,
+    metalness: 0.22,
     depthWrite: true,
     depthTest: true
   });
   const roofDarkMat = new THREE.MeshStandardMaterial({
-    color: 0x292524,
-    roughness: 0.65,
-    metalness: 0.35,
+    color: 0x24211f,
+    roughness: 0.62,
+    metalness: 0.38,
     depthWrite: true,
     depthTest: true
   });
   const sandShoreMat = new THREE.MeshStandardMaterial({
-    color: 0xb59b6d,
+    map: sandTex,
+    color: 0xc2a97e,
     roughness: 0.92,
     metalness: 0.04,
+    transparent: true,
+    opacity: 0.92,
     depthWrite: true,
     depthTest: true
   });
   const islandRockMat = new THREE.MeshStandardMaterial({
-    color: 0x44403c,
-    roughness: 0.88,
+    color: 0x453e37,
+    roughness: 0.9,
     metalness: 0.1,
     depthWrite: true,
     depthTest: true
@@ -1810,22 +1890,23 @@ function buildCastleKeepAndIsland(parentGroup, wallRadius) {
 
   const keepBaseY = SHIP_Y_POS - 62;
 
-  const sandShoal = new THREE.Mesh(
-    new THREE.CylinderGeometry(wallRadius * 0.96, wallRadius * 1.02, 8, 36),
+  const naturalIslandDisc = new THREE.Mesh(
+    new THREE.CircleGeometry(92, 32),
     sandShoreMat
   );
-  sandShoal.position.set(0, keepBaseY - 12, 0);
-  parentGroup.add(sandShoal);
+  naturalIslandDisc.rotation.x = -Math.PI / 2;
+  naturalIslandDisc.position.set(0, keepBaseY - 11, 0);
+  parentGroup.add(naturalIslandDisc);
 
   const centralIsland = new THREE.Mesh(
-    new THREE.CylinderGeometry(58, 76, 18, 24),
+    new THREE.CylinderGeometry(64, 86, 18, 28),
     islandRockMat
   );
   centralIsland.position.set(0, keepBaseY - 4, 0);
   parentGroup.add(centralIsland);
 
   const centralSandPad = new THREE.Mesh(
-    new THREE.CylinderGeometry(52, 56, 4, 24),
+    new THREE.CylinderGeometry(58, 66, 4, 28),
     sandShoreMat
   );
   centralSandPad.position.set(0, keepBaseY + 5, 0);
@@ -1834,47 +1915,56 @@ function buildCastleKeepAndIsland(parentGroup, wallRadius) {
   const citadelGroup = new THREE.Group();
   citadelGroup.position.set(0, keepBaseY + 6, 0);
 
-  const lowerHall = new THREE.Mesh(new THREE.BoxGeometry(46, 22, 38), stoneMainMat);
-  lowerHall.position.set(0, 11, 0);
+  const lowerHall = new THREE.Mesh(new THREE.BoxGeometry(58, 28, 48), stoneMainMat);
+  lowerHall.position.set(0, 14, 0);
   citadelGroup.add(lowerHall);
 
-  const upperKeep = new THREE.Mesh(new THREE.BoxGeometry(30, 20, 26), stoneTrimMat);
-  upperKeep.position.set(0, 32, -2);
-  citadelGroup.add(upperKeep);
-
-  const mainRoof = new THREE.Mesh(new THREE.ConeGeometry(24, 16, 4), roofDarkMat);
-  mainRoof.position.set(0, 50, -2);
-  mainRoof.rotation.y = Math.PI / 4;
-  citadelGroup.add(mainRoof);
-
-  const lowerRoof = new THREE.Mesh(new THREE.ConeGeometry(34, 10, 4), roofDarkMat);
-  lowerRoof.position.set(0, 27, 0);
+  const lowerRoof = new THREE.Mesh(new THREE.ConeGeometry(44, 13, 4), roofDarkMat);
+  lowerRoof.position.set(0, 34.5, 0);
   lowerRoof.rotation.y = Math.PI / 4;
   citadelGroup.add(lowerRoof);
 
+  const upperKeep = new THREE.Mesh(new THREE.BoxGeometry(38, 26, 32), stoneTrimMat);
+  upperKeep.position.set(0, 41, -2);
+  citadelGroup.add(upperKeep);
+
+  const mainRoof = new THREE.Mesh(new THREE.ConeGeometry(31, 22, 4), roofDarkMat);
+  mainRoof.position.set(0, 65, -2);
+  mainRoof.rotation.y = Math.PI / 4;
+  citadelGroup.add(mainRoof);
+
+  const spire = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 3.2, 16, 8), roofDarkMat);
+  spire.position.set(0, 81, -2);
+  citadelGroup.add(spire);
+
   const towerPositions = [
-    [-22, -18], [22, -18], [-22, 18], [22, 18]
+    [-28, -22], [28, -22], [-28, 22], [28, 22], [0, -25]
   ];
-  towerPositions.forEach(([tx, tz]) => {
-    const tBody = new THREE.Mesh(new THREE.CylinderGeometry(5.5, 6.6, 36, 12), stoneMainMat);
-    tBody.position.set(tx, 18, tz);
+  towerPositions.forEach(([tx, tz], idx) => {
+    const h = idx === 4 ? 54 : 44;
+    const tBody = new THREE.Mesh(new THREE.CylinderGeometry(6.5, 8.0, h, 12), stoneMainMat);
+    tBody.position.set(tx, h * 0.5, tz);
     citadelGroup.add(tBody);
 
-    const tCap = new THREE.Mesh(new THREE.ConeGeometry(7.2, 11, 12), roofDarkMat);
-    tCap.position.set(tx, 41.5, tz);
+    const tCap = new THREE.Mesh(new THREE.ConeGeometry(8.8, 14, 12), roofDarkMat);
+    tCap.position.set(tx, h + 7, tz);
     citadelGroup.add(tCap);
   });
 
-  const gateArch = new THREE.Mesh(new THREE.BoxGeometry(14, 14, 8), stoneTrimMat);
-  gateArch.position.set(0, 7, 19);
+  const gateArch = new THREE.Mesh(new THREE.BoxGeometry(18, 18, 10), stoneTrimMat);
+  gateArch.position.set(0, 9, 24);
   citadelGroup.add(gateArch);
+
+  const gateDoor = new THREE.Mesh(new THREE.BoxGeometry(10, 13, 11), roofDarkMat);
+  gateDoor.position.set(0, 6.5, 24.5);
+  citadelGroup.add(gateDoor);
 
   parentGroup.add(citadelGroup);
 
-  addCastleFlameCluster(parentGroup, 0, keepBaseY + 66, -2, 1.35, 0.0);
-  addCastleFlameCluster(parentGroup, 95, keepBaseY + 12, 55, 1.25, 1.7);
-  addCastleFlameCluster(parentGroup, -110, keepBaseY + 12, 95, 1.15, 3.1);
-  addCastleFlameCluster(parentGroup, 145, keepBaseY + 12, -115, 1.1, 4.4);
+  addCastleFlameCluster(parentGroup, 0, keepBaseY + 94, -2, 1.85, 0.0);
+  addCastleFlameCluster(parentGroup, 105, keepBaseY + 14, 65, 1.35, 1.7);
+  addCastleFlameCluster(parentGroup, -120, keepBaseY + 14, 105, 1.25, 3.1);
+  addCastleFlameCluster(parentGroup, 155, keepBaseY + 14, -125, 1.2, 4.4);
 }
 
 function spawnDefenseTowersRing() {
@@ -1897,15 +1987,25 @@ function spawnDefenseTowersRing() {
 
   const wallRadius = WALL_RADIUS; 
   const wallSegments = 20;
+  const wallStoneTex = createStoneWallTexture();
   
   const wallMat = new THREE.MeshStandardMaterial({ 
-    color: 0x475569, 
-    roughness: 0.6, 
-    metalness: 0.3,
+    map: wallStoneTex,
+    color: 0x626a73, 
+    roughness: 0.68, 
+    metalness: 0.28,
     depthWrite: true,
     depthTest: true
   });
   wallMat.renderOrder = 0;
+
+  const merlonMat = new THREE.MeshStandardMaterial({
+    color: 0x3f464e,
+    roughness: 0.72,
+    metalness: 0.32,
+    depthWrite: true,
+    depthTest: true
+  });
   
   for (let i = 0; i < wallSegments; i++) {
     const angle = (i / wallSegments) * Math.PI * 2;
@@ -1916,8 +2016,8 @@ function spawnDefenseTowersRing() {
       continue;
     }
     
-    const segmentWidth = (2 * Math.PI * wallRadius) / wallSegments * 1.05;
-    const wallSegGeo = new THREE.BoxGeometry(segmentWidth, 40, 24);
+    const segmentWidth = (2 * Math.PI * wallRadius) / wallSegments * 1.06;
+    const wallSegGeo = new THREE.BoxGeometry(segmentWidth, 42, 26);
     const wallSegMesh = new THREE.Mesh(wallSegGeo, wallMat);
     wallSegMesh.renderOrder = 0;
     
@@ -1927,6 +2027,20 @@ function spawnDefenseTowersRing() {
     wallSegMesh.position.set(wx, SHIP_Y_POS - 60, wz);
     wallSegMesh.rotation.y = -midAngle + Math.PI / 2;
     defenseIslandGroup.add(wallSegMesh);
+
+    [-0.26, 0.26].forEach((offsetRatio) => {
+      const merlon = new THREE.Mesh(new THREE.BoxGeometry(segmentWidth * 0.22, 10, 28), merlonMat);
+      const mLocalX = segmentWidth * offsetRatio;
+      const cosA = Math.cos(-midAngle + Math.PI / 2);
+      const sinA = Math.sin(-midAngle + Math.PI / 2);
+      merlon.position.set(
+        wx + mLocalX * cosA,
+        SHIP_Y_POS - 36,
+        wz - mLocalX * sinA
+      );
+      merlon.rotation.y = -midAngle + Math.PI / 2;
+      defenseIslandGroup.add(merlon);
+    });
 
     wallCollisionBoxes.push({ x: wx, z: wz, radius: segmentWidth / 2 + 6 });
   }
